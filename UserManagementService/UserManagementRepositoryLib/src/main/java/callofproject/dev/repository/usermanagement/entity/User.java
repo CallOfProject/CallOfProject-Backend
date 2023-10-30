@@ -30,7 +30,7 @@ public class User
     @Column(name = "birthdate", nullable = false)
     private LocalDate birthDate;
     @Column(name = "creation_date", nullable = false)
-    private LocalDate creationDate;
+    private LocalDate creationDate = LocalDate.now();
 
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "userId")

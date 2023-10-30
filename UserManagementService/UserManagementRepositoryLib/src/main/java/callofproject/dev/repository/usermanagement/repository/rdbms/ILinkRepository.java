@@ -5,7 +5,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
+import static callofproject.dev.repository.usermanagement.BeanName.LINK_REPOSITORY_BEAN;
+
+@Repository(LINK_REPOSITORY_BEAN)
 @Lazy
 public interface ILinkRepository extends CrudRepository<Link, Long>
 {

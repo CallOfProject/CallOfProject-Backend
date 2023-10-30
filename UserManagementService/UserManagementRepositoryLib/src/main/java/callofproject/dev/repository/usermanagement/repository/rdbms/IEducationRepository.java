@@ -6,7 +6,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
-@Repository
+
+import static callofproject.dev.repository.usermanagement.BeanName.EDUCATION_REPOSITORY_BEAN;
+
+@Repository(EDUCATION_REPOSITORY_BEAN)
 @Lazy
 public interface IEducationRepository extends CrudRepository<Education, UUID>
 {

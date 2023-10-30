@@ -6,7 +6,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
-@Repository
+
+import static callofproject.dev.repository.usermanagement.BeanName.EXPERIENCE_REPOSITORY_BEAN;
+
+@Repository(EXPERIENCE_REPOSITORY_BEAN)
 @Lazy
 public interface IExperienceRepository extends CrudRepository<Experience, UUID>
 {
