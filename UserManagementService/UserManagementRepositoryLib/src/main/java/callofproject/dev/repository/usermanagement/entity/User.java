@@ -1,13 +1,16 @@
 package callofproject.dev.repository.usermanagement.entity;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.UUID;
 
 @Entity
 @Table(name = "cop_user")
-public class User
+public class User implements UserDetails
 {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -64,9 +67,34 @@ public class User
         middleName = "";
     }
 
+    @Override
     public String getUsername()
     {
         return username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled()
+    {
+        return false;
     }
 
     public void setUsername(String username)
@@ -122,6 +150,12 @@ public class User
     public void setEmail(String email)
     {
         this.email = email;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities()
+    {
+        return null;
     }
 
     public String getPassword()
