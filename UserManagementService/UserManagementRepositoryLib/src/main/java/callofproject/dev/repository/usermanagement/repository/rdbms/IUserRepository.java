@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static callofproject.dev.repository.usermanagement.BeanName.USER_REPOSITORY_BEAN;
@@ -13,4 +14,5 @@ import static callofproject.dev.repository.usermanagement.BeanName.USER_REPOSITO
 @Lazy
 public interface IUserRepository extends CrudRepository<User, UUID>
 {
+    Optional<User> findByEmail(String email);
 }

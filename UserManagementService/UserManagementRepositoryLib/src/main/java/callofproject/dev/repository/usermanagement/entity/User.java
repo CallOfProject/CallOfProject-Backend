@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user")
+@Table(name = "cop_user")
 public class User
 {
     @Id
@@ -22,6 +22,8 @@ public class User
     @Column(name = "last_name", length = 80, nullable = false)
     private String lastName;
 
+    @Column(name = "username", length = 80, nullable = false, unique = true)
+    private String username;
     @Column(name = "email", length = 100, nullable = false, unique = true)
     private String email;
     @Column(name = "password", nullable = false)
@@ -40,14 +42,36 @@ public class User
     {
     }
 
-    public User(String firstName, String middleName, String lastName, String email, String password, LocalDate birthDate)
+    public User(String username, String firstName, String middleName, String lastName, String email, String password, LocalDate birthDate)
     {
+        this.username = username;
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.birthDate = birthDate;
+    }
+
+    public User(String username, String firstName, String lastName, String email, String password, LocalDate birthDate)
+    {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.birthDate = birthDate;
+        middleName = "";
+    }
+
+    public String getUsername()
+    {
+        return username;
+    }
+
+    public void setUsername(String username)
+    {
+        this.username = username;
     }
 
     public UUID getUserId()

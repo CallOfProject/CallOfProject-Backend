@@ -15,5 +15,4 @@ public class BeanName
     public static final String COURSE_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.course";
     public static final String EXPERIENCE_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.experience";
     public static final String LINK_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.link";
-
 }

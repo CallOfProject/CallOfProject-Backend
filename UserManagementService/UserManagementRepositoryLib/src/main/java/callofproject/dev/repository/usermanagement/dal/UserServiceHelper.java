@@ -23,6 +23,11 @@ public class UserServiceHelper
         m_userRepository = userRepository;
     }
 
+    public Iterable<User> saveAll(Iterable<User> users)
+    {
+        return m_userRepository.saveAll(users);
+    }
+
     public User saveUser(User user)
     {
         return m_userRepository.save(user);
@@ -46,5 +51,9 @@ public class UserServiceHelper
     public Iterable<User> findAll()
     {
         return m_userRepository.findAll();
+    }
+    public Optional<User> findByEmail(String email)
+    {
+        return m_userRepository.findByEmail(email);
     }
 }
