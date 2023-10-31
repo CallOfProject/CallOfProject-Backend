@@ -5,21 +5,20 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ComponentScans;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+import static callofproject.dev.usermanagement.Util.BASE_PACKAGE;
+import static callofproject.dev.usermanagement.Util.REPO_PACKAGE;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@ComponentScan(basePackages = {"callofproject.dev.repository", "callofproject.dev.usermanagement"})
-@EnableJpaRepositories(basePackages = "callofproject.dev.repository")
-@EntityScan(basePackages = "callofproject.dev.repository")
+@ComponentScan(basePackages = {REPO_PACKAGE, BASE_PACKAGE})
+@EnableJpaRepositories(basePackages = REPO_PACKAGE)
+@EntityScan(basePackages = REPO_PACKAGE)
 public class UserManagementApplication
 {
-
-
     public static void main(String[] args)
     {
         SpringApplication.run(UserManagementApplication.class, args);
     }
-
 }

@@ -16,13 +16,14 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
+import static callofproject.dev.usermanagement.Util.*;
 import static java.nio.file.Files.delete;
 import static java.time.LocalDate.now;
 
 @SpringBootTest
-@EntityScan(basePackages = "callofproject.dev.repository")
-@ComponentScan(basePackages = {"callofproject.dev.repository", "callofproject.dev.usermanagement"})
-@TestPropertySource(locations = "classpath:application-test.properties")
+@EntityScan(basePackages = REPO_PACKAGE)
+@ComponentScan(basePackages = {BASE_PACKAGE, REPO_PACKAGE})
+@TestPropertySource(locations = TEST_PROPERTIES_FILE)
 //@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class UserRepositoryTest
 {
@@ -33,7 +34,7 @@ public class UserRepositoryTest
     @AfterAll
     static void cleanData() throws IOException
     {
-        delete(Path.of("test_data/callofproject_usermanagement_test_db.mv.db"));
+        delete(Path.of(TEST_DB_PATH));
     }
 
     @Test
