@@ -20,6 +20,8 @@ public class UserRate
 
     public UserRate()
     {
+        userRate = 0.0;
+        userFeedbackRate = 0.0;
     }
 
     public UUID getRate_id()

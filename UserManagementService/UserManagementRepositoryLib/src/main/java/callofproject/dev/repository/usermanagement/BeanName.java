@@ -8,6 +8,7 @@ public class BeanName
     public static final String COURSE_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.course";
     public static final String LINK_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.link";
     public static final String EXPERIENCE_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.experience";
+    public static final String UNIVERSITY_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.university";
     public static final String USER_MANAGEMENT_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.usermanagement";
     public static final String USER_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.user";
     public static final String USER_PROFILE_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.userprofile";

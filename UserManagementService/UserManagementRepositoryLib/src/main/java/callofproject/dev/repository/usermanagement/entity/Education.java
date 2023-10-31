@@ -14,6 +14,8 @@ public class Education
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "education_id")
     private UUID education_id;
+    @Column(name = "university_id", nullable = false)
+    private long universityId;
     @Column(name = "school_name", nullable = false, length = 80)
     private String schoolName;
     @Column(name = "department", nullable = false, length = 80)
@@ -34,6 +36,28 @@ public class Education
 
     public Education()
     {
+    }
+
+
+    public Education(long universityId, String schoolName, String department, String description, LocalDate startDate, LocalDate finishDate, boolean isContinue)
+    {
+        this.universityId = universityId;
+        this.schoolName = schoolName;
+        this.department = department;
+        this.description = description;
+        this.startDate = startDate;
+        this.finishDate = finishDate;
+        this.isContinue = isContinue;
+    }
+
+    public long getUniversityId()
+    {
+        return universityId;
+    }
+
+    public void setUniversityId(long universityId)
+    {
+        this.universityId = universityId;
     }
 
     public UUID getEducation_id()

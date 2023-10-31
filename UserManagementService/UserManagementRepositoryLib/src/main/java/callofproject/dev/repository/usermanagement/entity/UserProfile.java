@@ -2,6 +2,7 @@ package callofproject.dev.repository.usermanagement.entity;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -39,17 +40,26 @@ public class UserProfile
     private Set<Course> courseList;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_profiles_to_experience", joinColumns = @JoinColumn(name = "user_profile_id", referencedColumnName = "user_profile_id", nullable = false),
+    @JoinTable(name = "user_profiles_to_experience",
+            joinColumns = @JoinColumn(name = "user_profile_id", referencedColumnName = "user_profile_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "experience_id", referencedColumnName = "experience_id", nullable = false))
     private Set<Experience> experienceList;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_profiles_to_link", joinColumns = @JoinColumn(name = "user_profile_id", referencedColumnName = "user_profile_id", nullable = false),
+    @JoinTable(name = "user_profiles_to_link",
+            joinColumns = @JoinColumn(name = "user_profile_id", referencedColumnName = "user_profile_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "link_id", referencedColumnName = "link_id", nullable = false))
     private Set<Link> linkList;
 
     public UserProfile()
     {
+    }
+
+    public UserProfile(String cv, String profilePhoto, String aboutMe)
+    {
+        this.cv = cv;
+        this.profilePhoto = profilePhoto;
+        this.aboutMe = aboutMe;
     }
 
     public UUID getUserProfileId()
@@ -150,5 +160,13 @@ public class UserProfile
     public void setLinkList(Set<Link> linkList)
     {
         this.linkList = linkList;
+    }
+
+    public void addEducation(Education education)
+    {
+        if (educationList == null)
+            educationList = new HashSet<>();
+
+        educationList.add(education);
     }
 }

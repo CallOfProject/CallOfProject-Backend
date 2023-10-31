@@ -1,7 +1,15 @@
 package callofproject.dev.usermanagement;
 
+import callofproject.dev.repository.usermanagement.entity.Education;
+import callofproject.dev.repository.usermanagement.entity.User;
+import callofproject.dev.repository.usermanagement.entity.UserProfile;
+import callofproject.dev.repository.usermanagement.entity.UserRate;
 import callofproject.dev.repository.usermanagement.entity.nosql.MatchDB;
 import callofproject.dev.repository.usermanagement.repository.nosql.IMatchDbRepository;
+import callofproject.dev.repository.usermanagement.repository.rdbms.IEducationRepository;
+import callofproject.dev.repository.usermanagement.repository.rdbms.IUniversityRepository;
+import callofproject.dev.repository.usermanagement.repository.rdbms.IUserProfileRepository;
+import callofproject.dev.repository.usermanagement.repository.rdbms.IUserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,6 +19,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import static callofproject.dev.usermanagement.Util.BASE_PACKAGE;
@@ -25,10 +34,19 @@ import static callofproject.dev.usermanagement.Util.REPO_PACKAGE;
 public class UserManagementApplication implements CommandLineRunner
 {
     private final IMatchDbRepository m_repository;
+    private final IEducationRepository m_educationRepository;
+    private final IUniversityRepository m_universityRepository;
+    private final IUserRepository m_userRepository;
 
-    public UserManagementApplication(IMatchDbRepository repository)
+    private final IUserProfileRepository m_userProfileRepository;
+
+    public UserManagementApplication(IMatchDbRepository repository, IEducationRepository educationRepository, IUniversityRepository universityRepository, IUserRepository userRepository, IUserProfileRepository userProfileRepository)
     {
         m_repository = repository;
+        m_educationRepository = educationRepository;
+        m_universityRepository = universityRepository;
+        m_userRepository = userRepository;
+        m_userProfileRepository = userProfileRepository;
     }
 
     public static void main(String[] args)
@@ -39,9 +57,29 @@ public class UserManagementApplication implements CommandLineRunner
     @Override
     public void run(String... args) throws Exception
     {
-        //m_repository.insert(new MatchDB(UUID.randomUUID(),UUID.randomUUID(),"DENEME", "DENEME"));
+        /*var school = m_universityRepository.findByUniversityName("YAŞAR ÜNİVERSİTESİ");
+
+        var user = new User("nuricanodzturk", "Nuri", "Can", "ÖZTÜRK", "cand@mail.com", "123", LocalDate.now());
+
+        var profile = new UserProfile("no_cv", "image.png", "no");
+        user.setUserProfile(profile);
+
+        var education = new Education(school.get().getUniversityId(), school.get().getUniversityName(),
+                "Engineering", "", LocalDate.now(), LocalDate.now().plusYears(4), true);
+
+        profile.addEducation(education);
+        m_userRepository.save(user);*/
+
+        var school = m_universityRepository.findByUniversityName("YAŞAR ÜNİVERSİTESİ");
+        var user = m_userRepository.findByEmail("cand@mail.com").get();
+        m_repository.save(new MatchDB(user.getUserId(), school.get().getUniversityId(), UUID.randomUUID(), UUID.randomUUID()));
+        m_repository.findAll().stream().map(MatchDB::getSchoolId).forEach(System.out::println);
+
+       /* var school1 = new Education("Yasar University", "Engineering", "", now(), now());
+        var school2 = new Education("Ege University", "Engineering", "", now(), now());
+        var course = new Course();
         m_repository.save(new MatchDB(UUID.randomUUID(), "Yasar University", "CSD Java"));
 
-        m_repository.findAll().stream().map(MatchDB::getSchoolName).forEach(System.out::println);
+        m_repository.findAll().stream().map(MatchDB::getSchoolName).forEach(System.out::println);*/
     }
 }

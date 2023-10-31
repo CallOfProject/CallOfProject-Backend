@@ -1,5 +1,6 @@
 package callofproject.dev.repository.usermanagement.entity.nosql;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,28 +14,36 @@ public class MatchDB
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "match_id")
     private UUID matchId;
+    @Column(name = "user_id")
     private UUID userID;
-    private String schoolName;
-    private String CourseName;
+    @Column(name = "school_id")
+    private long schoolId;
+    @Column(name = "course_id")
+    private UUID courseId;
+    @Column(name = "experience_id")
+    private UUID experienceId;
 
     public MatchDB()
     {
     }
 
-    public MatchDB(UUID matchId, UUID userID, String schoolName, String courseName)
+    public MatchDB(UUID matchId, UUID userID, long schoolId, UUID courseId, UUID experienceId)
     {
         this.matchId = matchId;
         this.userID = userID;
-        this.schoolName = schoolName;
-        CourseName = courseName;
+        this.schoolId = schoolId;
+        this.courseId = courseId;
+        this.experienceId = experienceId;
     }
 
-    public MatchDB(UUID userID, String schoolName, String courseName)
+    public MatchDB(UUID userID, long schoolId, UUID courseId, UUID experienceId)
     {
         this.userID = userID;
-        this.schoolName = schoolName;
-        CourseName = courseName;
+        this.schoolId = schoolId;
+        this.courseId = courseId;
+        this.experienceId = experienceId;
     }
 
     public UUID getMatchId()
@@ -57,23 +66,33 @@ public class MatchDB
         this.userID = userID;
     }
 
-    public String getSchoolName()
+    public long getSchoolId()
     {
-        return schoolName;
+        return schoolId;
     }
 
-    public void setSchoolName(String schoolName)
+    public void setSchoolId(long schoolId)
     {
-        this.schoolName = schoolName;
+        this.schoolId = schoolId;
     }
 
-    public String getCourseName()
+    public UUID getCourseId()
     {
-        return CourseName;
+        return courseId;
     }
 
-    public void setCourseName(String courseName)
+    public void setCourseId(UUID courseId)
     {
-        CourseName = courseName;
+        this.courseId = courseId;
+    }
+
+    public UUID getExperienceId()
+    {
+        return experienceId;
+    }
+
+    public void setExperienceId(UUID experienceId)
+    {
+        this.experienceId = experienceId;
     }
 }
