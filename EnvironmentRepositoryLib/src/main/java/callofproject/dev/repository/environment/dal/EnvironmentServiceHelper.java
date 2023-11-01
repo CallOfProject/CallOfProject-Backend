@@ -112,4 +112,9 @@ public class EnvironmentServiceHelper
     {
         return m_courseOrganizatorRepository.findAllById(ids);
     }
+
+    public Iterable<University> findAllByUniversityNameContainingIgnoreCase(String name)
+    {
+        return m_universityRepository.findAllByUniversityNameContainingIgnoreCase(name);
+    }
 }

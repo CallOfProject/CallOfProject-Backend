@@ -3,7 +3,7 @@ package callofproject.dev.repository.environment.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "company", schema = "cop_environment_db")
+@Table(name = "company")
 public class Company
 {
     @Id

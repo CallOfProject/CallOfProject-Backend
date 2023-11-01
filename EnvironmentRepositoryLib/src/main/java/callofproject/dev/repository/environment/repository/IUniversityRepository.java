@@ -14,4 +14,5 @@ import static callofproject.dev.repository.environment.BeanName.UNIVERSITY_REPOS
 public interface IUniversityRepository extends CrudRepository<University, Long>
 {
     Optional<University> findByUniversityName(String universityName);
+    Iterable<University> findAllByUniversityNameContainingIgnoreCase(String name);
 }

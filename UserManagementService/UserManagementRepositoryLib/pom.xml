@@ -20,11 +20,6 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>callofproject.dev</groupId>
-            <artifactId>EnvironmentRepositoryLib</artifactId>
-            <version>1.0.0</version>
-        </dependency>
     </dependencies>
 
     <build>
