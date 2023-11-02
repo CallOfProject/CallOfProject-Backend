@@ -15,11 +15,14 @@ public class RegisterRequest
     private String m_middleName;
     @JsonProperty("username")
     private String m_username;
-    @JsonProperty("email")
     private String email;
     private String password;
     @JsonProperty("birth_date")
     private LocalDate m_birthDate;
+
+    public RegisterRequest()
+    {
+    }
 
     public RegisterRequest(String firstName, String lastName, String middleName, String username, String email, String password, LocalDate birthDate)
     {

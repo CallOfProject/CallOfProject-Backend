@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("auth")
+@RequestMapping("api/v1/auth")
 public class AuthenticationController
 {
     private final AuthenticationService service;
@@ -24,6 +24,11 @@ public class AuthenticationController
         this.service = service;
     }
 
+    @GetMapping("deneme")
+    public String a()
+    {
+        return "AAA";
+    }
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request)
     {
