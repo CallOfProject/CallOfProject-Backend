@@ -1,6 +1,8 @@
 package callofproject.dev.authentication.config;
 
+import callofproject.dev.repository.usermanagement.BeanName;
 import callofproject.dev.repository.usermanagement.repository.rdbms.IUserRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,7 +19,8 @@ public class ApplicationConfig
 {
     private final IUserRepository m_userRepository;
 
-    public ApplicationConfig(IUserRepository userRepository)
+
+    public ApplicationConfig(@Qualifier(BeanName.USER_REPOSITORY_BEAN) IUserRepository userRepository)
     {
         m_userRepository = userRepository;
     }
@@ -36,6 +39,7 @@ public class ApplicationConfig
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception

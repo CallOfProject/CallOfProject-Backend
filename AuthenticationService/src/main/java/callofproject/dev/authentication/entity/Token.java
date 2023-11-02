@@ -1,26 +1,30 @@
 package callofproject.dev.authentication.entity;
 
-import callofproject.dev.repository.usermanagement.entity.User;
 import jakarta.persistence.*;
 
 import java.util.UUID;
 
 @Entity
+@Table(name = "token")
 public class Token
 {
 
     @Id
-    @GeneratedValue
-    public Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public long id;
     @Column(name = "user_id")
     public UUID userId;
 
-    @Column(unique = true)
     public String token;
 
     public boolean revoked;
 
     public boolean expired;
+
+    public Token()
+    {
+
+    }
 
     public Token(String token, boolean revoked, boolean expired)
     {
@@ -76,7 +80,8 @@ public class Token
     {
         this.expired = expired;
     }
-    /*    @ManyToOne(fetch = FetchType.LAZY)
+
+   /* @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     public User user;*/
 }

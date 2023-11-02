@@ -3,10 +3,12 @@ package callofproject.dev.repository.environment.dto;
 public class UniversityDTO
 {
     private String universityName;
+    private long universityId;
 
-    public UniversityDTO(String universityName)
+    public UniversityDTO(String universityName, long universityId)
     {
         this.universityName = universityName.toUpperCase();
+        this.universityId = universityId;
     }
 
     public String getUniversityName()
@@ -14,5 +16,9 @@ public class UniversityDTO
         return universityName;
     }
 
+    public long getUniversityId()
+    {
+        return universityId;
+    }
 
 }

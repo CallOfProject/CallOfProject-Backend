@@ -1,5 +1,6 @@
 package callofproject.dev.repository.environment.repository;
 
+import callofproject.dev.repository.environment.entity.Company;
 import callofproject.dev.repository.environment.entity.CourseOrganizator;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.repository.CrudRepository;
@@ -14,4 +15,5 @@ import static callofproject.dev.repository.environment.BeanName.COURSE_REPOSITOR
 public interface ICourseOrganizatorRepository extends CrudRepository<CourseOrganizator, Long>
 {
     Optional<CourseOrganizator> findByOrganizatorName(String organizatorName);
+    Iterable<CourseOrganizator> findAllByOrganizatorNameContainsIgnoreCase(String name);
 }

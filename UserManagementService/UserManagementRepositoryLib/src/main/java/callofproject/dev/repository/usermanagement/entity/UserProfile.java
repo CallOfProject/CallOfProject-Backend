@@ -30,7 +30,8 @@ public class UserProfile
     private UserRate userRate;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_profiles_to_education", joinColumns = @JoinColumn(name = "user_profile_id", referencedColumnName = "user_profile_id", nullable = false),
+    @JoinTable(name = "user_profiles_to_education",
+            joinColumns = @JoinColumn(name = "user_profile_id", referencedColumnName = "user_profile_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "education_id", referencedColumnName = "education_id", nullable = false))
     private Set<Education> educationList;
 

@@ -60,4 +60,17 @@ public class EnvironmentController
     {
         return ok(m_environmentService.findAllByUniversityNameContainingIgnoreCase(name));
     }
+
+    @GetMapping("find/company/all/contains")
+    public ResponseEntity<Object> findAllCompaniesContains(@RequestParam("n") String name)
+    {
+        return ok(m_environmentService.findAllByCompanyNameContainingIgnoreCase(name));
+    }
+
+
+    @GetMapping("find/course-organizators/all/contains")
+    public ResponseEntity<Object> findAllCourseOrganizatorsContains(@RequestParam("n") String name)
+    {
+        return ok(m_environmentService.findAllByCourseOrganizatorsNameContainingIgnoreCase(name));
+    }
 }

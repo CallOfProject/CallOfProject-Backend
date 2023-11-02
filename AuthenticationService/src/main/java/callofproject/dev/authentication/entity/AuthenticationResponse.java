@@ -15,6 +15,7 @@ public class AuthenticationResponse {
     this.refreshToken = refreshToken;
   }
 
+
   public String getAccessToken()
   {
     return accessToken;

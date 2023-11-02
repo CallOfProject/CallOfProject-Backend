@@ -1,11 +1,14 @@
 package callofproject.dev.repository.usermanagement.entity;
 
+
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -41,11 +44,30 @@ public class User implements UserDetails
     @JoinColumn(name = "userId")
     private UserProfile userProfile;
 
+    @Column(name = "is_account_expired")
+    private boolean isAccountExpired = true;
+
+    @Column(name = "is_account_blocked")
+    private boolean isAccountBlocked = false;
+
+    @Column(name = "is_enabled")
+    private boolean isEnabled = true;
+
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "role_id")
+    )
+    private Set<Role> roles;
+
+
     public User()
     {
     }
 
-    public User(String username, String firstName, String middleName, String lastName, String email, String password, LocalDate birthDate)
+    public User(String username, String firstName, String middleName, String lastName,
+                String email, String password, LocalDate birthDate, Role role)
     {
         this.username = username;
         this.firstName = firstName;
@@ -54,6 +76,9 @@ public class User implements UserDetails
         this.email = email;
         this.password = password;
         this.birthDate = birthDate;
+        if (roles == null)
+            roles = new HashSet<>();
+        roles.add(role);
     }
 
     public User(String username, String firstName, String lastName, String email, String password, LocalDate birthDate)
@@ -76,13 +101,13 @@ public class User implements UserDetails
     @Override
     public boolean isAccountNonExpired()
     {
-        return false;
+        return !isAccountExpired;
     }
 
     @Override
     public boolean isAccountNonLocked()
     {
-        return false;
+        return !isAccountBlocked;
     }
 
     @Override
@@ -94,7 +119,22 @@ public class User implements UserDetails
     @Override
     public boolean isEnabled()
     {
-        return false;
+        return isEnabled;
+    }
+
+    public void setAccountExpired(boolean accountExpired)
+    {
+        isAccountExpired = accountExpired;
+    }
+
+    public void setAccountLocked(boolean accountLocked)
+    {
+        isAccountBlocked = accountLocked;
+    }
+
+    public void setEnabled(boolean enabled)
+    {
+        isEnabled = enabled;
     }
 
     public void setUsername(String username)
@@ -193,8 +233,19 @@ public class User implements UserDetails
         return userProfile;
     }
 
+    public Set<Role> getRoles()
+    {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles)
+    {
+        this.roles = roles;
+    }
+
     public void setUserProfile(UserProfile userProfile)
     {
         this.userProfile = userProfile;
     }
+
 }

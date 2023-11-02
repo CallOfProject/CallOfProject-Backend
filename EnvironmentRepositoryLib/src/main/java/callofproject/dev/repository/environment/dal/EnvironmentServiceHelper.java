@@ -117,4 +117,14 @@ public class EnvironmentServiceHelper
     {
         return m_universityRepository.findAllByUniversityNameContainingIgnoreCase(name);
     }
+
+    public Iterable<Company> findAllByCompanyNameContainingIgnoreCase(String name)
+    {
+        return m_companyRepository.findAllByCompanyNameContainingIgnoreCase(name);
+    }
+
+    public Iterable<CourseOrganizator> findAllByCourseOrganizatorNameContainingIgnoreCase(String name)
+    {
+        return m_courseOrganizatorRepository.findAllByOrganizatorNameContainsIgnoreCase(name);
+    }
 }

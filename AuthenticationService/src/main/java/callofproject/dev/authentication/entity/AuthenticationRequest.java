@@ -1,8 +1,6 @@
 package callofproject.dev.authentication.entity;
 
-public record AuthenticationRequest(String email, String password) {
-
-
-
+public record AuthenticationRequest(String username, String password)
+{
 
 }

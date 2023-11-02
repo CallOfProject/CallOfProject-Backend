@@ -143,6 +143,20 @@ public class EnvironmentService
     public UniversitiesDTO findAllByUniversityNameContainingIgnoreCase(String name)
     {
         var universites = m_serviceHelper.findAllByUniversityNameContainingIgnoreCase(name);
-        return m_universityMapper.toUniversitiesDTO(stream(universites.spliterator(), false).map(m_universityMapper::toUniversityDTO).toList());
+        return m_universityMapper.toUniversitiesDTO(stream(universites.spliterator(), false)
+                .map(m_universityMapper::toUniversityDTO).toList());
+    }
+
+    public CourseOrganizatorsDTO findAllByCourseOrganizatorsNameContainingIgnoreCase(String name)
+    {
+        var organizators = m_serviceHelper.findAllByCourseOrganizatorNameContainingIgnoreCase(name);
+        return m_courseOrganizatorMapper.toCourseOrganizatorsDTO(stream(organizators.spliterator(), false)
+                .map(m_courseOrganizatorMapper::toCourseOrganizatorDTO).toList());
+    }
+
+    public CompaniesDTO findAllByCompanyNameContainingIgnoreCase(String name)
+    {
+        var companies = m_serviceHelper.findAllByCompanyNameContainingIgnoreCase(name);
+        return m_companyMapper.toCompaniesDTO(stream(companies.spliterator(), false).map(m_companyMapper::toCompanyDTO).toList());
     }
 }

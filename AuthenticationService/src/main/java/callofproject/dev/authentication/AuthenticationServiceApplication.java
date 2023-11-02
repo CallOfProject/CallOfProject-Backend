@@ -8,8 +8,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"callofproject.dev.authentication", "callofproject.dev.repository.usermanagement"})
-@EnableJpaRepositories(basePackages = "callofproject.dev.repository.usermanagement")
-@EntityScan(basePackages = "callofproject.dev.repository.usermanagement")
+@EnableJpaRepositories(basePackages = {"callofproject.dev.repository.usermanagement",
+        "callofproject.dev.authentication.repository"})
+@EntityScan(basePackages = {"callofproject.dev.repository.usermanagement", "callofproject.dev.authentication.entity"})
 public class AuthenticationServiceApplication
 {
 
