@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static callofproject.dev.authentication.Util.USER_MANAGEMENT_SERVICE;
+import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
 
 @Configuration
 public class ApplicationConfig

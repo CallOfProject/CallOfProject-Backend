@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ca2328e7-826f-4432-a46e-303df9f01b16" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../AuthenticationService/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../AuthenticationService/.idea/misc.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="AnnotationType" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2XTj3jGkto0jZYEGzYXQma0tQGT" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;17&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/nuricanozturk/CallOfProject/CallOfProject-Backend/UserManagementService&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.idesettings.debugger.capture&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/UserManagement/src/main/resources" />
+      <recent name="$PROJECT_DIR$/UserManagement/src/test/java/callofproject/dev/usermanagement" />
+      <recent name="$PROJECT_DIR$/UserManagementRepositoryLib/src/main/java/callofproject/dev/repository/usermanagement/entity" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="callofproject.dev.repository.usermanagement.repository.rdbms" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Spring Boot.UserManagementApplication">
+    <configuration name="UserManagementApplicationTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="User-Management" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="callofproject.dev.usermanagement.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="callofproject.dev.usermanagement" />
+      <option name="MAIN_CLASS_NAME" value="callofproject.dev.usermanagement.UserManagementApplicationTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserManagementApplicationTests.contextLoads" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="User-Management" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="callofproject.dev.usermanagement.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="callofproject.dev.usermanagement" />
+      <option name="MAIN_CLASS_NAME" value="callofproject.dev.usermanagement.UserManagementApplicationTests" />
+      <option name="METHOD_NAME" value="contextLoads" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserRepositoryTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="User-Management" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="callofproject.dev.usermanagement.test.repository.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="callofproject.dev.usermanagement.test.repository" />
+      <option name="MAIN_CLASS_NAME" value="callofproject.dev.usermanagement.test.repository.UserRepositoryTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserRepositoryTest.saveMultipleUsers_ShouldSucceed" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="User-Management" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="callofproject.dev.usermanagement.test.repository.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="callofproject.dev.usermanagement.test.repository" />
+      <option name="MAIN_CLASS_NAME" value="callofproject.dev.usermanagement.test.repository.UserRepositoryTest" />
+      <option name="METHOD_NAME" value="saveMultipleUsers_ShouldSucceed" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="GenericParenProject" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="GenericParenProject" />
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserManagementApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="User-Management" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="callofproject.dev.usermanagement.UserManagementApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yaml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="docker-compose.yaml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Docker.docker-compose.yaml: Compose Deployment" />
+        <item itemvalue="JUnit.UserRepositoryTest" />
+        <item itemvalue="JUnit.UserRepositoryTest.saveMultipleUsers_ShouldSucceed" />
+        <item itemvalue="JUnit.UserManagementApplicationTests" />
+        <item itemvalue="JUnit.UserManagementApplicationTests.contextLoads" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ca2328e7-826f-4432-a46e-303df9f01b16" name="Changes" comment="" />
+      <created>1698659767287</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1698659767287</updated>
+      <workItem from="1698659768329" duration="6806000" />
+      <workItem from="1698673604027" duration="2991000" />
+      <workItem from="1698683431292" duration="4662000" />
+      <workItem from="1698689165943" duration="7892000" />
+      <workItem from="1698739596842" duration="15164000" />
+      <workItem from="1698764686874" duration="1812000" />
+      <workItem from="1698775175378" duration="9051000" />
+      <workItem from="1698827598186" duration="853000" />
+      <workItem from="1698858348184" duration="2988000" />
+      <workItem from="1698946939469" duration="1887000" />
+      <workItem from="1699087931654" duration="8000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

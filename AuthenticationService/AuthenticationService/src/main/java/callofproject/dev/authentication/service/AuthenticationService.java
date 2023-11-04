@@ -1,9 +1,7 @@
 package callofproject.dev.authentication.service;
 
-import callofproject.dev.authentication.Util;
 import callofproject.dev.library.constant.dto.usermanagement.UserSignUpRequestDTO;
 import callofproject.dev.library.constant.exception.CopServiceException;
-import callofproject.dev.repository.authentication.BeanName;
 import callofproject.dev.repository.authentication.dal.TokenServiceHelper;
 import callofproject.dev.repository.authentication.entity.security.Token;
 import callofproject.dev.authentication.config.JwtService;
@@ -24,8 +22,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-import static callofproject.dev.authentication.Util.AUTHENTICATION_SERVICE;
-import static callofproject.dev.authentication.Util.USER_MANAGEMENT_SERVICE;
+import static callofproject.dev.authentication.util.Util.AUTHENTICATION_SERVICE;
+import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
 import static callofproject.dev.repository.authentication.BeanName.TOKEN_DAL_BEAN;
 
 @Service(AUTHENTICATION_SERVICE)

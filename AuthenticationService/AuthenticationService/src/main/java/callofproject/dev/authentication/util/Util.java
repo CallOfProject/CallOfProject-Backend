@@ -1,4 +1,4 @@
-package callofproject.dev.authentication;
+package callofproject.dev.authentication.util;
 
 public final class Util
 {

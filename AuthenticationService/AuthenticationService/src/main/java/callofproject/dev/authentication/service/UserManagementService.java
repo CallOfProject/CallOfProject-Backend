@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static callofproject.dev.authentication.Util.USER_MANAGEMENT_SERVICE;
+import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
 import static callofproject.dev.repository.authentication.BeanName.USER_MANAGEMENT_DAL_BEAN;
 
 

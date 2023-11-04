@@ -14,8 +14,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-import static callofproject.dev.authentication.Util.BASE_PACKAGE;
-import static callofproject.dev.authentication.Util.REPO_PACKAGE;
+import static callofproject.dev.authentication.util.Util.BASE_PACKAGE;
+import static callofproject.dev.authentication.util.Util.REPO_PACKAGE;
 
 @SpringBootApplication
 @EnableDiscoveryClient
@@ -23,7 +23,7 @@ import static callofproject.dev.authentication.Util.REPO_PACKAGE;
 @EnableJpaRepositories(basePackages = REPO_PACKAGE) // Enable RDBMS ORM entities
 @EnableMongoRepositories(basePackages = REPO_PACKAGE) // Enable NoSQL ORM entities
 @EntityScan(basePackages = REPO_PACKAGE)
-public class UserManagementApplication implements CommandLineRunner
+public class AuthenticationServiceApplication implements CommandLineRunner
 {
     private final IMatchDbRepository m_repository;
     private final IEducationRepository m_educationRepository;
@@ -35,7 +35,7 @@ public class UserManagementApplication implements CommandLineRunner
 
     private final IUserProfileRepository m_userProfileRepository;
 
-    public UserManagementApplication(IMatchDbRepository repository, IEducationRepository educationRepository, IUserRepository userRepository, IUserProfileRepository userProfileRepository)
+    public AuthenticationServiceApplication(IMatchDbRepository repository, IEducationRepository educationRepository, IUserRepository userRepository, IUserProfileRepository userProfileRepository)
     {
         m_repository = repository;
         m_educationRepository = educationRepository;
@@ -45,7 +45,7 @@ public class UserManagementApplication implements CommandLineRunner
 
     public static void main(String[] args)
     {
-        SpringApplication.run(UserManagementApplication.class, args);
+        SpringApplication.run(AuthenticationServiceApplication.class, args);
     }
 
     @Override

@@ -17,7 +17,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import static callofproject.dev.authentication.Util.*;
+import static callofproject.dev.authentication.util.Util.*;
 import static java.nio.file.Files.delete;
 import static java.time.LocalDate.now;
 
