@@ -1,17 +1,10 @@
 package callofproject.dev.repository.environment.dto;
 
-public class CourseOrganizatorDTO
+public record CourseOrganizatorDTO(String courseOrganizatorName)
 {
-    private String courseOrganizatorName;
-
     public CourseOrganizatorDTO(String courseOrganizatorName)
     {
         this.courseOrganizatorName = courseOrganizatorName.toUpperCase();
-    }
-
-    public String getCourseOrganizatorName()
-    {
-        return courseOrganizatorName;
     }
 
 }

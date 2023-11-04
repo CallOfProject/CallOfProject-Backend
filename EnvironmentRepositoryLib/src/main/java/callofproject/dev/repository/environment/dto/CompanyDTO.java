@@ -1,16 +1,9 @@
 package callofproject.dev.repository.environment.dto;
 
-public class CompanyDTO
+public record CompanyDTO(String companyName)
 {
-    private String companyName;
-
     public CompanyDTO(String companyName)
     {
         this.companyName = companyName.toUpperCase();
-    }
-
-    public String getCompanyName()
-    {
-        return companyName;
     }
 }
