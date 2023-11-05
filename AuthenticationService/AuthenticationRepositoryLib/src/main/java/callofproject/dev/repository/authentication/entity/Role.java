@@ -2,6 +2,8 @@ package callofproject.dev.repository.authentication.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "roles")
 public class Role
@@ -12,6 +14,10 @@ public class Role
     private long m_roleId;
     @Column(name = "name")
     private String m_name;
+
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    private Set<User> users;
+
     public Role()
     {
 
@@ -40,5 +46,15 @@ public class Role
     public void setName(String name)
     {
         m_name = name;
+    }
+
+    public Set<User> getUsers()
+    {
+        return users;
+    }
+
+    public void setUsers(Set<User> users)
+    {
+        this.users = users;
     }
 }

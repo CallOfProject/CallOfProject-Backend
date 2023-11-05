@@ -54,7 +54,7 @@ public class User implements UserDetails
     private boolean isEnabled = true;
 
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "role_id")
@@ -64,6 +64,10 @@ public class User implements UserDetails
 
     public User()
     {
+        if (roles == null)
+            roles = new HashSet<>();
+
+        roles.add(new Role("ROLE_USER"));
     }
 
     public User(String username, String firstName, String middleName, String lastName,
@@ -76,8 +80,10 @@ public class User implements UserDetails
         this.email = email;
         this.password = password;
         this.birthDate = birthDate;
+
         if (roles == null)
             roles = new HashSet<>();
+
         roles.add(role);
     }
 
@@ -90,6 +96,11 @@ public class User implements UserDetails
         this.password = password;
         this.birthDate = birthDate;
         middleName = "";
+
+        if (roles == null)
+            roles = new HashSet<>();
+
+        roles.add(new Role("ROLE_USER"));
     }
 
     @Override
