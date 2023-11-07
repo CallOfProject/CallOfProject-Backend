@@ -6,6 +6,7 @@ import callofproject.dev.authentication.entity.AuthenticationResponse;
 import callofproject.dev.authentication.entity.RegisterRequest;
 import callofproject.dev.authentication.service.AuthenticationService;
 import callofproject.dev.library.exception.service.DataServiceException;
+import callofproject.dev.library.exception.util.CopDataUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.hc.core5.http.HttpStatus;
