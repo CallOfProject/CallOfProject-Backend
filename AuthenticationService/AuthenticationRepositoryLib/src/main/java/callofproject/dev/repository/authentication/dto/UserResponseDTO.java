@@ -1,4 +1,4 @@
-package callofproject.dev.library.constant.dto.usermanagement;
+package callofproject.dev.repository.authentication.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

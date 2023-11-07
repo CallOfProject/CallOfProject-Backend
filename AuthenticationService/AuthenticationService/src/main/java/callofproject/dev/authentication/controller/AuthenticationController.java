@@ -1,10 +1,11 @@
 package callofproject.dev.authentication.controller;
 
-import callofproject.dev.library.constant.exception.CopServiceException;
+
 import callofproject.dev.authentication.entity.AuthenticationRequest;
 import callofproject.dev.authentication.entity.AuthenticationResponse;
 import callofproject.dev.authentication.entity.RegisterRequest;
 import callofproject.dev.authentication.service.AuthenticationService;
+import callofproject.dev.library.exception.service.DataServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.hc.core5.http.HttpStatus;
@@ -34,7 +35,7 @@ public class AuthenticationController
         {
             return ResponseEntity.ok(service.register(request));
         }
-        catch (CopServiceException ignored)
+        catch (DataServiceException ignored)
         {
 
             return new ResponseEntity<>(new AuthenticationResponse(null, null),
@@ -49,7 +50,7 @@ public class AuthenticationController
         {
             return ResponseEntity.ok(service.authenticate(request));
         }
-        catch (CopServiceException ignored)
+        catch (DataServiceException ignored)
         {
 
             return new ResponseEntity<>(new AuthenticationResponse(null, null),
@@ -65,7 +66,7 @@ public class AuthenticationController
             service.refreshToken(request, response);
             return ResponseEntity.ok(true);
         }
-        catch (CopServiceException ignored)
+        catch (DataServiceException ignored)
         {
             return ResponseEntity.badRequest().body(false);
         }

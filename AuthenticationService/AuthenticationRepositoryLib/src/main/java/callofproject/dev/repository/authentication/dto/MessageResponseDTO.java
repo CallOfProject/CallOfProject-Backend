@@ -1,4 +1,4 @@
-package callofproject.dev.library.constant.message;
+package callofproject.dev.repository.authentication.dto;
 
 public class MessageResponseDTO<T>
 {

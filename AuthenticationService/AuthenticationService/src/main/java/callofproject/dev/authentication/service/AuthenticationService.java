@@ -1,8 +1,8 @@
 package callofproject.dev.authentication.service;
 
-import callofproject.dev.library.constant.dto.usermanagement.UserSignUpRequestDTO;
-import callofproject.dev.library.constant.exception.CopServiceException;
+import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.TokenServiceHelper;
+import callofproject.dev.repository.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.repository.authentication.entity.security.Token;
 import callofproject.dev.authentication.config.JwtService;
 import callofproject.dev.authentication.entity.AuthenticationRequest;
@@ -53,7 +53,7 @@ public class AuthenticationService
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthenticationResponse register(RegisterRequest request) throws CopServiceException
+    public AuthenticationResponse register(RegisterRequest request) throws DataServiceException
     {
         var dto = new UserSignUpRequestDTO(request.getEmail(), request.getFirstName(), request.getMiddleName(),
                 request.getLastName(), request.getUsername(), m_passwordEncoder.encode(request.getPassword()), request.getBirthDate());
@@ -68,7 +68,7 @@ public class AuthenticationService
     }
 
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) throws CopServiceException
+    public AuthenticationResponse authenticate(AuthenticationRequest request)
     {
        /* var k = authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
         if (!k.isAuthenticated())
@@ -104,7 +104,7 @@ public class AuthenticationService
         m_tokenServiceHelper.saveAll(validUserTokens);
     }
 
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, CopServiceException
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String refreshToken;

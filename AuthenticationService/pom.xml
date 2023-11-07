@@ -24,6 +24,13 @@
         <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>CallOfProject</id>
+            <url>https://raw.github.com/CallOfProject/CallOfProject-Maven-Repo/main</url>
+        </repository>
+    </repositories>
+
 
     <dependencies>
         <dependency>
@@ -33,9 +40,10 @@
 
         <dependency>
             <groupId>callofproject.dev</groupId>
-            <artifactId>ConstantLibrary</artifactId>
+            <artifactId>call-of-project-exception-lib</artifactId>
             <version>1.0.0</version>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

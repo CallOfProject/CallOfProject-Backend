@@ -1,9 +1,10 @@
 package callofproject.dev.authentication.service;
 
-import callofproject.dev.library.constant.dto.usermanagement.UserResponseDTO;
-import callofproject.dev.library.constant.dto.usermanagement.UserSignUpRequestDTO;
-import callofproject.dev.library.constant.exception.CopServiceException;
+
+import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
+import callofproject.dev.repository.authentication.dto.UserResponseDTO;
+import callofproject.dev.repository.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.authentication.mapper.IUserMapper;
 import org.apache.hc.core5.http.HttpStatus;
@@ -37,34 +38,34 @@ public class UserManagementService implements UserDetailsService
     }
 
 
-    public UserResponseDTO<User> saveUser(UserSignUpRequestDTO userDTO) throws CopServiceException
+    public UserResponseDTO<User> saveUser(UserSignUpRequestDTO userDTO) throws DataServiceException
     {
         try
         {
             var savedUser = m_serviceHelper.getUserServiceHelper().saveUser(m_userMapper.toUser(userDTO));
 
             if (savedUser == null)
-                throw new CopServiceException("User cannot be saved!", HttpStatus.SC_INTERNAL_SERVER_ERROR);
+                throw new DataServiceException("User cannot be saved!");
 
             return new UserResponseDTO<User>(true, savedUser);
         } catch (Exception exception)
         {
-            throw new CopServiceException("User cannot be saved!", HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            throw new DataServiceException("User cannot be saved!");
         }
     }
 
-    public UserResponseDTO<User> findUserByUsername(String username) throws CopServiceException
+    public UserResponseDTO<User> findUserByUsername(String username)
     {
         try
         {
             var user = m_serviceHelper.getUserServiceHelper().findByUsername(username);
             if (user.isEmpty())
-                throw new CopServiceException("User does not exists", HttpStatus.SC_NO_CONTENT);
+                throw new DataServiceException("User does not exists");
 
             return new UserResponseDTO<User>(true, user.get());
-        } catch (CopServiceException exception)
+        } catch (DataServiceException exception)
         {
-            throw new CopServiceException("Internal Server Error!", HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            throw new DataServiceException("Internal Server Error!");
         }
     }
 
