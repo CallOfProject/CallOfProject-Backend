@@ -7,7 +7,8 @@ import callofproject.dev.repository.authentication.dto.UserResponseDTO;
 import callofproject.dev.repository.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.authentication.mapper.IUserMapper;
-import org.apache.hc.core5.http.HttpStatus;
+import callofproject.dev.repository.authentication.entity.nosql.MatchDB;
+import callofproject.dev.repository.authentication.repository.nosql.IMatchDbRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,6 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
@@ -29,11 +31,13 @@ import static callofproject.dev.repository.authentication.BeanName.USER_MANAGEME
 public class UserManagementService implements UserDetailsService
 {
     private final UserManagementServiceHelper m_serviceHelper;
+    private final IMatchDbRepository m_matchDbRepository;
     private final IUserMapper m_userMapper;
 
-    public UserManagementService(@Qualifier(USER_MANAGEMENT_DAL_BEAN) UserManagementServiceHelper serviceHelper, IUserMapper userMapper)
+    public UserManagementService(@Qualifier(USER_MANAGEMENT_DAL_BEAN) UserManagementServiceHelper serviceHelper, IMatchDbRepository matchDbRepository, IUserMapper userMapper)
     {
         m_serviceHelper = serviceHelper;
+        m_matchDbRepository = matchDbRepository;
         m_userMapper = userMapper;
     }
 

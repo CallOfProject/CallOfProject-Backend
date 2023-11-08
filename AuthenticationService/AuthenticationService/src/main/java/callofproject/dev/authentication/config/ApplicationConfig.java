@@ -18,6 +18,7 @@ public class ApplicationConfig
 {
     private final UserManagementService m_userManagementService;
 
+
     public ApplicationConfig(@Qualifier(USER_MANAGEMENT_SERVICE) UserManagementService userManagementService)
     {
         m_userManagementService = userManagementService;

@@ -32,11 +32,11 @@ public class UserRepositoryTest
     private IUserRepository m_userRepository;
 
 
-    @AfterAll
+    /*@AfterAll
     static void cleanData() throws IOException
     {
         delete(Path.of(TEST_DB_PATH));
-    }
+    }*/
 
     @Test
     void saveMultipleUsers_ShouldSucceed()
