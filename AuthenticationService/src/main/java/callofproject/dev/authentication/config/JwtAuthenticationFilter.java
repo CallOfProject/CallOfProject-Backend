@@ -2,6 +2,8 @@ package callofproject.dev.authentication.config;
 
 
 import callofproject.dev.repository.authentication.dal.TokenServiceHelper;
+import callofproject.dev.service.jwt.JwtService;
+import callofproject.dev.service.jwt.JwtServiceBeanName;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 import static callofproject.dev.repository.authentication.BeanName.TOKEN_DAL_BEAN;
+import static callofproject.dev.service.jwt.JwtServiceBeanName.JWT_SERVICE_BEAN_NAME;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter
@@ -27,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter
     private final UserDetailsService userDetailsService;
     private final TokenServiceHelper m_tokenServiceHelper;
 
-    public JwtAuthenticationFilter(JwtService jwtService,
+    public JwtAuthenticationFilter(@Qualifier(JWT_SERVICE_BEAN_NAME) JwtService jwtService,
                                    UserDetailsService userDetailsService,
                                    @Qualifier(TOKEN_DAL_BEAN) TokenServiceHelper tokenServiceHelper)
     {
@@ -66,7 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter
                     .map(t -> !t.isExpired() && !t.isRevoked())
                     .orElse(false);
 
-            if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid)
+            if (jwtService.isTokenValid(jwt, userDetails.getUsername()) && isTokenValid)
             {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

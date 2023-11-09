@@ -5,6 +5,7 @@ import callofproject.dev.authentication.entity.AuthenticationRequest;
 import callofproject.dev.authentication.entity.AuthenticationResponse;
 import callofproject.dev.authentication.entity.RegisterRequest;
 import callofproject.dev.authentication.service.AuthenticationService;
+import callofproject.dev.authentication.service.UserManagementService;
 import callofproject.dev.library.exception.service.DataServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,15 +16,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
+import static org.apache.hc.core5.http.HttpStatus.SC_NOT_FOUND;
+
 @RestController
 @RequestMapping("api/auth")
 public class AuthenticationController
 {
     private final AuthenticationService service;
+    private final UserManagementService m_userManagementService;
 
-    public AuthenticationController(AuthenticationService service)
+    public AuthenticationController(AuthenticationService service, UserManagementService userManagementService)
     {
         this.service = service;
+        m_userManagementService = userManagementService;
     }
 
 
@@ -70,12 +75,16 @@ public class AuthenticationController
 
 
     @GetMapping("/validate")
-    public ResponseEntity<Object> validateToken(@RequestParam("uname") String username,
-                                                @RequestParam("token") String token)
+    public ResponseEntity<Object> validateToken(@RequestParam("token") String token)
     {
         try
         {
-            return ResponseEntity.ok(service.verifyWithUsernameAndToken(username, token));
+            var user = m_userManagementService.findUserByUsername(service.extractUsername(token));
+
+            if (user == null)
+                return new ResponseEntity<>("User not found!", HttpStatusCode.valueOf(SC_NOT_FOUND));
+
+            return ResponseEntity.ok(service.verifyTokenByTokenStr(token, user.getObject()));
         } catch (DataServiceException ignored)
         {
             return ResponseEntity.badRequest().body(false);

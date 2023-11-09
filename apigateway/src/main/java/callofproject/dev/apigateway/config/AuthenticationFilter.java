@@ -5,6 +5,7 @@ import callofproject.dev.apigateway.service.TokenValidateService;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthenticationFilter implements GlobalFilter
 {
+    private final String authenticationRequest = "/api/auth/";
     private final TokenValidateService m_validateService;
 
     public AuthenticationFilter(TokenValidateService validateService)
@@ -23,12 +25,12 @@ public class AuthenticationFilter implements GlobalFilter
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain)
     {
-        String requestPath = exchange.getRequest().getPath().value();
+        var requestPath = exchange.getRequest().getPath().value();
 
-        if (!requestPath.startsWith("/api/auth/"))
+        if (!requestPath.startsWith(authenticationRequest))
         {
-            ServerHttpRequest request = exchange.getRequest();
-            String authorizationHeader = request.getHeaders().getFirst("Authorization");
+            var request = exchange.getRequest();
+            var authorizationHeader = request.getHeaders().getFirst("Authorization");
 
             if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer "))
             {
@@ -36,16 +38,17 @@ public class AuthenticationFilter implements GlobalFilter
                 return exchange.getResponse().setComplete();
             }
 
-            String token = authorizationHeader.substring(7);
-
-            // Token'ı kullanmak veya doğrulamak için token değişkenini kullanabilirsiniz
-
-            // Örnek: Token'ı başka bir servise gönderme
-            // Bu örnekte token'ı bir HTTP başlığı olarak ekliyoruz
-            ServerHttpRequest modifiedRequest = request.mutate()
+            var token = authorizationHeader.substring(7).trim();
+            System.out.println("token is: " + token);
+            if (!m_validateService.verifyToken(token))
+            {
+                System.out.println("no");
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
+            }
+            var modifiedRequest = request.mutate()
                     .header("Authorization", "Bearer " + token)
                     .build();
-
             return chain.filter(exchange.mutate().request(modifiedRequest).build());
         }
 

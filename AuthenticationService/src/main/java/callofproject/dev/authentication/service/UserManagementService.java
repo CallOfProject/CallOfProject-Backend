@@ -73,6 +73,7 @@ public class UserManagementService implements UserDetailsService
         }
     }
 
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
     {
@@ -80,14 +81,13 @@ public class UserManagementService implements UserDetailsService
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found with username or email: " + username));
 
-        Set<GrantedAuthority> authorities = user
+       /* Set<GrantedAuthority> authorities = user
                 .getRoles()
                 .stream()
-                .map((role) -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toSet());
+                .map((role) -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toSet());*/
 
         return new org.springframework.security.core.userdetails.User(user.getEmail(),
-                user.getPassword(),
-                authorities);
+                user.getPassword());
     }
 
    /* public void removeUser(User user)

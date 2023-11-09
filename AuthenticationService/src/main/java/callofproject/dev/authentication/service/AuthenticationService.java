@@ -4,10 +4,10 @@ import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.TokenServiceHelper;
 import callofproject.dev.repository.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.repository.authentication.entity.security.Token;
-import callofproject.dev.authentication.config.JwtService;
 import callofproject.dev.authentication.entity.AuthenticationRequest;
 import callofproject.dev.authentication.entity.AuthenticationResponse;
 import callofproject.dev.authentication.entity.RegisterRequest;
+import callofproject.dev.service.jwt.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ import java.io.IOException;
 import static callofproject.dev.authentication.util.Util.AUTHENTICATION_SERVICE;
 import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
 import static callofproject.dev.repository.authentication.BeanName.TOKEN_DAL_BEAN;
+import static callofproject.dev.service.jwt.JwtServiceBeanName.JWT_SERVICE_BEAN_NAME;
 
 @Service(AUTHENTICATION_SERVICE)
 @Lazy
@@ -39,7 +41,8 @@ public class AuthenticationService
 
     public AuthenticationService(PasswordEncoder passwordEncoder,
                                  @Qualifier(TOKEN_DAL_BEAN) TokenServiceHelper tokenServiceHelper,
-                                 @Qualifier(USER_MANAGEMENT_SERVICE) UserManagementService userManagementService, JwtService jwtService)
+                                 @Qualifier(USER_MANAGEMENT_SERVICE) UserManagementService userManagementService,
+                                 @Qualifier(JWT_SERVICE_BEAN_NAME) JwtService jwtService)
     {
         m_tokenServiceHelper = tokenServiceHelper;
         m_passwordEncoder = passwordEncoder;
@@ -60,17 +63,18 @@ public class AuthenticationService
         var user = m_userManagementService.saveUser(dto);
 
 
-        var jwtToken = m_jwtService.generateToken(user.getObject());
-        var refreshToken = m_jwtService.generateRefreshToken(user.getObject());
+        var jwtToken = m_jwtService.generateToken(user.getObject().getUsername());
+        var refreshToken = m_jwtService.generateRefreshToken(user.getObject().getUsername());
 
         saveUserToken(user.getObject().getUsername(), jwtToken);
         return new AuthenticationResponse(jwtToken, refreshToken);
     }
 
-    public boolean verifyWithUsernameAndToken(String token, String username)
+    public boolean verifyTokenByTokenStr(String token, UserDetails userDetails)
     {
-        return m_jwtService.verifyWithUsernameAndToken(token, username);
+        return m_jwtService.verifyWithUsernameAndToken(token, userDetails.getUsername());
     }
+
     public AuthenticationResponse authenticate(AuthenticationRequest request)
     {
        /* var k = authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
@@ -80,8 +84,8 @@ public class AuthenticationService
         var user = m_userManagementService.findUserByUsername(request.username());
         if (user.getObject() == null)
             return new AuthenticationResponse(null, null);
-        var jwtToken = m_jwtService.generateToken(user.getObject());
-        var refreshToken = m_jwtService.generateRefreshToken(user.getObject());
+        var jwtToken = m_jwtService.generateToken(user.getObject().getUsername());
+        var refreshToken = m_jwtService.generateRefreshToken(user.getObject().getUsername());
         revokeAllUserTokens(user.getObject().getUsername());
         saveUserToken(user.getObject().getUsername(), jwtToken);
         return new AuthenticationResponse(jwtToken, refreshToken);
@@ -122,17 +126,21 @@ public class AuthenticationService
         {
             var user = m_userManagementService.findUserByUsername(username);
 
-            if (m_jwtService.isTokenValid(refreshToken, user.getObject()))
+            if (m_jwtService.isTokenValid(refreshToken, user.getObject().getUsername()))
             {
-                var accessToken = m_jwtService.generateToken(user.getObject());
+                var accessToken = m_jwtService.generateToken(user.getObject().getUsername());
                 revokeAllUserTokens(user.getObject().getUsername());
                 saveUserToken(user.getObject().getUsername(), accessToken);
                 var authResponse = new AuthenticationResponse(accessToken, refreshToken);
 
-
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
+    }
+
+    public String extractUsername(String token)
+    {
+        return m_jwtService.extractUsername(token);
     }
 
 }
