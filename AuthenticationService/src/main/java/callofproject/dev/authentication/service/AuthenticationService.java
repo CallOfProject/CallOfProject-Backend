@@ -1,115 +1,94 @@
 package callofproject.dev.authentication.service;
 
 import callofproject.dev.library.exception.service.DataServiceException;
-import callofproject.dev.repository.authentication.dal.TokenServiceHelper;
+import callofproject.dev.repository.authentication.BeanName;
+import callofproject.dev.repository.authentication.dal.RoleServiceHelper;
+import callofproject.dev.repository.authentication.dto.RoleEnum;
 import callofproject.dev.repository.authentication.dto.UserSignUpRequestDTO;
-import callofproject.dev.repository.authentication.entity.security.Token;
 import callofproject.dev.authentication.entity.AuthenticationRequest;
 import callofproject.dev.authentication.entity.AuthenticationResponse;
 import callofproject.dev.authentication.entity.RegisterRequest;
-import callofproject.dev.service.jwt.JwtService;
+
+import callofproject.dev.service.jwt.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Set;
 
 import static callofproject.dev.authentication.util.Util.AUTHENTICATION_SERVICE;
 import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
-import static callofproject.dev.repository.authentication.BeanName.TOKEN_DAL_BEAN;
-import static callofproject.dev.service.jwt.JwtServiceBeanName.JWT_SERVICE_BEAN_NAME;
 
 @Service(AUTHENTICATION_SERVICE)
 @Lazy
 public class AuthenticationService
 {
-
-    private final TokenServiceHelper m_tokenServiceHelper;
     private final PasswordEncoder m_passwordEncoder;
     private final UserManagementService m_userManagementService;
-    private final JwtService m_jwtService;
-    private AuthenticationManager authenticationManager;
+    private final RoleServiceHelper m_roleServiceHelper;
+    private final AuthenticationProvider m_authenticationProvider;
+
 
     public AuthenticationService(PasswordEncoder passwordEncoder,
-                                 @Qualifier(TOKEN_DAL_BEAN) TokenServiceHelper tokenServiceHelper,
                                  @Qualifier(USER_MANAGEMENT_SERVICE) UserManagementService userManagementService,
-                                 @Qualifier(JWT_SERVICE_BEAN_NAME) JwtService jwtService)
+                                 @Qualifier(BeanName.ROLE_DAL_BEAN) RoleServiceHelper roleServiceHelper,
+                                 AuthenticationProvider authenticationProvider)
     {
-        m_tokenServiceHelper = tokenServiceHelper;
         m_passwordEncoder = passwordEncoder;
         m_userManagementService = userManagementService;
-        m_jwtService = jwtService;
+        m_roleServiceHelper = roleServiceHelper;
+        m_authenticationProvider = authenticationProvider;
     }
 
-    @Autowired
-    public void setAuthenticationManager(AuthenticationManager authenticationManager)
-    {
-        this.authenticationManager = authenticationManager;
-    }
 
     public AuthenticationResponse register(RegisterRequest request) throws DataServiceException
     {
-        var dto = new UserSignUpRequestDTO(request.getEmail(), request.getFirstName(), request.getMiddleName(),
-                request.getLastName(), request.getUsername(), m_passwordEncoder.encode(request.getPassword()), request.getBirthDate());
+        var dto = new UserSignUpRequestDTO(request.getEmail(),
+                request.getFirstName(),
+                request.getMiddleName(),
+                request.getLastName(),
+                request.getUsername(),
+                m_passwordEncoder.encode(request.getPassword()),
+                request.getBirthDate(),
+                RoleEnum.ROLE_USER);
+
         var user = m_userManagementService.saveUser(dto);
 
-
-        var jwtToken = m_jwtService.generateToken(user.getObject().getUsername());
-        var refreshToken = m_jwtService.generateRefreshToken(user.getObject().getUsername());
-
-        saveUserToken(user.getObject().getUsername(), jwtToken);
-        return new AuthenticationResponse(jwtToken, refreshToken);
+        return new AuthenticationResponse(user.getToken(), user.getRefreshToken());
     }
 
-    public boolean verifyTokenByTokenStr(String token, UserDetails userDetails)
+    public boolean verifyTokenByTokenStr(String token, String username)
     {
-        return m_jwtService.verifyWithUsernameAndToken(token, userDetails.getUsername());
+        return JwtUtil.verifyWithUsernameAndToken(token, username);
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request)
     {
-       /* var k = authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
-        if (!k.isAuthenticated())
-            return new AuthenticationResponse(null, null);*/
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
+        m_authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
         var user = m_userManagementService.findUserByUsername(request.username());
         if (user.getObject() == null)
             return new AuthenticationResponse(null, null);
-        var jwtToken = m_jwtService.generateToken(user.getObject().getUsername());
-        var refreshToken = m_jwtService.generateRefreshToken(user.getObject().getUsername());
-        revokeAllUserTokens(user.getObject().getUsername());
-        saveUserToken(user.getObject().getUsername(), jwtToken);
+
+        var authorities = JwtUtil.populateAuthorities(user.getObject().getRoles());
+        var claims = new HashMap<String, Object>();
+        claims.put("authorities", authorities);
+        System.out.println(authorities);
+        var jwtToken = JwtUtil.generateToken(claims, user.getObject().getUsername());
+        var refreshToken = JwtUtil.generateRefreshToken(claims, user.getObject().getUsername());
+
         return new AuthenticationResponse(jwtToken, refreshToken);
     }
 
-    private void saveUserToken(String userId, String jwtToken)
-    {
-        var token = new Token(userId, jwtToken, false, false);
-        m_tokenServiceHelper.saveToken(token);
-    }
-
-    private void revokeAllUserTokens(String username)
-    {
-        var validUserTokens = m_tokenServiceHelper.findAllValidTokenByUsername(username);
-        if (validUserTokens.isEmpty())
-            return;
-
-        validUserTokens.forEach(token -> {
-            token.setExpired(true);
-            token.setRevoked(true);
-        });
-
-        m_tokenServiceHelper.saveAll(validUserTokens);
-    }
 
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
@@ -121,16 +100,15 @@ public class AuthenticationService
             return;
 
         refreshToken = authHeader.substring(7);
-        username = m_jwtService.extractUsername(refreshToken);
+        username = JwtUtil.extractUsername(refreshToken);
         if (username != null)
         {
             var user = m_userManagementService.findUserByUsername(username);
 
-            if (m_jwtService.isTokenValid(refreshToken, user.getObject().getUsername()))
+            if (JwtUtil.isTokenValid(refreshToken, user.getObject().getUsername()))
             {
-                var accessToken = m_jwtService.generateToken(user.getObject().getUsername());
-                revokeAllUserTokens(user.getObject().getUsername());
-                saveUserToken(user.getObject().getUsername(), accessToken);
+                var accessToken = JwtUtil.generateToken(user.getObject().getUsername());
+
                 var authResponse = new AuthenticationResponse(accessToken, refreshToken);
 
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
@@ -140,7 +118,7 @@ public class AuthenticationService
 
     public String extractUsername(String token)
     {
-        return m_jwtService.extractUsername(token);
+        return JwtUtil.extractUsername(token);
     }
 
 }

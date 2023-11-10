@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "cop_user")
-public class User implements UserDetails
+public class User
 {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -44,14 +44,9 @@ public class User implements UserDetails
     @JoinColumn(name = "userId")
     private UserProfile userProfile;
 
-    @Column(name = "is_account_expired")
-    private boolean isAccountExpired = true;
 
     @Column(name = "is_account_blocked")
     private boolean isAccountBlocked = false;
-
-    @Column(name = "is_enabled")
-    private boolean isEnabled = true;
 
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -103,50 +98,6 @@ public class User implements UserDetails
         roles.add(new Role("ROLE_USER"));
     }
 
-    @Override
-    public String getUsername()
-    {
-        return username;
-    }
-
-    @Override
-    public boolean isAccountNonExpired()
-    {
-        return !isAccountExpired;
-    }
-
-    @Override
-    public boolean isAccountNonLocked()
-    {
-        return !isAccountBlocked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired()
-    {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled()
-    {
-        return isEnabled;
-    }
-
-    public void setAccountExpired(boolean accountExpired)
-    {
-        isAccountExpired = accountExpired;
-    }
-
-    public void setAccountLocked(boolean accountLocked)
-    {
-        isAccountBlocked = accountLocked;
-    }
-
-    public void setEnabled(boolean enabled)
-    {
-        isEnabled = enabled;
-    }
 
     public void setUsername(String username)
     {
@@ -203,11 +154,6 @@ public class User implements UserDetails
         this.email = email;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities()
-    {
-        return null;
-    }
 
     public String getPassword()
     {
@@ -254,9 +200,32 @@ public class User implements UserDetails
         this.roles = roles;
     }
 
+
+    public boolean isAccountBlocked()
+    {
+        return isAccountBlocked;
+    }
+
+    public void setAccountBlocked(boolean accountBlocked)
+    {
+        isAccountBlocked = accountBlocked;
+    }
+
     public void setUserProfile(UserProfile userProfile)
     {
         this.userProfile = userProfile;
     }
 
+    public String getUsername()
+    {
+        return username;
+    }
+
+    public void addRoleToUser(Role role)
+    {
+        var isExistsRole = roles.stream().anyMatch(r -> r.getAuthority().equals(role.getAuthority()));
+
+        if (!isExistsRole)
+            roles.add(role);
+    }
 }

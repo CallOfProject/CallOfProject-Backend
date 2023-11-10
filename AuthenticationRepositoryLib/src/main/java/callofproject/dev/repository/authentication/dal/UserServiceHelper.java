@@ -1,7 +1,9 @@
 package callofproject.dev.repository.authentication.dal;
 
+import callofproject.dev.repository.authentication.entity.Role;
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
+import callofproject.dev.repository.authentication.repository.rdbms.IRoleRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -9,14 +11,14 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.UUID;
 
-import static callofproject.dev.repository.authentication.BeanName.USER_DAL_BEAN;
-import static callofproject.dev.repository.authentication.BeanName.USER_REPOSITORY_BEAN;
+import static callofproject.dev.repository.authentication.BeanName.*;
 
 @Component(USER_DAL_BEAN)
 @Lazy
 public class UserServiceHelper
 {
     private final IUserRepository m_userRepository;
+
 
     public UserServiceHelper(@Qualifier(USER_REPOSITORY_BEAN) IUserRepository userRepository)
     {
@@ -52,12 +54,24 @@ public class UserServiceHelper
     {
         return m_userRepository.findAll();
     }
+
     public Optional<User> findByEmail(String email)
     {
         return m_userRepository.findByEmail(email);
     }
+
     public Optional<User> findByUsername(String username)
     {
         return m_userRepository.findByUsername(username);
+    }
+
+    public void addNewRoleToUserByUsername(String username, Role role)
+    {
+        findByUsername(username).ifPresent(user -> user.addRoleToUser(role));
+    }
+
+    public void addNewRoleToUserById(String uuid, Role role)
+    {
+        findById(UUID.fromString(uuid)).ifPresent(user -> user.addRoleToUser(role));
     }
 }

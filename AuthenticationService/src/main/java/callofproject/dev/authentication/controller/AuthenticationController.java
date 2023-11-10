@@ -6,10 +6,12 @@ import callofproject.dev.authentication.entity.AuthenticationResponse;
 import callofproject.dev.authentication.entity.RegisterRequest;
 import callofproject.dev.authentication.service.AuthenticationService;
 import callofproject.dev.authentication.service.UserManagementService;
+import callofproject.dev.authentication.util.Util;
 import callofproject.dev.library.exception.service.DataServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.hc.core5.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +27,8 @@ public class AuthenticationController
     private final AuthenticationService service;
     private final UserManagementService m_userManagementService;
 
-    public AuthenticationController(AuthenticationService service, UserManagementService userManagementService)
+    public AuthenticationController(@Qualifier(Util.AUTHENTICATION_SERVICE) AuthenticationService service,
+                                    @Qualifier(Util.USER_MANAGEMENT_SERVICE) UserManagementService userManagementService)
     {
         this.service = service;
         m_userManagementService = userManagementService;
@@ -38,8 +41,7 @@ public class AuthenticationController
         try
         {
             return ResponseEntity.ok(service.register(request));
-        }
-        catch (DataServiceException ignored)
+        } catch (DataServiceException ignored)
         {
 
             return new ResponseEntity<>(new AuthenticationResponse(null, null),
@@ -53,8 +55,7 @@ public class AuthenticationController
         try
         {
             return ResponseEntity.ok(service.authenticate(request));
-        }
-        catch (DataServiceException ignored)
+        } catch (DataServiceException ignored)
         {
 
             return new ResponseEntity<>(new AuthenticationResponse(null, null),
@@ -69,8 +70,7 @@ public class AuthenticationController
         {
             service.refreshToken(request, response);
             return ResponseEntity.ok(true);
-        }
-        catch (DataServiceException ignored)
+        } catch (DataServiceException ignored)
         {
             return ResponseEntity.badRequest().body(false);
         }
@@ -82,19 +82,13 @@ public class AuthenticationController
     {
         try
         {
-<<<<<<< Updated upstream
             var user = m_userManagementService.findUserByUsername(service.extractUsername(token));
 
             if (user == null)
                 return new ResponseEntity<>("User not found!", HttpStatusCode.valueOf(SC_NOT_FOUND));
 
-            return ResponseEntity.ok(service.verifyTokenByTokenStr(token, user.getObject()));
+            return ResponseEntity.ok(service.verifyTokenByTokenStr(token, user.getObject().getUsername()));
         } catch (DataServiceException ignored)
-=======
-            return ResponseEntity.ok(service.verifyWithUsernameAndToken(username, token));
-        }
-        catch (DataServiceException ignored)
->>>>>>> Stashed changes
         {
             return ResponseEntity.badRequest().body(false);
         }

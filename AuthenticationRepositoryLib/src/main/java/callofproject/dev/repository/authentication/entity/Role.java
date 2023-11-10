@@ -1,12 +1,14 @@
 package callofproject.dev.repository.authentication.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Set;
 
 @Entity
 @Table(name = "roles")
-public class Role
+public class Role implements GrantedAuthority
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,12 +17,23 @@ public class Role
     @Column(name = "name")
     private String m_name;
 
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-    private Set<User> users;
+    @JsonIgnore
+    @ManyToMany(mappedBy = "roles")
+    private Set<User> user;
 
     public Role()
     {
 
+    }
+
+    public Set<User> getUser()
+    {
+        return user;
+    }
+
+    public void setUser(Set<User> user)
+    {
+        this.user = user;
     }
 
     public Role(String roleName)
@@ -48,13 +61,18 @@ public class Role
         m_name = name;
     }
 
-    public Set<User> getUsers()
+
+    @Override
+    public String getAuthority()
     {
-        return users;
+        return m_name;
     }
 
-    public void setUsers(Set<User> users)
+    public void addUser(User userForRole)
     {
-        this.users = users;
+        var isExistsUser = user.stream().anyMatch(usr -> usr.getUsername().equals(userForRole.getUsername()));
+
+        if (!isExistsUser)
+            user.add(userForRole);
     }
 }

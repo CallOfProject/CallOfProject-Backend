@@ -23,7 +23,14 @@ public class UserResponseDTO<T>
         m_refreshToken = refreshToken;
         m_object = null;
     }
-
+    public UserResponseDTO(boolean success, String token, String refreshToken, T object)
+    {
+        m_success = success;
+        m_token = token;
+        m_refreshToken = refreshToken;
+        m_object = null;
+        m_object = object;
+    }
     public UserResponseDTO(boolean success)
     {
         m_success = success;

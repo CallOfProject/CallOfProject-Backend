@@ -28,5 +28,4 @@ public class MessageResponseDTO<T>
     {
         return m_object;
     }
-
 }

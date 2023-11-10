@@ -10,6 +10,7 @@ public class BeanName
     public static final String EXPERIENCE_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.experience";
     public static final String USER_RATE_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.userrate";
     public static final String ROLE_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.userrole";
+    public static final String ROLE_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.userrole";
     public static final String USER_MANAGEMENT_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.usermanagement";
     public static final String USER_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.user";
     public static final String USER_PROFILE_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.userprofile";

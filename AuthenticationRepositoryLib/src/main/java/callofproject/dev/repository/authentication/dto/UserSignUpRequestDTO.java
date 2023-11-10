@@ -1,6 +1,7 @@
 package callofproject.dev.repository.authentication.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
@@ -21,8 +22,24 @@ public class UserSignUpRequestDTO
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate birthDate;
 
+    private RoleEnum role;
+
     public UserSignUpRequestDTO()
     {
+    }
+
+    public UserSignUpRequestDTO(String email, String firstName, String middleName, String lastName,
+                                String username, String password, LocalDate birthDate,
+                                RoleEnum role)
+    {
+        this.email = email;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.username = username;
+        this.password = password;
+        this.birthDate = birthDate;
+        this.role = role;
     }
 
     public UserSignUpRequestDTO(String email, String firstName, String middleName, String lastName,
@@ -35,6 +52,17 @@ public class UserSignUpRequestDTO
         this.username = username;
         this.password = password;
         this.birthDate = birthDate;
+        role = RoleEnum.ROLE_USER;
+    }
+
+    public RoleEnum getRole()
+    {
+        return role;
+    }
+
+    public void setRole(RoleEnum role)
+    {
+        this.role = role;
     }
 
     public String getEmail()
