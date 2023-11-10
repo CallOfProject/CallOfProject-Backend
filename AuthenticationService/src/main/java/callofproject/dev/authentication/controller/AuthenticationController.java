@@ -38,7 +38,8 @@ public class AuthenticationController
         try
         {
             return ResponseEntity.ok(service.register(request));
-        } catch (DataServiceException ignored)
+        }
+        catch (DataServiceException ignored)
         {
 
             return new ResponseEntity<>(new AuthenticationResponse(null, null),
@@ -52,7 +53,8 @@ public class AuthenticationController
         try
         {
             return ResponseEntity.ok(service.authenticate(request));
-        } catch (DataServiceException ignored)
+        }
+        catch (DataServiceException ignored)
         {
 
             return new ResponseEntity<>(new AuthenticationResponse(null, null),
@@ -67,7 +69,8 @@ public class AuthenticationController
         {
             service.refreshToken(request, response);
             return ResponseEntity.ok(true);
-        } catch (DataServiceException ignored)
+        }
+        catch (DataServiceException ignored)
         {
             return ResponseEntity.badRequest().body(false);
         }
@@ -79,6 +82,7 @@ public class AuthenticationController
     {
         try
         {
+<<<<<<< Updated upstream
             var user = m_userManagementService.findUserByUsername(service.extractUsername(token));
 
             if (user == null)
@@ -86,6 +90,11 @@ public class AuthenticationController
 
             return ResponseEntity.ok(service.verifyTokenByTokenStr(token, user.getObject()));
         } catch (DataServiceException ignored)
+=======
+            return ResponseEntity.ok(service.verifyWithUsernameAndToken(username, token));
+        }
+        catch (DataServiceException ignored)
+>>>>>>> Stashed changes
         {
             return ResponseEntity.badRequest().body(false);
         }

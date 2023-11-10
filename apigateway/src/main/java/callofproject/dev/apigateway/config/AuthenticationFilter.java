@@ -38,6 +38,7 @@ public class AuthenticationFilter implements GlobalFilter
                 return exchange.getResponse().setComplete();
             }
 
+<<<<<<< Updated upstream
             var token = authorizationHeader.substring(7).trim();
             System.out.println("token is: " + token);
             if (!m_validateService.verifyToken(token))
@@ -46,6 +47,10 @@ public class AuthenticationFilter implements GlobalFilter
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
             }
+=======
+            String token = authorizationHeader.substring(7);
+
+>>>>>>> Stashed changes
             var modifiedRequest = request.mutate()
                     .header("Authorization", "Bearer " + token)
                     .build();
