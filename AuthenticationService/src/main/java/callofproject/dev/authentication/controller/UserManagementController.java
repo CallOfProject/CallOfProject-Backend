@@ -1,11 +1,13 @@
 package callofproject.dev.authentication.controller;
 
+import callofproject.dev.authentication.dto.MessageResponseDTO;
+import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.library.exception.service.DataServiceException;
-import callofproject.dev.repository.authentication.dto.MessageResponseDTO;
-import callofproject.dev.repository.authentication.dto.UserSignUpRequestDTO;
+
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.authentication.service.UserManagementService;
 import jakarta.annotation.security.RolesAllowed;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +34,7 @@ public class UserManagementController
             var msgResponse = new MessageResponseDTO<User>(message, HttpStatus.SC_OK, user.getObject());
             return ResponseEntity.ok(msgResponse);
 
-        }
-        catch (DataServiceException ignored)
+        } catch (DataServiceException ignored)
         {
             var msgResponse = new MessageResponseDTO<User>(ignored.getMessage(), 505, null);
             return new ResponseEntity<>(msgResponse, HttpStatusCode.valueOf(HttpStatus.SC_INTERNAL_SERVER_ERROR));

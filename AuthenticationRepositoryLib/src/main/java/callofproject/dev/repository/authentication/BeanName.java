@@ -18,10 +18,4 @@ public class BeanName
     public static final String COURSE_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.course";
     public static final String EXPERIENCE_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.experience";
     public static final String LINK_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.link";
-
-    public static final String TOKEN_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.security.token";
-    public static final String SESSION_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.security.session";
-    public static final String SESSION_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.session";
-    public static final String TOKEN_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.token";
-
 }

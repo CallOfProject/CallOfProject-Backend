@@ -2,9 +2,12 @@ package callofproject.dev.authentication.config;
 
 import callofproject.dev.service.jwt.filter.JWTTokenGeneratorFilter;
 import callofproject.dev.service.jwt.filter.JWTTokenValidatorFilter;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -12,9 +15,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -23,6 +28,7 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -44,26 +50,32 @@ public class SecurityConfig
 
     private static void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests)
     {
-        requests.requestMatchers("/api/users/**").permitAll()
-                .requestMatchers("/api/auth/**").permitAll();
+        requests.requestMatchers("/api/auth/register").permitAll()
+                .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/refresh-token").hasAnyRole("ROOT", "ADMIN")
+                .requestMatchers("/api/auth/validate").hasAnyRole("ROOT", "ADMIN")
+                .requestMatchers("/api/users/**").hasAnyRole("USER")
+                .requestMatchers("/api/root/**").hasAnyRole("ROOT")
+                .requestMatchers("/api/admin/**").hasAnyRole("ROOT", "ADMIN");
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
 
-        //  CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-        //  requestHandler.setCsrfRequestAttributeName("_csrf");
+         /* CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+          requestHandler.setCsrfRequestAttributeName("_csrf");*/
 
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                //.cors(corsCustomizer -> corsCustomizer.configurationSource(this::setCorsConfig))
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(this::setCorsConfig))
                 .csrf(AbstractHttpConfigurer::disable);
 
         http.addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(SecurityConfig::customize)
-                .formLogin(Customizer.withDefaults())
-                .httpBasic(Customizer.withDefaults())
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                //.exceptionHandling(this::exceptionHandler)
                 .authenticationProvider(authenticationProvider);
 
         http.logout(logout -> logout.logoutUrl("/api/auth/logout")
@@ -73,10 +85,11 @@ public class SecurityConfig
         return http.build();
     }
 
+
     private CorsConfiguration setCorsConfig(HttpServletRequest httpServletRequest)
     {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Collections.singletonList("*"));
+        config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
         config.setAllowedMethods(Collections.singletonList("*"));
         config.setAllowCredentials(true);
         config.setAllowedHeaders(Collections.singletonList("*"));

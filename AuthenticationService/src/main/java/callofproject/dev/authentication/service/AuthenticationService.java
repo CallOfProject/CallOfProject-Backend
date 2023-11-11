@@ -1,14 +1,15 @@
 package callofproject.dev.authentication.service;
 
+import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.BeanName;
 import callofproject.dev.repository.authentication.dal.RoleServiceHelper;
-import callofproject.dev.repository.authentication.dto.RoleEnum;
-import callofproject.dev.repository.authentication.dto.UserSignUpRequestDTO;
+
 import callofproject.dev.authentication.entity.AuthenticationRequest;
 import callofproject.dev.authentication.entity.AuthenticationResponse;
 import callofproject.dev.authentication.entity.RegisterRequest;
 
+import callofproject.dev.repository.authentication.enumeration.RoleEnum;
 import callofproject.dev.service.jwt.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,7 +65,7 @@ public class AuthenticationService
 
         var user = m_userManagementService.saveUser(dto);
 
-        return new AuthenticationResponse(user.getToken(), user.getRefreshToken());
+        return new AuthenticationResponse(user.getToken(), user.getRefreshToken(), true);
     }
 
     public boolean verifyTokenByTokenStr(String token, String username)
@@ -77,7 +78,7 @@ public class AuthenticationService
         m_authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
         var user = m_userManagementService.findUserByUsername(request.username());
         if (user.getObject() == null)
-            return new AuthenticationResponse(null, null);
+            return new AuthenticationResponse(null, null, false);
 
         var authorities = JwtUtil.populateAuthorities(user.getObject().getRoles());
         var claims = new HashMap<String, Object>();
@@ -86,7 +87,7 @@ public class AuthenticationService
         var jwtToken = JwtUtil.generateToken(claims, user.getObject().getUsername());
         var refreshToken = JwtUtil.generateRefreshToken(claims, user.getObject().getUsername());
 
-        return new AuthenticationResponse(jwtToken, refreshToken);
+        return new AuthenticationResponse(jwtToken, refreshToken, true);
     }
 
 
@@ -109,7 +110,7 @@ public class AuthenticationService
             {
                 var accessToken = JwtUtil.generateToken(user.getObject().getUsername());
 
-                var authResponse = new AuthenticationResponse(accessToken, refreshToken);
+                var authResponse = new AuthenticationResponse(accessToken, refreshToken, true);
 
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }

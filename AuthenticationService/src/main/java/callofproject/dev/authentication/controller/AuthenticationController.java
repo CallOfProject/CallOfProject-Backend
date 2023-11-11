@@ -44,7 +44,7 @@ public class AuthenticationController
         } catch (DataServiceException ignored)
         {
 
-            return new ResponseEntity<>(new AuthenticationResponse(null, null),
+            return new ResponseEntity<>(new AuthenticationResponse(null, null, false),
                     HttpStatusCode.valueOf(HttpStatus.SC_INTERNAL_SERVER_ERROR));
         }
     }
@@ -58,7 +58,7 @@ public class AuthenticationController
         } catch (DataServiceException ignored)
         {
 
-            return new ResponseEntity<>(new AuthenticationResponse(null, null),
+            return new ResponseEntity<>(new AuthenticationResponse(null, null, false),
                     HttpStatusCode.valueOf(HttpStatus.SC_INTERNAL_SERVER_ERROR));
         }
     }

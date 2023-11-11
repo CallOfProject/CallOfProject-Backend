@@ -16,12 +16,9 @@ import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE
 @Configuration
 public class ApplicationConfig
 {
-
-
     @Bean
     public PasswordEncoder passwordEncoder()
     {
         return new BCryptPasswordEncoder();
     }
-
 }

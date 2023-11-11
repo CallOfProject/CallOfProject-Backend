@@ -1,12 +1,10 @@
 package callofproject.dev.repository.authentication.entity;
 
 
+import callofproject.dev.repository.authentication.enumeration.RoleEnum;
 import jakarta.persistence.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -64,6 +62,7 @@ public class User
 
         roles.add(new Role("ROLE_USER"));
     }
+
 
     public User(String username, String firstName, String middleName, String lastName,
                 String email, String password, LocalDate birthDate, Role role)
@@ -227,5 +226,20 @@ public class User
 
         if (!isExistsRole)
             roles.add(role);
+    }
+
+    public boolean isAdmin()
+    {
+        return roles.stream().map(Role::getName).anyMatch(role -> role.equals(RoleEnum.ROLE_ADMIN.getRole()));
+    }
+
+    public boolean isRoot()
+    {
+        return roles.stream().map(Role::getName).anyMatch(role -> role.equals(RoleEnum.ROLE_ROOT.getRole()));
+    }
+
+    public boolean isAdminOrRoot()
+    {
+        return roles.stream().map(Role::getName).anyMatch(role -> role.equals(RoleEnum.ROLE_ADMIN.getRole()) || role.equals(RoleEnum.ROLE_ROOT.getRole()));
     }
 }

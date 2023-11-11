@@ -20,7 +20,6 @@ public interface IRoleRepository extends CrudRepository<Role, Long>
     @Query("from Role as r where r.m_name = :name")
     List<Role> findRoleByName(@Param("name") String name);
 
-    void save
     @Query(value = "insert user_roles (user_id, role_id) values (:userId, :roleId)", nativeQuery = true)
     void saveUserRole(@Param("userId") UUID userId, @Param("roleId") long roleId);
 }

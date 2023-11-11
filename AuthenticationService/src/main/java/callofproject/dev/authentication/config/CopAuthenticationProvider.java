@@ -38,19 +38,12 @@ public class CopAuthenticationProvider implements AuthenticationProvider
         if (user.isPresent())
         {
             if (passwordEncoder.matches(pwd, user.get().getPassword()))
-            {
                 return new UsernamePasswordAuthenticationToken(username, pwd,
                         getGrantedAuthorities(user.get().getRoles()));
-            }
             else
-            {
                 throw new BadCredentialsException("Invalid password!");
-            }
         }
-        else
-        {
-            throw new BadCredentialsException("No user registered with this details!");
-        }
+        else throw new BadCredentialsException("No user registered with this details!");
     }
 
     private List<GrantedAuthority> getGrantedAuthorities(Set<Role> authorities)

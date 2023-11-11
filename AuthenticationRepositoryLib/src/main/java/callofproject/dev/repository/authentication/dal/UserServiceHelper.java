@@ -6,8 +6,11 @@ import callofproject.dev.repository.authentication.repository.rdbms.IUserReposit
 import callofproject.dev.repository.authentication.repository.rdbms.IRoleRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,6 +58,11 @@ public class UserServiceHelper
         return m_userRepository.findAll();
     }
 
+    public Iterable<User> findAllPageable(Pageable pageable)
+    {
+        return m_userRepository.findAll(pageable);
+    }
+
     public Optional<User> findByEmail(String email)
     {
         return m_userRepository.findByEmail(email);
@@ -73,5 +81,44 @@ public class UserServiceHelper
     public void addNewRoleToUserById(String uuid, Role role)
     {
         findById(UUID.fromString(uuid)).ifPresent(user -> user.addRoleToUser(role));
+    }
+
+
+    public Iterable<User> findUsersByBirthDate(LocalDate localDate, Pageable pageable)
+    {
+        return m_userRepository.findUsersByBirthDate(localDate, pageable);
+    }
+
+    public Iterable<User> findUsersByBirthDateBetween(LocalDate start, LocalDate end, Pageable pageable)
+    {
+        return m_userRepository.findUsersByBirthDateBetween(start, end, pageable);
+    }
+
+
+    public Iterable<User> findUsersByUsernameNotContainsIgnoreCase(String namePart, Pageable pageable)
+    {
+        return m_userRepository.findUsersByUsernameNotContainsIgnoreCase(namePart, pageable);
+    }
+
+
+    public Iterable<User> findUsersByUsernameContainsIgnoreCase(String namePart, Pageable pageable)
+    {
+        return m_userRepository.findUsersByUsernameContainsIgnoreCase(namePart, pageable);
+    }
+
+ /*   public Iterable<User> findUsersByUsernameNotContainsIgnoreCase(String namePart, Sort sort)
+    {
+        return m_userRepository.findUsersByUsernameNotContainsIgnoreCase(namePart, sort);
+    }*/
+
+
+    public Iterable<User> findUsersByCreationDate(LocalDate creationDate, Pageable pageable)
+    {
+        return m_userRepository.findUsersByCreationDate(creationDate, pageable);
+    }
+
+    public Iterable<User> findUsersByCreationDateBetween(LocalDate start, LocalDate end, Pageable pageable)
+    {
+        return m_userRepository.findUsersByCreationDateBetween(start, end, pageable);
     }
 }
