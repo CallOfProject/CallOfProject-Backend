@@ -5,6 +5,7 @@ import callofproject.dev.authentication.dto.MessageResponseDTO;
 import callofproject.dev.authentication.dto.UserDTO;
 import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.authentication.service.UserManagementService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RequestMapping("api/users")
 @RestController
+@SecurityRequirement(name = "Authorization")
 public class UserManagementController
 {
     private final UserManagementService m_service;

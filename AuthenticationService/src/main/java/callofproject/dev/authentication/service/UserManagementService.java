@@ -8,11 +8,8 @@ import callofproject.dev.repository.authentication.dal.UserManagementServiceHelp
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.repository.nosql.IMatchDbRepository;
 import callofproject.dev.service.jwt.JwtUtil;
-import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,8 +27,6 @@ import static java.util.stream.StreamSupport.stream;
 @Lazy
 public class UserManagementService
 {
-    @Value("${spring.data.web.pageable.default-page-size}")
-    private int m_defaultPageSize;
 
     private final UserManagementServiceHelper m_serviceHelper;
     private final IMatchDbRepository m_matchDbRepository;
@@ -44,6 +39,11 @@ public class UserManagementService
         m_serviceHelper = serviceHelper;
         m_matchDbRepository = matchDbRepository;
         m_userMapper = userMapper;
+    }
+
+    private long getTotalPage()
+    {
+        return m_serviceHelper.getUserServiceHelper().getPageSize();
     }
 
 
@@ -128,17 +128,16 @@ public class UserManagementService
     {
         try
         {
-            var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
             var dtoList = m_userMapper
                     .toUsersDTO(stream(m_serviceHelper.getUserServiceHelper()
-                            .findUsersByUsernameContainsIgnoreCase(word, pageable).spliterator(), true)
+                            .findUsersByUsernameContainsIgnoreCase(word, page).spliterator(), true)
                             .map(m_userMapper::toUserDTO)
                             .toList());
 
             var msg = format("%d user found!", dtoList.users().size());
 
-            return new MultipleMessageResponseDTO<>(page, dtoList.users().size(), msg, HttpStatus.SC_OK, dtoList);
+            return new MultipleMessageResponseDTO<>(getTotalPage(), page, dtoList.users().size(), msg, dtoList);
 
         } catch (DataServiceException ex)
         {

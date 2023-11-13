@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.UUID;
 
+import static callofproject.dev.library.exception.util.CopDataUtil.doForRepository;
 import static callofproject.dev.repository.authentication.BeanName.USER_PROFILE_DAL_BEAN;
 import static callofproject.dev.repository.authentication.BeanName.USER_PROFILE_REPOSITORY_BEAN;
 
@@ -25,26 +26,26 @@ public class UserProfileServiceHelper
 
     public UserProfile saveUserProfile(UserProfile userProfile)
     {
-        return m_userProfileRepository.save(userProfile);
+        return doForRepository(() -> m_userProfileRepository.save(userProfile), "UserProfileRepository::saveUserProfile");
     }
 
     public void removeUserProfile(UserProfile userProfile)
     {
-        m_userProfileRepository.delete(userProfile);
+        doForRepository(() -> m_userProfileRepository.delete(userProfile), "UserProfileRepository::removeUserProfile");
     }
 
     public void removeUserProfileById(UUID uuid)
     {
-        m_userProfileRepository.deleteById(uuid);
+        doForRepository(() -> m_userProfileRepository.deleteById(uuid), "UserProfileRepository::removeUserProfileById");
     }
 
     public Optional<UserProfile> findByIdUserProfile(UUID id)
     {
-        return m_userProfileRepository.findById(id);
+        return doForRepository(() -> m_userProfileRepository.findById(id), "UserProfileRepository::findByIdUserProfile");
     }
 
     public Iterable<UserProfile> findAllUserProfile()
     {
-        return m_userProfileRepository.findAll();
+        return doForRepository(m_userProfileRepository::findAll, "UserProfileRepository::findAllUserProfile");
     }
 }

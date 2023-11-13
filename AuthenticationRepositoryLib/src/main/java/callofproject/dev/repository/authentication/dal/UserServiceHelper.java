@@ -3,122 +3,135 @@ package callofproject.dev.repository.authentication.dal;
 import callofproject.dev.repository.authentication.entity.Role;
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
-import callofproject.dev.repository.authentication.repository.rdbms.IRoleRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
-import static callofproject.dev.repository.authentication.BeanName.*;
+import static callofproject.dev.library.exception.util.CopDataUtil.doForRepository;
+import static callofproject.dev.repository.authentication.BeanName.USER_DAL_BEAN;
+import static callofproject.dev.repository.authentication.BeanName.USER_REPOSITORY_BEAN;
+import static org.springframework.data.domain.PageRequest.of;
 
 @Component(USER_DAL_BEAN)
 @Lazy
 public class UserServiceHelper
 {
+    private final int m_defaultPageSize = 30;
     private final IUserRepository m_userRepository;
-
 
     public UserServiceHelper(@Qualifier(USER_REPOSITORY_BEAN) IUserRepository userRepository)
     {
         m_userRepository = userRepository;
     }
 
+    public long count()
+    {
+        return doForRepository(() -> m_userRepository.count(), "UserRepository::count");
+    }
+
+    public long getPageSize()
+    {
+        return doForRepository(() -> ((m_userRepository.count() / m_defaultPageSize) + 1), "UserRepository::count");
+    }
+
+
     public Iterable<User> saveAll(Iterable<User> users)
     {
-        return m_userRepository.saveAll(users);
+        return doForRepository(() -> m_userRepository.saveAll(users), "UserRepository::saveAll");
     }
 
     public User saveUser(User user)
     {
-        return m_userRepository.save(user);
+        return doForRepository(() -> m_userRepository.save(user), "UserRepository::saveUser");
     }
 
     public void removeUser(User user)
     {
-        m_userRepository.delete(user);
+        doForRepository(() -> m_userRepository.delete(user), "UserRepository::removeUser");
     }
 
     public void removeUserById(UUID uuid)
     {
-        m_userRepository.deleteById(uuid);
+        doForRepository(() -> m_userRepository.deleteById(uuid), "UserRepository::removeUserById");
     }
 
     public Optional<User> findById(UUID id)
     {
-        return m_userRepository.findById(id);
+        return doForRepository(() -> m_userRepository.findById(id), "UserRepository::findById");
     }
 
     public Iterable<User> findAll()
     {
-        return m_userRepository.findAll();
+        return doForRepository(() -> m_userRepository.findAll(), "UserRepository::findAll");
     }
 
-    public Iterable<User> findAllPageable(Pageable pageable)
+    public Iterable<User> findAllPageable(int page)
     {
-        return m_userRepository.findAll(pageable);
+        var pageable = of(page - 1, m_defaultPageSize);
+        return doForRepository(() -> m_userRepository.findAll(pageable), "UserRepository::findAllPageable");
     }
 
     public Optional<User> findByEmail(String email)
     {
-        return m_userRepository.findByEmail(email);
+        return doForRepository(() -> m_userRepository.findByEmail(email), "UserRepository::findByEmail");
     }
 
     public Optional<User> findByUsername(String username)
     {
-        return m_userRepository.findByUsername(username);
+        return doForRepository(() -> m_userRepository.findByUsername(username), "UserRepository::findByUsername");
     }
 
     public void addNewRoleToUserByUsername(String username, Role role)
     {
-        findByUsername(username).ifPresent(user -> user.addRoleToUser(role));
+        doForRepository(() -> findByUsername(username).ifPresent(user -> user.addRoleToUser(role)), "UserRepository::addNewRoleToUserByUsername");
     }
 
     public void addNewRoleToUserById(String uuid, Role role)
     {
-        findById(UUID.fromString(uuid)).ifPresent(user -> user.addRoleToUser(role));
+        doForRepository(() -> findById(UUID.fromString(uuid)).ifPresent(user -> user.addRoleToUser(role)), "UserRepository::addNewRoleToUserById");
     }
 
 
-    public Iterable<User> findUsersByBirthDate(LocalDate localDate, Pageable pageable)
+    public Iterable<User> findUsersByBirthDate(LocalDate localDate, int page)
     {
-        return m_userRepository.findUsersByBirthDate(localDate, pageable);
+        var pageable = of(page - 1, m_defaultPageSize);
+        return doForRepository(() -> m_userRepository.findUsersByBirthDate(localDate, pageable), "UserRepository::findUsersByBirthDate");
     }
 
-    public Iterable<User> findUsersByBirthDateBetween(LocalDate start, LocalDate end, Pageable pageable)
+    public Iterable<User> findUsersByBirthDateBetween(LocalDate start, LocalDate end, int page)
     {
-        return m_userRepository.findUsersByBirthDateBetween(start, end, pageable);
-    }
-
-
-    public Iterable<User> findUsersByUsernameNotContainsIgnoreCase(String namePart, Pageable pageable)
-    {
-        return m_userRepository.findUsersByUsernameNotContainsIgnoreCase(namePart, pageable);
+        var pageable = of(page - 1, m_defaultPageSize);
+        return doForRepository(() -> m_userRepository.findUsersByBirthDateBetween(start, end, pageable), "UserRepository::findUsersByBirthDateBetween");
     }
 
 
-    public Iterable<User> findUsersByUsernameContainsIgnoreCase(String namePart, Pageable pageable)
+    public Iterable<User> findUsersByUsernameNotContainsIgnoreCase(String namePart, int page)
     {
-        return m_userRepository.findUsersByUsernameContainsIgnoreCase(namePart, pageable);
+        var pageable = of(page - 1, m_defaultPageSize);
+        return doForRepository(() -> m_userRepository.findUsersByUsernameNotContainsIgnoreCase(namePart, pageable), "UserRepository::findUsersByUsernameNotContainsIgnoreCase");
     }
 
- /*   public Iterable<User> findUsersByUsernameNotContainsIgnoreCase(String namePart, Sort sort)
-    {
-        return m_userRepository.findUsersByUsernameNotContainsIgnoreCase(namePart, sort);
-    }*/
 
-
-    public Iterable<User> findUsersByCreationDate(LocalDate creationDate, Pageable pageable)
+    public Iterable<User> findUsersByUsernameContainsIgnoreCase(String namePart, int page)
     {
-        return m_userRepository.findUsersByCreationDate(creationDate, pageable);
+        var pageable = of(page - 1, m_defaultPageSize);
+        return doForRepository(() -> m_userRepository.findUsersByUsernameContainsIgnoreCase(namePart, pageable), "UserRepository::findUsersByUsernameContainsIgnoreCase");
     }
 
-    public Iterable<User> findUsersByCreationDateBetween(LocalDate start, LocalDate end, Pageable pageable)
+
+    public Iterable<User> findUsersByCreationDate(LocalDate creationDate, int page)
     {
-        return m_userRepository.findUsersByCreationDateBetween(start, end, pageable);
+        var pageable = of(page - 1, m_defaultPageSize);
+        return doForRepository(() -> m_userRepository.findUsersByCreationDate(creationDate, pageable), "UserRepository::findUsersByCreationDate");
+    }
+
+    public Iterable<User> findUsersByCreationDateBetween(LocalDate start, LocalDate end, int page)
+    {
+        var pageable = of(page - 1, m_defaultPageSize);
+        return doForRepository(() -> m_userRepository.findUsersByCreationDateBetween(start, end, pageable), "UserRepository::findUsersByCreationDateBetween");
     }
 }

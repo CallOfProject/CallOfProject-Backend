@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
 import java.util.UUID;
 
+import static callofproject.dev.library.exception.util.CopDataUtil.doForRepository;
 import static callofproject.dev.repository.authentication.BeanName.ROLE_DAL_BEAN;
 import static callofproject.dev.repository.authentication.BeanName.ROLE_REPOSITORY_BEAN;
 
@@ -26,21 +26,21 @@ public class RoleServiceHelper
 
     public Iterable<Role> findRoleByRoleName(String roleName)
     {
-        return m_roleRepository.findRoleByName(roleName);
+        return doForRepository(() -> m_roleRepository.findRoleByName(roleName), "RoleRepository::findRoleByRoleName");
     }
 
     public Iterable<Role> findAllRole()
     {
-        return m_roleRepository.findAll();
+        return doForRepository(m_roleRepository::findAll, "RoleRepository::findAllRole");
     }
 
     public Role saveRole(Role role)
     {
-        return m_roleRepository.save(role);
+        return doForRepository(() -> m_roleRepository.save(role), "RoleRepository::saveRole");
     }
 
     public void saveUserRole(UUID userId, long roleId)
     {
-        m_roleRepository.saveUserRole(userId, roleId);
+        doForRepository(() -> m_roleRepository.saveUserRole(userId, roleId), "RoleRepository::saveUserRole");
     }
 }

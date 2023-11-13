@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -245,5 +244,21 @@ public class User
     public boolean isAdminOrRoot()
     {
         return roles.stream().map(Role::getName).anyMatch(role -> role.equals(RoleEnum.ROLE_ADMIN.getRole()) || role.equals(RoleEnum.ROLE_ROOT.getRole()));
+    }
+
+    @Override
+    public String toString()
+    {
+        return "User{" +
+                "userId=" + userId +
+                ", firstName='" + firstName + '\'' +
+                ", middleName='" + middleName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", birthDate=" + birthDate +
+                ", creationDate=" + creationDate +
+                '}';
     }
 }

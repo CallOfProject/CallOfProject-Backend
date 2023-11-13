@@ -14,8 +14,19 @@
     <version>1.0.0</version>
     <name>AuthenticationRepositoryLib</name>
 
+    <repositories>
+        <repository>
+            <id>CallOfProject</id>
+            <url>https://raw.github.com/CallOfProject/CallOfProject-Maven-Repo/main</url>
+        </repository>
+    </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>callofproject.dev</groupId>
+            <artifactId>call-of-project-exception-lib</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>

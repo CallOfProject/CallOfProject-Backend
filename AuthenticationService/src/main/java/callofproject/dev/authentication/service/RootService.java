@@ -3,7 +3,6 @@ package callofproject.dev.authentication.service;
 import callofproject.dev.authentication.dto.MessageResponseDTO;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
-
 import callofproject.dev.repository.authentication.entity.Role;
 import callofproject.dev.repository.authentication.enumeration.RoleEnum;
 import org.apache.hc.core5.http.HttpStatus;

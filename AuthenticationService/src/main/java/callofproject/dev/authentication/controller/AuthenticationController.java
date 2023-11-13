@@ -6,6 +6,7 @@ import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.dto.auth.RegisterRequest;
 import callofproject.dev.authentication.service.AuthenticationService;
 import callofproject.dev.authentication.util.Util;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -21,6 +22,7 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("api/auth")
+@SecurityRequirement(name = "Authorization")
 public class AuthenticationController
 {
     private final AuthenticationService m_authenticationService;

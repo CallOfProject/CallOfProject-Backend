@@ -4,23 +4,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MultipleMessageResponseDTO<T>
 {
+    @JsonProperty("total_page")
+    private final long m_totalPage;
     @JsonProperty("page")
-    private final int m_pageCount;
+    private final int m_page;
     @JsonProperty("item_count")
     private final int m_itemCount;
     @JsonProperty("message")
     private final String m_message;
-    @JsonProperty("status_code")
-    private final int m_statusCode;
-    @JsonProperty("objects")
-    private final T m_objects;
+    @JsonProperty("object")
+    private final T m_object;
 
-    public MultipleMessageResponseDTO(int pageCount, int itemCount, String message, int statusCode, T object)
+    public MultipleMessageResponseDTO(long totalPage, int page, int itemCount, String message, T object)
     {
-        m_pageCount = pageCount;
+        m_totalPage = totalPage;
+        m_page = page;
         m_itemCount = itemCount;
         m_message = message;
-        m_statusCode = statusCode;
-        m_objects = object;
+        m_object = object;
     }
 }

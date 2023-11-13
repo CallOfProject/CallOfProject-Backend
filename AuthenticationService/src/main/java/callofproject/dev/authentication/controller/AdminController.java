@@ -1,13 +1,12 @@
 package callofproject.dev.authentication.controller;
 
 import callofproject.dev.authentication.dto.ErrorMessage;
+import callofproject.dev.authentication.dto.MultipleMessageResponseDTO;
+import callofproject.dev.authentication.dto.admin.UserUpdateDTOAdmin;
 import callofproject.dev.authentication.service.AdminService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.internalServerError;
@@ -34,8 +33,7 @@ public class AdminController
     @GetMapping("find/all/page")
     public ResponseEntity<Object> findAllUserByPage(@RequestParam("p") int page)
     {
-        return subscribe(() -> ok(m_adminService.findAllUsersPageable(page)),
-                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+        return subscribe(() -> ok(m_adminService.findAllUsersPageable(page)), msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
     /**
@@ -49,7 +47,7 @@ public class AdminController
     public ResponseEntity<Object> findUsersByUsernameContainsIgnoreCase(@RequestParam("p") int page, String word)
     {
         return subscribe(() -> ok(m_adminService.findUsersByUsernameContainsIgnoreCase(page, word)),
-                msg -> internalServerError().body(new ErrorMessage("Users Not Found!", false, 500)));
+                msg -> internalServerError().body(new MultipleMessageResponseDTO<>(0, 0, 0, "", null)));
     }
 
     /**
@@ -63,6 +61,28 @@ public class AdminController
     public ResponseEntity<Object> findUsersByUsernameNotContainsIgnoreCase(@RequestParam("p") int page, String word)
     {
         return subscribe(() -> ok(m_adminService.findUsersByUsernameNotContainsIgnoreCase(page, word)),
+                msg -> internalServerError().body(new ErrorMessage("Users Not Found!", false, 500)));
+    }
+
+    /**
+     * remove user with given username parameter
+     *
+     * @param username represent the user
+     * @return success or not
+     */
+    @DeleteMapping("remove/user")
+    public ResponseEntity<Object> removeUserByUsername(@RequestParam("uname") String username)
+    {
+        return subscribe(() -> ok(m_adminService.removeUser(username)),
+                msg -> internalServerError().body(new ErrorMessage("Users Not Found!", false, 500)));
+    }
+
+
+
+    @PutMapping("update/user")
+    public ResponseEntity<Object> updateUserByUsername(@RequestBody UserUpdateDTOAdmin userUpdateDTO)
+    {
+        return subscribe(() -> ok(m_adminService.updateUser(userUpdateDTO)),
                 msg -> internalServerError().body(new ErrorMessage("Users Not Found!", false, 500)));
     }
 }

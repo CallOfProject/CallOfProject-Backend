@@ -2,6 +2,7 @@ package callofproject.dev.authentication.controller;
 
 import callofproject.dev.authentication.dto.ErrorMessage;
 import callofproject.dev.authentication.service.RootService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("api/root")
+@SecurityRequirement(name = "Authorization")
 public class RootController
 {
     private final RootService m_rootService;
