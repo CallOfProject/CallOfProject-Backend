@@ -31,8 +31,8 @@ import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE
 @Lazy
 public class AuthenticationService
 {
-    private final PasswordEncoder m_passwordEncoder;
     private final UserManagementService m_userManagementService;
+    private final PasswordEncoder m_passwordEncoder;
     private final AuthenticationProvider m_authenticationProvider;
 
 

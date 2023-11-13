@@ -50,6 +50,7 @@ public class SecurityConfig
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers(antMatcher("/api-docs/**")).permitAll()
                 .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/admin/login").permitAll()
                 .requestMatchers("/api/auth/refresh-token").hasAnyRole("ROOT", "ADMIN")
                 .requestMatchers("/api/auth/validate").hasAnyRole("ROOT", "ADMIN")
                 .requestMatchers("/api/users/**").hasAnyRole("USER")

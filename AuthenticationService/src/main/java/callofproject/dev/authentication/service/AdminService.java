@@ -5,13 +5,20 @@ import callofproject.dev.authentication.dto.MultipleMessageResponseDTO;
 import callofproject.dev.authentication.dto.admin.UserShowingAdminDTO;
 import callofproject.dev.authentication.dto.admin.UserUpdateDTOAdmin;
 import callofproject.dev.authentication.dto.admin.UsersShowingAdminDTO;
+import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
+import callofproject.dev.authentication.dto.auth.AuthenticationResponse;
 import callofproject.dev.authentication.mapper.IUserMapper;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
+import callofproject.dev.service.jwt.JwtUtil;
 import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
@@ -23,11 +30,15 @@ public class AdminService
 {
 
     private final UserManagementServiceHelper m_managementServiceHelper;
+    private final PasswordEncoder m_passwordEncoder;
+    private final AuthenticationProvider m_authenticationProvider;
     private final IUserMapper m_userMapper;
 
-    public AdminService(UserManagementServiceHelper managementServiceHelper, IUserMapper userMapper)
+    public AdminService(UserManagementServiceHelper managementServiceHelper, PasswordEncoder passwordEncoder, AuthenticationProvider authenticationProvider, IUserMapper userMapper)
     {
         m_managementServiceHelper = managementServiceHelper;
+        m_passwordEncoder = passwordEncoder;
+        m_authenticationProvider = authenticationProvider;
         m_userMapper = userMapper;
     }
 
@@ -176,4 +187,23 @@ public class AdminService
     }
 
 
+    public Object authenticate(AuthenticationRequest request)
+    {
+        m_authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
+        var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(request.username());
+
+        if (user.isEmpty())
+            return new AuthenticationResponse(null, null, false);
+
+        if (!user.get().isAdmin())
+            throw new DataServiceException("You are not admin!");
+
+        var authorities = JwtUtil.populateAuthorities(user.get().getRoles());
+        var claims = new HashMap<String, Object>();
+        claims.put("authorities", authorities);
+        var jwtToken = JwtUtil.generateToken(claims, user.get().getUsername());
+        var refreshToken = JwtUtil.generateRefreshToken(claims, user.get().getUsername());
+
+        return new AuthenticationResponse(jwtToken, refreshToken, true);
+    }
 }

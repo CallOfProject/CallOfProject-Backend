@@ -3,6 +3,7 @@ package callofproject.dev.authentication.controller;
 import callofproject.dev.authentication.dto.ErrorMessage;
 import callofproject.dev.authentication.dto.MultipleMessageResponseDTO;
 import callofproject.dev.authentication.dto.admin.UserUpdateDTOAdmin;
+import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.service.AdminService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,19 @@ public class AdminController
     public AdminController(AdminService adminService)
     {
         m_adminService = adminService;
+    }
+
+    /**
+     * Login operation for admins.
+     *
+     * @param request represent the login information.
+     * @return if success returns AuthenticationResponse that include token and status else return ErrorMessage.
+     */
+    @PostMapping("/login")
+    public ResponseEntity<Object> authenticate(@RequestBody AuthenticationRequest request)
+    {
+        return subscribe(() -> ok(m_adminService.authenticate(request)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 401)));
     }
 
     /**
@@ -76,7 +90,6 @@ public class AdminController
         return subscribe(() -> ok(m_adminService.removeUser(username)),
                 msg -> internalServerError().body(new ErrorMessage("Users Not Found!", false, 500)));
     }
-
 
 
     @PutMapping("update/user")
