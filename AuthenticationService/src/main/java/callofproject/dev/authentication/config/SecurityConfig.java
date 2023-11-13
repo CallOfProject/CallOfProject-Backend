@@ -2,43 +2,38 @@ package callofproject.dev.authentication.config;
 
 import callofproject.dev.service.jwt.filter.JWTTokenGeneratorFilter;
 import callofproject.dev.service.jwt.filter.JWTTokenValidatorFilter;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
-import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 
 @Configuration
 @EnableMethodSecurity
+@EnableWebSecurity
 public class SecurityConfig
 {
+    private static final String[] AUTH_WHITELIST = {
+            "/swagger-resources/",
+            "/swagger-ui/",
+            "/v3/api-docs/"
+    };
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
 
@@ -50,7 +45,10 @@ public class SecurityConfig
 
     private static void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests)
     {
-        requests.requestMatchers("/api/auth/register").permitAll()
+        requests
+                .requestMatchers("/api/auth/register").permitAll()
+                .requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers(antMatcher("/api-docs/**")).permitAll()
                 .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/api/auth/refresh-token").hasAnyRole("ROOT", "ADMIN")
                 .requestMatchers("/api/auth/validate").hasAnyRole("ROOT", "ADMIN")
@@ -75,7 +73,6 @@ public class SecurityConfig
                 .authorizeHttpRequests(SecurityConfig::customize)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                //.exceptionHandling(this::exceptionHandler)
                 .authenticationProvider(authenticationProvider);
 
         http.logout(logout -> logout.logoutUrl("/api/auth/logout")
@@ -89,7 +86,7 @@ public class SecurityConfig
     private CorsConfiguration setCorsConfig(HttpServletRequest httpServletRequest)
     {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+        config.setAllowedOrigins(List.of("http://localhost:3000", "http://192.168.1.13:3000"));
         config.setAllowedMethods(Collections.singletonList("*"));
         config.setAllowCredentials(true);
         config.setAllowedHeaders(Collections.singletonList("*"));

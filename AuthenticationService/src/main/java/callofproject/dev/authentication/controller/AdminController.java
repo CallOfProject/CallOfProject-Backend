@@ -1,80 +1,68 @@
 package callofproject.dev.authentication.controller;
 
-import callofproject.dev.authentication.dto.MessageResponseDTO;
-import callofproject.dev.authentication.dto.MultipleMessageResponseDTO;
-import callofproject.dev.authentication.dto.UsersShowingAdminDTO;
+import callofproject.dev.authentication.dto.ErrorMessage;
 import callofproject.dev.authentication.service.AdminService;
-import callofproject.dev.authentication.service.AuthenticationService;
-import callofproject.dev.authentication.service.RootService;
-import callofproject.dev.authentication.service.UserManagementService;
-import callofproject.dev.library.exception.service.DataServiceException;
-import org.apache.hc.core5.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreFilter;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
+import static org.springframework.http.ResponseEntity.internalServerError;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("api/admin")
+@SecurityRequirement(name = "Authorization")
 public class AdminController
 {
-    private final AuthenticationService m_authenticationService;
-    private final UserManagementService m_userManagementService;
-    private final RootService m_rootService;
     private final AdminService m_adminService;
 
-    public AdminController(AuthenticationService authenticationService, UserManagementService userManagementService, RootService rootService, AdminService adminService)
+    public AdminController(AdminService adminService)
     {
-        m_authenticationService = authenticationService;
-        m_userManagementService = userManagementService;
-        m_rootService = rootService;
         m_adminService = adminService;
     }
 
+    /**
+     * Find all users page by page
+     *
+     * @param page is page
+     * @return UserShowingAdminDTO
+     */
     @GetMapping("find/all/page")
-    public ResponseEntity<MultipleMessageResponseDTO<UsersShowingAdminDTO>> findAllUserByPage(@RequestParam("p") int page)
+    public ResponseEntity<Object> findAllUserByPage(@RequestParam("p") int page)
     {
-        try
-        {
-            return ResponseEntity.ok(m_adminService.findAllUsersPageable(page));
-        } catch (DataServiceException ex)
-        {
-            return new ResponseEntity<>(new MultipleMessageResponseDTO<>(page, 0, "", HttpStatus.SC_INTERNAL_SERVER_ERROR, null),
-                    HttpStatusCode.valueOf(HttpStatus.SC_INTERNAL_SERVER_ERROR));
-        }
+        return subscribe(() -> ok(m_adminService.findAllUsersPageable(page)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
-    /*public ResponseEntity<MessageResponseDTO<Boolean>> removeUser(@RequestParam("uname") String username)
-    {
-        return ResponseEntity.ok(m_adminService.removeUser(username));
-    }
-
-    @DeleteMapping("find/all/page")
-    public ResponseEntity<MultipleMessageResponseDTO<UsersShowingAdminDTO>> findUser(@RequestParam("p") int page)
-    {
-        try
-        {
-            return ResponseEntity.ok(m_adminService.findAllUsersPageable(page));
-        } catch (DataServiceException ex)
-        {
-            return new ResponseEntity<>(new MultipleMessageResponseDTO<>(page, 0, "", HttpStatus.SC_INTERNAL_SERVER_ERROR, null),
-                    HttpStatusCode.valueOf(HttpStatus.SC_INTERNAL_SERVER_ERROR));
-        }
-    }*/
-
-
+    /**
+     * Find all users with given parameters are word and page
+     *
+     * @param page is page
+     * @param word contains word
+     * @return Users Showing Admin DTO
+     */
     @GetMapping("find/all/contains/page")
-    public ResponseEntity<MultipleMessageResponseDTO<UsersShowingAdminDTO>> findUsersByUsernameContainsIgnoreCase
-            (@RequestParam("p") int page, String word)
+    public ResponseEntity<Object> findUsersByUsernameContainsIgnoreCase(@RequestParam("p") int page, String word)
     {
-        return ResponseEntity.ok(m_adminService.findUsersByUsernameContainsIgnoreCase(page, word));
+        return subscribe(() -> ok(m_adminService.findUsersByUsernameContainsIgnoreCase(page, word)),
+                msg -> internalServerError().body(new ErrorMessage("Users Not Found!", false, 500)));
     }
 
-
+    /**
+     * Find all users with given parameters are word and page
+     *
+     * @param page is page
+     * @param word not contains word
+     * @return Users Showing Admin DTO
+     */
     @GetMapping("find/all/ignore/page")
-    public ResponseEntity<MultipleMessageResponseDTO<UsersShowingAdminDTO>> findUsersByUsernameNotContainsIgnoreCase
-            (@RequestParam("p") int page, String word)
+    public ResponseEntity<Object> findUsersByUsernameNotContainsIgnoreCase(@RequestParam("p") int page, String word)
     {
-        return ResponseEntity.ok(m_adminService.findUsersByUsernameNotContainsIgnoreCase(page, word));
+        return subscribe(() -> ok(m_adminService.findUsersByUsernameNotContainsIgnoreCase(page, word)),
+                msg -> internalServerError().body(new ErrorMessage("Users Not Found!", false, 500)));
     }
 }

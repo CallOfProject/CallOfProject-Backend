@@ -1,4 +1,4 @@
-package callofproject.dev.authentication.dto;
+package callofproject.dev.authentication.dto.admin;
 
 import callofproject.dev.repository.authentication.entity.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;

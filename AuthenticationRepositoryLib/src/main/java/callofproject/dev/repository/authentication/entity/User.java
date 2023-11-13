@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -44,7 +45,7 @@ public class User
 
 
     @Column(name = "is_account_blocked")
-    private boolean isAccountBlocked = false;
+    private boolean isAccountBlocked;
 
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -59,10 +60,19 @@ public class User
     {
         if (roles == null)
             roles = new HashSet<>();
-
+        isAccountBlocked = false;
         roles.add(new Role("ROLE_USER"));
     }
 
+    public boolean isAccountBlocked()
+    {
+        return isAccountBlocked;
+    }
+
+    public void setAccountBlocked(boolean accountBlocked)
+    {
+        isAccountBlocked = accountBlocked;
+    }
 
     public User(String username, String firstName, String middleName, String lastName,
                 String email, String password, LocalDate birthDate, Role role)
@@ -74,7 +84,7 @@ public class User
         this.email = email;
         this.password = password;
         this.birthDate = birthDate;
-
+        isAccountBlocked = false;
         if (roles == null)
             roles = new HashSet<>();
 
@@ -90,13 +100,17 @@ public class User
         this.password = password;
         this.birthDate = birthDate;
         middleName = "";
-
+        isAccountBlocked = false;
         if (roles == null)
             roles = new HashSet<>();
 
         roles.add(new Role("ROLE_USER"));
     }
 
+    public boolean getIsAccountBlocked()
+    {
+        return isAccountBlocked;
+    }
 
     public void setUsername(String username)
     {
@@ -199,16 +213,6 @@ public class User
         this.roles = roles;
     }
 
-
-    public boolean isAccountBlocked()
-    {
-        return isAccountBlocked;
-    }
-
-    public void setAccountBlocked(boolean accountBlocked)
-    {
-        isAccountBlocked = accountBlocked;
-    }
 
     public void setUserProfile(UserProfile userProfile)
     {

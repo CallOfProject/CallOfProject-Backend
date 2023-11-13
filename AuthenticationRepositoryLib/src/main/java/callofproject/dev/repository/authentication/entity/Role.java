@@ -41,6 +41,7 @@ public class Role implements GrantedAuthority
         m_name = roleName;
     }
 
+    @JsonIgnore
     public long getRoleId()
     {
         return m_roleId;
@@ -61,7 +62,7 @@ public class Role implements GrantedAuthority
         m_name = name;
     }
 
-
+    @JsonIgnore
     @Override
     public String getAuthority()
     {

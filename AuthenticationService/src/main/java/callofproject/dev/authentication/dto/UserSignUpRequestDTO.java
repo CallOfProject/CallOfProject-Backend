@@ -3,21 +3,37 @@ package callofproject.dev.authentication.dto;
 import callofproject.dev.repository.authentication.enumeration.RoleEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.time.LocalDate;
 
 public class UserSignUpRequestDTO
 {
+    @NotBlank(message = "email cannot be empty")
+    @NotEmpty
     private String email;
+    @NotBlank(message = "first name cannot be empty")
+    @NotEmpty
     @JsonProperty("first_name")
     private String firstName;
+    @NotBlank(message = "middle name cannot be empty")
+    @NotEmpty
     @JsonProperty("middle_name")
     private String middleName;
+    @NotBlank(message = "last name cannot be empty")
+    @NotEmpty
     @JsonProperty("last_name")
     private String lastName;
+    @NotBlank(message = "username cannot be empty")
+    @NotEmpty
     private String username;
+    @NotBlank(message = "password cannot be empty")
+    @NotEmpty
     private String password;
 
+    @NotBlank(message = "birthdate cannot be empty")
+    @NotEmpty
     @JsonProperty("birth_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate birthDate;

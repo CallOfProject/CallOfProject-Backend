@@ -2,8 +2,6 @@ package callofproject.dev.authentication.config;
 
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
 import callofproject.dev.repository.authentication.entity.Role;
-import callofproject.dev.repository.authentication.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,25 +14,27 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Component
 public class CopAuthenticationProvider implements AuthenticationProvider
 {
+    private final UserManagementServiceHelper m_userManagementServiceHelper;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UserManagementServiceHelper m_userManagementServiceHelper;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public CopAuthenticationProvider(UserManagementServiceHelper userManagementServiceHelper, PasswordEncoder passwordEncoder)
+    {
+        m_userManagementServiceHelper = userManagementServiceHelper;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException
     {
-        String username = authentication.getName();
-        String pwd = authentication.getCredentials().toString();
-        Optional<User> user = m_userManagementServiceHelper.getUserServiceHelper().findByUsername(username);
+        var username = authentication.getName();
+        var pwd = authentication.getCredentials().toString();
+        var user = m_userManagementServiceHelper.getUserServiceHelper().findByUsername(username);
+
         if (user.isPresent())
         {
             if (passwordEncoder.matches(pwd, user.get().getPassword()))
@@ -42,8 +42,7 @@ public class CopAuthenticationProvider implements AuthenticationProvider
                         getGrantedAuthorities(user.get().getRoles()));
             else
                 throw new BadCredentialsException("Invalid password!");
-        }
-        else throw new BadCredentialsException("No user registered with this details!");
+        } else throw new BadCredentialsException("No user registered with this details!");
     }
 
     private List<GrantedAuthority> getGrantedAuthorities(Set<Role> authorities)

@@ -1,96 +1,99 @@
 package callofproject.dev.authentication.controller;
 
 
-import callofproject.dev.authentication.entity.AuthenticationRequest;
-import callofproject.dev.authentication.entity.AuthenticationResponse;
-import callofproject.dev.authentication.entity.RegisterRequest;
+import callofproject.dev.authentication.dto.ErrorMessage;
+import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
+import callofproject.dev.authentication.dto.auth.RegisterRequest;
 import callofproject.dev.authentication.service.AuthenticationService;
-import callofproject.dev.authentication.service.UserManagementService;
 import callofproject.dev.authentication.util.Util;
-import callofproject.dev.library.exception.service.DataServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.hc.core5.http.HttpStatus;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+import java.util.List;
 
-import static org.apache.hc.core5.http.HttpStatus.SC_NOT_FOUND;
+import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
+import static org.springframework.http.ResponseEntity.internalServerError;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("api/auth")
 public class AuthenticationController
 {
-    private final AuthenticationService service;
-    private final UserManagementService m_userManagementService;
+    private final AuthenticationService m_authenticationService;
 
-    public AuthenticationController(@Qualifier(Util.AUTHENTICATION_SERVICE) AuthenticationService service,
-                                    @Qualifier(Util.USER_MANAGEMENT_SERVICE) UserManagementService userManagementService)
+    public AuthenticationController(@Qualifier(Util.AUTHENTICATION_SERVICE) AuthenticationService service)
     {
-        this.service = service;
-        m_userManagementService = userManagementService;
+        this.m_authenticationService = service;
     }
 
-
+    /**
+     * Register to application.
+     *
+     * @param request represent the Register information.
+     * @return if success AuthenticationResponse else return ErrorMessage.
+     */
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request)
+    public ResponseEntity<Object> register(@Valid @RequestBody RegisterRequest request)
     {
-        try
-        {
-            return ResponseEntity.ok(service.register(request));
-        } catch (DataServiceException ignored)
-        {
-
-            return new ResponseEntity<>(new AuthenticationResponse(null, null, false),
-                    HttpStatusCode.valueOf(HttpStatus.SC_INTERNAL_SERVER_ERROR));
-        }
+        return subscribe(() -> ok(m_authenticationService.register(request)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
+    /**
+     * Register multiple user to application.
+     *
+     * @param request represent the Register information.
+     * @return if success AuthenticationResponse else return ErrorMessage.
+     */
+    @PostMapping("/register-all")
+    public ResponseEntity<Object> register(@RequestBody List<RegisterRequest> request)
+    {
+        return subscribe(() -> ok(m_authenticationService.register(request)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    /**
+     * Login operation for application.
+     *
+     * @param request represent the login information.
+     * @return if success returns AuthenticationResponse that include token and status else return ErrorMessage.
+     */
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request)
+    public ResponseEntity<Object> authenticate(@RequestBody AuthenticationRequest request)
     {
-        try
-        {
-            return ResponseEntity.ok(service.authenticate(request));
-        } catch (DataServiceException ignored)
-        {
-
-            return new ResponseEntity<>(new AuthenticationResponse(null, null, false),
-                    HttpStatusCode.valueOf(HttpStatus.SC_INTERNAL_SERVER_ERROR));
-        }
+        return subscribe(() -> ok(m_authenticationService.authenticate(request)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
+
+    /**
+     * Refresh token
+     *
+     * @param request  from Servlet
+     * @param response from Servlet
+     * @return success or not. Return type is boolean.
+     */
     @PostMapping("/refresh-token")
-    public ResponseEntity<Object> refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException
+    public ResponseEntity<Object> refreshToken(HttpServletRequest request, HttpServletResponse response)
     {
-        try
-        {
-            service.refreshToken(request, response);
-            return ResponseEntity.ok(true);
-        } catch (DataServiceException ignored)
-        {
-            return ResponseEntity.badRequest().body(false);
-        }
+        return subscribe(() -> ok(m_authenticationService.refreshToken(request, response)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
-
+    /**
+     * Validate the token with given token.
+     *
+     * @param token represent the request token
+     * @return success or not. Return type is boolean.
+     */
     @GetMapping("/validate")
     public ResponseEntity<Object> validateToken(@RequestParam("token") String token)
     {
-        try
-        {
-            var user = m_userManagementService.findUserByUsername(service.extractUsername(token));
-
-            if (user == null)
-                return new ResponseEntity<>("User not found!", HttpStatusCode.valueOf(SC_NOT_FOUND));
-
-            return ResponseEntity.ok(service.verifyTokenByTokenStr(token, user.getObject().getUsername()));
-        } catch (DataServiceException ignored)
-        {
-            return ResponseEntity.badRequest().body(false);
-        }
+        return subscribe(() -> ok(m_authenticationService.validateToken(token)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 }

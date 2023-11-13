@@ -2,8 +2,7 @@ package callofproject.dev.authentication.service;
 
 import callofproject.dev.authentication.dto.MessageResponseDTO;
 import callofproject.dev.authentication.dto.MultipleMessageResponseDTO;
-import callofproject.dev.authentication.dto.UserShowingAdminDTO;
-import callofproject.dev.authentication.dto.UsersShowingAdminDTO;
+import callofproject.dev.authentication.dto.admin.UsersShowingAdminDTO;
 import callofproject.dev.authentication.mapper.IUserMapper;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
@@ -12,15 +11,9 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.security.access.prepost.PreFilter;
 import org.springframework.stereotype.Service;
 
-import java.util.stream.StreamSupport;
-
 import static java.util.stream.StreamSupport.stream;
-import static org.springframework.data.domain.Sort.by;
 
 @Service
 @Lazy
@@ -44,7 +37,8 @@ public class AdminService
             var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
             var dtoList = m_userMapper
-                    .toUsersShowingAdminDTO(stream(m_managementServiceHelper.getUserServiceHelper().findAllPageable(pageable).spliterator(), true)
+                    .toUsersShowingAdminDTO(stream(m_managementServiceHelper.getUserServiceHelper()
+                            .findAllPageable(pageable).spliterator(), true)
                             .map(m_userMapper::toUserShowingAdminDTO).toList());
 
             var msg = String.format("%d user found!", dtoList.users().size());
@@ -85,8 +79,12 @@ public class AdminService
             var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
             var dtoList = m_userMapper
-                    .toUsersShowingAdminDTO(stream(m_managementServiceHelper.getUserServiceHelper().findUsersByUsernameContainsIgnoreCase(word, pageable).spliterator(), true)
-                            .map(m_userMapper::toUserShowingAdminDTO).toList());
+                    .toUsersShowingAdminDTO(stream(m_managementServiceHelper.getUserServiceHelper()
+                            .findUsersByUsernameContainsIgnoreCase(word, pageable).spliterator(), true)
+                            .map(m_userMapper::toUserShowingAdminDTO)
+                            .toList());
+            if (dtoList.users().isEmpty())
+                throw new DataServiceException("Users does not exists!");
 
             var msg = String.format("%d user found!", dtoList.users().size());
 

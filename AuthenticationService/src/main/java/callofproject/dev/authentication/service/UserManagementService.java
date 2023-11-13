@@ -1,54 +1,53 @@
 package callofproject.dev.authentication.service;
 
 
-import callofproject.dev.authentication.dto.UserResponseDTO;
-import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
-import callofproject.dev.library.exception.service.DataServiceException;
-import callofproject.dev.repository.authentication.BeanName;
-import callofproject.dev.repository.authentication.dal.RoleServiceHelper;
-import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
-
-import callofproject.dev.repository.authentication.entity.Role;
-import callofproject.dev.repository.authentication.entity.User;
+import callofproject.dev.authentication.dto.*;
 import callofproject.dev.authentication.mapper.IUserMapper;
+import callofproject.dev.library.exception.service.DataServiceException;
+import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
+import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.repository.nosql.IMatchDbRepository;
-import callofproject.dev.repository.authentication.repository.rdbms.IRoleRepository;
 import callofproject.dev.service.jwt.JwtUtil;
+import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.StreamSupport;
 
 import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
 import static callofproject.dev.repository.authentication.BeanName.USER_MANAGEMENT_DAL_BEAN;
+import static java.lang.String.format;
+import static java.util.stream.StreamSupport.stream;
 
 
 @Service(USER_MANAGEMENT_SERVICE)
 @Lazy
 public class UserManagementService
 {
+    @Value("${spring.data.web.pageable.default-page-size}")
+    private int m_defaultPageSize;
+
     private final UserManagementServiceHelper m_serviceHelper;
     private final IMatchDbRepository m_matchDbRepository;
     private final IUserMapper m_userMapper;
-    private final RoleServiceHelper m_roleRepository;
 
     public UserManagementService(@Qualifier(USER_MANAGEMENT_DAL_BEAN) UserManagementServiceHelper serviceHelper,
-                                 IMatchDbRepository matchDbRepository, IUserMapper userMapper,
-                                 @Qualifier(BeanName.ROLE_DAL_BEAN) RoleServiceHelper roleRepository)
+                                 IMatchDbRepository matchDbRepository,
+                                 IUserMapper userMapper)
     {
         m_serviceHelper = serviceHelper;
         m_matchDbRepository = matchDbRepository;
         m_userMapper = userMapper;
-        m_roleRepository = roleRepository;
     }
 
 
-    public UserResponseDTO<User> saveUser(UserSignUpRequestDTO userDTO) throws DataServiceException
+    public UserSaveDTO saveUser(UserSignUpRequestDTO userDTO) throws DataServiceException
     {
         try
         {
@@ -67,15 +66,49 @@ public class UserManagementService
             var token = JwtUtil.generateToken(claims, user.getUsername());
             var refreshToken = JwtUtil.generateToken(claims, user.getUsername());
 
-            return new UserResponseDTO<User>(true, token, refreshToken);
-        }
-        catch (Exception exception)
+            return new UserSaveDTO(token, refreshToken, true, savedUser.getUserId());
+        } catch (Exception exception)
         {
             throw new DataServiceException("User cannot be saved!");
         }
     }
 
-    public UserResponseDTO<User> findUserByUsername(String username)
+
+    public Iterable<User> saveUsers(List<UserSignUpRequestDTO> userDTOs) throws DataServiceException
+    {
+        try
+        {
+            var list = new ArrayList<User>();
+            for (var userDTO : userDTOs)
+            {
+                var user = m_userMapper.toUser(userDTO);
+                list.add(user);
+            }
+
+            return m_serviceHelper.getUserServiceHelper().saveAll(list);
+        } catch (Exception exception)
+        {
+            return Collections.emptyList();
+        }
+    }
+
+    public UserDTO findUserByUsername(String username)
+    {
+        try
+        {
+            var user = m_serviceHelper.getUserServiceHelper().findByUsername(username);
+
+            if (user.isEmpty())
+                throw new DataServiceException("User does not exists");
+
+            return m_userMapper.toUserDTO(user.get());
+        } catch (DataServiceException exception)
+        {
+            throw new DataServiceException(exception.getMessage());
+        }
+    }
+
+    public UserResponseDTO<User> findUserByUsernameForAuthenticationService(String username)
     {
         try
         {
@@ -91,32 +124,25 @@ public class UserManagementService
         }
     }
 
-
-
-   /* public void removeUser(User user)
+    public MultipleMessageResponseDTO<UsersDTO> findAllUsersPageableByContainsWord(int page, String word)
     {
-        m_userRepository.delete(user);
-    }
+        try
+        {
+            var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
-    public void removeUserById(UUID uuid)
-    {
-        m_userRepository.deleteById(uuid);
-    }
+            var dtoList = m_userMapper
+                    .toUsersDTO(stream(m_serviceHelper.getUserServiceHelper()
+                            .findUsersByUsernameContainsIgnoreCase(word, pageable).spliterator(), true)
+                            .map(m_userMapper::toUserDTO)
+                            .toList());
 
-    public Optional<User> findById(UUID id)
-    {
-        return m_userRepository.findById(id);
-    }
+            var msg = format("%d user found!", dtoList.users().size());
 
-    public Iterable<User> findAll()
-    {
-        return m_userRepository.findAll();
-    }
+            return new MultipleMessageResponseDTO<>(page, dtoList.users().size(), msg, HttpStatus.SC_OK, dtoList);
 
-    public Optional<User> findByEmail(String email)
-    {
-        return m_userRepository.findByEmail(email);
+        } catch (DataServiceException ex)
+        {
+            throw new DataServiceException("Internal Server Error!");
+        }
     }
-*/
-
 }

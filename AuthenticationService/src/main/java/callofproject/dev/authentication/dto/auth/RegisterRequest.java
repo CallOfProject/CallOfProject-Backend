@@ -1,23 +1,42 @@
-package callofproject.dev.authentication.entity;
+package callofproject.dev.authentication.dto.auth;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.time.LocalDate;
 
 public class RegisterRequest
 {
     @JsonProperty("first_name")
+    @NotBlank(message = "first name cannot be empty")
+    @NotEmpty
     private String m_firstName;
     @JsonProperty("last_name")
+    @NotBlank(message = "last name cannot be empty")
+    @NotEmpty
     private String m_lastName;
     @JsonProperty("middle_name")
+    @NotBlank(message = "middle name cannot be empty")
+    @NotEmpty
     private String m_middleName;
     @JsonProperty("username")
+    @NotBlank(message = "username cannot be empty")
+    @NotEmpty
     private String m_username;
+    @NotBlank(message = "email cannot be empty")
+    @NotEmpty
     private String email;
+    @NotBlank(message = "password cannot be empty")
+    @NotEmpty
     private String password;
+    @NotBlank(message = "birthdate cannot be empty")
+    @NotEmpty
     @JsonProperty("birth_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate m_birthDate;
+
 
     public RegisterRequest()
     {

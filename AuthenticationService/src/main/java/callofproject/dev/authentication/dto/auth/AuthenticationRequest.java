@@ -1,6 +1,5 @@
-package callofproject.dev.authentication.entity;
+package callofproject.dev.authentication.dto.auth;
 
 public record AuthenticationRequest(String username, String password)
 {
-
 }
