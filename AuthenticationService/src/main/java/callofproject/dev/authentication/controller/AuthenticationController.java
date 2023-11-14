@@ -27,6 +27,7 @@ public class AuthenticationController
 {
     private final AuthenticationService m_authenticationService;
 
+
     public AuthenticationController(@Qualifier(Util.AUTHENTICATION_SERVICE) AuthenticationService service)
     {
         this.m_authenticationService = service;

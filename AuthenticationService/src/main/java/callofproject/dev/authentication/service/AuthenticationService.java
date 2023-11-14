@@ -26,6 +26,7 @@ import java.util.List;
 
 import static callofproject.dev.authentication.util.Util.AUTHENTICATION_SERVICE;
 import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
+import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 
 @Service(AUTHENTICATION_SERVICE)
 @Lazy
@@ -45,27 +46,50 @@ public class AuthenticationService
         m_authenticationProvider = authenticationProvider;
     }
 
-
-    public AuthenticationResponse register(RegisterRequest request) throws DataServiceException
+    /**
+     * Register user with given RegisterRequest parameter.
+     *
+     * @param request represent the request.
+     * @return AuthenticationResponse.
+     */
+    public AuthenticationResponse register(RegisterRequest request)
     {
-        try
-        {
-            var dto = new UserSignUpRequestDTO(request.getEmail(),
-                    request.getFirstName(),
-                    request.getMiddleName(),
-                    request.getLastName(),
-                    request.getUsername(),
-                    m_passwordEncoder.encode(request.getPassword()),
-                    request.getBirthDate(),
-                    RoleEnum.ROLE_USER);
+        return doForDataService(() -> registerUserCallback(request), "AuthenticationService::register");
+    }
 
-            var user = m_userManagementService.saveUser(dto);
+    /**
+     * Login operation for users.
+     *
+     * @param request represent the AuthenticationRequest
+     * @return the AuthenticationResponse
+     */
+    public AuthenticationResponse authenticate(AuthenticationRequest request)
+    {
+        return doForDataService(() -> authenticateCallback(request), "AuthenticationService::authenticate");
+    }
 
-            return new AuthenticationResponse(user.accessToken(), user.refreshToken(), true);
-        } catch (Exception ex)
-        {
-            throw new DataServiceException(ex.getMessage());
-        }
+    /**
+     * Validate given token.
+     *
+     * @param token represent the jwt.
+     * @return boolean value.
+     */
+    public boolean validateToken(String token)
+    {
+        return doForDataService(() -> validateTokenCallback(token), "AuthenticationService::validateToken");
+    }
+
+    //-------------------------------------------------CALLBACK-----------------------------------------------------
+    private AuthenticationResponse registerUserCallback(RegisterRequest request)
+    {
+        var dto = new UserSignUpRequestDTO(request.getEmail(), request.getFirstName(),
+                request.getMiddleName(), request.getLastName(), request.getUsername(),
+                m_passwordEncoder.encode(request.getPassword()), request.getBirthDate(),
+                RoleEnum.ROLE_USER);
+
+        var user = m_userManagementService.saveUser(dto);
+
+        return new AuthenticationResponse(user.accessToken(), user.refreshToken(), true);
     }
 
 
@@ -89,21 +113,19 @@ public class AuthenticationService
         return m_userManagementService.saveUsers(list);
     }
 
-    public boolean verifyTokenByTokenStr(String token, String username)
-    {
-        return JwtUtil.verifyWithUsernameAndToken(token, username);
-    }
-
-    public AuthenticationResponse authenticate(AuthenticationRequest request)
+    private AuthenticationResponse authenticateCallback(AuthenticationRequest request)
     {
         m_authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
         var user = m_userManagementService.findUserByUsernameForAuthenticationService(request.username());
+
         if (user.getObject() == null)
             return new AuthenticationResponse(null, null, false);
 
         var authorities = JwtUtil.populateAuthorities(user.getObject().getRoles());
         var claims = new HashMap<String, Object>();
+
         claims.put("authorities", authorities);
+
         var jwtToken = JwtUtil.generateToken(claims, user.getObject().getUsername());
         var refreshToken = JwtUtil.generateRefreshToken(claims, user.getObject().getUsername());
 
@@ -139,28 +161,16 @@ public class AuthenticationService
         return false;
     }
 
-    public String extractUsername(String token)
+
+    private boolean validateTokenCallback(String token)
     {
-        return JwtUtil.extractUsername(token);
-    }
+        var username = JwtUtil.extractUsername(token);
 
+        if (username == null || username.isBlank() || username.isEmpty())
+            throw new DataServiceException("User not found!");
 
-    public boolean validateToken(String token)
-    {
-        try
-        {
-            var username = extractUsername(token);
+        var user = m_userManagementService.findUserByUsername(username);
 
-            if (username == null || username.isBlank() || username.isEmpty())
-                throw new DataServiceException("User not found!");
-
-            var user = m_userManagementService.findUserByUsername(username);
-
-            return JwtUtil.isTokenValid(token, user.username());
-
-        } catch (DataServiceException ex)
-        {
-            return false;
-        }
+        return JwtUtil.isTokenValid(token, user.username());
     }
 }

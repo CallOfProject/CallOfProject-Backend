@@ -15,7 +15,6 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -30,14 +29,12 @@ public class AdminService
 {
 
     private final UserManagementServiceHelper m_managementServiceHelper;
-    private final PasswordEncoder m_passwordEncoder;
     private final AuthenticationProvider m_authenticationProvider;
     private final IUserMapper m_userMapper;
 
-    public AdminService(UserManagementServiceHelper managementServiceHelper, PasswordEncoder passwordEncoder, AuthenticationProvider authenticationProvider, IUserMapper userMapper)
+    public AdminService(UserManagementServiceHelper managementServiceHelper, AuthenticationProvider authenticationProvider, IUserMapper userMapper)
     {
         m_managementServiceHelper = managementServiceHelper;
-        m_passwordEncoder = passwordEncoder;
         m_authenticationProvider = authenticationProvider;
         m_userMapper = userMapper;
     }
@@ -114,8 +111,7 @@ public class AdminService
 
     private MessageResponseDTO<UserShowingAdminDTO> updateUserCallback(UserUpdateDTOAdmin userUpdateDTO)
     {
-        System.out.println(userUpdateDTO);
-        var user = m_managementServiceHelper.getUserServiceHelper().findByEmail(userUpdateDTO.email());
+        var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(userUpdateDTO.username());
 
         if (user.isEmpty())
             throw new DataServiceException("User not found!");
@@ -128,6 +124,7 @@ public class AdminService
         user.get().setAccountBlocked(userUpdateDTO.isAccountBlocked());
 
         var savedUser = m_managementServiceHelper.getUserServiceHelper().saveUser(user.get());
+
         var userDto = m_userMapper.toUserShowingAdminDTO(savedUser);
 
         return new MessageResponseDTO<>("User updated successfully!", HttpStatus.SC_OK, userDto);

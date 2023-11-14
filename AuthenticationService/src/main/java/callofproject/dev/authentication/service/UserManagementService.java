@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
+import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static callofproject.dev.repository.authentication.BeanName.USER_MANAGEMENT_DAL_BEAN;
 import static java.lang.String.format;
 import static java.util.stream.StreamSupport.stream;
@@ -41,39 +42,52 @@ public class UserManagementService
         m_userMapper = userMapper;
     }
 
-    private long getTotalPage()
+    /**
+     * Save User with given dto class.
+     *
+     * @param userDTO represent the dto class
+     * @return UserSaveDTO.
+     */
+    public UserSaveDTO saveUser(UserSignUpRequestDTO userDTO)
     {
-        return m_serviceHelper.getUserServiceHelper().getPageSize();
+        return doForDataService(() -> saveUserCallback(userDTO), "User cannot be saved!");
     }
 
-
-    public UserSaveDTO saveUser(UserSignUpRequestDTO userDTO) throws DataServiceException
+    /**
+     * Find user with given username
+     *
+     * @param username represent the username.
+     * @return UserDTO class.
+     */
+    public UserDTO findUserByUsername(String username)
     {
-        try
-        {
-            var user = m_userMapper.toUser(userDTO);
-
-            var savedUser = m_serviceHelper.getUserServiceHelper().saveUser(user);
-
-            if (savedUser == null)
-                throw new DataServiceException("User cannot be saved!");
-
-            var claims = new HashMap<String, Object>();
-
-            var authorities = JwtUtil.populateAuthorities(user.getRoles());
-            claims.put("authorities", authorities);
-
-            var token = JwtUtil.generateToken(claims, user.getUsername());
-            var refreshToken = JwtUtil.generateToken(claims, user.getUsername());
-
-            return new UserSaveDTO(token, refreshToken, true, savedUser.getUserId());
-        } catch (Exception exception)
-        {
-            throw new DataServiceException("User cannot be saved!");
-        }
+        return doForDataService(() -> findUserByUsernameCallback(username), "User does not exists!");
     }
 
+    /**
+     * Find User with given username but returns the user entity.
+     *
+     * @param username represent the username.
+     * @return User class.
+     */
+    public UserResponseDTO<User> findUserByUsernameForAuthenticationService(String username)
+    {
+        return doForDataService(() -> findUserByUsernameForAuthenticationServiceCallback(username), "User does not exists!");
+    }
 
+    /**
+     * Find all users with given word and page.
+     *
+     * @param page represent the page.
+     * @param word represent the containing word.
+     * @return UsersDTO class.
+     */
+    public MultipleMessageResponseDTO<UsersDTO> findAllUsersPageableByContainsWord(int page, String word)
+    {
+        return doForDataService(() -> findAllUsersPageableByContainsWordCallback(page, word), "UserManagementService::findAllUsersPageableByContainsWord");
+    }
+
+    //-----------------------------------------------------CALLBACK-----------------------------------------------------
     public Iterable<User> saveUsers(List<UserSignUpRequestDTO> userDTOs) throws DataServiceException
     {
         try
@@ -92,56 +106,63 @@ public class UserManagementService
         }
     }
 
-    public UserDTO findUserByUsername(String username)
+
+    private long getTotalPage()
     {
-        try
-        {
-            var user = m_serviceHelper.getUserServiceHelper().findByUsername(username);
-
-            if (user.isEmpty())
-                throw new DataServiceException("User does not exists");
-
-            return m_userMapper.toUserDTO(user.get());
-        } catch (DataServiceException exception)
-        {
-            throw new DataServiceException(exception.getMessage());
-        }
+        return m_serviceHelper.getUserServiceHelper().getPageSize();
     }
 
-    public UserResponseDTO<User> findUserByUsernameForAuthenticationService(String username)
+
+    public UserSaveDTO saveUserCallback(UserSignUpRequestDTO userDTO)
     {
-        try
-        {
-            var user = m_serviceHelper.getUserServiceHelper().findByUsername(username);
+        var user = m_userMapper.toUser(userDTO);
 
-            if (user.isEmpty())
-                throw new DataServiceException("User does not exists");
+        var savedUser = m_serviceHelper.getUserServiceHelper().saveUser(user);
 
-            return new UserResponseDTO<User>(true, user.get());
-        } catch (DataServiceException exception)
-        {
-            throw new DataServiceException(exception.getMessage());
-        }
+        if (savedUser == null)
+            throw new DataServiceException("User cannot be saved!");
+
+        var claims = new HashMap<String, Object>();
+
+        var authorities = JwtUtil.populateAuthorities(user.getRoles());
+        claims.put("authorities", authorities);
+
+        var token = JwtUtil.generateToken(claims, user.getUsername());
+        var refreshToken = JwtUtil.generateToken(claims, user.getUsername());
+        return new UserSaveDTO(token, refreshToken, true, savedUser.getUserId());
     }
 
-    public MultipleMessageResponseDTO<UsersDTO> findAllUsersPageableByContainsWord(int page, String word)
+
+    public UserDTO findUserByUsernameCallback(String username)
     {
-        try
-        {
+        var user = m_serviceHelper.getUserServiceHelper().findByUsername(username);
 
-            var dtoList = m_userMapper
-                    .toUsersDTO(stream(m_serviceHelper.getUserServiceHelper()
-                            .findUsersByUsernameContainsIgnoreCase(word, page).spliterator(), true)
-                            .map(m_userMapper::toUserDTO)
-                            .toList());
+        if (user.isEmpty())
+            throw new DataServiceException("User does not exists");
 
-            var msg = format("%d user found!", dtoList.users().size());
+        return m_userMapper.toUserDTO(user.get());
+    }
 
-            return new MultipleMessageResponseDTO<>(getTotalPage(), page, dtoList.users().size(), msg, dtoList);
+    public UserResponseDTO<User> findUserByUsernameForAuthenticationServiceCallback(String username)
+    {
+        var user = m_serviceHelper.getUserServiceHelper().findByUsername(username);
 
-        } catch (DataServiceException ex)
-        {
-            throw new DataServiceException("Internal Server Error!");
-        }
+        if (user.isEmpty())
+            throw new DataServiceException("User does not exists");
+
+        return new UserResponseDTO<User>(true, user.get());
+    }
+
+    public MultipleMessageResponseDTO<UsersDTO> findAllUsersPageableByContainsWordCallback(int page, String word)
+    {
+        var dtoList = m_userMapper
+                .toUsersDTO(stream(m_serviceHelper.getUserServiceHelper()
+                        .findUsersByUsernameContainsIgnoreCase(word, page).spliterator(), true)
+                        .map(m_userMapper::toUserDTO)
+                        .toList());
+
+        var msg = format("%d user found!", dtoList.users().size());
+
+        return new MultipleMessageResponseDTO<>(getTotalPage(), page, dtoList.users().size(), msg, dtoList);
     }
 }

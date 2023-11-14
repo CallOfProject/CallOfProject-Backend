@@ -6,6 +6,7 @@ import callofproject.dev.authentication.dto.admin.UserUpdateDTOAdmin;
 import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.service.AdminService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +33,7 @@ public class AdminController
      * @return if success returns AuthenticationResponse that include token and status else return ErrorMessage.
      */
     @PostMapping("/login")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> authenticate(@RequestBody AuthenticationRequest request)
     {
         return subscribe(() -> ok(m_adminService.authenticate(request)),
@@ -91,7 +93,12 @@ public class AdminController
                 msg -> internalServerError().body(new ErrorMessage("Users Not Found!", false, 500)));
     }
 
-
+    /**
+     * Update user with given information.
+     *
+     * @param userUpdateDTO represent the user information.
+     * @return the UserShowingAdminDTO.
+     */
     @PutMapping("update/user")
     public ResponseEntity<Object> updateUserByUsername(@RequestBody UserUpdateDTOAdmin userUpdateDTO)
     {

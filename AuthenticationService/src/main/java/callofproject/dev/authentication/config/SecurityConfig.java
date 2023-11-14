@@ -12,9 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
@@ -30,41 +28,42 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 public class SecurityConfig
 {
     private static final String[] AUTH_WHITELIST = {
-            "/swagger-resources/",
-            "/swagger-ui/",
-            "/v3/api-docs/"
+            "/api/forgot-password/**",
+            "/api/auth/register",
+            "/swagger-ui/**",
+            "/api/auth/login",
+            "/api/admin/login"
+    };
+
+    private static final String[] ROOT_AND_ADMIN_WHITE_LIST = {
+            "/api/auth/refresh-token",
+            "/api/auth/validate",
+            "/api/admin/**"
     };
     private final AuthenticationProvider authenticationProvider;
-    private final LogoutHandler logoutHandler;
+    //private final LogoutSuccessHandler logoutHandler;
 
-    public SecurityConfig(AuthenticationProvider authenticationProvider, LogoutHandler logoutHandler)
+    public SecurityConfig(AuthenticationProvider authenticationProvider)
     {
         this.authenticationProvider = authenticationProvider;
-        this.logoutHandler = logoutHandler;
+        //this.logoutHandler = logoutHandler;
     }
 
     private static void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests)
     {
         requests
-                .requestMatchers("/api/auth/register").permitAll()
-                .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers(antMatcher("/api-docs/**")).permitAll()
-                .requestMatchers("/api/auth/login").permitAll()
-                .requestMatchers("/api/admin/login").permitAll()
-                .requestMatchers("/api/auth/refresh-token").hasAnyRole("ROOT", "ADMIN")
-                .requestMatchers("/api/auth/validate").hasAnyRole("ROOT", "ADMIN")
+                .requestMatchers(AUTH_WHITELIST).permitAll()
+                .requestMatchers(ROOT_AND_ADMIN_WHITE_LIST).hasAnyRole("ROOT", "ADMIN")
+                .requestMatchers("/api/auth/logout").authenticated()
                 .requestMatchers("/api/users/**").hasAnyRole("USER")
                 .requestMatchers("/api/root/**").hasAnyRole("ROOT")
-                .requestMatchers("/api/admin/**").hasAnyRole("ROOT", "ADMIN");
+                .requestMatchers("/api/auth/register-all").denyAll();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
-
-         /* CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-          requestHandler.setCsrfRequestAttributeName("_csrf");*/
-
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(corsCustomizer -> corsCustomizer.configurationSource(this::setCorsConfig))
                 .csrf(AbstractHttpConfigurer::disable);
@@ -76,9 +75,9 @@ public class SecurityConfig
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authenticationProvider(authenticationProvider);
 
-        http.logout(logout -> logout.logoutUrl("/api/auth/logout")
+      /*  http.logout(logout -> logout.logoutUrl("/api/auth/logout")
                 .addLogoutHandler(logoutHandler)
-                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()));
+                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()));*/
 
         return http.build();
     }

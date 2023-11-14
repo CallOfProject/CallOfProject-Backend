@@ -9,6 +9,8 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
+
 @Service
 @Lazy
 public class RootService
@@ -20,8 +22,31 @@ public class RootService
         m_managementServiceHelper = managementServiceHelper;
     }
 
-
+    /**
+     * Give Admin tole to user
+     *
+     * @param username represent the user.
+     * @return boolean value.
+     */
     public MessageResponseDTO<Boolean> giveAdminRoleByUsername(String username)
+    {
+        return doForDataService(() -> giveAdminRoleByUsernameCallback(username), "");
+    }
+
+    /**
+     * Remove admin role from user.
+     *
+     * @param username represent the user.
+     * @return boolean value.
+     */
+    public MessageResponseDTO<Boolean> removeAdminRoleByUsername(String username)
+    {
+        return doForDataService(() -> removeAdminRoleByUsernameCallback(username), "");
+    }
+
+    //-----------------------------------------------------CALLBACK-----------------------------------------------------
+
+    private MessageResponseDTO<Boolean> giveAdminRoleByUsernameCallback(String username)
     {
         var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(username);
 
@@ -38,7 +63,7 @@ public class RootService
         return new MessageResponseDTO<>("Success!", HttpStatus.SC_OK, true);
     }
 
-    public MessageResponseDTO<Boolean> removeAdminRoleByUsername(String username)
+    private MessageResponseDTO<Boolean> removeAdminRoleByUsernameCallback(String username)
     {
         var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(username);
 
