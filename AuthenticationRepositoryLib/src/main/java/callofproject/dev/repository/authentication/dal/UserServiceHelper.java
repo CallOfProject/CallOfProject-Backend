@@ -134,4 +134,10 @@ public class UserServiceHelper
         var pageable = of(page - 1, m_defaultPageSize);
         return doForRepository(() -> m_userRepository.findUsersByCreationDateBetween(start, end, pageable), "UserRepository::findUsersByCreationDateBetween");
     }
+
+
+    public long countUsersByCreationDateAfter(LocalDate date)
+    {
+        return doForRepository(() -> m_userRepository.countUsersByCreationDateAfter(date), "UserRepository::countUsersByCreationDateAfter");
+    }
 }

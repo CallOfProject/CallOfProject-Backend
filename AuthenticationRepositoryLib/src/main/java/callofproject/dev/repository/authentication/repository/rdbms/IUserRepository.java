@@ -37,4 +37,5 @@ public interface IUserRepository extends JpaRepository<User, UUID>
     Page<User> findUsersByCreationDate(LocalDate creationDate, Pageable pageable);
 
     Page<User> findUsersByCreationDateBetween(LocalDate start, LocalDate end, Pageable pageable);
+    long countUsersByCreationDateAfter(LocalDate date);
 }

@@ -30,7 +30,7 @@ public class RootService
      */
     public MessageResponseDTO<Boolean> giveAdminRoleByUsername(String username)
     {
-        return doForDataService(() -> giveAdminRoleByUsernameCallback(username), "");
+        return doForDataService(() -> giveAdminRoleByUsernameCallback(username), "RootService::giveAdminRoleByUsername");
     }
 
     /**
@@ -41,7 +41,7 @@ public class RootService
      */
     public MessageResponseDTO<Boolean> removeAdminRoleByUsername(String username)
     {
-        return doForDataService(() -> removeAdminRoleByUsernameCallback(username), "");
+        return doForDataService(() -> removeAdminRoleByUsernameCallback(username), "RootService::removeAdminRoleByUsername");
     }
 
     //-----------------------------------------------------CALLBACK-----------------------------------------------------

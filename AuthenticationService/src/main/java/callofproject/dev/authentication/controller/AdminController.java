@@ -90,7 +90,7 @@ public class AdminController
     public ResponseEntity<Object> removeUserByUsername(@RequestParam("uname") String username)
     {
         return subscribe(() -> ok(m_adminService.removeUser(username)),
-                msg -> internalServerError().body(new ErrorMessage("Users Not Found!", false, 500)));
+                msg -> internalServerError().body(new ErrorMessage("User not removed!", false, 500)));
     }
 
     /**
@@ -103,6 +103,31 @@ public class AdminController
     public ResponseEntity<Object> updateUserByUsername(@RequestBody UserUpdateDTOAdmin userUpdateDTO)
     {
         return subscribe(() -> ok(m_adminService.updateUser(userUpdateDTO)),
+                msg -> internalServerError().body(new ErrorMessage("User not updated!", false, 500)));
+    }
+
+    /**
+     * Find Total User Count.
+     *
+     * @return the total user count
+     */
+    @GetMapping("find/user/all/count")
+    public ResponseEntity<Object> findAllUserCount()
+    {
+        return subscribe(() -> ok(m_adminService.findAllUserCount()),
+                msg -> internalServerError().body(new ErrorMessage("Users Not Found!", false, 500)));
+    }
+
+    /**
+     * Find new user last n day.
+     *
+     * @param day represent the day
+     * @return the new user count
+     */
+    @GetMapping("find/user/all/new")
+    public ResponseEntity<Object> findNewUserCount(@RequestParam("n") int day)
+    {
+        return subscribe(() -> ok(m_adminService.findNewUsersLastNday(day)),
                 msg -> internalServerError().body(new ErrorMessage("Users Not Found!", false, 500)));
     }
 }

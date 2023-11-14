@@ -18,9 +18,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.concurrent.ExecutionException;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
+import static java.time.LocalDate.now;
 import static java.util.stream.StreamSupport.stream;
 
 @Service
@@ -100,7 +100,27 @@ public class AdminService
                 "AdminService::findUsersByUsernameNotContainsIgnoreCase");
     }
 
+    /**
+     * Find total user count.
+     *
+     * @return the total user count
+     */
+    public long findAllUserCount()
+    {
+        return doForDataService(() -> m_managementServiceHelper.getUserServiceHelper().count(), "AdminService::findAllUserCount");
+    }
 
+    /**
+     * Find new users last n day.
+     *
+     * @param day represent the day
+     * @return new user count.
+     */
+    public long findNewUsersLastNday(long day)
+    {
+        return doForDataService(() -> m_managementServiceHelper.getUserServiceHelper().countUsersByCreationDateAfter(now().minusDays(day)),
+                "AdminService::findNewUsersLastNday");
+    }
     //-------------------------------------------CALLBACKS-------------------------------------------------------------
 
     private long getTotalPage()
@@ -158,14 +178,11 @@ public class AdminService
         return new MultipleMessageResponseDTO<>(getTotalPage(), page, dtoList.users().size(), msg, dtoList);
     }
 
-    private MultipleMessageResponseDTO<UsersShowingAdminDTO> findUsersByUsernameContainsIgnoreCaseCallback(int page, String word) throws ExecutionException, InterruptedException
+    private MultipleMessageResponseDTO<UsersShowingAdminDTO> findUsersByUsernameContainsIgnoreCaseCallback(int page, String word)
     {
         var dtoList = m_userMapper.toUsersShowingAdminDTO(stream(m_managementServiceHelper.getUserServiceHelper()
                 .findUsersByUsernameContainsIgnoreCase(word, page).spliterator(), true)
                 .map(m_userMapper::toUserShowingAdminDTO).toList());
-
-        if (dtoList.users().isEmpty())
-            throw new DataServiceException("Users does not exists!");
 
         var msg = String.format("%d user found!", dtoList.users().size());
 
