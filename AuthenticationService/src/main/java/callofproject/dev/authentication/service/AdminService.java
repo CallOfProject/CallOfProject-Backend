@@ -11,6 +11,7 @@ import callofproject.dev.authentication.mapper.IUserMapper;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
 import callofproject.dev.repository.authentication.entity.Role;
+import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.enumeration.RoleEnum;
 import callofproject.dev.service.jwt.JwtUtil;
 import org.apache.hc.core5.http.HttpStatus;
@@ -206,6 +207,23 @@ public class AdminService
         return new MultipleMessageResponseDTO<>(getTotalPage(), page, dtoList.users().size(), msg, dtoList);
     }
 
+    private String findTopRole(User user)
+    {
+        var role = RoleEnum.ROLE_USER.getRole();
+
+        for (var r : user.getRoles())
+        {
+            if (r.getName().equals(RoleEnum.ROLE_ROOT.getRole()))
+            {
+                role = RoleEnum.ROLE_ROOT.getRole();
+                break;
+            }
+            if (r.getName().equals(RoleEnum.ROLE_ADMIN.getRole()))
+                role = RoleEnum.ROLE_ADMIN.getRole();
+        }
+        return role;
+    }
+
 
     public Object authenticate(AuthenticationRequest request)
     {
@@ -213,7 +231,7 @@ public class AdminService
         var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(request.username());
 
         if (user.isEmpty())
-            return new AuthenticationResponse(null, null, false);
+            return new AuthenticationResponse(null, null, false, null);
 
         if (!user.get().isAdmin())
             throw new DataServiceException("You are not admin!");
@@ -224,6 +242,6 @@ public class AdminService
         var jwtToken = JwtUtil.generateToken(claims, user.get().getUsername());
         var refreshToken = JwtUtil.generateRefreshToken(claims, user.get().getUsername());
 
-        return new AuthenticationResponse(jwtToken, refreshToken, true);
+        return new AuthenticationResponse(jwtToken, refreshToken, true, findTopRole(user.get()));
     }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AuthenticationResponse
 {
 
+    private String role;
     @JsonProperty("success")
     private boolean isSuccess;
     @JsonProperty("access_token")
@@ -12,11 +13,22 @@ public class AuthenticationResponse
     @JsonProperty("refresh_token")
     private String refreshToken;
 
-    public AuthenticationResponse(String accessToken, String refreshToken, boolean isSuccess)
+    public AuthenticationResponse(String accessToken, String refreshToken, boolean isSuccess, String role)
     {
+        this.role = role;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.isSuccess = isSuccess;
+    }
+
+    public String getRole()
+    {
+        return role;
+    }
+
+    public void setRole(String role)
+    {
+        this.role = role;
     }
 
     public boolean isSuccess()
