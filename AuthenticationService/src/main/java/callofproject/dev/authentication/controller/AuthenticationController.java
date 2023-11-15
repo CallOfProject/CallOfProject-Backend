@@ -55,7 +55,7 @@ public class AuthenticationController
     @PostMapping("/register-all")
     public ResponseEntity<Object> register(@RequestBody List<RegisterRequest> request)
     {
-        return subscribe(() -> ok(m_authenticationService.register(request)),
+        return subscribe(() -> ok(m_authenticationService.registerAll(request)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 

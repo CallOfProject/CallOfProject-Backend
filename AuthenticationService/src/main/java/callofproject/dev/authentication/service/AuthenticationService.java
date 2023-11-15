@@ -93,7 +93,7 @@ public class AuthenticationService
     }
 
 
-    public Iterable<User> register(List<RegisterRequest> requests) throws DataServiceException
+    public Iterable<User> registerAll(List<RegisterRequest> requests)
     {
         var list = new ArrayList<UserSignUpRequestDTO>();
         for (var request : requests)

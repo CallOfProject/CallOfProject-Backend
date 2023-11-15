@@ -51,21 +51,36 @@ public class AuthenticationServiceApplication implements ApplicationRunner
     @Override
     public void run(ApplicationArguments args) throws Exception
     {
-     /*   if (m_userRepository.findByUsername("cop_root").isEmpty())
+        /*if (m_userRepository.findByUsername("cop_root").isEmpty())
         {
             var rootUser = new User("cop_root", "root", "root", "root", "canozturk309@gmail.com",
                     m_passwordEncoder.encode("cop123"), LocalDate.now(), new Role(RoleEnum.ROLE_ROOT.getRole()));
 
             rootUser.addRoleToUser(new Role(RoleEnum.ROLE_USER.getRole()));
             rootUser.addRoleToUser(new Role(RoleEnum.ROLE_ADMIN.getRole()));
+            var profile1 = new UserProfile();
+            profile1.setUser(rootUser);
+            rootUser.setUserProfile(profile1);
 
             m_userRepository.save(rootUser);
 
             var adminUser = new User("cop_admin", "admin", "admin", "admin", "nuricanozturk01@gmail.com",
                     m_passwordEncoder.encode("cop_123"), LocalDate.now(), new Role(RoleEnum.ROLE_ADMIN.getRole()));
-
+            adminUser.setUserProfile(new UserProfile());
             adminUser.addRoleToUser(new Role(RoleEnum.ROLE_USER.getRole()));
+
+            var profile2 = new UserProfile();
+            profile2.setUser(adminUser);
+            adminUser.setUserProfile(profile2);
             m_userRepository.save(adminUser);
+        } else
+        {
+            var usr = m_userRepository.findByUsername("cop_root");
+            System.out.println("name: " + usr.get().getUsername());
+            var profileUser = usr.get().getUserProfile();
+            System.out.println("id: " + profileUser.getUserProfileId());
+            var ptu = profileUser.getUser();
+            System.out.println("Profile to user: " + ptu.getUsername());
         }*/
     }
 }

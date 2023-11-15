@@ -6,6 +6,7 @@ import callofproject.dev.authentication.mapper.IUserMapper;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
 import callofproject.dev.repository.authentication.entity.User;
+import callofproject.dev.repository.authentication.entity.UserProfile;
 import callofproject.dev.repository.authentication.repository.nosql.IMatchDbRepository;
 import callofproject.dev.service.jwt.JwtUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -96,6 +97,10 @@ public class UserManagementService
             for (var userDTO : userDTOs)
             {
                 var user = m_userMapper.toUser(userDTO);
+                var userProfile = new UserProfile();
+
+                userProfile.setUser(user);
+                user.setUserProfile(userProfile);
                 list.add(user);
             }
 
@@ -117,6 +122,11 @@ public class UserManagementService
     {
         var user = m_userMapper.toUser(userDTO);
 
+        var userProfile = new UserProfile();
+
+        userProfile.setUser(user);
+        user.setUserProfile(userProfile);
+
         var savedUser = m_serviceHelper.getUserServiceHelper().saveUser(user);
 
         if (savedUser == null)
@@ -129,6 +139,7 @@ public class UserManagementService
 
         var token = JwtUtil.generateToken(claims, user.getUsername());
         var refreshToken = JwtUtil.generateToken(claims, user.getUsername());
+
         return new UserSaveDTO(token, refreshToken, true, savedUser.getUserId());
     }
 

@@ -52,13 +52,13 @@ public class SecurityConfig
     private static void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests)
     {
         requests
+                .requestMatchers("/api/auth/register-all").permitAll()
                 .requestMatchers(antMatcher("/api-docs/**")).permitAll()
                 .requestMatchers(AUTH_WHITELIST).permitAll()
                 .requestMatchers(ROOT_AND_ADMIN_WHITE_LIST).hasAnyRole("ROOT", "ADMIN")
                 .requestMatchers("/api/auth/logout").authenticated()
                 .requestMatchers("/api/users/**").hasAnyRole("USER")
-                .requestMatchers("/api/root/**").hasAnyRole("ROOT")
-                .requestMatchers("/api/auth/register-all").denyAll();
+                .requestMatchers("/api/root/**").hasAnyRole("ROOT");
     }
 
     @Bean

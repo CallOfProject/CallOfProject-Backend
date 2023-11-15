@@ -23,10 +23,10 @@ public class UserProfile
     private String aboutMe;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userProfile")
     private User user;
+
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_rate_id")
     private UserRate userRate;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -62,6 +62,7 @@ public class UserProfile
         this.profilePhoto = profilePhoto;
         this.aboutMe = aboutMe;
     }
+
 
     public UUID getUserProfileId()
     {

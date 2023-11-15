@@ -10,6 +10,8 @@ import callofproject.dev.authentication.dto.auth.AuthenticationResponse;
 import callofproject.dev.authentication.mapper.IUserMapper;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
+import callofproject.dev.repository.authentication.entity.Role;
+import callofproject.dev.repository.authentication.enumeration.RoleEnum;
 import callofproject.dev.service.jwt.JwtUtil;
 import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.context.annotation.Lazy;
@@ -135,6 +137,10 @@ public class AdminService
 
         if (user.isEmpty())
             throw new DataServiceException("User not found!");
+
+        if (user.get().getRoles().stream().map(Role::getName).anyMatch(roleName -> roleName.equals(RoleEnum.ROLE_ROOT.getRole())
+                || roleName.equals(RoleEnum.ROLE_ADMIN.getRole())))
+            throw new DataServiceException("You cannot edit this user!");
 
         user.get().setEmail(userUpdateDTO.email());
         user.get().setBirthDate(userUpdateDTO.birthDate());
