@@ -20,7 +20,9 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static java.time.LocalDate.now;
@@ -99,8 +101,8 @@ public class AdminService
      */
     public MessageResponseDTO<UserShowingAdminDTO> updateUser(UserUpdateDTOAdmin userUpdateDTO)
     {
-        return doForDataService(() -> updateUserCallback(userUpdateDTO),
-                "AdminService::findUsersByUsernameNotContainsIgnoreCase");
+        return doForDataService(() -> updateUserCallbackAdmin(userUpdateDTO),
+                "AdminService::updateUser");
     }
 
     /**
@@ -139,8 +141,56 @@ public class AdminService
         if (user.isEmpty())
             throw new DataServiceException("User not found!");
 
-        if (user.get().getRoles().stream().map(Role::getName).anyMatch(roleName -> roleName.equals(RoleEnum.ROLE_ROOT.getRole())
-                || roleName.equals(RoleEnum.ROLE_ADMIN.getRole())))
+        if (user.get().getRoles().stream().map(Role::getName)
+                .anyMatch(roleName -> roleName.equals(RoleEnum.ROLE_ROOT.getRole()) || roleName.equals(RoleEnum.ROLE_ADMIN.getRole())))
+            throw new DataServiceException("You cannot edit this user!");
+
+        user.get().setEmail(userUpdateDTO.email());
+        user.get().setBirthDate(userUpdateDTO.birthDate());
+        user.get().setFirstName(userUpdateDTO.firstName());
+        user.get().setMiddleName(userUpdateDTO.middleName());
+        user.get().setLastName(userUpdateDTO.lastName());
+        user.get().setAccountBlocked(userUpdateDTO.isAccountBlocked());
+
+        var savedUser = m_managementServiceHelper.getUserServiceHelper().saveUser(user.get());
+
+        var userDto = m_userMapper.toUserShowingAdminDTO(savedUser);
+
+        return new MessageResponseDTO<>("User updated successfully!", HttpStatus.SC_OK, userDto);
+    }
+
+    private int compareRole(String role1, String role2)
+    {
+        var roleOrder = Arrays.asList(RoleEnum.ROLE_ROOT.getRole(), RoleEnum.ROLE_ADMIN.getRole(), RoleEnum.ROLE_USER.getRole());
+
+        int index1 = roleOrder.indexOf(role1);
+        int index2 = roleOrder.indexOf(role2);
+
+        if (index1 == -1 || index2 == -1)
+            return 0;
+
+        return Integer.compare(index1, index2);
+    }
+
+
+    private MessageResponseDTO<UserShowingAdminDTO> updateUserCallbackAdmin(UserUpdateDTOAdmin userUpdateDTO)
+    {
+        var authorizedPerson = m_managementServiceHelper.getUserServiceHelper().findById(UUID.fromString(userUpdateDTO.adminId()));
+
+        var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(userUpdateDTO.username());
+
+        if (user.isEmpty() || authorizedPerson.isEmpty())
+            throw new DataServiceException("User not found!");
+
+        if (!authorizedPerson.get().isAdminOrRoot())
+            throw new DataServiceException("Denied Permissions!");
+
+        var userRole = findTopRole(user.get());
+        var authorizedPersonRole = findTopRole(authorizedPerson.get());
+
+        var compareResult = compareRole(authorizedPersonRole, userRole);
+
+        if (compareResult == 0 || compareResult == -1)
             throw new DataServiceException("You cannot edit this user!");
 
         user.get().setEmail(userUpdateDTO.email());
@@ -231,7 +281,10 @@ public class AdminService
         var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(request.username());
 
         if (user.isEmpty())
-            return new AuthenticationResponse(null, null, false, null);
+            return new AuthenticationResponse(null, null, false, null, true, null);
+
+        if (user.get().getIsAccountBlocked())
+            return new AuthenticationResponse(false, true);
 
         if (!user.get().isAdmin())
             throw new DataServiceException("You are not admin!");
@@ -242,6 +295,7 @@ public class AdminService
         var jwtToken = JwtUtil.generateToken(claims, user.get().getUsername());
         var refreshToken = JwtUtil.generateRefreshToken(claims, user.get().getUsername());
 
-        return new AuthenticationResponse(jwtToken, refreshToken, true, findTopRole(user.get()));
+        return new AuthenticationResponse(jwtToken, refreshToken, true, findTopRole(user.get()),
+                user.get().getIsAccountBlocked(), user.get().getUserId());
     }
 }

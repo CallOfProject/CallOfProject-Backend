@@ -8,6 +8,9 @@ import jakarta.validation.constraints.NotEmpty;
 import java.time.LocalDate;
 
 public record UserUpdateDTOAdmin(
+
+        @JsonProperty("admin_id")
+        String adminId,
         @NotBlank(message = "username name cannot be empty")
         @NotEmpty
         String username,

@@ -51,6 +51,7 @@ public class AuthenticationServiceApplication implements ApplicationRunner
     @Override
     public void run(ApplicationArguments args) throws Exception
     {
+        //save random user
         /*if (m_userRepository.findByUsername("cop_root").isEmpty())
         {
             var rootUser = new User("cop_root", "root", "root", "root", "canozturk309@gmail.com",

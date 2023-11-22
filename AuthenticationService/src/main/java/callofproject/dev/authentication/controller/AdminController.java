@@ -103,7 +103,7 @@ public class AdminController
     public ResponseEntity<Object> updateUserByUsername(@RequestBody UserUpdateDTOAdmin userUpdateDTO)
     {
         return subscribe(() -> ok(m_adminService.updateUser(userUpdateDTO)),
-                msg -> internalServerError().body(new ErrorMessage("User not updated!", false, 500)));
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
     /**

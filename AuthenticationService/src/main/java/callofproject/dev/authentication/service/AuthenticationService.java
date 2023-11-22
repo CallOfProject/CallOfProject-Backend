@@ -89,7 +89,8 @@ public class AuthenticationService
 
         var user = m_userManagementService.saveUser(dto);
 
-        return new AuthenticationResponse(user.accessToken(), user.refreshToken(), true, RoleEnum.ROLE_USER.getRole());
+        return new AuthenticationResponse(user.accessToken(), user.refreshToken(), true,
+                RoleEnum.ROLE_USER.getRole(), user.userId());
     }
 
 
@@ -119,7 +120,11 @@ public class AuthenticationService
         var user = m_userManagementService.findUserByUsernameForAuthenticationService(request.username());
 
         if (user.getObject() == null)
-            return new AuthenticationResponse(null, null, false, null);
+            return new AuthenticationResponse(null, null, false, null, false,
+                    null);
+
+        if (user.getObject().getIsAccountBlocked())
+            return new AuthenticationResponse(false, true);
 
         var topRole = findTopRole(user.getObject());
         var authorities = JwtUtil.populateAuthorities(user.getObject().getRoles());
@@ -130,7 +135,8 @@ public class AuthenticationService
         var jwtToken = JwtUtil.generateToken(claims, user.getObject().getUsername());
         var refreshToken = JwtUtil.generateRefreshToken(claims, user.getObject().getUsername());
 
-        return new AuthenticationResponse(jwtToken, refreshToken, true, topRole);
+        return new AuthenticationResponse(jwtToken, refreshToken, true, topRole, false,
+                user.getObject().getUserId());
     }
 
     private String findTopRole(User user)
@@ -170,7 +176,8 @@ public class AuthenticationService
             {
                 var accessToken = JwtUtil.generateToken(user.getObject().getUsername());
                 var topRole = findTopRole(user.getObject());
-                var authResponse = new AuthenticationResponse(accessToken, refreshToken, true, topRole);
+                var authResponse = new AuthenticationResponse(accessToken, refreshToken, true, topRole,
+                        user.getObject().getIsAccountBlocked(), user.getObject().getUserId());
 
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
                 return true;
