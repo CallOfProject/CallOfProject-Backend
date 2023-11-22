@@ -1,4 +1,12 @@
-package callofproject.dev.repository.repository.project.entity.nosql;
+/*----------------------------------------------------------------
+	FILE		: ProjectTag.java
+	AUTHOR		: Nuri Can OZTURK
+	LAST UPDATE	: 22.11.2023
+	ProjectTag class represent the entity layer of the ProjectTag entity.
+	Copyleft (c) NoSQLRepository.
+	All Rights Free
+----------------------------------------------------------------*/
+package callofproject.dev.nosql.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;

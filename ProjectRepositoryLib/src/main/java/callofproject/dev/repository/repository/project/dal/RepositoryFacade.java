@@ -15,13 +15,11 @@ public class RepositoryFacade
     public final IProjectProfessionLevelRepository m_professionLevelRepository;
     public final IProjectRepository m_projectRepository;
     public final ISectorRepository m_sectorRepository;
-    public final ITagProjectRepository m_tagProjectRepository;
-    public final IUserTagRepository m_userTagRepository;
 
     public RepositoryFacade(IDegreeRepository degreeRepository, IInterviewTypeRepository interviewTypeRepository,
                             IProjectAccessTypeRepository projectAccessTypeRepository, IProjectLevelRepository projectLevelRepository,
                             IProjectProfessionLevelRepository professionLevelRepository, IProjectRepository projectRepository,
-                            ISectorRepository sectorRepository, ITagProjectRepository tagProjectRepository, IUserTagRepository userTagRepository)
+                            ISectorRepository sectorRepository)
     {
         m_degreeRepository = degreeRepository;
         m_interviewTypeRepository = interviewTypeRepository;
@@ -30,8 +28,6 @@ public class RepositoryFacade
         m_professionLevelRepository = professionLevelRepository;
         m_projectRepository = projectRepository;
         m_sectorRepository = sectorRepository;
-        m_tagProjectRepository = tagProjectRepository;
-        m_userTagRepository = userTagRepository;
     }
 
 

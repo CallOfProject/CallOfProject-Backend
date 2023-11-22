@@ -1,6 +1,10 @@
 package callofproject.dev.project;
 
-import callofproject.dev.repository.repository.project.entity.nosql.ProjectTag;
+import callofproject.dev.nosql.dal.ProjectTagServiceHelper;
+import callofproject.dev.nosql.entity.ProjectTag;
+import callofproject.dev.repository.repository.project.dal.ProjectServiceHelper;
+import callofproject.dev.repository.repository.project.entity.Project;
+import callofproject.dev.repository.repository.project.entity.enums.EInterviewType;
 import callofproject.dev.repository.repository.project.repository.*;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -13,11 +17,14 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
+import java.util.stream.StreamSupport;
+
 @SpringBootApplication
 @EnableDiscoveryClient
-@ComponentScan(basePackages = {"callofproject.dev.project", "callofproject.dev.repository.repository.project"})
-@EnableJpaRepositories(basePackages = "callofproject.dev.repository.repository.project") // Enable RDBMS ORM entities
-@EnableMongoRepositories(basePackages = "callofproject.dev.repository.repository.project") // Enable NoSQL ORM entities
+@ComponentScan(basePackages = {"callofproject.dev.project", "callofproject.dev.repository.repository.project", "callofproject.dev.nosql"})
+@EnableJpaRepositories(basePackages = {"callofproject.dev.repository.repository.project", "callofproject.dev.nosql"})
+// Enable RDBMS ORM entities
+@EnableMongoRepositories(basePackages = "callofproject.dev.nosql") // Enable NoSQL ORM entities
 @EntityScan(basePackages = "callofproject.dev.repository.repository.project")
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class ProjectServiceApplication implements ApplicationRunner
@@ -29,9 +36,11 @@ public class ProjectServiceApplication implements ApplicationRunner
     private final ISectorRepository m_sectorRepository;
     private final IProjectLevelRepository m_projectLevelRepository;
     private final IInterviewTypeRepository m_interviewTypeRepository;
-    private final ITagProjectRepository m_tagProjectRepository;
+    private final ProjectTagServiceHelper m_tagProjectRepository;
 
-    public ProjectServiceApplication(IProjectRepository projectRepository, IProjectAccessTypeRepository accessTypeRepository, IDegreeRepository degreeRepository, IProjectProfessionLevelRepository projectProfessionLevelRepository, ISectorRepository sectorRepository, IProjectLevelRepository projectLevelRepository, IInterviewTypeRepository interviewTypeRepository, ITagProjectRepository tagProjectRepository)
+    private final ProjectServiceHelper m_serviceHelper;
+
+    public ProjectServiceApplication(IProjectRepository projectRepository, IProjectAccessTypeRepository accessTypeRepository, IDegreeRepository degreeRepository, IProjectProfessionLevelRepository projectProfessionLevelRepository, ISectorRepository sectorRepository, IProjectLevelRepository projectLevelRepository, IInterviewTypeRepository interviewTypeRepository, ProjectTagServiceHelper tagProjectRepository, ProjectServiceHelper serviceHelper)
     {
         m_projectRepository = projectRepository;
         m_accessTypeRepository = accessTypeRepository;
@@ -41,6 +50,7 @@ public class ProjectServiceApplication implements ApplicationRunner
         m_projectLevelRepository = projectLevelRepository;
         m_interviewTypeRepository = interviewTypeRepository;
         m_tagProjectRepository = tagProjectRepository;
+        m_serviceHelper = serviceHelper;
     }
 
     public static void main(String[] args)
@@ -132,14 +142,19 @@ public class ProjectServiceApplication implements ApplicationRunner
         var saveP1 = m_projectRepository.save(project1);
         var saveP2 = m_projectRepository.save(project2);*/
 
-      /*    var p1 = m_projectRepository.findAll();
-           var projectTag = new ProjectTag("JAVA", p1.get(0).getProjectId());
+     /*   var p1 = m_projectRepository.findAll();
+        var projectTag = new ProjectTag("JAVA", p1.get(0).getProjectId());
         var projectTag2 = new ProjectTag("C#", p1.get(1).getProjectId());
         var projectTag3 = new ProjectTag("SPRING-BOOT", p1.get(0).getProjectId());
         var projectTag4 = new ProjectTag("ASP .NET CORE", p1.get(1).getProjectId());
 
-        m_tagProjectRepository.save(projectTag3);
-        m_tagProjectRepository.save(projectTag4);*/
+        m_tagProjectRepository.saveProjectTag(projectTag);
+        m_tagProjectRepository.saveProjectTag(projectTag2);
+        m_tagProjectRepository.saveProjectTag(projectTag3);
+        m_tagProjectRepository.saveProjectTag(projectTag4);
 
+        var p = StreamSupport.stream(m_serviceHelper.findAllProjectsByInterviewType(EInterviewType.CODE, 1).spliterator(), false).toList();
+
+        p.stream().map(Project::getProjectName).forEach(System.out::println);*/
     }
 }

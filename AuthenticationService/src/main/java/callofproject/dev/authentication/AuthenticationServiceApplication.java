@@ -1,5 +1,8 @@
 package callofproject.dev.authentication;
 
+import callofproject.dev.nosql.dal.MatchServiceHelper;
+import callofproject.dev.nosql.entity.UserTag;
+import callofproject.dev.nosql.repository.IUserTagRepository;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -20,10 +23,10 @@ import static callofproject.dev.authentication.util.Util.REPO_PACKAGE;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@ComponentScan(basePackages = {REPO_PACKAGE, BASE_PACKAGE, "callofproject.dev.service.jwt"})
+@ComponentScan(basePackages = {REPO_PACKAGE, BASE_PACKAGE, "callofproject.dev.service.jwt", "callofproject.dev.nosql"})
 @EnableJpaRepositories(basePackages = REPO_PACKAGE) // Enable RDBMS ORM entities
-@EnableMongoRepositories(basePackages = REPO_PACKAGE) // Enable NoSQL ORM entities
-@EntityScan(basePackages = REPO_PACKAGE)
+@EnableMongoRepositories(basePackages = {REPO_PACKAGE, "callofproject.dev.nosql"}) // Enable NoSQL ORM entities
+@EntityScan(basePackages = {REPO_PACKAGE, "callofproject.dev.nosql"})
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @SecurityScheme(
         name = "Authorization",
@@ -35,11 +38,15 @@ public class AuthenticationServiceApplication implements ApplicationRunner
 {
     private final IUserRepository m_userRepository;
     private final PasswordEncoder m_passwordEncoder;
+    private final IUserTagRepository m_userTagRepository;
+    private final MatchServiceHelper m_serviceHelper;
 
-    public AuthenticationServiceApplication(IUserRepository userRepository, PasswordEncoder passwordEncoder)
+    public AuthenticationServiceApplication(IUserRepository userRepository, PasswordEncoder passwordEncoder, IUserTagRepository userTagRepository, MatchServiceHelper serviceHelper)
     {
         m_userRepository = userRepository;
         m_passwordEncoder = passwordEncoder;
+        m_userTagRepository = userTagRepository;
+        m_serviceHelper = serviceHelper;
     }
 
     public static void main(String[] args)
@@ -83,5 +90,10 @@ public class AuthenticationServiceApplication implements ApplicationRunner
             var ptu = profileUser.getUser();
             System.out.println("Profile to user: " + ptu.getUsername());
         }*/
+
+        var user = m_userRepository.findByUsername("cop_root");
+        var tag = new UserTag("JAVA DEVELOPER", user.get().getUserId());
+        m_userTagRepository.save(tag);
+
     }
 }

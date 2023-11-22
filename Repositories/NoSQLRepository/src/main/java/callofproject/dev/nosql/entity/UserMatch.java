@@ -1,4 +1,12 @@
-package callofproject.dev.repository.authentication.entity.nosql;
+/*----------------------------------------------------------------
+	FILE		: UserMatch.java
+	AUTHOR		: Nuri Can OZTURK
+	LAST UPDATE	: 22.11.2023
+	UserMatch class represent the entity layer of the UserMatch entity.
+	Copyleft (c) NoSQLRepository.
+	All Rights Free
+----------------------------------------------------------------*/
+package callofproject.dev.nosql.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
@@ -8,10 +16,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.UUID;
 
-@Document
-public class MatchDB
+@Document("user_match")
+@SuppressWarnings("all")
+public class UserMatch
 {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "match_id")
@@ -25,11 +33,11 @@ public class MatchDB
     @Column(name = "experience_id")
     private UUID experienceId;
 
-    public MatchDB()
+    public UserMatch()
     {
     }
 
-    public MatchDB(UUID matchId, UUID userID, long schoolId, UUID courseId, UUID experienceId)
+    public UserMatch(UUID matchId, UUID userID, long schoolId, UUID courseId, UUID experienceId)
     {
         this.matchId = matchId;
         this.userID = userID;
@@ -38,7 +46,7 @@ public class MatchDB
         this.experienceId = experienceId;
     }
 
-    public MatchDB(UUID userID, long schoolId, UUID courseId, UUID experienceId)
+    public UserMatch(UUID userID, long schoolId, UUID courseId, UUID experienceId)
     {
         this.userID = userID;
         this.schoolId = schoolId;

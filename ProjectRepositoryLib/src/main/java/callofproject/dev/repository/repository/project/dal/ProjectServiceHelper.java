@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForRepository;
 
@@ -19,6 +20,12 @@ public class ProjectServiceHelper
     public ProjectServiceHelper(RepositoryFacade facade)
     {
         m_facade = facade;
+    }
+
+
+    public void removeProjectById(UUID projectId)
+    {
+        doForRepository(() -> m_facade.m_projectRepository.deleteById(projectId), "ProjectServiceHelper::removeProjectById");
     }
 
     public Project saveProject(Project project)

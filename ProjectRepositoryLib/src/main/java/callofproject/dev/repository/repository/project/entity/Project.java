@@ -38,7 +38,6 @@ public class Project
     private String m_technicalRequirements;
     @Column(name = "special_requirements")
     private String m_specialRequirements;
-
     @ManyToOne
     @JoinColumn(name = "project_access_type_id", nullable = false)
     private ProjectAccessType m_projectAccessType;

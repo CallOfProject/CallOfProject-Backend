@@ -33,6 +33,11 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
+            <groupId>callofproject.dev</groupId>
+            <artifactId>cop-nosql-db</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>

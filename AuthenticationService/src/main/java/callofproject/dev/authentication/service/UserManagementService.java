@@ -4,10 +4,10 @@ package callofproject.dev.authentication.service;
 import callofproject.dev.authentication.dto.*;
 import callofproject.dev.authentication.mapper.IUserMapper;
 import callofproject.dev.library.exception.service.DataServiceException;
+import callofproject.dev.nosql.dal.MatchServiceHelper;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.entity.UserProfile;
-import callofproject.dev.repository.authentication.repository.nosql.IMatchDbRepository;
 import callofproject.dev.service.jwt.JwtUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -31,11 +31,11 @@ public class UserManagementService
 {
 
     private final UserManagementServiceHelper m_serviceHelper;
-    private final IMatchDbRepository m_matchDbRepository;
+    private final MatchServiceHelper m_matchDbRepository;
     private final IUserMapper m_userMapper;
 
     public UserManagementService(@Qualifier(USER_MANAGEMENT_DAL_BEAN) UserManagementServiceHelper serviceHelper,
-                                 IMatchDbRepository matchDbRepository,
+                                 MatchServiceHelper matchDbRepository,
                                  IUserMapper userMapper)
     {
         m_serviceHelper = serviceHelper;
@@ -105,7 +105,8 @@ public class UserManagementService
             }
 
             return m_serviceHelper.getUserServiceHelper().saveAll(list);
-        } catch (Exception exception)
+        }
+        catch (Exception exception)
         {
             return Collections.emptyList();
         }
