@@ -10,6 +10,7 @@ package callofproject.dev.nosql.dal;
 
 import callofproject.dev.nosql.entity.UserMatch;
 import callofproject.dev.nosql.repository.IMatchDbRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +18,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForRepository;
+import static callofproject.dev.nosql.NoSqlBeanName.MATCH_REPOSITORY_BEAN_NAME;
+import static callofproject.dev.nosql.NoSqlBeanName.MATCH_SERVICE_HELPER_BEAN_NAME;
 
-@Component
+@Component(MATCH_SERVICE_HELPER_BEAN_NAME)
 @Lazy
 @SuppressWarnings("all")
 public class MatchServiceHelper
@@ -26,7 +29,7 @@ public class MatchServiceHelper
     private final IMatchDbRepository m_matchDbRepository;
 
 
-    public MatchServiceHelper(IMatchDbRepository matchDbRepository)
+    public MatchServiceHelper(@Qualifier(MATCH_REPOSITORY_BEAN_NAME) IMatchDbRepository matchDbRepository)
     {
         m_matchDbRepository = matchDbRepository;
     }

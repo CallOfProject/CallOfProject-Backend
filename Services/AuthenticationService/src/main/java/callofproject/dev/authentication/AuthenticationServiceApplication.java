@@ -1,7 +1,6 @@
 package callofproject.dev.authentication;
 
 import callofproject.dev.nosql.dal.MatchServiceHelper;
-import callofproject.dev.nosql.entity.UserTag;
 import callofproject.dev.nosql.repository.IUserTagRepository;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -91,9 +90,9 @@ public class AuthenticationServiceApplication implements ApplicationRunner
             System.out.println("Profile to user: " + ptu.getUsername());
         }*/
 
-        var user = m_userRepository.findByUsername("cop_root");
+       /* var user = m_userRepository.findByUsername("cop_root");
         var tag = new UserTag("JAVA DEVELOPER", user.get().getUserId());
-        m_userTagRepository.save(tag);
+        m_userTagRepository.save(tag);*/
 
     }
 }

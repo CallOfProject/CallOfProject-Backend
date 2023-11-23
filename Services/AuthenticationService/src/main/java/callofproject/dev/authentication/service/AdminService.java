@@ -128,12 +128,23 @@ public class AdminService
     }
     //-------------------------------------------CALLBACKS-------------------------------------------------------------
 
+    /**
+     * Get total page
+     *
+     * @return the total page
+     */
     private long getTotalPage()
     {
         return m_managementServiceHelper.getUserServiceHelper().getPageSize();
     }
 
 
+    /**
+     * Update user with given UserUpdateDTOAdmin class
+     *
+     * @param userUpdateDTO represent the updating information
+     * @return UserShowingAdminDTO class.
+     */
     private MessageResponseDTO<UserShowingAdminDTO> updateUserCallback(UserUpdateDTOAdmin userUpdateDTO)
     {
         var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(userUpdateDTO.username());
@@ -159,6 +170,13 @@ public class AdminService
         return new MessageResponseDTO<>("User updated successfully!", HttpStatus.SC_OK, userDto);
     }
 
+    /**
+     * Compare two role
+     *
+     * @param role1 represent the role1
+     * @param role2 represent the role2
+     * @return the compare result
+     */
     private int compareRole(String role1, String role2)
     {
         var roleOrder = Arrays.asList(RoleEnum.ROLE_ROOT.getRole(), RoleEnum.ROLE_ADMIN.getRole(), RoleEnum.ROLE_USER.getRole());
@@ -173,6 +191,12 @@ public class AdminService
     }
 
 
+    /**
+     * Update user with given UserUpdateDTOAdmin class
+     *
+     * @param userUpdateDTO represent the updating information
+     * @return UserShowingAdminDTO class.
+     */
     private MessageResponseDTO<UserShowingAdminDTO> updateUserCallbackAdmin(UserUpdateDTOAdmin userUpdateDTO)
     {
         var authorizedPerson = m_managementServiceHelper.getUserServiceHelper().findById(UUID.fromString(userUpdateDTO.adminId()));
@@ -208,6 +232,12 @@ public class AdminService
     }
 
 
+    /**
+     * Remove user with given username
+     *
+     * @param username represent the username
+     * @return boolean value.
+     */
     private MessageResponseDTO<Boolean> removeUserCallback(String username)
     {
         var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(username);
@@ -223,6 +253,12 @@ public class AdminService
         return new MessageResponseDTO<>("User removed Successfully!", HttpStatus.SC_OK, true);
     }
 
+    /**
+     * Find all users pageable
+     *
+     * @param page represent the page
+     * @return the UsersShowingAdminDTO
+     */
     private MultipleMessageResponseDTO<UsersShowingAdminDTO> findAllUsersPageableCallback(int page)
     {
 
@@ -235,6 +271,13 @@ public class AdminService
         return new MultipleMessageResponseDTO<>(getTotalPage(), page, dtoList.users().size(), msg, dtoList);
     }
 
+    /**
+     * Find Users with given word. If username contains the word, return it.
+     *
+     * @param page represent the page
+     * @param word represent the part of username
+     * @return UsersShowingAdminDTO
+     */
     private MultipleMessageResponseDTO<UsersShowingAdminDTO> findUsersByUsernameContainsIgnoreCaseCallback(int page, String word)
     {
         var dtoList = m_userMapper.toUsersShowingAdminDTO(stream(m_managementServiceHelper.getUserServiceHelper()
@@ -246,6 +289,14 @@ public class AdminService
         return new MultipleMessageResponseDTO<>(getTotalPage(), page, dtoList.users().size(), msg, dtoList);
     }
 
+
+    /**
+     * Find all users with given parameters are word and page
+     *
+     * @param page is page
+     * @param word not contains word
+     * @return UsersShowingAdminDTO
+     */
     private MultipleMessageResponseDTO<UsersShowingAdminDTO> findUsersByUsernameNotContainsIgnoreCaseCallback(int page, String word)
     {
         var dtoList = m_userMapper.toUsersShowingAdminDTO(stream(m_managementServiceHelper.getUserServiceHelper()
@@ -257,6 +308,13 @@ public class AdminService
         return new MultipleMessageResponseDTO<>(getTotalPage(), page, dtoList.users().size(), msg, dtoList);
     }
 
+
+    /**
+     * Find top role of user
+     *
+     * @param user represent the user
+     * @return the top role
+     */
     private String findTopRole(User user)
     {
         var role = RoleEnum.ROLE_USER.getRole();
@@ -275,6 +333,12 @@ public class AdminService
     }
 
 
+    /**
+     * Authenticate user with given username and password
+     *
+     * @param request represent the AuthenticationRequest
+     * @return AuthenticationResponse
+     */
     public Object authenticate(AuthenticationRequest request)
     {
         m_authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));

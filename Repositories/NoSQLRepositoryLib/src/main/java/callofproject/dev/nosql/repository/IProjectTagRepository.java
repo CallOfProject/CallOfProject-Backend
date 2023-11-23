@@ -15,7 +15,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
-@Repository
+import static callofproject.dev.nosql.NoSqlBeanName.PROJECT_TAG_REPOSITORY_BEAN_NAME;
+
+@Repository(PROJECT_TAG_REPOSITORY_BEAN_NAME)
 @Lazy
 public interface IProjectTagRepository extends MongoRepository<ProjectTag, Long>
 {

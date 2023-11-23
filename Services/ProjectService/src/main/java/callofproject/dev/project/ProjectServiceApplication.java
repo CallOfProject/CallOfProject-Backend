@@ -1,11 +1,8 @@
 package callofproject.dev.project;
 
+import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.nosql.dal.ProjectTagServiceHelper;
-import callofproject.dev.nosql.entity.ProjectTag;
-import callofproject.dev.repository.repository.project.dal.ProjectServiceHelper;
-import callofproject.dev.repository.repository.project.entity.Project;
-import callofproject.dev.repository.repository.project.entity.enums.EInterviewType;
-import callofproject.dev.repository.repository.project.repository.*;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -15,40 +12,30 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
-import java.util.stream.StreamSupport;
+import static callofproject.dev.data.project.ProjectRepositoryBeanName.BASE_PACKAGE_BEAN_NAME;
+import static callofproject.dev.data.project.ProjectRepositoryBeanName.PROJECT_SERVICE_HELPER_BEAN;
+import static callofproject.dev.nosql.NoSqlBeanName.NO_SQL_REPOSITORY_BEAN_NAME;
+import static callofproject.dev.nosql.NoSqlBeanName.PROJECT_TAG_SERVICE_HELPER_BEAN_NAME;
+import static callofproject.dev.project.util.Constants.SERVICE_BASE_PACKAGE;
+
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@ComponentScan(basePackages = {"callofproject.dev.project", "callofproject.dev.repository.repository.project", "callofproject.dev.nosql"})
-@EnableJpaRepositories(basePackages = {"callofproject.dev.repository.repository.project", "callofproject.dev.nosql"})
-// Enable RDBMS ORM entities
-@EnableMongoRepositories(basePackages = "callofproject.dev.nosql") // Enable NoSQL ORM entities
-@EntityScan(basePackages = "callofproject.dev.repository.repository.project")
-@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+@ComponentScan(basePackages = {SERVICE_BASE_PACKAGE, BASE_PACKAGE_BEAN_NAME, NO_SQL_REPOSITORY_BEAN_NAME})
+@EnableJpaRepositories(basePackages = {BASE_PACKAGE_BEAN_NAME, NO_SQL_REPOSITORY_BEAN_NAME})
+@EnableMongoRepositories(basePackages = NO_SQL_REPOSITORY_BEAN_NAME) // Enable NoSQL ORM entities
+@EntityScan(basePackages = BASE_PACKAGE_BEAN_NAME)
+//@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class ProjectServiceApplication implements ApplicationRunner
 {
-    private final IProjectRepository m_projectRepository;
-    private final IProjectAccessTypeRepository m_accessTypeRepository;
-    private final IDegreeRepository m_degreeRepository;
-    private final IProjectProfessionLevelRepository m_projectProfessionLevelRepository;
-    private final ISectorRepository m_sectorRepository;
-    private final IProjectLevelRepository m_projectLevelRepository;
-    private final IInterviewTypeRepository m_interviewTypeRepository;
     private final ProjectTagServiceHelper m_tagProjectRepository;
 
     private final ProjectServiceHelper m_serviceHelper;
 
-    public ProjectServiceApplication(IProjectRepository projectRepository, IProjectAccessTypeRepository accessTypeRepository, IDegreeRepository degreeRepository, IProjectProfessionLevelRepository projectProfessionLevelRepository, ISectorRepository sectorRepository, IProjectLevelRepository projectLevelRepository, IInterviewTypeRepository interviewTypeRepository, ProjectTagServiceHelper tagProjectRepository, ProjectServiceHelper serviceHelper)
+    public ProjectServiceApplication(@Qualifier(PROJECT_TAG_SERVICE_HELPER_BEAN_NAME) ProjectTagServiceHelper tagProjectRepository,
+                                     @Qualifier(PROJECT_SERVICE_HELPER_BEAN) ProjectServiceHelper serviceHelper)
     {
-        m_projectRepository = projectRepository;
-        m_accessTypeRepository = accessTypeRepository;
-        m_degreeRepository = degreeRepository;
-        m_projectProfessionLevelRepository = projectProfessionLevelRepository;
-        m_sectorRepository = sectorRepository;
-        m_projectLevelRepository = projectLevelRepository;
-        m_interviewTypeRepository = interviewTypeRepository;
         m_tagProjectRepository = tagProjectRepository;
         m_serviceHelper = serviceHelper;
     }

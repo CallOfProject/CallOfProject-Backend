@@ -80,6 +80,13 @@ public class AuthenticationService
     }
 
     //-------------------------------------------------CALLBACK-----------------------------------------------------
+
+    /**
+     * Register user with given RegisterRequest parameter.
+     *
+     * @param request represent the request.
+     * @return AuthenticationResponse.
+     */
     private AuthenticationResponse registerUserCallback(RegisterRequest request)
     {
         var dto = new UserSignUpRequestDTO(request.getEmail(), request.getFirstName(),
@@ -94,6 +101,12 @@ public class AuthenticationService
     }
 
 
+    /**
+     * Register all users with given RegisterRequest list parameter.
+     *
+     * @param requests represent the RegisterRequest list.
+     * @return Iterable<User>
+     */
     public Iterable<User> registerAll(List<RegisterRequest> requests)
     {
         var list = new ArrayList<UserSignUpRequestDTO>();
@@ -114,6 +127,12 @@ public class AuthenticationService
         return m_userManagementService.saveUsers(list);
     }
 
+    /**
+     * Login operation for admins.
+     *
+     * @param request represent the login information.
+     * @return if success returns AuthenticationResponse that include token and status else return ErrorMessage.
+     */
     private AuthenticationResponse authenticateCallback(AuthenticationRequest request)
     {
         m_authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
@@ -139,6 +158,13 @@ public class AuthenticationService
                 user.getObject().getUserId());
     }
 
+
+    /**
+     * Find top role for user.
+     *
+     * @param user represent the user.
+     * @return String value.
+     */
     private String findTopRole(User user)
     {
         var role = RoleEnum.ROLE_USER.getRole();
@@ -157,6 +183,14 @@ public class AuthenticationService
     }
 
 
+    /**
+     * Refresh token.
+     *
+     * @param request  represent the request.
+     * @param response represent the response.
+     * @return boolean value.
+     * @throws IOException if an I/O error occurs.
+     */
     public boolean refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -186,7 +220,12 @@ public class AuthenticationService
         return false;
     }
 
-
+    /**
+     * Validate given token.
+     *
+     * @param token represent the jwt.
+     * @return boolean value.
+     */
     private boolean validateTokenCallback(String token)
     {
         var username = JwtUtil.extractUsername(token);

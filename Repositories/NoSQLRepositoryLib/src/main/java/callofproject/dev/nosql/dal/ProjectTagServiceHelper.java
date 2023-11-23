@@ -10,21 +10,24 @@ package callofproject.dev.nosql.dal;
 
 import callofproject.dev.nosql.entity.ProjectTag;
 import callofproject.dev.nosql.repository.IProjectTagRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForRepository;
+import static callofproject.dev.nosql.NoSqlBeanName.PROJECT_TAG_REPOSITORY_BEAN_NAME;
+import static callofproject.dev.nosql.NoSqlBeanName.PROJECT_TAG_SERVICE_HELPER_BEAN_NAME;
 
-@Component
+@Component(PROJECT_TAG_SERVICE_HELPER_BEAN_NAME)
 @Lazy
 @SuppressWarnings("all")
 public class ProjectTagServiceHelper
 {
     private final IProjectTagRepository m_tagRepository;
 
-    public ProjectTagServiceHelper(IProjectTagRepository tagRepository)
+    public ProjectTagServiceHelper(@Qualifier(PROJECT_TAG_REPOSITORY_BEAN_NAME) IProjectTagRepository tagRepository)
     {
         m_tagRepository = tagRepository;
     }

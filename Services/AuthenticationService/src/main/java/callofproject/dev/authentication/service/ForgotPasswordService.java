@@ -56,6 +56,13 @@ public class ForgotPasswordService
     }
 
     //---------------------------------------------------CALLBACK-------------------------------------------------------
+
+    /**
+     * Send Reset password link to email.
+     *
+     * @param email represent the email.
+     * @return the boolean value.
+     */
     private MessageResponseDTO<Object> sendResetPasswordLinkCallback(String email)
     {
         var user = m_userServiceHelper.findByEmail(email);
@@ -73,6 +80,12 @@ public class ForgotPasswordService
         throw new UnsupportedOperationException("TODO:");
     }
 
+    /**
+     * Change password.
+     *
+     * @param forgotPasswordDTO represent the necessary information for change password.
+     * @return the boolean value.
+     */
     private MessageResponseDTO<Object> resetPasswordCallback(ForgotPasswordDTO forgotPasswordDTO)
     {
         try

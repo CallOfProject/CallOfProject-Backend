@@ -28,6 +28,11 @@ public class CopAuthenticationProvider implements AuthenticationProvider
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * @param authentication the authentication request object.
+     * @return Authentication
+     * @throws AuthenticationException if the authentication fails
+     */
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException
     {
@@ -45,6 +50,11 @@ public class CopAuthenticationProvider implements AuthenticationProvider
         } else throw new BadCredentialsException("No user registered with this details!");
     }
 
+
+    /**
+     * @param authorities the authorities granted to the user.
+     * @return List<GrantedAuthority>
+     */
     private List<GrantedAuthority> getGrantedAuthorities(Set<Role> authorities)
     {
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
@@ -54,6 +64,10 @@ public class CopAuthenticationProvider implements AuthenticationProvider
         return grantedAuthorities;
     }
 
+    /**
+     * @param authentication the authentication request object.
+     * @return boolean
+     */
     @Override
     public boolean supports(Class<?> authentication)
     {

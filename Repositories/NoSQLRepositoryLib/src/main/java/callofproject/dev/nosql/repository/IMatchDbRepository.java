@@ -16,7 +16,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
-@Repository
+import static callofproject.dev.nosql.NoSqlBeanName.MATCH_REPOSITORY_BEAN_NAME;
+
+@Repository(MATCH_REPOSITORY_BEAN_NAME)
 @Lazy
 public interface IMatchDbRepository extends MongoRepository<UserMatch, UUID>
 {

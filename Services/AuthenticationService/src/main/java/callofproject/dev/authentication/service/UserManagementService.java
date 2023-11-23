@@ -89,6 +89,13 @@ public class UserManagementService
     }
 
     //-----------------------------------------------------CALLBACK-----------------------------------------------------
+
+    /**
+     * Save User with given dto class.
+     *
+     * @param userDTOs represent the dto class
+     * @return Iterable<User>.
+     */
     public Iterable<User> saveUsers(List<UserSignUpRequestDTO> userDTOs) throws DataServiceException
     {
         try
@@ -105,20 +112,29 @@ public class UserManagementService
             }
 
             return m_serviceHelper.getUserServiceHelper().saveAll(list);
-        }
-        catch (Exception exception)
+        } catch (Exception exception)
         {
             return Collections.emptyList();
         }
     }
 
-
+    /**
+     * find total page.
+     *
+     * @return total page.
+     */
     private long getTotalPage()
     {
         return m_serviceHelper.getUserServiceHelper().getPageSize();
     }
 
 
+    /**
+     * Save User with given dto class.
+     *
+     * @param userDTO represent the dto class
+     * @return UserSaveDTO.
+     */
     public UserSaveDTO saveUserCallback(UserSignUpRequestDTO userDTO)
     {
         var user = m_userMapper.toUser(userDTO);
@@ -144,7 +160,12 @@ public class UserManagementService
         return new UserSaveDTO(token, refreshToken, true, savedUser.getUserId());
     }
 
-
+    /**
+     * Find user with given username
+     *
+     * @param username represent the username.
+     * @return UserDTO class.
+     */
     public UserDTO findUserByUsernameCallback(String username)
     {
         var user = m_serviceHelper.getUserServiceHelper().findByUsername(username);
@@ -155,6 +176,12 @@ public class UserManagementService
         return m_userMapper.toUserDTO(user.get());
     }
 
+    /**
+     * Find User with given username but returns the user entity.
+     *
+     * @param username represent the username.
+     * @return User class.
+     */
     public UserResponseDTO<User> findUserByUsernameForAuthenticationServiceCallback(String username)
     {
         var user = m_serviceHelper.getUserServiceHelper().findByUsername(username);
@@ -165,6 +192,13 @@ public class UserManagementService
         return new UserResponseDTO<User>(true, user.get());
     }
 
+    /**
+     * Find all users with given word and page.
+     *
+     * @param page represent the page.
+     * @param word represent the containing word.
+     * @return UsersDTO class.
+     */
     public MultipleMessageResponseDTO<UsersDTO> findAllUsersPageableByContainsWordCallback(int page, String word)
     {
         var dtoList = m_userMapper

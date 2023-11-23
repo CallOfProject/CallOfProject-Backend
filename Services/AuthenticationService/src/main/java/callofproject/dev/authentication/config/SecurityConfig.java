@@ -49,10 +49,14 @@ public class SecurityConfig
         //this.logoutHandler = logoutHandler;
     }
 
+    /**
+     * Customize security
+     *
+     * @param requests represent the request
+     */
     private static void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests)
     {
-        requests
-                .requestMatchers("/api/auth/register-all").permitAll()
+        requests.requestMatchers("/api/auth/register-all").permitAll()
                 .requestMatchers(antMatcher("/api-docs/**")).permitAll()
                 .requestMatchers(AUTH_WHITELIST).permitAll()
                 .requestMatchers(ROOT_AND_ADMIN_WHITE_LIST).hasAnyRole("ROOT", "ADMIN")
@@ -61,6 +65,13 @@ public class SecurityConfig
                 .requestMatchers("/api/root/**").hasAnyRole("ROOT");
     }
 
+    /**
+     * Configure security
+     *
+     * @param http represent the http
+     * @return SecurityFilterChain
+     * @throws Exception if something goes wrong
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
@@ -83,6 +94,12 @@ public class SecurityConfig
     }
 
 
+    /**
+     * Set cors configuration
+     *
+     * @param httpServletRequest represent the request
+     * @return CorsConfiguration
+     */
     private CorsConfiguration setCorsConfig(HttpServletRequest httpServletRequest)
     {
         CorsConfiguration config = new CorsConfiguration();

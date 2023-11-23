@@ -10,21 +10,24 @@ package callofproject.dev.nosql.dal;
 
 import callofproject.dev.nosql.entity.UserTag;
 import callofproject.dev.nosql.repository.IUserTagRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForRepository;
+import static callofproject.dev.nosql.NoSqlBeanName.USER_TAG_REPOSITORY_BEAN_NAME;
+import static callofproject.dev.nosql.NoSqlBeanName.USER_TAG_SERVICE_HELPER_BEAN_NAME;
 
-@Component
+@Component(USER_TAG_SERVICE_HELPER_BEAN_NAME)
 @Lazy
 @SuppressWarnings("all")
 public class UserTagServiceHelper
 {
     private final IUserTagRepository m_userTagRepository;
 
-    public UserTagServiceHelper(IUserTagRepository userTagRepository)
+    public UserTagServiceHelper(@Qualifier(USER_TAG_REPOSITORY_BEAN_NAME) IUserTagRepository userTagRepository)
     {
         m_userTagRepository = userTagRepository;
     }

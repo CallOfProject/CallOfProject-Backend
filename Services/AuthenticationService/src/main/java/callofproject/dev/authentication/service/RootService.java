@@ -46,6 +46,12 @@ public class RootService
 
     //-----------------------------------------------------CALLBACK-----------------------------------------------------
 
+    /**
+     * Give admin role to user.
+     *
+     * @param username represent the user.
+     * @return boolean value.
+     */
     private MessageResponseDTO<Boolean> giveAdminRoleByUsernameCallback(String username)
     {
         var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(username);
@@ -63,6 +69,12 @@ public class RootService
         return new MessageResponseDTO<>("Success!", HttpStatus.SC_OK, true);
     }
 
+    /**
+     * Remove admin role from user.
+     *
+     * @param username represent the user.
+     * @return boolean value.
+     */
     private MessageResponseDTO<Boolean> removeAdminRoleByUsernameCallback(String username)
     {
         var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(username);

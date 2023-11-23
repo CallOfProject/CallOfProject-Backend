@@ -3,7 +3,6 @@ package callofproject.dev.authentication.test.repository;
 import callofproject.dev.repository.authentication.entity.Role;
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.TestPropertySource;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
 import static callofproject.dev.authentication.util.Util.*;
-import static java.nio.file.Files.delete;
 import static java.time.LocalDate.now;
 
 @SpringBootTest
@@ -38,6 +34,11 @@ public class UserRepositoryTest
         delete(Path.of(TEST_DB_PATH));
     }*/
 
+    /**
+     * Test: Save user test
+     * Result: User should be saved
+     */
+
     @Test
     void saveMultipleUsers_ShouldSucceed()
     {
@@ -50,6 +51,10 @@ public class UserRepositoryTest
         Assertions.assertEquals(3, userList.size());
     }
 
+    /**
+     * Test: Find user by username test
+     * Result: User should be found
+     */
     @Test
     void findUserByEmail_ExistingUser_ShouldReturnUser()
     {
@@ -62,6 +67,10 @@ public class UserRepositoryTest
         Assertions.assertEquals("testuser", foundUser.get().getUsername());
     }
 
+    /**
+     * Test: Find user by email test
+     * Result: User should not be found
+     */
     @Test
     void findUserByEmail_NonExistingUser_ShouldReturnNull()
     {
@@ -70,6 +79,10 @@ public class UserRepositoryTest
         Assertions.assertTrue(foundUser.isEmpty());
     }
 
+    /**
+     * Test: Remove user test
+     * Result: User should be deleted
+     */
     @Test
     void deleteUser_ExistingUser_ShouldDeleteUser()
     {
@@ -81,6 +94,11 @@ public class UserRepositoryTest
         var foundUser = m_userRepository.findByEmail("testuser@mail.com");
         Assertions.assertTrue(foundUser.isEmpty());
     }
+
+    /**
+     * Test: Update user test
+     * Result: User should be updated
+     */
 
     @Test
     void updateUser_ExistingUser_ShouldUpdateUser()
