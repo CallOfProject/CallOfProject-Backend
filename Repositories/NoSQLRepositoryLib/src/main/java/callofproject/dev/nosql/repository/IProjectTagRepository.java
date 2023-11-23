@@ -19,9 +19,28 @@ import java.util.UUID;
 @Lazy
 public interface IProjectTagRepository extends MongoRepository<ProjectTag, Long>
 {
+    /**
+     * Find all project tags by project id
+     *
+     * @param id project id
+     * @return project tags
+     */
     Iterable<ProjectTag> findAllByProjectId(UUID id);
 
+    /**
+     * Find all project tags by tag name
+     *
+     * @param tagName tag name
+     * @return project tags
+     */
     Iterable<ProjectTag> findAllByTagName(String tagName);
 
+    /**
+     * Find all project tags by project id and tag name
+     *
+     * @param projectId project id
+     * @param tagName   tag name
+     * @return project tags
+     */
     Iterable<ProjectTag> findAllByProjectIdAndTagName(UUID projectId, String tagName);
 }

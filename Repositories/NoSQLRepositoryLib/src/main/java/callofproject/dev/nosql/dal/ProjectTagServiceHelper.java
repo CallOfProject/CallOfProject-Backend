@@ -29,46 +29,97 @@ public class ProjectTagServiceHelper
         m_tagRepository = tagRepository;
     }
 
+    /**
+     * @param projectTag
+     * @return
+     */
     public ProjectTag saveProjectTag(ProjectTag projectTag)
     {
         return doForRepository(() -> m_tagRepository.save(projectTag), "ProjectTagServiceHelper::saveProjectTag");
     }
 
+    /**
+     * Remove project tag
+     *
+     * @param projectTag
+     */
     public void removeProjectTag(ProjectTag projectTag)
     {
         doForRepository(() -> m_tagRepository.delete(projectTag), "ProjectTagServiceHelper::removeProjectTag");
     }
 
+    /**
+     * Remove project tag by id
+     *
+     * @param id
+     */
     public void removeProjectTagById(Long id)
     {
         doForRepository(() -> m_tagRepository.deleteById(id), "ProjectTagServiceHelper::removeProjectTagById");
     }
 
+    /**
+     * Find project tag count
+     *
+     * @param id
+     * @return long (count of project tag)
+     */
     public long count()
     {
         return doForRepository(() -> m_tagRepository.count(), "ProjectTagServiceHelper::count");
     }
 
+    /**
+     * Save all project tag
+     *
+     * @param id
+     * @return Iterable project tag
+     */
     public Iterable<ProjectTag> saveAll(Iterable<ProjectTag> projectTags)
     {
         return doForRepository(() -> m_tagRepository.saveAll(projectTags), "ProjectTagServiceHelper::saveAll");
     }
 
+    /**
+     * Find all tags
+     *
+     * @param id
+     * @return Iterable project tag
+     */
     public Iterable<ProjectTag> getAllProjectTag()
     {
         return doForRepository(() -> m_tagRepository.findAll(), "ProjectTagServiceHelper::getAllProjectTag");
     }
 
+    /**
+     * Find project tag by id
+     *
+     * @param id
+     * @return Iterable project tag
+     */
     public Iterable<ProjectTag> getAllProjectTagByProjectId(UUID projectId)
     {
         return doForRepository(() -> m_tagRepository.findAllByProjectId(projectId), "ProjectTagServiceHelper::getAllProjectTagByProjectId");
     }
 
+    /**
+     * Find project tag by tag name
+     *
+     * @param tagName
+     * @return Iterable project tag
+     */
     public Iterable<ProjectTag> getAllProjectTagByTagName(String tagName)
     {
         return doForRepository(() -> m_tagRepository.findAllByTagName(tagName), "ProjectTagServiceHelper::getAllProjectTagByTagName");
     }
 
+    /**
+     * Find project tag by project id and tag name
+     *
+     * @param projectId
+     * @param tagName
+     * @return Iterable project tag
+     */
     public Iterable<ProjectTag> getAllProjectTagByProjectIdAndTagName(UUID projectId, String tagName)
     {
         return doForRepository(() -> m_tagRepository.findAllByProjectIdAndTagName(projectId, tagName), "ProjectTagServiceHelper::getAllProjectTagByProjectIdAndTagName");

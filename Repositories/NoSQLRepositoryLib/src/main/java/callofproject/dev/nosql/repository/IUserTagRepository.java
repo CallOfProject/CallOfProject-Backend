@@ -19,9 +19,28 @@ import java.util.UUID;
 @Lazy
 public interface IUserTagRepository extends MongoRepository<UserTag, Long>
 {
+    /**
+     * Find all user tag by user id
+     *
+     * @param id user id
+     * @return user tag list
+     */
     Iterable<UserTag> findAllByUserId(UUID id);
 
+    /**
+     * Find all user tag by tag name
+     *
+     * @param tagName tag name
+     * @return user tag list
+     */
     Iterable<UserTag> findAllByTagName(String tagName);
 
+    /**
+     * Find all user tag by user id and tag name
+     *
+     * @param userId  user id
+     * @param tagName tag name
+     * @return user tag list
+     */
     Iterable<UserTag> findAllByUserIdAndTagName(UUID userId, String tagName);
 }

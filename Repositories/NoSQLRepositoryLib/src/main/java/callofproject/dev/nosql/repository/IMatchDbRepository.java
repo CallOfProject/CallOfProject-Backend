@@ -20,25 +20,103 @@ import java.util.UUID;
 @Lazy
 public interface IMatchDbRepository extends MongoRepository<UserMatch, UUID>
 {
+    /**
+     * Delete user match by match id
+     *
+     * @param userID (user id is the id of the user who is matched with the user)
+     */
     void deleteByUserID(UUID userID);
 
+    /**
+     * Get user match by user id
+     *
+     * @param userID (user id is the id of the user who is matched with the user)
+     * @return Iterable<UserMatch>
+     */
     Iterable<UserMatch> findAllByUserID(UUID userID);
+
+    /**
+     * Get user match by user id
+     *
+     * @param schoolId (school id is the id of the user who is matched with the user)
+     * @return Iterable<UserMatch>
+     */
 
     Iterable<UserMatch> findAllBySchoolId(long schoolId);
 
+    /**
+     * Get user match by user id and course id
+     *
+     * @param courseId (course id is the id of the user who is matched with the user)
+     * @return Iterable<UserMatch>
+     */
     Iterable<UserMatch> findAllByCourseId(UUID courseId);
 
+    /**
+     * Get user match by experience id
+     *
+     * @param experienceId (experience id is the id of the user who is matched with the user)
+     * @return Iterable<UserMatch>
+     */
     Iterable<UserMatch> findAllByExperienceId(UUID experienceId);
 
+    /**
+     * Get user match by school id and user id
+     *
+     * @param schoolId (school id is the id of the user who is matched with the user)
+     * @param courseId (course id is the id of the user who is matched with the user)
+     * @return Iterable<UserMatch>
+     */
     Iterable<UserMatch> findAllBySchoolIdAndCourseId(long schoolId, UUID courseId);
 
+    /**
+     * Get user match by school id and experience id
+     *
+     * @param schoolId     (school id is the id of the user who is matched with the user)
+     * @param experienceId (experience id is the id of the user who is matched with the user)
+     * @return Iterable<UserMatch>
+     */
     Iterable<UserMatch> findAllBySchoolIdAndExperienceId(long schoolId, UUID experienceId);
 
+    /**
+     * Get user match by school id, course id and user id
+     *
+     * @param experienceId (experience id is the id of the user who is matched with the user)
+     * @param courseId     (course id is the id of the user who is matched with the user)
+     * @return Iterable<UserMatch>
+     */
     Iterable<UserMatch> findAllByCourseIdAndExperienceId(UUID courseId, UUID experienceId);
 
+    /**
+     * Get user match by school id, course id and experience id
+     *
+     * @param schoolId     (school id is the id of the user who is matched with the user)
+     * @param courseId     (course id is the id of the user who is matched with the user)
+     * @param experienceId (experience id is the id of the user who is matched with the user)
+     * @return Iterable<UserMatch>
+     */
     Iterable<UserMatch> findAllBySchoolIdAndCourseIdAndExperienceId(long schoolId, UUID courseId, UUID experienceId);
 
+    /**
+     * Get user match by school id, course id, experience id and user id
+     *
+     * @param schoolId     (school id is the id of the user who is matched with the user)
+     * @param courseId     (course id is the id of the user who is matched with the user)
+     * @param experienceId (experience id is the id of the user who is matched with the user)
+     * @param userId       (user id is the id of the user who is matched with the user)
+     * @return Iterable<UserMatch>
+     */
     Iterable<UserMatch> getUserMatchBySchoolIdAndCourseIdAndExperienceIdAndUserID(long schoolId, UUID courseId, UUID experienceId, UUID userId);
 
+    /**
+     * Get user match by school id, course id, experience id, user id and match id
+     *
+     * @param schoolId     (school id is the id of the user who is matched with the user)
+     * @param courseId     (course id is the id of the user who is matched with the user)
+     * @param experienceId (experience id is the id of the user who is matched with the user)
+     * @param userId       (user id is the id of the user who is matched with the user)
+     * @param matchId      (match id is the id of the user who is matched with the user)
+     * @return Iterable<UserMatch>
+     */
     Iterable<UserMatch> getUserMatchBySchoolIdAndCourseIdAndExperienceIdAndUserIDAndMatchId(long schoolId, UUID courseId, UUID experienceId, UUID userId, UUID matchId);
 }
