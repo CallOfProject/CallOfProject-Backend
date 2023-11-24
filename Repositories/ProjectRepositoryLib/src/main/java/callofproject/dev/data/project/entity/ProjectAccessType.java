@@ -1,6 +1,7 @@
 package callofproject.dev.data.project.entity;
 
 import callofproject.dev.data.project.entity.enums.EProjectAccessType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,6 +11,7 @@ public class ProjectAccessType
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "project_access_type_id")
+    @JsonIgnore
     private long m_projectAccessTypeId;
     @Enumerated(EnumType.STRING)
     @Column(name = "project_access_type_name", unique = true)

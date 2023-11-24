@@ -16,6 +16,10 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 @Configuration
 public class MongoRepoConfig
 {
+    /**
+     * @param uri The MongoDB connection string.
+     * @return The MongoClientFactoryBean.
+     */
     @Bean
     public MongoClientFactoryBean mongoConfig(@Value("${spring.data.mongodb.uri}") String uri)
     {

@@ -1,6 +1,7 @@
 package callofproject.dev.data.project.entity;
 
 import callofproject.dev.data.project.entity.enums.EInterviewType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,6 +11,7 @@ public class InterviewType
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "interview_type_id")
+    @JsonIgnore
     private long m_interviewTypeId;
 
     @Enumerated(EnumType.STRING)

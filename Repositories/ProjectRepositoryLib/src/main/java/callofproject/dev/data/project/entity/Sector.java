@@ -1,6 +1,7 @@
 package callofproject.dev.data.project.entity;
 
 import callofproject.dev.data.project.entity.enums.ESector;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,6 +11,7 @@ public class Sector
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sector_id")
+    @JsonIgnore
     private long m_sectorId;
 
     @Enumerated(EnumType.STRING)

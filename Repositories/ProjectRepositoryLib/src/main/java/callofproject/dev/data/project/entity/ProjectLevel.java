@@ -1,6 +1,7 @@
 package callofproject.dev.data.project.entity;
 
 import callofproject.dev.data.project.entity.enums.EProjectLevel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,6 +11,7 @@ public class ProjectLevel
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "project_level_id")
+    @JsonIgnore
     private long m_projectLevelId;
 
     @Enumerated(EnumType.STRING)

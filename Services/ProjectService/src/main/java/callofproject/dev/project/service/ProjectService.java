@@ -3,12 +3,16 @@ package callofproject.dev.project.service;
 
 import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.data.project.entity.Project;
+import callofproject.dev.data.project.entity.ProjectParticipants;
+import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.project.dto.ProjectSaveDTO;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import static callofproject.dev.data.project.ProjectRepositoryBeanName.PROJECT_SERVICE_HELPER_BEAN;
+import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
+import static java.util.UUID.fromString;
 
 
 @Service
@@ -24,56 +28,52 @@ public class ProjectService
 
     public Project saveProject(ProjectSaveDTO projectDTO)
     {
-        try
-        {
-            System.out.println("here0");
-            var accessType = projectDTO.projectAccessType();
-            var projectLevel = projectDTO.projectLevel();
-            var professionLevel = projectDTO.professionLevel();
-            var sector = projectDTO.sector();
-            var degree = projectDTO.degree();
-            var interviewType = projectDTO.interviewType();
-
-
-            var projectAccessType = m_serviceHelper.findProjectAccessTypeByProjectAccessType(accessType);
-            var projectLevelType = m_serviceHelper.findProjectLevelByProjectLevel(projectLevel);
-            var professionLevelType = m_serviceHelper.findProjectProfessionLevelByProjectProfessionLevel(professionLevel);
-            var sectorType = m_serviceHelper.findSectorBySector(sector);
-            var degreeType = m_serviceHelper.findDegreeByDegree(degree);
-            var interviewTypeType = m_serviceHelper.findInterviewTypeByInterviewType(interviewType);
-
-            if (projectAccessType.isEmpty() || projectLevelType.isEmpty() || professionLevelType.isEmpty() || sectorType.isEmpty() || degreeType.isEmpty() || interviewTypeType.isEmpty())
-                throw new Exception("Project Access Type or Project Level or Profession Level or Sector or Degree or Interview Type is not found!");
-
-            System.out.println("here1");
-            var project = new Project.Builder()
-                    .setExpectedProjectDeadline(projectDTO.expectedProjectDeadline())
-                    .setProjectAccessType(projectAccessType.get())
-                    .setProjectLevel(projectLevelType.get())
-                    .setProfessionLevel(professionLevelType.get())
-                    .setSector(sectorType.get())
-                    .setDegree(degreeType.get())
-                    .setInterviewType(interviewTypeType.get())
-                    .setProjectAim(projectDTO.projectAim())
-                    .setDescription(projectDTO.projectDescription())
-                    .setExpectedCompletionDate(projectDTO.expectedCompletionDate())
-                    .setApplicationDeadline(projectDTO.applicationDeadline())
-                    .setProjectImagePath(projectDTO.projectImage())
-                    .setProjectName(projectDTO.projectName())
-                    .setProjectSummary(projectDTO.projectSummary())
-                    .setSpecialRequirements(projectDTO.specialRequirements())
-                    .setTechnicalRequirements(projectDTO.technicalRequirements())
-                    .setMaxParticipant(23)
-                    .build();
-            System.out.println("here2");
-            return m_serviceHelper.saveProject(project);
-        } catch (Exception ex)
-        {
-            System.out.println(ex.getMessage());
-            return null;
-        }
+        return doForDataService(() -> saveProjectCallback(projectDTO), "ProjectService::saveProject");
     }
 
+
+    public Project saveProjectCallback(ProjectSaveDTO projectDTO)
+    {
+        var projectAccessType = m_serviceHelper.findProjectAccessTypeByProjectAccessType(projectDTO.projectAccessType());
+        var projectLevelType = m_serviceHelper.findProjectLevelByProjectLevel(projectDTO.projectLevel());
+        var professionLevelType = m_serviceHelper.findProjectProfessionLevelByProjectProfessionLevel(projectDTO.professionLevel());
+        var sectorType = m_serviceHelper.findSectorBySector(projectDTO.sector());
+        var degreeType = m_serviceHelper.findDegreeByDegree(projectDTO.degree());
+        var interviewTypeType = m_serviceHelper.findInterviewTypeByInterviewType(projectDTO.interviewType());
+
+        if (projectAccessType.isEmpty() || projectLevelType.isEmpty() || professionLevelType.isEmpty() || sectorType.isEmpty() || degreeType.isEmpty() || interviewTypeType.isEmpty())
+            throw new DataServiceException("Project Access Type or Project Level or Profession Level or Sector or Degree or Interview Type is not found!");
+
+        var project = new Project.Builder()
+                .setExpectedProjectDeadline(projectDTO.expectedProjectDeadline())
+                .setProjectAccessType(projectAccessType.get())
+                .setProjectLevel(projectLevelType.get())
+                .setProfessionLevel(professionLevelType.get())
+                .setSector(sectorType.get())
+                .setDegree(degreeType.get())
+                .setInterviewType(interviewTypeType.get())
+                .setProjectAim(projectDTO.projectAim())
+                .setDescription(projectDTO.projectDescription())
+                .setExpectedCompletionDate(projectDTO.expectedCompletionDate())
+                .setApplicationDeadline(projectDTO.applicationDeadline())
+                .setProjectImagePath(projectDTO.projectImage())
+                .setProjectName(projectDTO.projectName())
+                .setProjectSummary(projectDTO.projectSummary())
+                .setSpecialRequirements(projectDTO.specialRequirements())
+                .setTechnicalRequirements(projectDTO.technicalRequirements())
+                .setMaxParticipant(projectDTO.maxParticipantCount())
+                .build();
+
+        var savedProject = m_serviceHelper.saveProject(project);
+        m_serviceHelper.saveProjectToUser(projectDTO.userId(), savedProject.getProjectId());
+
+        return savedProject;
+    }
+
+    public Iterable<Project> findProjectsByUserId(String userId)
+    {
+        return doForDataService(() -> findProjectsByUserId(userId), "ProjectService::findProjectsByUserId");
+    }
 
     public Iterable<Project> findAll()
     {
@@ -81,4 +81,9 @@ public class ProjectService
     }
 
 
+    public ProjectParticipants addParticipant(String projectId, String userId)
+    {
+        return doForDataService(() -> m_serviceHelper.saveParticipantToProject(fromString(userId), fromString(projectId)),
+                "ProjectService::addParticipant");
+    }
 }
