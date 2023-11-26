@@ -17,6 +17,11 @@ import java.util.UUID;
 
 import static callofproject.dev.nosql.NoSqlBeanName.USER_TAG_REPOSITORY_BEAN_NAME;
 
+/**
+ * IUserTagRepository interface represent the repository layer of the UserTag entity.
+ * Copyleft (c) NoSQLRepository.
+ * All Rights Free
+ */
 @Repository(USER_TAG_REPOSITORY_BEAN_NAME)
 @Lazy
 public interface IUserTagRepository extends MongoRepository<UserTag, Long>

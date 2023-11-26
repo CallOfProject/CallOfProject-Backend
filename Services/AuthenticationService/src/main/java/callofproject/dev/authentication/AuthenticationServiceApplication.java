@@ -1,5 +1,6 @@
 package callofproject.dev.authentication;
 
+import callofproject.dev.authentication.config.kafka.KafkaProducer;
 import callofproject.dev.nosql.dal.MatchServiceHelper;
 import callofproject.dev.nosql.repository.IUserTagRepository;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
@@ -39,13 +40,15 @@ public class AuthenticationServiceApplication implements ApplicationRunner
     private final PasswordEncoder m_passwordEncoder;
     private final IUserTagRepository m_userTagRepository;
     private final MatchServiceHelper m_serviceHelper;
+    private final KafkaProducer m_kafkaProducer;
 
-    public AuthenticationServiceApplication(IUserRepository userRepository, PasswordEncoder passwordEncoder, IUserTagRepository userTagRepository, MatchServiceHelper serviceHelper)
+    public AuthenticationServiceApplication(IUserRepository userRepository, PasswordEncoder passwordEncoder, IUserTagRepository userTagRepository, MatchServiceHelper serviceHelper, KafkaProducer kafkaProducer)
     {
         m_userRepository = userRepository;
         m_passwordEncoder = passwordEncoder;
         m_userTagRepository = userTagRepository;
         m_serviceHelper = serviceHelper;
+        m_kafkaProducer = kafkaProducer;
     }
 
     public static void main(String[] args)
@@ -57,6 +60,7 @@ public class AuthenticationServiceApplication implements ApplicationRunner
     @Override
     public void run(ApplicationArguments args) throws Exception
     {
+
         //save random user
         /*if (m_userRepository.findByUsername("cop_root").isEmpty())
         {

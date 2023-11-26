@@ -47,7 +47,8 @@ public class Project
     @ManyToOne
     @JoinColumn(name = "sector_id", nullable = false)
     private Sector m_sector;
-
+    @Column(name = "project_owner_id", nullable = false)
+    private UUID m_projectOwnerId;
     @ManyToOne
     @JoinColumn(name = "degree_id", nullable = false)
     private Degree m_degree;
@@ -79,6 +80,11 @@ public class Project
             return this;
         }
 
+        public Builder setProjectOwnerId(UUID projectOwnerId)
+        {
+            m_project.m_projectOwnerId = projectOwnerId;
+            return this;
+        }
         public Builder setProjectName(String projectName)
         {
             m_project.m_projectName = projectName;
@@ -186,6 +192,11 @@ public class Project
         {
             return m_project;
         }
+    }
+
+    public UUID getProjectOwnerId()
+    {
+        return m_projectOwnerId;
     }
 
     public UUID getProjectId()

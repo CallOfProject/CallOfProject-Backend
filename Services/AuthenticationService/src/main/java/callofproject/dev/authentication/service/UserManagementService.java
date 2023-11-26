@@ -1,6 +1,7 @@
 package callofproject.dev.authentication.service;
 
 
+import callofproject.dev.authentication.config.kafka.KafkaProducer;
 import callofproject.dev.authentication.dto.*;
 import callofproject.dev.authentication.mapper.IUserMapper;
 import callofproject.dev.library.exception.service.DataServiceException;
@@ -29,15 +30,16 @@ import static java.util.stream.StreamSupport.stream;
 @Lazy
 public class UserManagementService
 {
-
+    private final KafkaProducer m_userProducer;
     private final UserManagementServiceHelper m_serviceHelper;
     private final MatchServiceHelper m_matchDbRepository;
     private final IUserMapper m_userMapper;
 
-    public UserManagementService(@Qualifier(USER_MANAGEMENT_DAL_BEAN) UserManagementServiceHelper serviceHelper,
+    public UserManagementService(KafkaProducer userProducer, @Qualifier(USER_MANAGEMENT_DAL_BEAN) UserManagementServiceHelper serviceHelper,
                                  MatchServiceHelper matchDbRepository,
                                  IUserMapper userMapper)
     {
+        m_userProducer = userProducer;
         m_serviceHelper = serviceHelper;
         m_matchDbRepository = matchDbRepository;
         m_userMapper = userMapper;
@@ -156,6 +158,10 @@ public class UserManagementService
 
         var token = JwtUtil.generateToken(claims, user.getUsername());
         var refreshToken = JwtUtil.generateToken(claims, user.getUsername());
+
+        m_userProducer.sendMessage(new UserDTO(savedUser.getUsername(), savedUser.getEmail(),
+                savedUser.getFirstName(), savedUser.getMiddleName(),
+                savedUser.getLastName()));
 
         return new UserSaveDTO(token, refreshToken, true, savedUser.getUserId());
     }

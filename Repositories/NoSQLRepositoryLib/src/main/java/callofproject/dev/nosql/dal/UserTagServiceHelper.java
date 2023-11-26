@@ -20,6 +20,11 @@ import static callofproject.dev.library.exception.util.CopDataUtil.doForReposito
 import static callofproject.dev.nosql.NoSqlBeanName.USER_TAG_REPOSITORY_BEAN_NAME;
 import static callofproject.dev.nosql.NoSqlBeanName.USER_TAG_SERVICE_HELPER_BEAN_NAME;
 
+/**
+ * UserTagServiceHelper class represent the helper class of the UserTagService.
+ * Copyleft (c) NoSQLRepository.
+ * All Rights Free
+ */
 @Component(USER_TAG_SERVICE_HELPER_BEAN_NAME)
 @Lazy
 @SuppressWarnings("all")
@@ -27,6 +32,11 @@ public class UserTagServiceHelper
 {
     private final IUserTagRepository m_userTagRepository;
 
+    /**
+     * Constructor
+     *
+     * @param userTagRepository user tag repository
+     */
     public UserTagServiceHelper(@Qualifier(USER_TAG_REPOSITORY_BEAN_NAME) IUserTagRepository userTagRepository)
     {
         m_userTagRepository = userTagRepository;
@@ -35,8 +45,8 @@ public class UserTagServiceHelper
     /**
      * Save User Tag
      *
-     * @param userTag
-     * @return
+     * @param userTag user tag
+     * @return UserTag object
      */
     public UserTag saveUserTag(UserTag userTag)
     {
@@ -46,7 +56,7 @@ public class UserTagServiceHelper
     /**
      * Remove user tag
      *
-     * @param userTag
+     * @param userTag user tag
      */
     public void removeUserTag(UserTag userTag)
     {
@@ -56,7 +66,7 @@ public class UserTagServiceHelper
     /**
      * Remove user tag by id
      *
-     * @param id
+     * @param id user id
      */
     public void removeUserTagById(Long id)
     {
@@ -66,7 +76,6 @@ public class UserTagServiceHelper
     /**
      * Find count of user tag
      *
-     * @param id
      * @return UserTag
      */
     public long count()
@@ -77,7 +86,7 @@ public class UserTagServiceHelper
     /**
      * Save all user tag
      *
-     * @param id
+     * @param userTags user tag list.
      * @return Iterable UserTag
      */
     public Iterable<UserTag> saveAll(Iterable<UserTag> userTags)
@@ -88,7 +97,6 @@ public class UserTagServiceHelper
     /**
      * Get all user tag
      *
-     * @param id
      * @return UserTag
      */
     public Iterable<UserTag> getAllUserTag()
@@ -99,7 +107,7 @@ public class UserTagServiceHelper
     /**
      * Get all user tag by user id
      *
-     * @param userId
+     * @param userId user id
      * @return Iterable user tag
      */
     public Iterable<UserTag> getAllUserTagByUserId(UUID userId)
@@ -110,7 +118,7 @@ public class UserTagServiceHelper
     /**
      * Get all user tag by tag name
      *
-     * @param tagName
+     * @param tagName tag name
      * @return Iterable user tag
      */
     public Iterable<UserTag> getAllUserTagByTagName(String tagName)
@@ -121,8 +129,8 @@ public class UserTagServiceHelper
     /**
      * Get all user tag by user id and tag name
      *
-     * @param userId
-     * @param tagName
+     * @param userId  user id
+     * @param tagName tag name
      * @return Iterable user tag
      */
     public Iterable<UserTag> getAllUserTagByUserIdAndTagName(UUID userId, String tagName)

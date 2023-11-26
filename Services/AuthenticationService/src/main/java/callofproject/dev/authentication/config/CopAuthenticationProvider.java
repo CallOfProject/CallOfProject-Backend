@@ -50,7 +50,6 @@ public class CopAuthenticationProvider implements AuthenticationProvider
         } else throw new BadCredentialsException("No user registered with this details!");
     }
 
-
     /**
      * @param authorities the authorities granted to the user.
      * @return List<GrantedAuthority>
@@ -73,5 +72,4 @@ public class CopAuthenticationProvider implements AuthenticationProvider
     {
         return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
     }
-
 }

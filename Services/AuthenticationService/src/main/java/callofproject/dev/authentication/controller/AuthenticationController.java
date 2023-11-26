@@ -27,7 +27,6 @@ public class AuthenticationController
 {
     private final AuthenticationService m_authenticationService;
 
-
     public AuthenticationController(@Qualifier(Util.AUTHENTICATION_SERVICE) AuthenticationService service)
     {
         this.m_authenticationService = service;
@@ -71,7 +70,6 @@ public class AuthenticationController
         return subscribe(() -> ok(m_authenticationService.authenticate(request)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
-
 
     /**
      * Refresh token

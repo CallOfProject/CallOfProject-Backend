@@ -19,7 +19,6 @@ public class RepositoryFacade
     public final IProjectRepository m_projectRepository;
     public final ISectorRepository m_sectorRepository;
     public final IUserProjectsRepository m_userProjectsRepository;
-
     public final IProjectParticipantsRepository m_projectParticipantsRepository;
 
     public RepositoryFacade(@Qualifier(DEGREE_REPOSITORY) IDegreeRepository degreeRepository,
@@ -42,6 +41,4 @@ public class RepositoryFacade
         m_userProjectsRepository = userProjectsRepository;
         m_projectParticipantsRepository = projectParticipantsRepository;
     }
-
-
 }

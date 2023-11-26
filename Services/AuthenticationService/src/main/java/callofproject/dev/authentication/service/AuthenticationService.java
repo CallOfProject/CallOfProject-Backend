@@ -96,10 +96,8 @@ public class AuthenticationService
 
         var user = m_userManagementService.saveUser(dto);
 
-        return new AuthenticationResponse(user.accessToken(), user.refreshToken(), true,
-                RoleEnum.ROLE_USER.getRole(), user.userId());
+        return new AuthenticationResponse(user.accessToken(), user.refreshToken(), true, RoleEnum.ROLE_USER.getRole(), user.userId());
     }
-
 
     /**
      * Register all users with given RegisterRequest list parameter.
@@ -158,7 +156,6 @@ public class AuthenticationService
                 user.getObject().getUserId());
     }
 
-
     /**
      * Find top role for user.
      *
@@ -181,7 +178,6 @@ public class AuthenticationService
         }
         return role;
     }
-
 
     /**
      * Refresh token.

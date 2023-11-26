@@ -62,6 +62,7 @@ public class ProjectService
                 .setSpecialRequirements(projectDTO.specialRequirements())
                 .setTechnicalRequirements(projectDTO.technicalRequirements())
                 .setMaxParticipant(projectDTO.maxParticipantCount())
+                .setProjectOwnerId(projectDTO.userId())
                 .build();
 
         var savedProject = m_serviceHelper.saveProject(project);

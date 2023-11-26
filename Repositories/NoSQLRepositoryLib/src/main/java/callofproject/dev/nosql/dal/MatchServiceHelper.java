@@ -21,6 +21,11 @@ import static callofproject.dev.library.exception.util.CopDataUtil.doForReposito
 import static callofproject.dev.nosql.NoSqlBeanName.MATCH_REPOSITORY_BEAN_NAME;
 import static callofproject.dev.nosql.NoSqlBeanName.MATCH_SERVICE_HELPER_BEAN_NAME;
 
+/**
+ * MatchServiceHelper class represent the helper class of the MatchService.
+ * Copyleft (c) NoSQLRepository.
+ * All Rights Free
+ */
 @Component(MATCH_SERVICE_HELPER_BEAN_NAME)
 @Lazy
 @SuppressWarnings("all")
@@ -29,6 +34,11 @@ public class MatchServiceHelper
     private final IMatchDbRepository m_matchDbRepository;
 
 
+    /**
+     * Constructor
+     *
+     * @param matchDbRepository match db repository
+     */
     public MatchServiceHelper(@Qualifier(MATCH_REPOSITORY_BEAN_NAME) IMatchDbRepository matchDbRepository)
     {
         m_matchDbRepository = matchDbRepository;
@@ -78,8 +88,8 @@ public class MatchServiceHelper
     /**
      * Check if the user match exists in the database by id.
      *
-     * @param id The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @param userMatches usermatch list
+     * @return UserMatch iterable.
      */
     public Iterable<UserMatch> saveAll(Iterable<UserMatch> userMatches)
     {
@@ -90,7 +100,7 @@ public class MatchServiceHelper
      * Check if the user match exists in the database by id.
      *
      * @param id The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @return UserMatch optional.
      */
     public Optional<UserMatch> getUserMatchById(UUID id)
     {
@@ -100,8 +110,7 @@ public class MatchServiceHelper
     /**
      * Check if the user match exists in the database by id.
      *
-     * @param id The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @return UserMatch iterable.
      */
     public Iterable<UserMatch> getAllUserMatch()
     {
@@ -110,9 +119,6 @@ public class MatchServiceHelper
 
     /**
      * Check if the user match exists in the database by id.
-     *
-     * @param id The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
      */
     public void removeAllUserMatch()
     {
@@ -122,8 +128,7 @@ public class MatchServiceHelper
     /**
      * Check if the user match exists in the database by id.
      *
-     * @param id The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @param userMatches usermatch list
      */
     public void removeAllUserMatch(Iterable<UserMatch> userMatches)
     {
@@ -133,8 +138,7 @@ public class MatchServiceHelper
     /**
      * Check if the user match exists in the database by id.
      *
-     * @param id The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @param userId The id of the user match to be checked.
      */
     public void removeUserMatchByUserId(UUID userId)
     {
@@ -144,8 +148,8 @@ public class MatchServiceHelper
     /**
      * Check if the user match exists in the database by id.
      *
-     * @param id The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @param userId The id of the user match to be checked.
+     * @return UserMatch iterable.
      */
     public Iterable<UserMatch> getUserMatchByUserId(UUID userId)
     {
@@ -155,8 +159,8 @@ public class MatchServiceHelper
     /**
      * Check if the user match exists in the database by id.
      *
-     * @param id The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @param schoolId The id of the user match to be checked.
+     * @return UserMatch iterable.
      */
     public Iterable<UserMatch> getUserMatchBySchoolId(long schoolId)
     {
@@ -166,8 +170,8 @@ public class MatchServiceHelper
     /**
      * Check if the user match exists in the database by id.
      *
-     * @param id The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @param courseId The id of the user match to be checked.
+     * @return UserMatch iterable.
      */
     public Iterable<UserMatch> getUserMatchByCourseId(UUID courseId)
     {
@@ -177,8 +181,8 @@ public class MatchServiceHelper
     /**
      * Check if the user match exists in the database by id.
      *
-     * @param id The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @param experienceId The id of the user match to be checked.
+     * @return UserMatch iterable.
      */
     public Iterable<UserMatch> getUserMatchByExperienceId(UUID experienceId)
     {
@@ -190,7 +194,7 @@ public class MatchServiceHelper
      *
      * @param schoolId The id of the user match to be checked.
      * @param courseId The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @return UserMatch iterable.
      */
     public Iterable<UserMatch> getUserMatchBySchoolIdAndCourseId(long schoolId, UUID courseId)
     {
@@ -203,7 +207,7 @@ public class MatchServiceHelper
      *
      * @param schoolId     The id of the user match to be checked.
      * @param experienceId The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @return UserMatch iterable.
      */
     public Iterable<UserMatch> getUserMatchBySchoolIdAndExperienceId(long schoolId, UUID experienceId)
     {
@@ -216,7 +220,7 @@ public class MatchServiceHelper
      *
      * @param courseId     The id of the user match to be checked.
      * @param experienceId The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @return UserMatch iterable.
      */
     public Iterable<UserMatch> getUserMatchByCourseIdAndExperienceId(UUID courseId, UUID experienceId)
     {
@@ -230,7 +234,7 @@ public class MatchServiceHelper
      * @param schoolId     The id of the user match to be checked.
      * @param courseId     The id of the user match to be checked.
      * @param experienceId The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @return UserMatch iterable.
      */
     public Iterable<UserMatch> getUserMatchBySchoolIdAndCourseIdAndExperienceId(long schoolId, UUID courseId, UUID experienceId)
     {
@@ -245,7 +249,7 @@ public class MatchServiceHelper
      * @param courseId     The id of the user match to be checked.
      * @param experienceId The id of the user match to be checked.
      * @param userId       The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @return UserMatch iterable.
      */
     public Iterable<UserMatch> getUserMatchBySchoolIdAndCourseIdAndExperienceIdAndUserId(long schoolId, UUID courseId, UUID experienceId, UUID userId)
     {
@@ -261,7 +265,7 @@ public class MatchServiceHelper
      * @param experienceId The id of the user match to be checked.
      * @param userId       The id of the user match to be checked.
      * @param matchId      The id of the user match to be checked.
-     * @return True if the user match exists in the database, false otherwise.
+     * @return UserMatch iterable.
      */
     public Iterable<UserMatch> getUserMatchBySchoolIdAndCourseIdAndExperienceIdAndUserIdAndMatchId(long schoolId, UUID courseId, UUID experienceId, UUID userId, UUID matchId)
     {

@@ -17,6 +17,11 @@ import java.util.UUID;
 
 import static callofproject.dev.nosql.NoSqlBeanName.PROJECT_TAG_REPOSITORY_BEAN_NAME;
 
+/**
+ * IProjectTagRepository interface represent the repository layer of the ProjectTag entity.
+ * Copyleft (c) NoSQLRepository.
+ * All Rights Free
+ */
 @Repository(PROJECT_TAG_REPOSITORY_BEAN_NAME)
 @Lazy
 public interface IProjectTagRepository extends MongoRepository<ProjectTag, Long>

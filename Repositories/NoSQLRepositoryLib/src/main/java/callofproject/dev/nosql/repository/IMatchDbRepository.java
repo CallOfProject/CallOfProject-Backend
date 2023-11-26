@@ -18,6 +18,11 @@ import java.util.UUID;
 
 import static callofproject.dev.nosql.NoSqlBeanName.MATCH_REPOSITORY_BEAN_NAME;
 
+/**
+ * IMatchDbRepository interface represent the repository layer of the UserMatch entity.
+ * Copyleft (c) NoSQLRepository.
+ * All Rights Free
+ */
 @Repository(MATCH_REPOSITORY_BEAN_NAME)
 @Lazy
 public interface IMatchDbRepository extends MongoRepository<UserMatch, UUID>
@@ -33,7 +38,7 @@ public interface IMatchDbRepository extends MongoRepository<UserMatch, UUID>
      * Get user match by user id
      *
      * @param userID (user id is the id of the user who is matched with the user)
-     * @return Iterable<UserMatch>
+     * @return UserMatch iterable.
      */
     Iterable<UserMatch> findAllByUserID(UUID userID);
 
@@ -41,7 +46,7 @@ public interface IMatchDbRepository extends MongoRepository<UserMatch, UUID>
      * Get user match by user id
      *
      * @param schoolId (school id is the id of the user who is matched with the user)
-     * @return Iterable<UserMatch>
+     * @return UserMatch iterable.
      */
 
     Iterable<UserMatch> findAllBySchoolId(long schoolId);
@@ -50,7 +55,7 @@ public interface IMatchDbRepository extends MongoRepository<UserMatch, UUID>
      * Get user match by user id and course id
      *
      * @param courseId (course id is the id of the user who is matched with the user)
-     * @return Iterable<UserMatch>
+     * @return UserMatch iterable.
      */
     Iterable<UserMatch> findAllByCourseId(UUID courseId);
 
@@ -58,7 +63,7 @@ public interface IMatchDbRepository extends MongoRepository<UserMatch, UUID>
      * Get user match by experience id
      *
      * @param experienceId (experience id is the id of the user who is matched with the user)
-     * @return Iterable<UserMatch>
+     * @return UserMatch iterable.
      */
     Iterable<UserMatch> findAllByExperienceId(UUID experienceId);
 
@@ -67,7 +72,7 @@ public interface IMatchDbRepository extends MongoRepository<UserMatch, UUID>
      *
      * @param schoolId (school id is the id of the user who is matched with the user)
      * @param courseId (course id is the id of the user who is matched with the user)
-     * @return Iterable<UserMatch>
+     * @return UserMatch iterable.
      */
     Iterable<UserMatch> findAllBySchoolIdAndCourseId(long schoolId, UUID courseId);
 
@@ -76,7 +81,7 @@ public interface IMatchDbRepository extends MongoRepository<UserMatch, UUID>
      *
      * @param schoolId     (school id is the id of the user who is matched with the user)
      * @param experienceId (experience id is the id of the user who is matched with the user)
-     * @return Iterable<UserMatch>
+     * @return UserMatch iterable.
      */
     Iterable<UserMatch> findAllBySchoolIdAndExperienceId(long schoolId, UUID experienceId);
 
@@ -85,7 +90,7 @@ public interface IMatchDbRepository extends MongoRepository<UserMatch, UUID>
      *
      * @param experienceId (experience id is the id of the user who is matched with the user)
      * @param courseId     (course id is the id of the user who is matched with the user)
-     * @return Iterable<UserMatch>
+     * @return UserMatch iterable.
      */
     Iterable<UserMatch> findAllByCourseIdAndExperienceId(UUID courseId, UUID experienceId);
 
@@ -95,7 +100,7 @@ public interface IMatchDbRepository extends MongoRepository<UserMatch, UUID>
      * @param schoolId     (school id is the id of the user who is matched with the user)
      * @param courseId     (course id is the id of the user who is matched with the user)
      * @param experienceId (experience id is the id of the user who is matched with the user)
-     * @return Iterable<UserMatch>
+     * @return UserMatch iterable.
      */
     Iterable<UserMatch> findAllBySchoolIdAndCourseIdAndExperienceId(long schoolId, UUID courseId, UUID experienceId);
 
@@ -106,7 +111,7 @@ public interface IMatchDbRepository extends MongoRepository<UserMatch, UUID>
      * @param courseId     (course id is the id of the user who is matched with the user)
      * @param experienceId (experience id is the id of the user who is matched with the user)
      * @param userId       (user id is the id of the user who is matched with the user)
-     * @return Iterable<UserMatch>
+     * @return UserMatch iterable.
      */
     Iterable<UserMatch> getUserMatchBySchoolIdAndCourseIdAndExperienceIdAndUserID(long schoolId, UUID courseId, UUID experienceId, UUID userId);
 
@@ -118,7 +123,7 @@ public interface IMatchDbRepository extends MongoRepository<UserMatch, UUID>
      * @param experienceId (experience id is the id of the user who is matched with the user)
      * @param userId       (user id is the id of the user who is matched with the user)
      * @param matchId      (match id is the id of the user who is matched with the user)
-     * @return Iterable<UserMatch>
+     * @return UserMatch iterable.
      */
     Iterable<UserMatch> getUserMatchBySchoolIdAndCourseIdAndExperienceIdAndUserIDAndMatchId(long schoolId, UUID courseId, UUID experienceId, UUID userId, UUID matchId);
 }
