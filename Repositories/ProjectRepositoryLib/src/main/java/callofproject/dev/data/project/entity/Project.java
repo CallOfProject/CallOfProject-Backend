@@ -1,8 +1,11 @@
 package callofproject.dev.data.project.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -16,13 +19,13 @@ public class Project
     private UUID m_projectId;
     @Column(name = "project_image", nullable = true)
     private String m_projectImagePath;
-    @Column(name = "title", nullable = false)
+    @Column(name = "title", nullable = false, length = 100)
     private String m_projectName;
-    @Column(name = "summary", nullable = false)
+    @Column(name = "summary", nullable = false, length = 200)
     private String m_projectSummary;
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, length = 500)
     private String m_description;
-    @Column(name = "aim", nullable = false)
+    @Column(name = "aim", nullable = false, length = 250)
     private String m_projectAim;
     @Column(name = "application_deadline", nullable = false)
     private LocalDate m_applicationDeadline;
@@ -34,9 +37,9 @@ public class Project
     private int m_maxParticipant;
     @Column(name = "invite_link")
     private String m_inviteLink;
-    @Column(name = "technical_requirements")
+    @Column(name = "technical_requirements", length = 200)
     private String m_technicalRequirements;
-    @Column(name = "special_requirements")
+    @Column(name = "special_requirements", length = 200)
     private String m_specialRequirements;
     @ManyToOne
     @JoinColumn(name = "project_access_type_id", nullable = false)
@@ -47,8 +50,6 @@ public class Project
     @ManyToOne
     @JoinColumn(name = "sector_id", nullable = false)
     private Sector m_sector;
-    @Column(name = "project_owner_id", nullable = false)
-    private UUID m_projectOwnerId;
     @ManyToOne
     @JoinColumn(name = "degree_id", nullable = false)
     private Degree m_degree;
@@ -59,11 +60,44 @@ public class Project
     @JoinColumn(name = "interview_type_id", nullable = false)
     private InterviewType m_interviewType;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User m_projectOwner;
+
+    @OneToMany(mappedBy = "m_project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<ProjectParticipant> m_projectParticipants;
+
 
     public Project()
     {
     }
 
+    public void addProjectParticipant(User user)
+    {
+        if (m_projectParticipants == null)
+            m_projectParticipants = new HashSet<>();
+
+        m_projectParticipants.add(new ProjectParticipant(this, user));
+    }
+
+    public void addProjectParticipant(ProjectParticipant projectParticipant)
+    {
+        if (m_projectParticipants == null)
+            m_projectParticipants = new HashSet<>();
+
+        m_projectParticipants.add(projectParticipant);
+    }
+
+    public User getProjectOwner()
+    {
+        return m_projectOwner;
+    }
+
+    public Set<ProjectParticipant> getProjectParticipants()
+    {
+        return m_projectParticipants;
+    }
 
     public static class Builder
     {
@@ -74,17 +108,18 @@ public class Project
             m_project = new Project();
         }
 
+        public Builder setProjectOwner(User projectOwner)
+        {
+            m_project.m_projectOwner = projectOwner;
+            return this;
+        }
+
         public Builder setProjectImagePath(String projectImagePath)
         {
             m_project.m_projectImagePath = projectImagePath;
             return this;
         }
 
-        public Builder setProjectOwnerId(UUID projectOwnerId)
-        {
-            m_project.m_projectOwnerId = projectOwnerId;
-            return this;
-        }
         public Builder setProjectName(String projectName)
         {
             m_project.m_projectName = projectName;
@@ -194,10 +229,6 @@ public class Project
         }
     }
 
-    public UUID getProjectOwnerId()
-    {
-        return m_projectOwnerId;
-    }
 
     public UUID getProjectId()
     {

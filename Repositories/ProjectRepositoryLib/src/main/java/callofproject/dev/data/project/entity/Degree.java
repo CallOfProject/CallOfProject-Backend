@@ -1,7 +1,6 @@
 package callofproject.dev.data.project.entity;
 
 import callofproject.dev.data.project.entity.enums.EDegree;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,7 +10,6 @@ public class Degree
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "degree_id")
-    @JsonIgnore
     private long m_degreeId;
     @Enumerated(EnumType.STRING)
     @Column(name = "degree_name", unique = true)

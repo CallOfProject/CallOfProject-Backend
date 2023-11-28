@@ -18,8 +18,8 @@ public class RepositoryFacade
     public final IProjectProfessionLevelRepository m_professionLevelRepository;
     public final IProjectRepository m_projectRepository;
     public final ISectorRepository m_sectorRepository;
-    public final IUserProjectsRepository m_userProjectsRepository;
-    public final IProjectParticipantsRepository m_projectParticipantsRepository;
+    public final IUserRepository m_userRepository;
+    public final IProjectParticipantRepository m_projectParticipantRepository;
 
     public RepositoryFacade(@Qualifier(DEGREE_REPOSITORY) IDegreeRepository degreeRepository,
                             @Qualifier(INTERVIEW_TYPE_REPOSITORY) IInterviewTypeRepository interviewTypeRepository,
@@ -28,8 +28,8 @@ public class RepositoryFacade
                             @Qualifier(PROJECT_PROFESSION_LEVEL_REPOSITORY) IProjectProfessionLevelRepository professionLevelRepository,
                             @Qualifier(PROJECT_REPOSITORY) IProjectRepository projectRepository,
                             @Qualifier(SECTOR_REPOSITORY) ISectorRepository sectorRepository,
-                            @Qualifier(USER_PROJECTS_REPOSITORY_BEAN) IUserProjectsRepository userProjectsRepository,
-                            @Qualifier(PROJECT_PARTICIPANTS_REPOSITORY_BEAN) IProjectParticipantsRepository projectParticipantsRepository)
+                            @Qualifier(USER_REPOSITORY) IUserRepository userRepository,
+                            @Qualifier(PROJECT_PARTICIPANT_REPOSITORY_BEAN) IProjectParticipantRepository projectParticipantRepository)
     {
         m_degreeRepository = degreeRepository;
         m_interviewTypeRepository = interviewTypeRepository;
@@ -38,7 +38,7 @@ public class RepositoryFacade
         m_professionLevelRepository = professionLevelRepository;
         m_projectRepository = projectRepository;
         m_sectorRepository = sectorRepository;
-        m_userProjectsRepository = userProjectsRepository;
-        m_projectParticipantsRepository = projectParticipantsRepository;
+        m_userRepository = userRepository;
+        m_projectParticipantRepository = projectParticipantRepository;
     }
 }

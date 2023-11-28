@@ -7,6 +7,7 @@ package callofproject.dev.data.project.dal;
 
 import callofproject.dev.data.project.entity.*;
 import callofproject.dev.data.project.entity.enums.*;
+import callofproject.dev.library.exception.repository.RepositoryException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -15,15 +16,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static callofproject.dev.data.project.ProjectRepositoryBeanName.PROJECT_SERVICE_HELPER_BEAN;
 import static callofproject.dev.data.project.ProjectRepositoryBeanName.REPOSITORY_FACADE_BEAN;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForRepository;
-import static callofproject.dev.util.stream.StreamUtil.toList;
-import static java.util.UUID.fromString;
 
 @Component(PROJECT_SERVICE_HELPER_BEAN)
 @PropertySource("classpath:application-project_repository.properties")
@@ -614,93 +612,76 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::findSectorBySector");
     }
 
-    /**
-     * Find All projects by user id.
-     *
-     * @param userId represent the user id.
-     * @return Iterable<UserProjects>
-     */
-    public Iterable<UserProjects> findAllByUserId(UUID userId)
+    public Optional<Project> findProjectById(UUID projectId)
     {
-        return doForRepository(() -> m_facade.m_userProjectsRepository.findAllByUserId(userId),
-                "ProjectServiceHelper::findAllByUserId");
+        return doForRepository(() -> m_facade.m_projectRepository.findById(projectId),
+                "ProjectServiceHelper::findById");
     }
 
-    /**
-     * Find All projects by project id.
-     *
-     * @param projectId represent the project id.
-     * @return Iterable<UserProjects>
-     */
-    public Iterable<UserProjects> findAllByProjectId(UUID projectId)
+    public User addUser(User user)
     {
-        return doForRepository(() -> m_facade.m_userProjectsRepository.findAllByProjectId(projectId),
-                "ProjectServiceHelper::findAllByProjectId");
-    }
+        return doForRepository(() -> m_facade.m_userRepository.save(user),
+                "ProjectServiceHelper::addUser");
 
-    /**
-     * Find by user id and project id.
-     *
-     * @param userId    represent the user id.
-     * @param projectId represent the project id.
-     * @return Optional<UserProjects>
-     */
-    public Optional<UserProjects> findByUserIdAndProjectId(UUID userId, UUID projectId)
-    {
-        return doForRepository(() -> m_facade.m_userProjectsRepository.findByUserIdAndProjectId(userId, projectId),
-                "ProjectServiceHelper::findByUserIdAndProjectId");
-    }
-
-    /**
-     * Save project to user.
-     *
-     * @param userId    represent the user id.
-     * @param projectId represent the project id.
-     * @return UserProjects
-     */
-    public UserProjects saveProjectToUser(UUID userId, UUID projectId)
-    {
-        return doForRepository(() -> m_facade.m_userProjectsRepository.save(new UserProjects(userId, projectId)),
-                "ProjectServiceHelper::saveProjectToUser");
     }
 
 
-    /**
-     * Find all projects by user id.
-     *
-     * @param userId    represent the user id.
-     * @param projectId represent the project id.
-     */
-    public Iterable<Project> findProjectsByUserId(String userId)
+    public Optional<User> findUserById(UUID userId)
     {
-        return doForRepository(() -> m_facade.m_projectRepository.findAllById(toList(m_facade.m_userProjectsRepository
-                        .findAllByUserId(fromString(userId)), UserProjects::getProjectId)),
-                "ProjectServiceHelper::findProjectsByUserId");
+        return doForRepository(() -> m_facade.m_userRepository.findById(userId),
+                "ProjectServiceHelper::findUserById");
     }
 
-    /**
-     * Save project participant by user id and project id.
-     *
-     * @param userId    represent the user id.
-     * @param projectId represent the project id.
-     */
-    public ProjectParticipants saveParticipantToProject(UUID userId, UUID projectId)
+    public void removeUser(UUID userId)
     {
-        return doForRepository(() -> m_facade.m_projectParticipantsRepository.save(new ProjectParticipants(userId, projectId)),
-                "ProjectServiceHelper::saveParticipantsToProject");
+        doForRepository(() -> m_facade.m_userRepository.deleteById(userId),
+                "ProjectServiceHelper::removeUser");
     }
 
-    /**
-     * Save All Project Participants with project id and user ids.
-     *
-     * @param projectId represent the project id.
-     * @return Iterable<ProjectParticipants>
-     */
-    public Iterable<ProjectParticipants> saveParticipantToProject(List<UUID> userIds, UUID projectId)
+    public ProjectParticipant addProjectParticipant(ProjectParticipant participant)
     {
-        var participants = toList(userIds, userId -> new ProjectParticipants(userId, projectId));
-
-        return doForRepository(() -> m_facade.m_projectParticipantsRepository.saveAll(participants),
-                "ProjectServiceHelper::saveParticipantsToProject");
+        return doForRepository(() -> m_facade.m_projectParticipantRepository.save(participant),
+                "ProjectServiceHelper::addProjectParticipant");
     }
+
+    public boolean addProjectParticipant(UUID projectId, UUID userId)
+    {
+        var user = findUserById(userId);
+        var project = findProjectById(projectId);
+
+        if (user.isEmpty() || project.isEmpty())
+            throw new RepositoryException("User or Project is not found!");
+
+        project.get().addProjectParticipant(user.get());
+
+        var updatedProject = doForRepository(() -> m_facade.m_projectRepository.save(project.get()),
+                "ProjectServiceHelper::addProjectParticipant");
+
+        return updatedProject != null;
+    }
+
+    public Iterable<Project> findAllProjectByProjectOwnerusername(String username, int page)
+    {
+        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
+
+        return doForRepository(() -> m_facade.m_projectRepository.findAllByProjectOwnerUsername(username, pageable),
+                "ProjectServiceHelper::findAllProjectByProjectOwnerusername");
+    }
+
+    public Iterable<Project> findAllProjectByProjectOwnerUserId(UUID userId, int page)
+    {
+        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
+
+        return doForRepository(() -> m_facade.m_projectRepository.findAllByProjectOwnerId(userId, pageable),
+                "ProjectServiceHelper::findAllProjectByProjectOwnerUserId");
+    }
+
+    public Iterable<Project> findAllParticipantProjectByUserId(UUID userId, int page)
+    {
+        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
+
+        return doForRepository(() -> m_facade.m_projectRepository.findAllParticipantProjectByUserId(userId, pageable),
+                "ProjectServiceHelper::findAllParticipantProjectByUsername");
+    }
+
 }

@@ -20,6 +20,11 @@ import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
+/**
+ * Authentication Controller
+ * Copyleft (C), 2021, Cal-of-Project Developers.
+ * All Rights free.
+ */
 @RestController
 @RequestMapping("api/auth")
 @SecurityRequirement(name = "Authorization")

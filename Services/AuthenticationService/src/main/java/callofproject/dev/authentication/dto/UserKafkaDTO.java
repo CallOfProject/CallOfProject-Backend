@@ -1,11 +1,10 @@
-package callofproject.dev.project.dto;
+package callofproject.dev.authentication.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.UUID;
 
-
-public record UserDTO(
+public record UserKafkaDTO(
         @JsonProperty("user_id")
         UUID userId,
         String username,
@@ -18,6 +17,7 @@ public record UserDTO(
         String lastName,
 
         Operation operation
+
 )
 {
 }

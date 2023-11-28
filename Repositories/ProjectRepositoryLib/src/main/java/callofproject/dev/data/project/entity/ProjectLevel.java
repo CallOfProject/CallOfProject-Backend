@@ -11,7 +11,6 @@ public class ProjectLevel
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "project_level_id")
-    @JsonIgnore
     private long m_projectLevelId;
 
     @Enumerated(EnumType.STRING)

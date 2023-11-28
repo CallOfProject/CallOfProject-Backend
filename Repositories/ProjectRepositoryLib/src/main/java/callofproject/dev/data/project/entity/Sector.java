@@ -11,7 +11,6 @@ public class Sector
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sector_id")
-    @JsonIgnore
     private long m_sectorId;
 
     @Enumerated(EnumType.STRING)

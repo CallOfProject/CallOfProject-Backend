@@ -11,7 +11,6 @@ public class ProjectAccessType
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "project_access_type_id")
-    @JsonIgnore
     private long m_projectAccessTypeId;
     @Enumerated(EnumType.STRING)
     @Column(name = "project_access_type_name", unique = true)

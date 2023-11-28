@@ -2,6 +2,7 @@ package callofproject.dev.project;
 
 import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.nosql.dal.ProjectTagServiceHelper;
+import callofproject.dev.nosql.entity.ProjectTag;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -12,6 +13,9 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
+import java.util.List;
+import java.util.UUID;
 
 import static callofproject.dev.data.project.ProjectRepositoryBeanName.BASE_PACKAGE_BEAN_NAME;
 import static callofproject.dev.data.project.ProjectRepositoryBeanName.PROJECT_SERVICE_HELPER_BEAN;
@@ -49,6 +53,13 @@ public class ProjectServiceApplication implements ApplicationRunner
     public void run(ApplicationArguments args) throws Exception
     {
 
+       /* var tag1 = new ProjectTag("JAVA", UUID.fromString("9ad481f8-eb21-4d40-9c76-013e9c499fd2"));
+        var tag2 = new ProjectTag("Spring BOOT", UUID.fromString("9ad481f8-eb21-4d40-9c76-013e9c499fd2"));
+
+        var tag3 = new ProjectTag("C#", UUID.fromString("61ba6025-5641-4ca8-aebe-8d32ad91994c"));
+        var tag4 = new ProjectTag("ASP .NET CORE", UUID.fromString("61ba6025-5641-4ca8-aebe-8d32ad91994c"));
+
+        m_tagProjectRepository.saveAll(List.of(tag1, tag2, tag3, tag4));*/
         // Örnek ProjectAccessType, ProjectProfessionLevel, Sector, Degree, ProjectLevel ve InterviewType değerleri oluşturun
        /* EProjectAccessType projectAccessType1 = EProjectAccessType.PUBLIC;
         EProjectAccessType projectAccessType2 = EProjectAccessType.PRIVATE;

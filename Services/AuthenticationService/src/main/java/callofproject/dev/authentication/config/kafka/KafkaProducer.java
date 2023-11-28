@@ -1,6 +1,6 @@
 package callofproject.dev.authentication.config.kafka;
 
-import callofproject.dev.authentication.dto.UserDTO;
+import callofproject.dev.authentication.dto.UserKafkaDTO;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.support.MessageBuilder;
@@ -15,9 +15,9 @@ import static org.springframework.kafka.support.KafkaHeaders.TOPIC;
 public class KafkaProducer
 {
     private final NewTopic m_topic;
-    private final KafkaTemplate<String, UserDTO> m_kafkaTemplate;
+    private final KafkaTemplate<String, UserKafkaDTO> m_kafkaTemplate;
 
-    public KafkaProducer(NewTopic topic, KafkaTemplate<String, UserDTO> kafkaTemplate)
+    public KafkaProducer(NewTopic topic, KafkaTemplate<String, UserKafkaDTO> kafkaTemplate)
     {
         m_topic = topic;
         m_kafkaTemplate = kafkaTemplate;
@@ -28,7 +28,7 @@ public class KafkaProducer
      *
      * @param message The message to send.
      */
-    public void sendMessage(UserDTO message)
+    public void sendMessage(UserKafkaDTO message)
     {
         var msg = MessageBuilder
                 .withPayload(message)

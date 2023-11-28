@@ -159,9 +159,8 @@ public class UserManagementService
         var token = JwtUtil.generateToken(claims, user.getUsername());
         var refreshToken = JwtUtil.generateToken(claims, user.getUsername());
 
-        m_userProducer.sendMessage(new UserDTO(savedUser.getUsername(), savedUser.getEmail(),
-                savedUser.getFirstName(), savedUser.getMiddleName(),
-                savedUser.getLastName()));
+        m_userProducer.sendMessage(new UserKafkaDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(),
+                user.getMiddleName(), user.getLastName(), Operation.CREATE));
 
         return new UserSaveDTO(token, refreshToken, true, savedUser.getUserId());
     }

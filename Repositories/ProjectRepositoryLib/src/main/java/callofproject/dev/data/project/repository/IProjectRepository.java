@@ -86,4 +86,13 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>
     Page<Project> findAllByProjectNameAndDescriptionAndProjectSummaryAndProjectAimContainsIgnoreCase(String projectName, String description, String projectSummary, String projectAim, Pageable pageable);
 
     Page<Project> findAllByProjectNameOrDescriptionOrProjectSummaryOrProjectAimContainsIgnoreCase(String projectName, String description, String projectSummary, String projectAim, Pageable pageable);
+
+    @Query("from Project where m_projectOwner.m_username = :username")
+    Page<Project> findAllByProjectOwnerUsername(String username, Pageable pageable);
+
+    @Query("from Project where m_projectOwner.m_userId = :userId")
+    Page<Project> findAllByProjectOwnerId(UUID userId, Pageable pageable);
+
+    @Query("FROM Project p WHERE :userId IN (select w.m_user.m_userId FROM p.m_projectParticipants as w)")
+    Page<Project> findAllParticipantProjectByUserId(@Param("userId") UUID userId, Pageable pageable);
 }
