@@ -28,6 +28,16 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>callofproject.dev</groupId>
+            <artifactId>cop-nosql-db</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
             <groupId>callofproject.dev</groupId>
             <artifactId>ProjectRepositoryLib</artifactId>
             <version>1.0.0</version>
@@ -37,11 +47,7 @@
             <artifactId>JwtService</artifactId>
             <version>1.0.0</version>
         </dependency>
-        <dependency>
-            <groupId>callofproject.dev</groupId>
-            <artifactId>cop-nosql-db</artifactId>
-            <version>1.0.0</version>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>

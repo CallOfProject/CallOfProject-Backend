@@ -1,7 +1,10 @@
 package callofproject.dev.authentication.service;
 
+import callofproject.dev.authentication.config.kafka.KafkaProducer;
 import callofproject.dev.authentication.dto.MessageResponseDTO;
 import callofproject.dev.authentication.dto.MultipleMessageResponseDTO;
+import callofproject.dev.authentication.dto.Operation;
+import callofproject.dev.authentication.dto.UserKafkaDTO;
 import callofproject.dev.authentication.dto.admin.UserShowingAdminDTO;
 import callofproject.dev.authentication.dto.admin.UserUpdateDTOAdmin;
 import callofproject.dev.authentication.dto.admin.UsersShowingAdminDTO;
@@ -34,12 +37,14 @@ public class AdminService
 {
 
     private final UserManagementServiceHelper m_managementServiceHelper;
+    private final KafkaProducer m_kafkaProducer;
     private final AuthenticationProvider m_authenticationProvider;
     private final IUserMapper m_userMapper;
 
-    public AdminService(UserManagementServiceHelper managementServiceHelper, AuthenticationProvider authenticationProvider, IUserMapper userMapper)
+    public AdminService(UserManagementServiceHelper managementServiceHelper, KafkaProducer kafkaProducer, AuthenticationProvider authenticationProvider, IUserMapper userMapper)
     {
         m_managementServiceHelper = managementServiceHelper;
+        m_kafkaProducer = kafkaProducer;
         m_authenticationProvider = authenticationProvider;
         m_userMapper = userMapper;
     }
@@ -226,6 +231,11 @@ public class AdminService
 
         var savedUser = m_managementServiceHelper.getUserServiceHelper().saveUser(user.get());
 
+        var toProjectServiceDTO = new UserKafkaDTO(savedUser.getUserId(), savedUser.getUsername(), savedUser.getEmail(),
+                savedUser.getFirstName(), savedUser.getMiddleName(), savedUser.getLastName(), Operation.UPDATE);
+
+        m_kafkaProducer.sendMessage(toProjectServiceDTO);
+
         var userDto = m_userMapper.toUserShowingAdminDTO(savedUser);
 
         return new MessageResponseDTO<>("User updated successfully!", HttpStatus.SC_OK, userDto);
@@ -247,7 +257,10 @@ public class AdminService
 
         if (user.get().isAdminOrRoot())
             throw new DataServiceException("You cannot remove this user!");
+        var toProjectServiceDTO = new UserKafkaDTO(user.get().getUserId(), user.get().getUsername(), user.get().getEmail(),
+                user.get().getFirstName(), user.get().getMiddleName(), user.get().getLastName(), Operation.DELETE);
 
+        m_kafkaProducer.sendMessage(toProjectServiceDTO);
         m_managementServiceHelper.getUserServiceHelper().removeUser(user.get());
 
         return new MessageResponseDTO<>("User removed Successfully!", HttpStatus.SC_OK, true);
@@ -261,7 +274,6 @@ public class AdminService
      */
     private MultipleMessageResponseDTO<UsersShowingAdminDTO> findAllUsersPageableCallback(int page)
     {
-
         var dtoList = m_userMapper.toUsersShowingAdminDTO(stream(m_managementServiceHelper.getUserServiceHelper()
                 .findAllPageable(page).spliterator(), true)
                 .map(m_userMapper::toUserShowingAdminDTO).toList());

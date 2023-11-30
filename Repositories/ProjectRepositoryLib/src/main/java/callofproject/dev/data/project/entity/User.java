@@ -33,6 +33,10 @@ public class User
     @JsonIgnore
     private Set<ProjectParticipant> m_projectParticipants; // projects that he owns
 
+    @OneToMany(mappedBy = "m_user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<ProjectParticipantRequest> m_projectParticipantRequests; // Project Join requests
+
 
     public User()
     {
@@ -55,6 +59,16 @@ public class User
             m_projects = new HashSet<>();
 
         m_projects.add(project);
+    }
+
+    public Set<ProjectParticipantRequest> getProjectParticipantRequests()
+    {
+        return m_projectParticipantRequests;
+    }
+
+    public void setProjectParticipantRequests(Set<ProjectParticipantRequest> projectParticipantRequests)
+    {
+        m_projectParticipantRequests = projectParticipantRequests;
     }
 
     public Set<ProjectParticipant> getProjectParticipants()
@@ -135,5 +149,13 @@ public class User
     public void setLastName(String lastName)
     {
         m_lastName = lastName;
+    }
+
+    public String getFullName()
+    {
+        if (m_middleName == null || m_middleName.isBlank() || m_middleName.isEmpty())
+            return String.format("%s %s", m_firstName, m_lastName);
+
+        return String.format("%s %s %s", m_firstName, m_middleName, m_lastName);
     }
 }

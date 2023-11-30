@@ -1,0 +1,81 @@
+2023-11-29 21:04:39 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table [*]user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, username varchar(255) not null, primary key (user_id))"; expected "identifier"; SQL statement:
+create table user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, username varchar(255) not null, primary key (user_id)) [42001-214]
+2023-11-29 21:04:39 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references user [42001-214]
+2023-11-29 21:04:39 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references user [42001-214]
+2023-11-29 21:04:39 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references user [42001-214]
+2023-11-29 21:04:41 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-214]
+2023-11-29 21:04:41 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-214]
+2023-11-29 21:04:41 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-214]
+2023-11-29 21:04:41 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-214]
+2023-11-29 21:04:41 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-214]
+2023-11-29 21:04:41 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-214]
+2023-11-29 21:04:41 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "select u1_0.user_id,u1_0.email,u1_0.first_name,u1_0.last_name,u1_0.middle_name,m1_0.user_id,m1_0.project_participant_request_id,m1_0.project_id,m2_0.project_id,m2_0.admin_note,m2_0.application_deadline,m2_0.degree_id,m3_0.degree_id,m3_0.degree_name,m2_0.description,m2_0.expected_completion_date,m2_0.expected_project_deadline,m2_0.interview_type_id,m4_0.interview_type_id,m4_0.interview_type_name,m2_0.invite_link,m2_0.max_participant,m2_0.project_profession_level_id,m5_0.project_profession_level_id,m5_0.project_profession_level_name,m2_0.project_access_type_id,m6_0.project_access_type_id,m6_0.project_access_type_name,m2_0.aim,m2_0.project_image,m2_0.project_level_id,m7_0.project_level_id,m7_0.project_level_name,m2_0.title,m2_0.user_id,m8_0.user_id,m8_0.email,m8_0.first_name,m8_0.last_name,m8_0.middle_name,m8_0.username,m2_0.summary,m2_0.sector_id,m9_0.sector_id,m9_0.sector_name,m2_0.special_requirements,m2_0.technical_requirements,m1_0.request_date,u1_0.username from [*]user u1_0 left join project_participant_request m1_0 on u1_0.user_id=m1_0.user_id left join project m2_0 on m2_0.project_id=m1_0.project_id left join degree m3_0 on m3_0.degree_id=m2_0.degree_id left join interview_type m4_0 on m4_0.interview_type_id=m2_0.interview_type_id left join project_profession_level m5_0 on m5_0.project_profession_level_id=m2_0.project_profession_level_id left join project_access_type m6_0 on m6_0.project_access_type_id=m2_0.project_access_type_id left join project_level m7_0 on m7_0.project_level_id=m2_0.project_level_id left join user m8_0 on m8_0.user_id=m2_0.user_id left join sector m9_0 on m9_0.sector_id=m2_0.sector_id where u1_0.user_id=?"; expected "identifier"; SQL statement:
+select u1_0.user_id,u1_0.email,u1_0.first_name,u1_0.last_name,u1_0.middle_name,m1_0.user_id,m1_0.project_participant_request_id,m1_0.project_id,m2_0.project_id,m2_0.admin_note,m2_0.application_deadline,m2_0.degree_id,m3_0.degree_id,m3_0.degree_name,m2_0.description,m2_0.expected_completion_date,m2_0.expected_project_deadline,m2_0.interview_type_id,m4_0.interview_type_id,m4_0.interview_type_name,m2_0.invite_link,m2_0.max_participant,m2_0.project_profession_level_id,m5_0.project_profession_level_id,m5_0.project_profession_level_name,m2_0.project_access_type_id,m6_0.project_access_type_id,m6_0.project_access_type_name,m2_0.aim,m2_0.project_image,m2_0.project_level_id,m7_0.project_level_id,m7_0.project_level_name,m2_0.title,m2_0.user_id,m8_0.user_id,m8_0.email,m8_0.first_name,m8_0.last_name,m8_0.middle_name,m8_0.username,m2_0.summary,m2_0.sector_id,m9_0.sector_id,m9_0.sector_name,m2_0.special_requirements,m2_0.technical_requirements,m1_0.request_date,u1_0.username from user u1_0 left join project_participant_request m1_0 on u1_0.user_id=m1_0.user_id left join project m2_0 on m2_0.project_id=m1_0.project_id left join degree m3_0 on m3_0.degree_id=m2_0.degree_id left join interview_type m4_0 on m4_0.interview_type_id=m2_0.interview_type_id left join project_profession_level m5_0 on m5_0.project_profession_level_id=m2_0.project_profession_level_id left join project_access_type m6_0 on m6_0.project_access_type_id=m2_0.project_access_type_id left join project_level m7_0 on m7_0.project_level_id=m2_0.project_level_id left join user m8_0 on m8_0.user_id=m2_0.user_id left join sector m9_0 on m9_0.sector_id=m2_0.sector_id where u1_0.user_id=? [42001-214]
+2023-11-29 21:14:25 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table [*]user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, username varchar(255) not null, primary key (user_id))"; expected "identifier"; SQL statement:
+create table user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, username varchar(255) not null, primary key (user_id)) [42001-214]
+2023-11-29 21:14:25 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references user [42001-214]
+2023-11-29 21:14:25 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references user [42001-214]
+2023-11-29 21:14:25 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references user [42001-214]
+2023-11-29 21:33:38 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table [*]user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, username varchar(255) not null, primary key (user_id))"; expected "identifier"; SQL statement:
+create table user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, username varchar(255) not null, primary key (user_id)) [42001-214]
+2023-11-29 21:33:38 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references user [42001-214]
+2023-11-29 21:33:38 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references user [42001-214]
+2023-11-29 21:33:38 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references user [42001-214]
+2023-11-29 21:33:44 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table [*]user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, username varchar(255) not null, primary key (user_id))"; expected "identifier"; SQL statement:
+create table user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, username varchar(255) not null, primary key (user_id)) [42001-214]
+2023-11-29 21:33:44 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references user [42001-214]
+2023-11-29 21:33:44 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references user [42001-214]
+2023-11-29 21:33:44 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references user [42001-214]
+2023-11-29 21:33:46 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "select u1_0.user_id,u1_0.email,u1_0.first_name,u1_0.last_name,u1_0.middle_name,u1_0.username from [*]user u1_0 where u1_0.username=?"; expected "identifier"; SQL statement:
+select u1_0.user_id,u1_0.email,u1_0.first_name,u1_0.last_name,u1_0.middle_name,u1_0.username from user u1_0 where u1_0.username=? [42001-214]
+2023-11-30 09:00:52 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table [*]user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, username varchar(255) not null, primary key (user_id))"; expected "identifier"; SQL statement:
+create table user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, username varchar(255) not null, primary key (user_id)) [42001-214]
+2023-11-30 09:00:52 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references user [42001-214]
+2023-11-30 09:00:52 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references user [42001-214]
+2023-11-30 09:00:52 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references user [42001-214]
+2023-11-30 09:00:55 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "select u1_0.user_id,u1_0.email,u1_0.first_name,u1_0.last_name,u1_0.middle_name,u1_0.username from [*]user u1_0 where u1_0.username=?"; expected "identifier"; SQL statement:
+select u1_0.user_id,u1_0.email,u1_0.first_name,u1_0.last_name,u1_0.middle_name,u1_0.username from user u1_0 where u1_0.username=? [42001-214]

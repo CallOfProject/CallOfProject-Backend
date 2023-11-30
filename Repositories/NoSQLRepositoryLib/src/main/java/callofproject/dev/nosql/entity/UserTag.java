@@ -8,9 +8,7 @@
 ----------------------------------------------------------------*/
 package callofproject.dev.nosql.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+
 import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -26,14 +24,8 @@ import java.util.UUID;
 public class UserTag
 {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "tag_user_id")
-    private long m_tagUserId;
-
-    @Column(name = "tag_name")
+    private String id;
     private String tagName;
-
-    @Column(name = "user_id")
     private UUID userId;
 
     /**
@@ -41,6 +33,7 @@ public class UserTag
      */
     public UserTag()
     {
+
     }
 
     /**
@@ -60,19 +53,19 @@ public class UserTag
      *
      * @return tag user id
      */
-    public long getTagUserId()
+    public String getId()
     {
-        return m_tagUserId;
+        return id;
     }
 
     /**
      * Set tag user id
      *
-     * @param tagUserId tag user id
+     * @param id tag user id
      */
-    public void setTagUserId(long tagUserId)
+    public void setId(String id)
     {
-        m_tagUserId = tagUserId;
+        this.id = id;
     }
 
     /**

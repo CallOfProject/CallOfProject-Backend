@@ -1,5 +1,6 @@
 package callofproject.dev.data.project.entity;
 
+import callofproject.dev.library.exception.repository.RepositoryException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
@@ -66,11 +67,33 @@ public class Project
 
     @OneToMany(mappedBy = "m_project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
-    private Set<ProjectParticipant> m_projectParticipants;
+    private Set<ProjectParticipant> m_projectParticipants; // Approval requests
 
+    @OneToMany(mappedBy = "m_project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<ProjectParticipantRequest> m_projectParticipantRequests;
+
+    @Column(name = "admin_note", length = 200)
+    private String m_adminNote;
 
     public Project()
     {
+    }
+
+
+    public String getAdminNote()
+    {
+        return m_adminNote;
+    }
+
+    public void setProjectOwner(User projectOwner)
+    {
+        m_projectOwner = projectOwner;
+    }
+
+    public void setAdminNote(String adminNote)
+    {
+        m_adminNote = adminNote;
     }
 
     public void addProjectParticipant(User user)
@@ -89,15 +112,28 @@ public class Project
         m_projectParticipants.add(projectParticipant);
     }
 
-    public User getProjectOwner()
+    public void addProjectParticipantRequest(User user)
     {
-        return m_projectOwner;
+        if (m_projectParticipantRequests == null)
+            m_projectParticipantRequests = new HashSet<>();
+
+        if (m_maxParticipant <= m_projectParticipantRequests.size())
+            throw new RepositoryException("Project is full! You cannot join this project");
+
+        m_projectParticipantRequests.add(new ProjectParticipantRequest(this, user));
     }
 
-    public Set<ProjectParticipant> getProjectParticipants()
+    public void addProjectParticipantRequest(ProjectParticipantRequest projectParticipantRequest)
     {
-        return m_projectParticipants;
+        if (m_projectParticipantRequests == null)
+            m_projectParticipantRequests = new HashSet<>();
+
+        if (m_maxParticipant <= m_projectParticipantRequests.size())
+            throw new RepositoryException("Project is full! You cannot join this project");
+
+        m_projectParticipantRequests.add(projectParticipantRequest);
     }
+
 
     public static class Builder
     {
@@ -108,6 +144,11 @@ public class Project
             m_project = new Project();
         }
 
+        public Builder setProjectId(UUID projectId)
+        {
+            m_project.m_projectId = projectId;
+            return this;
+        }
         public Builder setProjectOwner(User projectOwner)
         {
             m_project.m_projectOwner = projectOwner;
@@ -229,6 +270,20 @@ public class Project
         }
     }
 
+    public User getProjectOwner()
+    {
+        return m_projectOwner;
+    }
+
+    public Set<ProjectParticipant> getProjectParticipants()
+    {
+        return m_projectParticipants;
+    }
+
+    public Set<ProjectParticipantRequest> getProjectParticipantRequests()
+    {
+        return m_projectParticipantRequests;
+    }
 
     public UUID getProjectId()
     {

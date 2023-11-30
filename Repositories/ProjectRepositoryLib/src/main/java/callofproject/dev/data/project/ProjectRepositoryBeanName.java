@@ -2,6 +2,8 @@ package callofproject.dev.data.project;
 
 public final class ProjectRepositoryBeanName
 {
+
+
     private ProjectRepositoryBeanName()
     {
 
@@ -9,7 +11,7 @@ public final class ProjectRepositoryBeanName
 
     public static final String USER_REPOSITORY = "callofproject.dev.data.project.repository.IUserRepository";
     public static final String PROJECT_PARTICIPANT_REPOSITORY_BEAN = "callofproject.dev.data.project.repository.IProjectParticipantRepository";
-
+    public static final String PROJECT_PARTICIPANT_REQUEST_REPOSITORY = "callofproject.dev.data.project.repository.IProjectParticipantRequestRepository";
     public static final String PROJECT_SERVICE_HELPER_BEAN = "callofproject.dev.data.project.dal.ProjectServiceHelper";
     public static final String BASE_PACKAGE_BEAN_NAME = "callofproject.dev.data.project";
     public static final String REPOSITORY_FACADE_BEAN = "callofproject.dev.data.project.dal.RepositoryFacade";

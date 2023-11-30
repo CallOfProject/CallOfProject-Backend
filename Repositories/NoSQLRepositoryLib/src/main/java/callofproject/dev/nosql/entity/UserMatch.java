@@ -8,9 +8,6 @@
 ----------------------------------------------------------------*/
 package callofproject.dev.nosql.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -26,16 +23,10 @@ import java.util.UUID;
 public class UserMatch
 {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "match_id")
-    private UUID matchId;
-    @Column(name = "user_id")
+    private String id;
     private UUID userID;
-    @Column(name = "school_id")
     private long schoolId;
-    @Column(name = "course_id")
     private UUID courseId;
-    @Column(name = "experience_id")
     private UUID experienceId;
 
     /**
@@ -54,9 +45,9 @@ public class UserMatch
      * @param courseId     course id
      * @param experienceId experience id
      */
-    public UserMatch(UUID matchId, UUID userID, long schoolId, UUID courseId, UUID experienceId)
+    public UserMatch(String matchId, UUID userID, long schoolId, UUID courseId, UUID experienceId)
     {
-        this.matchId = matchId;
+        this.id = matchId;
         this.userID = userID;
         this.schoolId = schoolId;
         this.courseId = courseId;
@@ -84,19 +75,19 @@ public class UserMatch
      *
      * @return match id
      */
-    public UUID getMatchId()
+    public String getId()
     {
-        return matchId;
+        return id;
     }
 
     /**
      * Set match id
      *
-     * @param matchId match id
+     * @param id match id
      */
-    public void setMatchId(UUID matchId)
+    public void setId(String id)
     {
-        this.matchId = matchId;
+        this.id = id;
     }
 
     /**

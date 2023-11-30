@@ -2,6 +2,7 @@ package callofproject.dev.data.project.repository;
 
 import callofproject.dev.data.project.entity.ProjectParticipant;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +14,9 @@ import static callofproject.dev.data.project.ProjectRepositoryBeanName.PROJECT_P
 @Lazy
 public interface IProjectParticipantRepository extends CrudRepository<ProjectParticipant, UUID>
 {
+    @Query("from ProjectParticipant where m_project.m_projectId = :projectId")
+    Iterable<ProjectParticipant> findAllByProjectId(UUID projectId);
+
+    @Query("from ProjectParticipant where m_user.m_userId = :userId")
+    Iterable<ProjectParticipant> findAllByUserUserId(UUID userId);
 }

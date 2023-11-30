@@ -85,6 +85,25 @@ public class User
         isAccountBlocked = accountBlocked;
     }
 
+
+    public User(UUID userId, String username, String firstName, String middleName, String lastName,
+                String email, String password, LocalDate birthDate, Role role)
+    {
+        this.userId = userId;
+        this.username = username;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.birthDate = birthDate;
+        isAccountBlocked = false;
+        if (roles == null)
+            roles = new HashSet<>();
+
+        roles.add(role);
+    }
+
     public User(String username, String firstName, String middleName, String lastName,
                 String email, String password, LocalDate birthDate, Role role)
     {

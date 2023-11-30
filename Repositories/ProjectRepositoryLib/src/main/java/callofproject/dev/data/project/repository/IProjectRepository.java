@@ -93,6 +93,17 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>
     @Query("from Project where m_projectOwner.m_userId = :userId")
     Page<Project> findAllByProjectOwnerId(UUID userId, Pageable pageable);
 
+    @Query("from Project where m_projectOwner.m_userId = :userId")
+    Iterable<Project> findAllByProjectOwnerId(UUID userId);
+
     @Query("FROM Project p WHERE :userId IN (select w.m_user.m_userId FROM p.m_projectParticipants as w)")
     Page<Project> findAllParticipantProjectByUserId(@Param("userId") UUID userId, Pageable pageable);
+
+    @Query("FROM Project p WHERE :projectId IN (select w.m_project.m_projectId FROM p.m_projectParticipantRequests as w)")
+    Iterable<Project> findAllByProjectProjectId(@Param("projectId") UUID projectId);
+
+    @Query("FROM Project p WHERE :userId IN (select w.m_user.m_userId FROM p.m_projectParticipantRequests as w)")
+    Iterable<Project> findAllByUserUserId(UUID userId);
+
+
 }

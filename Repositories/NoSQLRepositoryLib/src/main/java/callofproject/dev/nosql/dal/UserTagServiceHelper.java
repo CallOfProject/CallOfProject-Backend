@@ -68,7 +68,7 @@ public class UserTagServiceHelper
      *
      * @param id user id
      */
-    public void removeUserTagById(Long id)
+    public void removeUserTagById(UUID id)
     {
         doForRepository(() -> m_userTagRepository.deleteById(id), "ProjectTagServiceHelper::removeUserTagById");
     }

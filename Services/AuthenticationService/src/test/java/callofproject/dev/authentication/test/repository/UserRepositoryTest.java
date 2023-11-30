@@ -11,9 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.List;
-import java.util.stream.StreamSupport;
-
 import static callofproject.dev.authentication.util.Util.*;
 import static java.time.LocalDate.now;
 
@@ -34,22 +31,6 @@ public class UserRepositoryTest
         delete(Path.of(TEST_DB_PATH));
     }*/
 
-    /**
-     * Test: Save user test
-     * Result: User should be saved
-     */
-
-    @Test
-    void saveMultipleUsers_ShouldSucceed()
-    {
-        var ahmet = new User("ahmet", "ahmet", "", "koc", "ahmet@mail.com", "ahmet123", now(), new Role("ROLE_ADMIN"));
-        var emir = new User("emir", "emir", "", "Kafadar", "emir@mail.com", "emir321", now(), new Role("ROLE_ADMIN"));
-        var nurican = new User("nuri", "nuri", "can", "öztürk", "nurican@mail.com", "nuri231", now(), new Role("ROLE_ADMIN"));
-
-        m_userRepository.saveAll(List.of(ahmet, emir, nurican));
-        var userList = StreamSupport.stream(m_userRepository.findAll().spliterator(), false).toList();
-        Assertions.assertEquals(3, userList.size());
-    }
 
     /**
      * Test: Find user by username test

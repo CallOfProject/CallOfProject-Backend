@@ -22,6 +22,7 @@ import java.util.UUID;
 import static callofproject.dev.data.project.ProjectRepositoryBeanName.PROJECT_SERVICE_HELPER_BEAN;
 import static callofproject.dev.data.project.ProjectRepositoryBeanName.REPOSITORY_FACADE_BEAN;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForRepository;
+import static callofproject.dev.util.stream.StreamUtil.toStream;
 
 @Component(PROJECT_SERVICE_HELPER_BEAN)
 @PropertySource("classpath:application-project_repository.properties")
@@ -684,4 +685,107 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::findAllParticipantProjectByUsername");
     }
 
+    public ProjectParticipantRequest sendParticipantRequestToProject(ProjectParticipantRequest participantRequest)
+    {
+        return doForRepository(() -> m_facade.m_projectParticipantRequestRepository.save(participantRequest),
+                "ProjectServiceHelper::sendParticipantRequestToProject");
+    }
+
+    public boolean sendParticipantRequestToProject(UUID projectId, UUID userId)
+    {
+        var user = findUserById(userId);
+        var project = findProjectById(projectId);
+
+        if (user.isEmpty() || project.isEmpty())
+            throw new RepositoryException("User or Project is not found!");
+
+        project.get().addProjectParticipantRequest(user.get());
+
+        var updatedProject = doForRepository(() -> m_facade.m_projectRepository.save(project.get()),
+                "ProjectServiceHelper::sendParticipantRequestToProject");
+
+        return updatedProject != null;
+    }
+
+    public Iterable<Project> findAllProjectParticipantRequestByProjectId(UUID projectId)
+    {
+
+        return doForRepository(() -> m_facade.m_projectRepository.findAllByProjectProjectId(projectId),
+                "ProjectServiceHelper::findAllProjectParticipantRequestByProjectId");
+    }
+
+    public Iterable<Project> findAllProjectParticipantRequestByUserId(UUID userId)
+    {
+        return doForRepository(() -> m_facade.m_projectRepository.findAllByUserUserId(userId),
+                "ProjectServiceHelper::findAllProjectParticipantRequestByUserId");
+    }
+
+
+    public void changeAllProjectOwnerToRootWhenUserRemoved(UUID removedUserId, UUID rootUserId)
+    {
+        var rootUser = m_facade.m_userRepository.findById(rootUserId);
+        var user = m_facade.m_userRepository.findById(removedUserId);
+
+        if (user.isEmpty() || rootUser.isEmpty())
+            throw new RepositoryException("User or Project is not found!");
+
+        var projects = toStream(m_facade.m_projectRepository.findAllByProjectOwnerId(removedUserId)).toList();
+
+        projects.forEach(p -> {
+            p.setAdminNote("Old Project Owner is: " + user.get().getUsername() + " - (" + user.get().getFullName() + ")");
+            p.setProjectOwner(rootUser.get());
+        });
+
+        doForRepository(() -> m_facade.m_projectRepository.saveAll(projects), "ProjectServiceHelper::changeProjectOwnerToRoot");
+    }
+
+    public void changeProjectOwner(UUID newProjectOwnerId, UUID projectId)
+    {
+        var newProjectOwner = findUserById(newProjectOwnerId);
+        var project = findProjectById(projectId);
+
+        if (newProjectOwner.isEmpty() || project.isEmpty())
+            throw new RepositoryException("User or Project is not found!");
+
+        project.get().setProjectOwner(newProjectOwner.get());
+
+        doForRepository(() -> m_facade.m_projectRepository.save(project.get()),
+                "ProjectServiceHelper::changeProjectOwner");
+    }
+
+    public Optional<User> findUserByUsername(String username)
+    {
+        return doForRepository(() -> m_facade.m_userRepository.findByUsername(username),
+                "ProjectServiceHelper::findUserByUsername");
+    }
+
+    public Iterable<ProjectParticipant> findAllProjectParticipantByProjectId(UUID projectId)
+    {
+        return doForRepository(() -> m_facade.m_projectParticipantRepository.findAllByProjectId(projectId),
+                "ProjectServiceHelper::findAllProjectParticipantByProjectId");
+    }
+
+    public Iterable<ProjectParticipant> findAllProjectParticipantByUserId(UUID userId)
+    {
+        return doForRepository(() -> m_facade.m_projectParticipantRepository.findAllByUserUserId(userId),
+                "ProjectServiceHelper::findAllProjectParticipantByUserId");
+    }
+
+    public ProjectParticipant saveProjectParticipant(ProjectParticipant projectParticipant)
+    {
+        return doForRepository(() -> m_facade.m_projectParticipantRepository.save(projectParticipant),
+                "ProjectServiceHelper::saveProjectParticipant");
+    }
+
+    public ProjectParticipantRequest saveProjectParticipantRequest(ProjectParticipantRequest projectParticipantRequest)
+    {
+        return doForRepository(() -> m_facade.m_projectParticipantRequestRepository.save(projectParticipantRequest),
+                "ProjectServiceHelper::saveProjectParticipantRequest");
+    }
+
+    public Optional<ProjectParticipantRequest> findProjectParticipantRequestByParticipantRequestId(UUID projectParticipantRequestId)
+    {
+        return doForRepository(() -> m_facade.m_projectParticipantRequestRepository.findById(projectParticipantRequestId),
+                "ProjectServiceHelper::findProjectParticipantRequestByParticipantRequestId");
+    }
 }
