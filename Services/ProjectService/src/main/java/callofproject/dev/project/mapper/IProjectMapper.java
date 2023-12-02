@@ -5,6 +5,8 @@ import callofproject.dev.data.project.entity.User;
 import callofproject.dev.nosql.entity.ProjectTag;
 import callofproject.dev.project.dto.ProjectOverviewDTO;
 import callofproject.dev.project.dto.ProjectOverviewsDTO;
+import callofproject.dev.project.dto.ProjectSaveDTO;
+import callofproject.dev.project.dto.ProjectUpdateDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

@@ -1,13 +1,14 @@
 package callofproject.dev.project.config.kafka;
 
+import callofproject.dev.data.common.enums.EOperation;
 import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.data.project.entity.Project;
-import callofproject.dev.project.dto.Operation;
 import callofproject.dev.project.dto.UserDTO;
 import callofproject.dev.project.mapper.IUserMapper;
-import callofproject.dev.util.stream.StreamUtil;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+
+import static callofproject.dev.util.stream.StreamUtil.toStreamConcurrent;
 
 
 @Service
@@ -25,22 +26,23 @@ public class KafkaConsumer
     @KafkaListener(topics = "${spring.kafka.topic-name}", groupId = "${spring.kafka.consumer.group-id}")
     public void listenAuthenticationTopic(UserDTO dto)
     {
-        if (dto.operation() == Operation.CREATE || dto.operation() == Operation.UPDATE)
+        if (dto.operation() == EOperation.CREATE || dto.operation() == EOperation.UPDATE)
             m_serviceHelper.addUser(m_userMapper.toUser(dto));
 
-        if (dto.operation() == Operation.DELETE)
+        if (dto.operation() == EOperation.DELETE)
         {
             var root = m_serviceHelper.findUserByUsername("cop_root");
-            var projects = StreamUtil.toStreamConcurrent(m_serviceHelper.findAllProjectByProjectOwnerUserId(dto.userId(), 1)).toList();
+            var projects = toStreamConcurrent(m_serviceHelper.findAllProjectByProjectOwnerUserId(dto.userId(), 1)).toList();
+
             projects.forEach(project -> {
                 project.setProjectOwner(root.get());
                 m_serviceHelper.saveProject(project);
             });
 
-            var rootProjects = StreamUtil.toStreamConcurrent(m_serviceHelper.findAllProjectByProjectOwnerUserId(root.get().getUserId(), 1)).toList();
+            var rootProjects = toStreamConcurrent(m_serviceHelper.findAllProjectByProjectOwnerUserId(root.get().getUserId(), 1)).toList();
             rootProjects.stream().map(Project::getProjectName).forEach(System.out::println);
 
-            var others = StreamUtil.toStreamConcurrent(m_serviceHelper.findAllProjectParticipantByUserId(dto.userId())).toList();
+            var others = toStreamConcurrent(m_serviceHelper.findAllProjectParticipantByUserId(dto.userId())).toList();
 
             others.forEach(projectParticipant -> {
                 projectParticipant.setUser(root.get());
@@ -48,8 +50,6 @@ public class KafkaConsumer
             });
 
             m_serviceHelper.removeUser(dto.userId());
-
-
         }
     }
 }

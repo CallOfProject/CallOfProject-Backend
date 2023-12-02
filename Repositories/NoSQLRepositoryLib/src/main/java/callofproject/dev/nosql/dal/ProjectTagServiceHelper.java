@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForRepository;
@@ -68,7 +69,7 @@ public class ProjectTagServiceHelper
      *
      * @param id user id
      */
-    public void removeProjectTagById(Long id)
+    public void removeProjectTagById(String id)
     {
         doForRepository(() -> m_tagRepository.deleteById(id), "ProjectTagServiceHelper::removeProjectTagById");
     }
@@ -136,5 +137,15 @@ public class ProjectTagServiceHelper
     public Iterable<ProjectTag> getAllProjectTagByProjectIdAndTagName(UUID projectId, String tagName)
     {
         return doForRepository(() -> m_tagRepository.findAllByProjectIdAndTagName(projectId, tagName), "ProjectTagServiceHelper::getAllProjectTagByProjectIdAndTagName");
+    }
+
+    public Optional<ProjectTag> findProjectTagByNames(String tagName)
+    {
+        return doForRepository(() -> m_tagRepository.findProjectTagByTagNameContainsIgnoreCase(tagName), "ProjectTagServiceHelper::findProjectTagByNames");
+    }
+
+    public boolean existsProjectTagByNames(String tagName)
+    {
+        return doForRepository(() -> m_tagRepository.existsProjectTagByTagNameContainsIgnoreCase(tagName), "ProjectTagServiceHelper::existsProjectTagByNames");
     }
 }

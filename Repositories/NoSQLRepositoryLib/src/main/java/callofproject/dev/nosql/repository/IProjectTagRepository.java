@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static callofproject.dev.nosql.NoSqlBeanName.PROJECT_TAG_REPOSITORY_BEAN_NAME;
@@ -24,7 +25,7 @@ import static callofproject.dev.nosql.NoSqlBeanName.PROJECT_TAG_REPOSITORY_BEAN_
  */
 @Repository(PROJECT_TAG_REPOSITORY_BEAN_NAME)
 @Lazy
-public interface IProjectTagRepository extends MongoRepository<ProjectTag, Long>
+public interface IProjectTagRepository extends MongoRepository<ProjectTag, String>
 {
     /**
      * Find all project tags by project id
@@ -50,4 +51,9 @@ public interface IProjectTagRepository extends MongoRepository<ProjectTag, Long>
      * @return project tags
      */
     Iterable<ProjectTag> findAllByProjectIdAndTagName(UUID projectId, String tagName);
+
+    Optional<ProjectTag> findProjectTagByTagNameContainsIgnoreCase(String tagName);
+
+    boolean existsProjectTagByTagNameContainsIgnoreCase(String tagName);
+
 }

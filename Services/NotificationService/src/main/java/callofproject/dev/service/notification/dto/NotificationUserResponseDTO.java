@@ -1,5 +1,17 @@
 package callofproject.dev.service.notification.dto;
 
-public record NotificationUserResponseDTO(String username, String message)
+import callofproject.dev.nosql.enums.NotificationType;
+
+import java.util.UUID;
+
+public record NotificationUserResponseDTO(
+        UUID toUserId,
+        UUID fromUserId,
+        String message,
+        NotificationType notificationType,
+        Object notificationData,
+        String notificationLink
+)
 {
+
 }

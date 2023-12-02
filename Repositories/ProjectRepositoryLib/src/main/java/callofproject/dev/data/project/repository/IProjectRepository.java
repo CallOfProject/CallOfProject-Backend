@@ -48,13 +48,13 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>
 
     Page<Project> findAllByExpectedCompletionDateBetween(LocalDate start, LocalDate end, Pageable pageable);
 
-    Page<Project> findAllByExpectedProjectDeadline(LocalDate date, Pageable pageable);
+/*    Page<Project> findAllByExpectedProjectDeadline(LocalDate date, Pageable pageable);
 
     Page<Project> findAllByExpectedProjectDeadlineBetween(LocalDate start, LocalDate end, Pageable pageable);
 
     Page<Project> findAllByExpectedProjectDeadlineAfter(LocalDate date, Pageable pageable);
 
-    Page<Project> findAllByExpectedProjectDeadlineBefore(LocalDate date, Pageable pageable);
+    Page<Project> findAllByExpectedProjectDeadlineBefore(LocalDate date, Pageable pageable);*/
 
     Page<Project> findAllByMaxParticipant(int maxParticipant, Pageable pageable);
 

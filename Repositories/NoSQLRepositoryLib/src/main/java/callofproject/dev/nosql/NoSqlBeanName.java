@@ -23,6 +23,11 @@ public final class NoSqlBeanName
     public static final String MATCH_REPOSITORY_BEAN_NAME = "callofproject.dev.nosql.repository.IMatchDbRepository";
 
     /**
+     * NotificationRepository bean name
+     */
+    public static final String TAG_REPOSITORY_BEAN_NAME = "callofproject.dev.nosql.repository.ITagRepository";
+
+    /**
      * ProjectTagRepository bean name
      */
     public static final String PROJECT_TAG_REPOSITORY_BEAN_NAME = "callofproject.dev.nosql.repository.IProjectTagRepository";
@@ -46,4 +51,14 @@ public final class NoSqlBeanName
      * ProjectTagServiceHelper bean name
      */
     public static final String PROJECT_TAG_SERVICE_HELPER_BEAN_NAME = "callofproject.dev.nosql.dal.ProjectTagServiceHelper";
+
+    /**
+     * NotificationServiceHelper bean name
+     */
+    public static final String NOTIFICATION_SERVICE_HELPER_BEAN_NAME = "callofproject.dev.nosql.dal.NotificationServiceHelper";
+
+    /**
+     * TagServiceHelper bean name
+     */
+    public static final String TAG_SERVICE_HELPER_BEAN_NAME = "callofproject.dev.nosql.dal.TagServiceHelper";
 }

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 public record ProjectSaveDTO(
@@ -39,10 +40,11 @@ public record ProjectSaveDTO(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
         @NotNull(message = "expected completion date cannot be empty")
         LocalDate expectedCompletionDate,
-        @JsonProperty("expected_project_deadline")
+
+        @JsonProperty("start_date")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-        @NotNull(message = "expected project deadline cannot be empty")
-        LocalDate expectedProjectDeadline,
+        @NotNull(message = "start date cannot be empty")
+        LocalDate startDate,
         @JsonProperty("max_participant_count")
         @NotNull
         @Min(value = 2, message = "max participant count cannot be less than 2")
@@ -73,7 +75,13 @@ public record ProjectSaveDTO(
         EProjectLevel projectLevel,
         @JsonProperty("project_interview_type")
         @NotNull(message = "project interview type cannot be empty")
-        EInterviewType interviewType)
+        EInterviewType interviewType,
+
+        @JsonProperty("feedback_time_range")
+        @NotNull(message = "feedback time range cannot be empty")
+        EFeedbackTimeRange feedbackTimeRange,
+        @JsonProperty("tags")
+        List<String> tags)
 {
 
 }

@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static jakarta.persistence.CascadeType.*;
+import static jakarta.persistence.CascadeType.REFRESH;
+
 @Entity
 @Table(name = "project_participant")
 public class ProjectParticipant
@@ -14,11 +17,11 @@ public class ProjectParticipant
     @Column(name = "project_participant_id")
     private UUID m_projectId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {DETACH, MERGE, PERSIST, REFRESH})
     @JoinColumn(name = "project_id", nullable = false)
     private Project m_project;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {DETACH, MERGE, PERSIST, REFRESH})
     @JoinColumn(name = "user_id", nullable = false)
     private User m_user;
 

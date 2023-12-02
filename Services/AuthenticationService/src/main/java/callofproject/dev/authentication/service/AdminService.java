@@ -232,7 +232,7 @@ public class AdminService
         var savedUser = m_managementServiceHelper.getUserServiceHelper().saveUser(user.get());
 
         var toProjectServiceDTO = new UserKafkaDTO(savedUser.getUserId(), savedUser.getUsername(), savedUser.getEmail(),
-                savedUser.getFirstName(), savedUser.getMiddleName(), savedUser.getLastName(), Operation.UPDATE);
+                savedUser.getFirstName(), savedUser.getMiddleName(), savedUser.getLastName(), Operation.UPDATE, 0, 0, 0);
 
         m_kafkaProducer.sendMessage(toProjectServiceDTO);
 
@@ -258,7 +258,7 @@ public class AdminService
         if (user.get().isAdminOrRoot())
             throw new DataServiceException("You cannot remove this user!");
         var toProjectServiceDTO = new UserKafkaDTO(user.get().getUserId(), user.get().getUsername(), user.get().getEmail(),
-                user.get().getFirstName(), user.get().getMiddleName(), user.get().getLastName(), Operation.DELETE);
+                user.get().getFirstName(), user.get().getMiddleName(), user.get().getLastName(), Operation.DELETE,0,0,0);
 
         m_kafkaProducer.sendMessage(toProjectServiceDTO);
         m_managementServiceHelper.getUserServiceHelper().removeUser(user.get());

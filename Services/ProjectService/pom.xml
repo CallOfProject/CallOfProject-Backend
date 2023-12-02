@@ -37,6 +37,12 @@
             <artifactId>cop-nosql-db</artifactId>
             <version>1.1.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>callofproject.dev</groupId>
+            <artifactId>common-data-lib</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <dependency>
             <groupId>callofproject.dev</groupId>
             <artifactId>ProjectRepositoryLib</artifactId>

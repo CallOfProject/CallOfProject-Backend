@@ -8,6 +8,7 @@
 ----------------------------------------------------------------*/
 package callofproject.dev.nosql.repository;
 
+import callofproject.dev.nosql.entity.ProjectTag;
 import callofproject.dev.nosql.entity.UserTag;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -50,4 +51,5 @@ public interface IUserTagRepository extends MongoRepository<UserTag, UUID>
      * @return user tag list
      */
     Iterable<UserTag> findAllByUserIdAndTagName(UUID userId, String tagName);
+
 }

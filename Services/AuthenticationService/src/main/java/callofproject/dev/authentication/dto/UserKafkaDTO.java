@@ -15,8 +15,10 @@ public record UserKafkaDTO(
         String middleName,
         @JsonProperty("last_name")
         String lastName,
-
-        Operation operation
+        Operation operation,
+        int ownerProjectCount,
+        int participantProjectCount,
+        int totalProjectCount
 
 )
 {

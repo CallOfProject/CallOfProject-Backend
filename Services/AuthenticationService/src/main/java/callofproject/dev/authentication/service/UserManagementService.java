@@ -159,8 +159,10 @@ public class UserManagementService
         var token = JwtUtil.generateToken(claims, user.getUsername());
         var refreshToken = JwtUtil.generateToken(claims, user.getUsername());
 
-        m_userProducer.sendMessage(new UserKafkaDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(),
-                user.getMiddleName(), user.getLastName(), Operation.CREATE));
+        var kafkaMessage = new UserKafkaDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(),
+                user.getMiddleName(), user.getLastName(), Operation.CREATE, 0, 0, 0);
+
+        m_userProducer.sendMessage(kafkaMessage);
 
         return new UserSaveDTO(token, refreshToken, true, savedUser.getUserId());
     }
@@ -206,11 +208,10 @@ public class UserManagementService
      */
     public MultipleMessageResponseDTO<UsersDTO> findAllUsersPageableByContainsWordCallback(int page, String word)
     {
-        var dtoList = m_userMapper
-                .toUsersDTO(stream(m_serviceHelper.getUserServiceHelper()
-                        .findUsersByUsernameContainsIgnoreCase(word, page).spliterator(), true)
-                        .map(m_userMapper::toUserDTO)
-                        .toList());
+        var dtoList = m_userMapper.toUsersDTO(stream(m_serviceHelper.getUserServiceHelper()
+                .findUsersByUsernameContainsIgnoreCase(word, page).spliterator(), true)
+                .map(m_userMapper::toUserDTO)
+                .toList());
 
         var msg = format("%d user found!", dtoList.users().size());
 

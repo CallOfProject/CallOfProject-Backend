@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import static jakarta.persistence.CascadeType.*;
+
 @Entity
 @Table(name = "user")
 public class User
@@ -25,15 +27,22 @@ public class User
     @Column(name = "last_name", nullable = false)
     private String m_lastName;
 
+    @Column(name = "owner_project_count", nullable = false)
+    private int m_ownerProjectCount;
+    @Column(name = "participant_project_count", nullable = false)
+    private int m_participantProjectCount;
+    @Column(name = "total_project_count", nullable = false)
+    private int m_totalProjectCount;
+
     @OneToMany(mappedBy = "m_projectOwner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Project> m_projects; // projects that he owns
 
-    @OneToMany(mappedBy = "m_user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "m_user", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<ProjectParticipant> m_projectParticipants; // projects that he owns
 
-    @OneToMany(mappedBy = "m_user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "m_user", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<ProjectParticipantRequest> m_projectParticipantRequests; // Project Join requests
 
@@ -59,6 +68,36 @@ public class User
             m_projects = new HashSet<>();
 
         m_projects.add(project);
+    }
+
+    public int getOwnerProjectCount()
+    {
+        return m_ownerProjectCount;
+    }
+
+    public void setOwnerProjectCount(int ownerProjectCount)
+    {
+        m_ownerProjectCount = ownerProjectCount;
+    }
+
+    public int getParticipantProjectCount()
+    {
+        return m_participantProjectCount;
+    }
+
+    public void setParticipantProjectCount(int participantProjectCount)
+    {
+        m_participantProjectCount = participantProjectCount;
+    }
+
+    public int getTotalProjectCount()
+    {
+        return m_totalProjectCount;
+    }
+
+    public void setTotalProjectCount(int totalProjectCount)
+    {
+        m_totalProjectCount = totalProjectCount;
     }
 
     public Set<ProjectParticipantRequest> getProjectParticipantRequests()

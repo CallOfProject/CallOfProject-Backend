@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +27,7 @@ import static callofproject.dev.util.stream.StreamUtil.toStream;
 
 @Component(PROJECT_SERVICE_HELPER_BEAN)
 @PropertySource("classpath:application-project_repository.properties")
-@SuppressWarnings("all")
+//@SuppressWarnings("all")
 @Lazy
 public class ProjectServiceHelper
 {
@@ -68,7 +69,7 @@ public class ProjectServiceHelper
      * @param page represent the page.
      * @return Project
      */
-    public Iterable<Project> findAllProjectsPageable(int page)
+    public Page<Project> findAllProjectsPageable(int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -84,7 +85,7 @@ public class ProjectServiceHelper
      * @param page        represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByProjectName(String projectName, int page)
+    public Page<Project> findAllProjectsByProjectName(String projectName, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -99,7 +100,7 @@ public class ProjectServiceHelper
      * @param page represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByProjectNameContaining(String word, int page)
+    public Page<Project> findAllProjectsByProjectNameContaining(String word, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -114,7 +115,7 @@ public class ProjectServiceHelper
      * @param page represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByApplicationDeadline(LocalDate date, int page)
+    public Page<Project> findAllProjectsByApplicationDeadline(LocalDate date, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -129,7 +130,7 @@ public class ProjectServiceHelper
      * @param page represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByDescriptionContainingIgnoreCase(String word, int page)
+    public Page<Project> findAllProjectsByDescriptionContainingIgnoreCase(String word, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -145,7 +146,7 @@ public class ProjectServiceHelper
      * @param page represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByApplicationDeadlineAfter(LocalDate date, int page)
+    public Page<Project> findAllProjectsByApplicationDeadlineAfter(LocalDate date, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -160,7 +161,7 @@ public class ProjectServiceHelper
      * @param page represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByApplicationDeadlineBefore(LocalDate date, int page)
+    public Page<Project> findAllProjectsByApplicationDeadlineBefore(LocalDate date, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -176,7 +177,7 @@ public class ProjectServiceHelper
      * @param page  represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByApplicationDeadlineBetween(LocalDate start, LocalDate end, int page)
+    public Page<Project> findAllProjectsByApplicationDeadlineBetween(LocalDate start, LocalDate end, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -191,7 +192,7 @@ public class ProjectServiceHelper
      * @param page represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByExpectedCompletionDate(LocalDate date, int page)
+    public Page<Project> findAllProjectsByExpectedCompletionDate(LocalDate date, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -206,7 +207,7 @@ public class ProjectServiceHelper
      * @param page represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByExpectedCompletionDateAfter(LocalDate date, int page)
+    public Page<Project> findAllProjectsByExpectedCompletionDateAfter(LocalDate date, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -221,7 +222,7 @@ public class ProjectServiceHelper
      * @param page represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByExpectedCompletionDateBefore(LocalDate date, int page)
+    public Page<Project> findAllProjectsByExpectedCompletionDateBefore(LocalDate date, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -237,7 +238,7 @@ public class ProjectServiceHelper
      * @param page  represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByExpectedCompletionDateBetween(LocalDate start, LocalDate end, int page)
+    public Page<Project> findAllProjectsByExpectedCompletionDateBetween(LocalDate start, LocalDate end, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -245,14 +246,14 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::findAllProjectsByExpectedCompletionDateBetween");
     }
 
-    /**
-     * Find all projects by expected project deadline.
-     *
-     * @param date represent the date.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Iterable<Project> findAllProjectsByExpectedProjectDeadline(LocalDate date, int page)
+    /* *//**
+ * Find all projects by expected project deadline.
+ *
+ * @param date represent the date.
+ * @param page represent the page.
+ * @return Iterable<Project>
+ *//*
+    public Page<Project> findAllProjectsByExpectedProjectDeadline(LocalDate date, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -260,14 +261,14 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::findAllProjectsByExpectedProjectDeadline");
     }
 
-    /**
-     * Find all projects by expected project deadline after.
-     *
-     * @param date represent the date.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Iterable<Project> findAllProjectsByExpectedProjectDeadlineAfter(LocalDate date, int page)
+    *//**
+ * Find all projects by expected project deadline after.
+ *
+ * @param date represent the date.
+ * @param page represent the page.
+ * @return Iterable<Project>
+ *//*
+    public Page<Project> findAllProjectsByExpectedProjectDeadlineAfter(LocalDate date, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -275,14 +276,14 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::findAllProjectsByExpectedProjectDeadlineAfter");
     }
 
-    /**
-     * Find all projects by expected project deadline before.
-     *
-     * @param date represent the date.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Iterable<Project> findAllProjectsByExpectedProjectDeadlineBefore(LocalDate date, int page)
+    *//**
+ * Find all projects by expected project deadline before.
+ *
+ * @param date represent the date.
+ * @param page represent the page.
+ * @return Iterable<Project>
+ *//*
+    public Page<Project> findAllProjectsByExpectedProjectDeadlineBefore(LocalDate date, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -290,21 +291,22 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::findAllProjectsByExpectedProjectDeadlineBefore");
     }
 
-    /**
-     * Find all projects by expected project deadline between.
-     *
-     * @param start represent the start date.
-     * @param end   represent the end date.
-     * @param page  represent the page.
-     * @return Iterable<Project>
-     */
-    public Iterable<Project> findAllProjectsByExpectedProjectDeadlineBetween(LocalDate start, LocalDate end, int page)
+    *//**
+ * Find all projects by expected project deadline between.
+ *
+ * @param start represent the start date.
+ * @param end   represent the end date.
+ * @param page  represent the page.
+ * @return Iterable<Project>
+ *//*
+    public Page<Project> findAllProjectsByExpectedProjectDeadlineBetween(LocalDate start, LocalDate end, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
         return doForRepository(() -> m_facade.m_projectRepository.findAllByExpectedProjectDeadlineBetween(start, end, pageable),
                 "ProjectServiceHelper::findAllProjectsByExpectedProjectDeadlineBetween");
     }
+*/
 
     /**
      * Find all projects by max participant.
@@ -313,7 +315,7 @@ public class ProjectServiceHelper
      * @param page           represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByMaxParticipant(int maxParticipant, int page)
+    public Page<Project> findAllProjectsByMaxParticipant(int maxParticipant, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -328,7 +330,7 @@ public class ProjectServiceHelper
      * @param page           represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByMaxParticipantLessThanEqual(int maxParticipant, int page)
+    public Page<Project> findAllProjectsByMaxParticipantLessThanEqual(int maxParticipant, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -343,7 +345,7 @@ public class ProjectServiceHelper
      * @param page           represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByMaxParticipantGreaterThanEqual(int minParticipant, int page)
+    public Page<Project> findAllProjectsByMaxParticipantGreaterThanEqual(int minParticipant, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -358,7 +360,7 @@ public class ProjectServiceHelper
      * @param page represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByInviteLink(String link, int page)
+    public Page<Project> findAllProjectsByInviteLink(String link, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -373,7 +375,7 @@ public class ProjectServiceHelper
      * @param page       represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByProjectAccessType(EProjectAccessType accessType, int page)
+    public Page<Project> findAllProjectsByProjectAccessType(EProjectAccessType accessType, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -388,7 +390,7 @@ public class ProjectServiceHelper
      * @param page            represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByProjectProfessionLevel(EProjectProfessionLevel professionLevel, int page)
+    public Page<Project> findAllProjectsByProjectProfessionLevel(EProjectProfessionLevel professionLevel, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -403,7 +405,7 @@ public class ProjectServiceHelper
      * @param page   represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsBySector(ESector sector, int page)
+    public Page<Project> findAllProjectsBySector(ESector sector, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -418,7 +420,7 @@ public class ProjectServiceHelper
      * @param page   represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByDegree(EDegree degree, int page)
+    public Page<Project> findAllProjectsByDegree(EDegree degree, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -433,7 +435,7 @@ public class ProjectServiceHelper
      * @param page         represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByProjectLevel(EProjectLevel projectLevel, int page)
+    public Page<Project> findAllProjectsByProjectLevel(EProjectLevel projectLevel, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -448,7 +450,7 @@ public class ProjectServiceHelper
      * @param page          represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByInterviewType(EInterviewType interviewType, int page)
+    public Page<Project> findAllProjectsByInterviewType(EInterviewType interviewType, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -466,7 +468,7 @@ public class ProjectServiceHelper
      * @param page           represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByMultipleCriteria(String projectName, String description, String projectSummary, String projectAim, int page)
+    public Page<Project> findAllProjectsByMultipleCriteria(String projectName, String description, String projectSummary, String projectAim, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -485,7 +487,7 @@ public class ProjectServiceHelper
      * @param page           represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllProjectsByAnyCriteria(String projectName, String description, String projectSummary, String projectAim, int page)
+    public Page<Project> findAllProjectsByAnyCriteria(String projectName, String description, String projectSummary, String projectAim, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -502,7 +504,7 @@ public class ProjectServiceHelper
      * @param page represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllByProjectNameContainingIgnoreCase(String word, int page)
+    public Page<Project> findAllByProjectNameContainingIgnoreCase(String word, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -517,7 +519,7 @@ public class ProjectServiceHelper
      * @param page represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllByProjectSummaryContainingIgnoreCase(String word, int page)
+    public Page<Project> findAllByProjectSummaryContainingIgnoreCase(String word, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -532,7 +534,7 @@ public class ProjectServiceHelper
      * @param page represent the page.
      * @return Iterable<Project>
      */
-    public Iterable<Project> findAllByProjectAimContainsIgnoreCase(String word, int page)
+    public Page<Project> findAllByProjectAimContainsIgnoreCase(String word, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -661,7 +663,7 @@ public class ProjectServiceHelper
         return updatedProject != null;
     }
 
-    public Iterable<Project> findAllProjectByProjectOwnerusername(String username, int page)
+    public Page<Project> findAllProjectByProjectOwnerusername(String username, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -669,7 +671,7 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::findAllProjectByProjectOwnerusername");
     }
 
-    public Iterable<Project> findAllProjectByProjectOwnerUserId(UUID userId, int page)
+    public Page<Project> findAllProjectByProjectOwnerUserId(UUID userId, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -677,7 +679,7 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::findAllProjectByProjectOwnerUserId");
     }
 
-    public Iterable<Project> findAllParticipantProjectByUserId(UUID userId, int page)
+    public Page<Project> findAllParticipantProjectByUserId(UUID userId, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
@@ -699,12 +701,20 @@ public class ProjectServiceHelper
         if (user.isEmpty() || project.isEmpty())
             throw new RepositoryException("User or Project is not found!");
 
+        var isExistParticipantRequest = project.get()
+                .getProjectParticipantRequests()
+                .stream()
+                .anyMatch(p -> p.getUser().getUserId().equals(userId) &&
+                        p.getProject().getProjectId().equals(projectId));
+
+        if (isExistParticipantRequest)
+            return false;
+
         project.get().addProjectParticipantRequest(user.get());
 
-        var updatedProject = doForRepository(() -> m_facade.m_projectRepository.save(project.get()),
-                "ProjectServiceHelper::sendParticipantRequestToProject");
+        doForRepository(() -> m_facade.m_projectRepository.save(project.get()), "ProjectServiceHelper::sendParticipantRequestToProject");
 
-        return updatedProject != null;
+        return true;
     }
 
     public Iterable<Project> findAllProjectParticipantRequestByProjectId(UUID projectId)
@@ -788,4 +798,17 @@ public class ProjectServiceHelper
         return doForRepository(() -> m_facade.m_projectParticipantRequestRepository.findById(projectParticipantRequestId),
                 "ProjectServiceHelper::findProjectParticipantRequestByParticipantRequestId");
     }
+
+    public void removeParticipant(UUID participantId)
+    {
+        doForRepository(() -> m_facade.m_projectParticipantRepository.deleteById(participantId),
+                "ProjectServiceHelper::removeParticipant");
+    }
+
+    public void removeParticipantRequestByRequestId(UUID participantRequestId)
+    {
+        doForRepository(() -> m_facade.m_projectParticipantRequestRepository.deleteById(participantRequestId),
+                "ProjectServiceHelper::removeParticipantRequest");
+    }
+
 }

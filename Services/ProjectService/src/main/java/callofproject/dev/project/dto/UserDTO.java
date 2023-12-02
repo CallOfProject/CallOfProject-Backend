@@ -1,5 +1,6 @@
 package callofproject.dev.project.dto;
 
+import callofproject.dev.data.common.enums.EOperation;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.UUID;
@@ -16,8 +17,10 @@ public record UserDTO(
         String middleName,
         @JsonProperty("last_name")
         String lastName,
-
-        Operation operation
+        EOperation operation,
+        int ownerProjectCount,
+        int participantProjectCount,
+        int totalProjectCount
 )
 {
 }

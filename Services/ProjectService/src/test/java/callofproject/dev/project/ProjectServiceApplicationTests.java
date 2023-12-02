@@ -75,7 +75,6 @@ class ProjectServiceApplicationTests
         // Project 1 and 2 are owned by user 1, project 3 is owned by user 2
         m_projectRepository.save(new Project.Builder()
                 .setProjectId(UUID.randomUUID())
-                .setExpectedProjectDeadline(LocalDate.now().plusMonths(2)) // after 2 months
                 .setProjectAccessType(accessType)
                 .setProjectOwner(user2)
                 .setProjectLevel(projectLevel)
@@ -95,7 +94,6 @@ class ProjectServiceApplicationTests
                 .setMaxParticipant(5)
                 .build());
         m_projectRepository.save(new Project.Builder()
-                .setExpectedProjectDeadline(LocalDate.now().plusMonths(2)) // after 2 months
                 .setProjectAccessType(accessType)
                 .setProjectOwner(user1)
                 .setProjectLevel(projectLevel)
@@ -116,7 +114,6 @@ class ProjectServiceApplicationTests
                 .build());
 
         m_projectRepository.save(new Project.Builder()
-                .setExpectedProjectDeadline(LocalDate.now().plusMonths(2)) // after 2 months
                 .setProjectAccessType(accessType)
                 .setProjectOwner(user2)
                 .setProjectLevel(projectLevel)

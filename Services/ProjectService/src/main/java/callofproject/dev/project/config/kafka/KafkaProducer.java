@@ -34,7 +34,6 @@ public class KafkaProducer
                 .withPayload(message)
                 .setHeader(TOPIC, m_topic.name())
                 .build();
-
         m_projectParticipantKafkaTemplate.send(msg);
     }
 }
