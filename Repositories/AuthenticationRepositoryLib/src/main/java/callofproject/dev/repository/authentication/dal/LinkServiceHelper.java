@@ -22,9 +22,20 @@ public class LinkServiceHelper
         m_linkRepository = linkRepository;
     }
 
+
+    public void removeLinks(Iterable<Link> links)
+    {
+        m_linkRepository.deleteAll(links);
+    }
+
     public ILinkRepository getLinkRepository()
     {
         return m_linkRepository;
+    }
+
+    public Iterable<Link> findAllByIds(Iterable<Long> ids)
+    {
+        return m_linkRepository.findAllById(ids);
     }
 
     public Link saveLink(Link link)

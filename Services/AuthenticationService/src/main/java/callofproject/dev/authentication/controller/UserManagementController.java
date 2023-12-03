@@ -1,9 +1,6 @@
 package callofproject.dev.authentication.controller;
 
-import callofproject.dev.authentication.dto.ErrorMessage;
-import callofproject.dev.authentication.dto.MessageResponseDTO;
-import callofproject.dev.authentication.dto.UserDTO;
-import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
+import callofproject.dev.authentication.dto.*;
 import callofproject.dev.authentication.service.UserManagementService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
@@ -66,4 +63,40 @@ public class UserManagementController
         return subscribe(() -> ok(m_service.findAllUsersPageableByContainsWord(page, word)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
+
+    @PutMapping("update/user/profile")
+    public ResponseEntity<Object> updateUserProfile(@RequestBody UserProfileUpdateDTO dto)
+    {
+        return subscribe(() -> ok(m_service.upsertUserProfile(dto)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    @PostMapping("save/education")
+    public ResponseEntity<Object> saveEducation(@RequestBody EducationUpsertDTO dto)
+    {
+        return subscribe(() -> ok(m_service.upsertEducation(dto)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    @PostMapping("save/experience")
+    public ResponseEntity<Object> saveExperience(@RequestBody ExperienceUpsertDTO dto)
+    {
+        return subscribe(() -> ok(m_service.upsertExperience(dto)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    @PostMapping("save/link")
+    public ResponseEntity<Object> saveLink(@RequestBody LinkUpsertDTO dto)
+    {
+        return subscribe(() -> ok(m_service.upsertLink(dto)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    @PostMapping("save/course")
+    public ResponseEntity<Object> saveCourse(@RequestBody CourseUpsertDTO dto)
+    {
+        return subscribe(() -> ok(m_service.upsertCourse(dto)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
 }

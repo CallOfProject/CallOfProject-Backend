@@ -11,4 +11,5 @@ import static callofproject.dev.repository.authentication.BeanName.LINK_REPOSITO
 @Lazy
 public interface ILinkRepository extends CrudRepository<Link, Long>
 {
+
 }

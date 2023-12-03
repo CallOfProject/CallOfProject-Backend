@@ -61,7 +61,7 @@ public class SecurityConfig
                 .requestMatchers(AUTH_WHITELIST).permitAll()
                 .requestMatchers(ROOT_AND_ADMIN_WHITE_LIST).hasAnyRole("ROOT", "ADMIN")
                 .requestMatchers("/api/auth/logout").authenticated()
-                .requestMatchers("/api/users/**").hasAnyRole("USER")
+                .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN", "ROOT")
                 .requestMatchers("/api/root/**").hasAnyRole("ROOT");
     }
 

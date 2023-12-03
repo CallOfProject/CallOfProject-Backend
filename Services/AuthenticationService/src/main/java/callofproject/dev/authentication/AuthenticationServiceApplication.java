@@ -9,6 +9,7 @@ import callofproject.dev.repository.authentication.entity.Role;
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.entity.UserProfile;
 import callofproject.dev.repository.authentication.enumeration.RoleEnum;
+import callofproject.dev.repository.authentication.repository.rdbms.IUserProfileRepository;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -48,14 +49,17 @@ public class AuthenticationServiceApplication implements ApplicationRunner
     private final PasswordEncoder m_passwordEncoder;
     private final IUserTagRepository m_userTagRepository;
     private final MatchServiceHelper m_serviceHelper;
+
+    private final IUserProfileRepository m_userProfileRepository;
     private final KafkaProducer m_kafkaProducer;
 
-    public AuthenticationServiceApplication(IUserRepository userRepository, PasswordEncoder passwordEncoder, IUserTagRepository userTagRepository, MatchServiceHelper serviceHelper, KafkaProducer kafkaProducer)
+    public AuthenticationServiceApplication(IUserRepository userRepository, PasswordEncoder passwordEncoder, IUserTagRepository userTagRepository, MatchServiceHelper serviceHelper, IUserProfileRepository userProfileRepository, KafkaProducer kafkaProducer)
     {
         m_userRepository = userRepository;
         m_passwordEncoder = passwordEncoder;
         m_userTagRepository = userTagRepository;
         m_serviceHelper = serviceHelper;
+        m_userProfileRepository = userProfileRepository;
         m_kafkaProducer = kafkaProducer;
     }
 
@@ -68,6 +72,7 @@ public class AuthenticationServiceApplication implements ApplicationRunner
     @Override
     public void run(ApplicationArguments args) throws Exception
     {
+
         if (m_userRepository.findByUsername("cop_root").isEmpty())
         {
             var rootUser = new User("cop_root", "root", "root", "root", "canozturk309@gmail.com",
@@ -92,10 +97,10 @@ public class AuthenticationServiceApplication implements ApplicationRunner
             m_userRepository.save(adminUser);
 
             m_kafkaProducer.sendMessage(new UserKafkaDTO(rootUser.getUserId(), rootUser.getUsername(), rootUser.getEmail(),
-                    rootUser.getFirstName(), rootUser.getMiddleName(), rootUser.getLastName(), Operation.CREATE,0,0,0));
+                    rootUser.getFirstName(), rootUser.getMiddleName(), rootUser.getLastName(), Operation.CREATE, 0, 0, 0));
 
             m_kafkaProducer.sendMessage(new UserKafkaDTO(adminUser.getUserId(), adminUser.getUsername(), adminUser.getEmail(),
-                    adminUser.getFirstName(), adminUser.getMiddleName(), adminUser.getLastName(), Operation.CREATE,0,0,0));
+                    adminUser.getFirstName(), adminUser.getMiddleName(), adminUser.getLastName(), Operation.CREATE, 0, 0, 0));
         }
     }
 }

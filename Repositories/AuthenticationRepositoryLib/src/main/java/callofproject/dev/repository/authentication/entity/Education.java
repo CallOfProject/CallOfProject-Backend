@@ -1,5 +1,6 @@
 package callofproject.dev.repository.authentication.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -31,7 +32,11 @@ public class Education
     @Column(name = "is_continue", nullable = false)
     private boolean isContinue;
 
-    @ManyToMany(mappedBy = "educationList", fetch = FetchType.LAZY)
+    @Column(name = "gpa", nullable = false)
+    private double gpa;
+
+    @ManyToMany(mappedBy = "educationList", fetch = FetchType.EAGER)
+    @JsonIgnore
     private Set<UserProfile> userProfiles;
 
     public Education()
@@ -39,8 +44,10 @@ public class Education
     }
 
 
-    public Education(long universityId, String schoolName, String department, String description, LocalDate startDate, LocalDate finishDate, boolean isContinue)
+    public Education(long universityId, String schoolName, String department, String description, LocalDate startDate,
+                     LocalDate finishDate, boolean isContinue, double gpa)
     {
+        this.gpa = gpa;
         this.universityId = universityId;
         this.schoolName = schoolName;
         this.department = department;
@@ -48,6 +55,16 @@ public class Education
         this.startDate = startDate;
         this.finishDate = finishDate;
         this.isContinue = isContinue;
+    }
+
+    public double getGpa()
+    {
+        return gpa;
+    }
+
+    public void setGpa(double gpa)
+    {
+        this.gpa = gpa;
     }
 
     public long getUniversityId()

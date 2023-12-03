@@ -23,6 +23,15 @@ public class ExperienceServiceHelper
         m_experienceRepository = experienceRepository;
     }
 
+    public Iterable<Experience> findAllByIds(Iterable<UUID> ids)
+    {
+        return m_experienceRepository.findAllById(ids);
+    }
+
+    public void removeExperiences(Iterable<Experience> experiences)
+    {
+        m_experienceRepository.deleteAll(experiences);
+    }
     public Experience saveExperience(Experience experience)
     {
         return m_experienceRepository.save(experience);

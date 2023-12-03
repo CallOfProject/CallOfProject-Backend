@@ -23,6 +23,15 @@ public class CourseServiceHelper
         m_courseRepository = courseRepository;
     }
 
+    public Iterable<Course> findAllByIds(Iterable<UUID> ids)
+    {
+        return m_courseRepository.findAllById(ids);
+    }
+
+    public void removeCourses(Iterable<Course> courses)
+    {
+        m_courseRepository.deleteAll(courses);
+    }
     public Course saveCourse(Course course)
     {
         return m_courseRepository.save(course);

@@ -1,16 +1,15 @@
 package callofproject.dev.repository.environment.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-@Table(name = "university")
+@Document("university")
 public class University
 {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "university_id")
-    private long universityId;
-    @Column(name = "university_name", unique = true, nullable = false)
+    private String universityId;
+    @Indexed(unique = true)
     private String universityName;
 
     public University(String universityName)
@@ -23,12 +22,12 @@ public class University
 
     }
 
-    public long getUniversityId()
+    public String getUniversityId()
     {
         return universityId;
     }
 
-    public void setUniversityId(long universityId)
+    public void setUniversityId(String universityId)
     {
         this.universityId = universityId;
     }

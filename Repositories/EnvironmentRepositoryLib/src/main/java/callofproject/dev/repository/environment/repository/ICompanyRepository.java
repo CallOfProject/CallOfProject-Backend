@@ -1,9 +1,8 @@
 package callofproject.dev.repository.environment.repository;
 
 import callofproject.dev.repository.environment.entity.Company;
-import callofproject.dev.repository.environment.entity.University;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -12,8 +11,11 @@ import static callofproject.dev.repository.environment.BeanName.COMPANY_REPOSITO
 
 @Repository(COMPANY_REPOSITORY)
 @Lazy
-public interface ICompanyRepository extends CrudRepository<Company, Long>
+public interface ICompanyRepository extends MongoRepository<Company, String>
 {
-    Optional<Company> findByCompanyName(String companyName);
+    boolean existsByCompanyNameIgnoreCase(String companyName);
+
+    Optional<Company> findByCompanyNameIgnoreCase(String companyName);
+
     Iterable<Company> findAllByCompanyNameContainingIgnoreCase(String name);
 }

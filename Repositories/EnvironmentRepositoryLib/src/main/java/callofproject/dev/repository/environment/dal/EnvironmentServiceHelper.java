@@ -1,7 +1,7 @@
 package callofproject.dev.repository.environment.dal;
 
 import callofproject.dev.repository.environment.entity.Company;
-import callofproject.dev.repository.environment.entity.CourseOrganizator;
+import callofproject.dev.repository.environment.entity.CourseOrganization;
 import callofproject.dev.repository.environment.entity.University;
 import callofproject.dev.repository.environment.repository.ICompanyRepository;
 import callofproject.dev.repository.environment.repository.ICourseOrganizatorRepository;
@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 
 import static callofproject.dev.repository.environment.BeanName.*;
@@ -38,7 +39,7 @@ public class EnvironmentServiceHelper
         return m_companyRepository.findAll();
     }
 
-    public Iterable<CourseOrganizator> findAllCourseOrganizator()
+    public Iterable<CourseOrganization> findAllCourseOrganizator()
     {
         return m_courseOrganizatorRepository.findAll();
     }
@@ -51,80 +52,89 @@ public class EnvironmentServiceHelper
 
     public University saveUniversity(University university)
     {
-        return m_universityRepository.save(university);
+        var universityOpt = findByUniversityNameIgnoreCase(university.getUniversityName());
+
+        return universityOpt.orElseGet(() -> m_universityRepository.save(university));
+
     }
 
     public Company saveCompany(Company company)
     {
-        return m_companyRepository.save(company);
+        var companyOpt = findByCompanyNameIgnoreCase(company.getCompanyName());
+
+        return companyOpt.orElseGet(() -> m_companyRepository.save(company));
+
     }
 
-    public CourseOrganizator saveCourseOrganizator(CourseOrganizator organizator)
+    public CourseOrganization saveCourseOrganizator(CourseOrganization organizatorName)
     {
-        return m_courseOrganizatorRepository.save(organizator);
+        var organizatorOpt = findByOrganizatorNameIgnoreCase(organizatorName.getCourseOrganizationName());
+
+        return organizatorOpt.orElseGet(() -> m_courseOrganizatorRepository.save(organizatorName));
+
     }
 
     // ------------------------------------------------------------------------
-    public Optional<University> findUniversityByName(String universityName)
+    public Optional<University> findByUniversityNameIgnoreCase(String universityName)
     {
-        return m_universityRepository.findByUniversityName(universityName);
+        return m_universityRepository.findByUniversityNameIgnoreCase(universityName.trim().toUpperCase(Locale.ENGLISH));
     }
 
-    public Optional<CourseOrganizator> findCourseOrganizatorByName(String organizator)
+    public Optional<CourseOrganization> findByOrganizatorNameIgnoreCase(String organizatorName)
     {
-        return m_courseOrganizatorRepository.findByOrganizatorName(organizator);
+        return m_courseOrganizatorRepository.findByCourseOrganizationNameIgnoreCase(organizatorName.trim().toUpperCase(Locale.ENGLISH));
     }
 
-    public Optional<Company> findCompanyByName(String companyName)
+    public Optional<Company> findByCompanyNameIgnoreCase(String companyName)
     {
-        return m_companyRepository.findByCompanyName(companyName);
+        return m_companyRepository.findByCompanyNameIgnoreCase(companyName.trim().toUpperCase(Locale.ENGLISH));
     }
 
     // ------------------------------------------------------------------------
-    public Optional<Company> findCompanyById(long id)
+    public Optional<Company> findCompanyById(String id)
     {
         return m_companyRepository.findById(id);
     }
 
-    public Iterable<Company> findCompanyByIds(Collection<Long> id)
+    public Iterable<Company> findCompanyByIds(Collection<String> id)
     {
         return m_companyRepository.findAllById(id);
     }
 
 
-    public Optional<University> findUniversityById(long id)
+    public Optional<University> findUniversityById(String id)
     {
         return m_universityRepository.findById(id);
     }
 
-    public Iterable<University> findUniversityByIds(Collection<Long> ids)
+    public Iterable<University> findUniversityByIds(Collection<String> ids)
     {
         return m_universityRepository.findAllById(ids);
     }
 
 
-    public Optional<CourseOrganizator> findCourseOrganizatorById(long id)
+    public Optional<CourseOrganization> findCourseOrganizatorById(String id)
     {
         return m_courseOrganizatorRepository.findById(id);
     }
 
-    public Iterable<CourseOrganizator> findCourseOrganizatorByIds(Collection<Long> ids)
+    public Iterable<CourseOrganization> findCourseOrganizatorByIds(Collection<String> ids)
     {
         return m_courseOrganizatorRepository.findAllById(ids);
     }
 
     public Iterable<University> findAllByUniversityNameContainingIgnoreCase(String name)
     {
-        return m_universityRepository.findAllByUniversityNameContainingIgnoreCase(name);
+        return m_universityRepository.findAllByUniversityNameContainingIgnoreCase(name.trim());
     }
 
     public Iterable<Company> findAllByCompanyNameContainingIgnoreCase(String name)
     {
-        return m_companyRepository.findAllByCompanyNameContainingIgnoreCase(name);
+        return m_companyRepository.findAllByCompanyNameContainingIgnoreCase(name.trim());
     }
 
-    public Iterable<CourseOrganizator> findAllByCourseOrganizatorNameContainingIgnoreCase(String name)
+    public Iterable<CourseOrganization> findAllByCourseOrganizatorNameContainingIgnoreCase(String name)
     {
-        return m_courseOrganizatorRepository.findAllByOrganizatorNameContainsIgnoreCase(name);
+        return m_courseOrganizatorRepository.findAllByCourseOrganizationNameContainsIgnoreCase(name.trim());
     }
 }

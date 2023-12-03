@@ -48,4 +48,14 @@ public class UserProfileServiceHelper
     {
         return doForRepository(m_userProfileRepository::findAll, "UserProfileRepository::findAllUserProfile");
     }
+
+    public Optional<UserProfile> findUserProfileByUserId(UUID userId)
+    {
+        return doForRepository(() -> m_userProfileRepository.findUserProfileByUserId(userId), "UserProfileRepository::findUserProfileByUserId");
+    }
+
+    public Optional<UserProfile> findUserProfileByUsername(String username)
+    {
+        return doForRepository(() -> m_userProfileRepository.findUserProfileByUsername(username), "UserProfileRepository::findByUsername");
+    }
 }

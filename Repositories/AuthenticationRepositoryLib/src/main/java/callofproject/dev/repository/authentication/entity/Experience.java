@@ -28,7 +28,7 @@ public class Experience
     @Column(name = "is_continue", nullable = false)
     private boolean isContinue;
 
-    @ManyToMany(mappedBy = "experienceList", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "experienceList", fetch = FetchType.EAGER)
     private Set<UserProfile> userProfiles;
 
     public Experience()

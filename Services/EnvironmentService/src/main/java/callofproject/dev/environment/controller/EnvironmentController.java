@@ -2,11 +2,8 @@ package callofproject.dev.environment.controller;
 
 import callofproject.dev.environment.service.EnvironmentService;
 import callofproject.dev.repository.environment.dto.CompanyDTO;
-import callofproject.dev.repository.environment.dto.CourseOrganizatorDTO;
+import callofproject.dev.repository.environment.dto.CourseOrganizationDTO;
 import callofproject.dev.repository.environment.dto.UniversityDTO;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +27,8 @@ public class EnvironmentController
         return ok(m_environmentService.saveUniversity(universityDTO));
     }
 
-    @PostMapping("save/course_organizator")
-    public ResponseEntity<Object> saveCourseOrganizator(@RequestBody CourseOrganizatorDTO courseOrganizatorDTO)
+    @PostMapping("save/course-organization")
+    public ResponseEntity<Object> saveCourseOrganizator(@RequestBody CourseOrganizationDTO courseOrganizatorDTO)
     {
         return ok(m_environmentService.saveCourseOrganizator(courseOrganizatorDTO));
     }
@@ -43,7 +40,7 @@ public class EnvironmentController
     }
 
     @GetMapping("find/university/name")
-    public ResponseEntity<Object> findUniversityByName(@Valid @NotEmpty @NotBlank(message = "name field cannot be empty") @RequestParam("name") String name)
+    public ResponseEntity<Object> findUniversityByName(@RequestParam("name") String name)
     {
         return ok(m_environmentService.findUniversityByName(name));
     }

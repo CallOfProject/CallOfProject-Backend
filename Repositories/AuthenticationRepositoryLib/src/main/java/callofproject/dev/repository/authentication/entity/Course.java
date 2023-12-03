@@ -28,7 +28,7 @@ public class Course
     private boolean isContinue;
     @Column(name = "description", length = 500)
     private String description;
-    @ManyToMany(mappedBy = "courseList", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "courseList", fetch = FetchType.EAGER)
     private Set<UserProfile> userProfiles;
 
 

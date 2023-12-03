@@ -23,6 +23,15 @@ public class EducationServiceHelper
         m_educationRepository = educationRepository;
     }
 
+    public Iterable<Education> findAllByIds(Iterable<UUID> ids)
+    {
+        return m_educationRepository.findAllById(ids);
+    }
+
+    public void removeEducations(Iterable<Education> educations)
+    {
+        m_educationRepository.deleteAll(educations);
+    }
     public Education saveEducation(Education education)
     {
         return m_educationRepository.save(education);

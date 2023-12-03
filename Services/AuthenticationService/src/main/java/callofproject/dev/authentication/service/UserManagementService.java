@@ -3,7 +3,7 @@ package callofproject.dev.authentication.service;
 
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
 import callofproject.dev.authentication.dto.*;
-import callofproject.dev.authentication.mapper.IUserMapper;
+import callofproject.dev.authentication.mapper.*;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.nosql.dal.MatchServiceHelper;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
@@ -34,15 +34,23 @@ public class UserManagementService
     private final UserManagementServiceHelper m_serviceHelper;
     private final MatchServiceHelper m_matchDbRepository;
     private final IUserMapper m_userMapper;
+    private final IEducationMapper m_educationMapper;
+    private final ICourseMapper m_courseMapper;
+    private final IExperienceMapper m_experienceMapper;
+    private final ILinkMapper m_linkMapper;
 
     public UserManagementService(KafkaProducer userProducer, @Qualifier(USER_MANAGEMENT_DAL_BEAN) UserManagementServiceHelper serviceHelper,
                                  MatchServiceHelper matchDbRepository,
-                                 IUserMapper userMapper)
+                                 IUserMapper userMapper, IEducationMapper educationMapper, ICourseMapper courseMapper, IExperienceMapper experienceMapper, ILinkMapper linkMapper)
     {
         m_userProducer = userProducer;
         m_serviceHelper = serviceHelper;
         m_matchDbRepository = matchDbRepository;
         m_userMapper = userMapper;
+        m_educationMapper = educationMapper;
+        m_courseMapper = courseMapper;
+        m_experienceMapper = experienceMapper;
+        m_linkMapper = linkMapper;
     }
 
     /**
@@ -88,6 +96,79 @@ public class UserManagementService
     public MultipleMessageResponseDTO<UsersDTO> findAllUsersPageableByContainsWord(int page, String word)
     {
         return doForDataService(() -> findAllUsersPageableByContainsWordCallback(page, word), "UserManagementService::findAllUsersPageableByContainsWord");
+    }
+
+
+    /**
+     * Update user profile with given dto class.
+     *
+     * @param dto represent the dto class
+     * @return MessageResponseDTO.
+     */
+    public MessageResponseDTO<Object> upsertUserProfile(UserProfileUpdateDTO dto)
+    {
+        return doForDataService(() -> upsertUserProfileCallback(dto), "UserManagementService::upsertUserProfile");
+    }
+
+
+    public MessageResponseDTO<Object> upsertEducation(EducationUpsertDTO dto)
+    {
+        var upsertedEducation = m_serviceHelper.getEducationServiceHelper().saveEducation(m_educationMapper.toEducation(dto));
+
+        return new MessageResponseDTO<>("Education upserted successfully!", 200, upsertedEducation);
+    }
+
+    public MessageResponseDTO<Object> upsertExperience(ExperienceUpsertDTO dto)
+    {
+        var upsertedExperience = m_serviceHelper.getExperienceServiceHelper().saveExperience(m_experienceMapper.toExperience(dto));
+
+        return new MessageResponseDTO<>("Experience upserted successfully!", 200, upsertedExperience);
+    }
+
+    public MessageResponseDTO<Object> upsertCourse(CourseUpsertDTO dto)
+    {
+        var upsertedCourse = m_serviceHelper.getCourseServiceHelper().saveCourse(m_courseMapper.toCourse(dto));
+
+        return new MessageResponseDTO<>("Course upserted successfully!", 200, upsertedCourse);
+    }
+
+    public MessageResponseDTO<Object> upsertLink(LinkUpsertDTO dto)
+    {
+        var upsertedLink = m_serviceHelper.getLinkServiceHelper().saveLink(m_linkMapper.toLink(dto));
+
+        return new MessageResponseDTO<>("Link upserted successfully!", 200, upsertedLink);
+    }
+
+    private MessageResponseDTO<Object> upsertUserProfileCallback(UserProfileUpdateDTO dto)
+    {
+        var user = m_serviceHelper.getUserServiceHelper().findById(dto.userId());
+
+        if (user.isEmpty())
+            throw new DataServiceException("User does not exists!");
+
+        var userProfile = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(dto.userId());
+
+        if (userProfile.isEmpty())
+            throw new DataServiceException("User profile does not exists!");
+
+        userProfile.get().setAboutMe(dto.aboutMe());
+        userProfile.get().setCv(dto.cv());
+        userProfile.get().setProfilePhoto(dto.profilePhoto());
+
+        var educationList = m_serviceHelper.getEducationServiceHelper().findAllByIds(dto.educationIds());
+        var experienceList = m_serviceHelper.getExperienceServiceHelper().findAllByIds(dto.experienceIds());
+        var courseList = m_serviceHelper.getCourseServiceHelper().findAllByIds(dto.courseIds());
+        var linkList = m_serviceHelper.getLinkServiceHelper().findAllByIds(dto.linkIds());
+
+        if (educationList == null || experienceList == null || courseList == null || linkList == null)
+            throw new DataServiceException("Education, experience, course or link does not exists!");
+
+        userProfile.get().clearAllEnvironments();
+        userProfile.get().addAllEnvironments(educationList, experienceList, courseList, linkList);
+
+        var savedUserProfile = m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile.get());
+
+        return new MessageResponseDTO<>("User profile updated successfully!", 200, savedUserProfile);
     }
 
     //-----------------------------------------------------CALLBACK-----------------------------------------------------
@@ -217,4 +298,6 @@ public class UserManagementService
 
         return new MultipleMessageResponseDTO<>(getTotalPage(), page, dtoList.users().size(), msg, dtoList);
     }
+
+
 }

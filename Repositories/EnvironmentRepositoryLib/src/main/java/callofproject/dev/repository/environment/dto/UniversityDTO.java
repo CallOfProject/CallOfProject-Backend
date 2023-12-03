@@ -1,10 +1,29 @@
 package callofproject.dev.repository.environment.dto;
 
-public record UniversityDTO(String universityName, long universityId)
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class UniversityDTO
 {
-    public UniversityDTO(String universityName, long universityId)
+    @JsonProperty("university_name")
+    private String universityName;
+
+    public UniversityDTO()
     {
-        this.universityName = universityName.toUpperCase();
-        this.universityId = universityId;
     }
+
+    public UniversityDTO(String universityName)
+    {
+        this.universityName = universityName;
+    }
+    @JsonProperty("university_name")
+    public String getUniversityName()
+    {
+        return universityName;
+    }
+
+    public void setUniversityName(String universityName)
+    {
+        this.universityName = universityName;
+    }
+
 }
