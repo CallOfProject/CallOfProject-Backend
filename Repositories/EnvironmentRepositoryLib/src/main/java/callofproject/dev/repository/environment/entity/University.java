@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class University
 {
     @Id
-    private String universityId;
+    private String id;
     @Indexed(unique = true)
     private String universityName;
 
@@ -22,14 +22,14 @@ public class University
 
     }
 
-    public String getUniversityId()
+    public String getId()
     {
-        return universityId;
+        return id;
     }
 
-    public void setUniversityId(String universityId)
+    public void setId(String id)
     {
-        this.universityId = universityId;
+        this.id = id;
     }
 
     public String getUniversityName()

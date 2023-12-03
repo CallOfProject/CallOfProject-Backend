@@ -1,10 +1,12 @@
 package callofproject.dev.repository.environment.dal;
 
 import callofproject.dev.repository.environment.entity.Company;
+import callofproject.dev.repository.environment.entity.Course;
 import callofproject.dev.repository.environment.entity.CourseOrganization;
 import callofproject.dev.repository.environment.entity.University;
 import callofproject.dev.repository.environment.repository.ICompanyRepository;
-import callofproject.dev.repository.environment.repository.ICourseOrganizatorRepository;
+import callofproject.dev.repository.environment.repository.ICourseOrganizationRepository;
+import callofproject.dev.repository.environment.repository.ICourseRepository;
 import callofproject.dev.repository.environment.repository.IUniversityRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -22,16 +24,19 @@ import static callofproject.dev.repository.environment.BeanName.*;
 public class EnvironmentServiceHelper
 {
     private final ICompanyRepository m_companyRepository;
-    private final ICourseOrganizatorRepository m_courseOrganizatorRepository;
+    private final ICourseRepository m_courseRepository;
     private final IUniversityRepository m_universityRepository;
+    private final ICourseOrganizationRepository m_organizationRepository;
 
     public EnvironmentServiceHelper(@Qualifier(COMPANY_REPOSITORY) ICompanyRepository companyRepository,
-                                    @Qualifier(COURSE_REPOSITORY) ICourseOrganizatorRepository courseOrganizatorRepository,
-                                    @Qualifier(UNIVERSITY_REPOSITORY) IUniversityRepository universityRepository)
+                                    @Qualifier(COURSE_REPOSITORY) ICourseRepository courseRepository,
+                                    @Qualifier(UNIVERSITY_REPOSITORY) IUniversityRepository universityRepository,
+                                    @Qualifier(COURSE_ORGANIZATION_REPOSITORY) ICourseOrganizationRepository organizationRepository)
     {
         m_companyRepository = companyRepository;
-        m_courseOrganizatorRepository = courseOrganizatorRepository;
+        m_courseRepository = courseRepository;
         m_universityRepository = universityRepository;
+        m_organizationRepository = organizationRepository;
     }
 
     public Iterable<Company> findAllCompany()
@@ -39,9 +44,14 @@ public class EnvironmentServiceHelper
         return m_companyRepository.findAll();
     }
 
-    public Iterable<CourseOrganization> findAllCourseOrganizator()
+    public Iterable<CourseOrganization> findAllCourseOrganizations()
     {
-        return m_courseOrganizatorRepository.findAll();
+        return m_organizationRepository.findAll();
+    }
+
+    public Iterable<Course> findAllCourses()
+    {
+        return m_courseRepository.findAll();
     }
 
     public Iterable<University> findAllUniversity()
@@ -58,6 +68,14 @@ public class EnvironmentServiceHelper
 
     }
 
+    public CourseOrganization saveCourseOrganization(CourseOrganization courseOrganization)
+    {
+        var courseOrganizationOpt = m_organizationRepository.findByCourseOrganizationNameIgnoreCase(courseOrganization.getCourseOrganizationName());
+
+        return courseOrganizationOpt.orElseGet(() -> m_organizationRepository.save(courseOrganization));
+
+    }
+
     public Company saveCompany(Company company)
     {
         var companyOpt = findByCompanyNameIgnoreCase(company.getCompanyName());
@@ -66,11 +84,11 @@ public class EnvironmentServiceHelper
 
     }
 
-    public CourseOrganization saveCourseOrganizator(CourseOrganization organizatorName)
+    public Course saveCourse(Course course)
     {
-        var organizatorOpt = findByOrganizatorNameIgnoreCase(organizatorName.getCourseOrganizationName());
+        var courseOpt = findCourseByNameIgnoreCase(course.getCourseName());
 
-        return organizatorOpt.orElseGet(() -> m_courseOrganizatorRepository.save(organizatorName));
+        return courseOpt.orElseGet(() -> m_courseRepository.save(course));
 
     }
 
@@ -80,9 +98,14 @@ public class EnvironmentServiceHelper
         return m_universityRepository.findByUniversityNameIgnoreCase(universityName.trim().toUpperCase(Locale.ENGLISH));
     }
 
-    public Optional<CourseOrganization> findByOrganizatorNameIgnoreCase(String organizatorName)
+    public Optional<CourseOrganization> findByOrganizationNameIgnoreCase(String organizationName)
     {
-        return m_courseOrganizatorRepository.findByCourseOrganizationNameIgnoreCase(organizatorName.trim().toUpperCase(Locale.ENGLISH));
+        return m_organizationRepository.findByCourseOrganizationNameIgnoreCase(organizationName.trim().toUpperCase(Locale.ENGLISH));
+    }
+
+    public Optional<Course> findCourseByNameIgnoreCase(String courseName)
+    {
+        return m_courseRepository.findByCourseNameIgnoreCase(courseName.trim().toUpperCase(Locale.ENGLISH));
     }
 
     public Optional<Company> findByCompanyNameIgnoreCase(String companyName)
@@ -101,6 +124,16 @@ public class EnvironmentServiceHelper
         return m_companyRepository.findAllById(id);
     }
 
+    public Optional<CourseOrganization> findCourseOrganizationById(String id)
+    {
+        return m_organizationRepository.findById(id);
+    }
+
+    public Iterable<CourseOrganization> findCourseOrganizationByIds(Collection<String> id)
+    {
+        return m_organizationRepository.findAllById(id);
+    }
+
 
     public Optional<University> findUniversityById(String id)
     {
@@ -113,28 +146,34 @@ public class EnvironmentServiceHelper
     }
 
 
-    public Optional<CourseOrganization> findCourseOrganizatorById(String id)
+    public Optional<Course> findCourseById(String id)
     {
-        return m_courseOrganizatorRepository.findById(id);
+        return m_courseRepository.findById(id);
     }
 
-    public Iterable<CourseOrganization> findCourseOrganizatorByIds(Collection<String> ids)
+    public Iterable<Course> findCourseByIds(Collection<String> ids)
     {
-        return m_courseOrganizatorRepository.findAllById(ids);
+        return m_courseRepository.findAllById(ids);
     }
 
-    public Iterable<University> findAllByUniversityNameContainingIgnoreCase(String name)
+    // ------------------------------------------------------------------------
+    public Iterable<University> findAllUniversitiesByUniversityNameContainingIgnoreCase(String name)
     {
         return m_universityRepository.findAllByUniversityNameContainingIgnoreCase(name.trim());
     }
 
-    public Iterable<Company> findAllByCompanyNameContainingIgnoreCase(String name)
+    public Iterable<Company> findAllCompaniesByCompanyNameContainingIgnoreCase(String name)
     {
         return m_companyRepository.findAllByCompanyNameContainingIgnoreCase(name.trim());
     }
 
-    public Iterable<CourseOrganization> findAllByCourseOrganizatorNameContainingIgnoreCase(String name)
+    public Iterable<Course> findAllCoursesByCourseNameContainingIgnoreCase(String name)
     {
-        return m_courseOrganizatorRepository.findAllByCourseOrganizationNameContainsIgnoreCase(name.trim());
+        return m_courseRepository.findAllByCourseNameContainsIgnoreCase(name.trim());
+    }
+
+    public Iterable<CourseOrganization> findAllCourseOrganizationsByCourseNameContainingIgnoreCase(String name)
+    {
+        return m_organizationRepository.findAllByCourseOrganizationNameContainsIgnoreCase(name.trim());
     }
 }

@@ -6,6 +6,7 @@ public class BeanName
     public static final String USER_PROFILE_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.userprofilerepository";
     public static final String EDUCATION_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.education";
     public static final String COURSE_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.course";
+    public static final String COURSE_ORGANIZATION_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.courseorganization";
     public static final String LINK_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.link";
     public static final String EXPERIENCE_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.experience";
     public static final String USER_RATE_REPOSITORY_BEAN = "callofproject.dev.repository.usermanagement.userrate";
@@ -18,4 +19,5 @@ public class BeanName
     public static final String COURSE_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.course";
     public static final String EXPERIENCE_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.experience";
     public static final String LINK_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.link";
+    public static final String COURSE_ORGANIZATION_DAL_BEAN = "callofproject.dev.repository.usermanagement.dal.courseorganization";
 }

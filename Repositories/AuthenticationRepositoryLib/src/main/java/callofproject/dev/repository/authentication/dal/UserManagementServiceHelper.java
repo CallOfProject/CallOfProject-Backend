@@ -16,13 +16,15 @@ public class UserManagementServiceHelper
     private final CourseServiceHelper m_courseServiceHelper;
     private final LinkServiceHelper m_linkServiceHelper;
     private final ExperienceServiceHelper m_experienceServiceHelper;
+    private final CourseOrganizationServiceHelper m_courseOrganizationServiceHelper;
 
     public UserManagementServiceHelper(@Qualifier(USER_DAL_BEAN) UserServiceHelper userServiceHelper,
                                        @Qualifier(USER_PROFILE_DAL_BEAN) UserProfileServiceHelper userProfileServiceHelper,
                                        @Qualifier(EDUCATION_DAL_BEAN) EducationServiceHelper educationServiceHelper,
                                        @Qualifier(COURSE_DAL_BEAN) CourseServiceHelper courseServiceHelper,
                                        @Qualifier(LINK_DAL_BEAN) LinkServiceHelper linkServiceHelper,
-                                       @Qualifier(EXPERIENCE_DAL_BEAN) ExperienceServiceHelper experienceServiceHelper)
+                                       @Qualifier(EXPERIENCE_DAL_BEAN) ExperienceServiceHelper experienceServiceHelper,
+                                       @Qualifier(COURSE_ORGANIZATION_DAL_BEAN) CourseOrganizationServiceHelper courseOrganizationServiceHelper)
     {
         m_userServiceHelper = userServiceHelper;
         m_userProfileServiceHelper = userProfileServiceHelper;
@@ -30,6 +32,12 @@ public class UserManagementServiceHelper
         m_courseServiceHelper = courseServiceHelper;
         m_linkServiceHelper = linkServiceHelper;
         m_experienceServiceHelper = experienceServiceHelper;
+        m_courseOrganizationServiceHelper = courseOrganizationServiceHelper;
+    }
+
+    public CourseOrganizationServiceHelper getCourseOrganizationServiceHelper()
+    {
+        return m_courseOrganizationServiceHelper;
     }
 
     public UserServiceHelper getUserServiceHelper()

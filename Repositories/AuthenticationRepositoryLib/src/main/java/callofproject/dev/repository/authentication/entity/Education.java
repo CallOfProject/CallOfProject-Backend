@@ -16,7 +16,7 @@ public class Education
     @Column(name = "education_id")
     private UUID education_id;
     @Column(name = "university_id", nullable = false)
-    private long universityId;
+    private String universityId;
     @Column(name = "school_name", nullable = false, length = 80)
     private String schoolName;
     @Column(name = "department", nullable = false, length = 80)
@@ -44,8 +44,7 @@ public class Education
     }
 
 
-    public Education(long universityId, String schoolName, String department, String description, LocalDate startDate,
-                     LocalDate finishDate, boolean isContinue, double gpa)
+    public Education(String universityId, String schoolName, String department, String description, LocalDate startDate, LocalDate finishDate, boolean isContinue, double gpa)
     {
         this.gpa = gpa;
         this.universityId = universityId;
@@ -67,12 +66,12 @@ public class Education
         this.gpa = gpa;
     }
 
-    public long getUniversityId()
+    public String getUniversityId()
     {
         return universityId;
     }
 
-    public void setUniversityId(long universityId)
+    public void setUniversityId(String universityId)
     {
         this.universityId = universityId;
     }

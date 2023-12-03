@@ -1,9 +1,14 @@
 package callofproject.dev.environment.controller;
 
+import callofproject.dev.environment.dto.CompanySaveDTO;
+import callofproject.dev.environment.dto.CourseOrganizationSaveDTO;
+import callofproject.dev.environment.dto.CourseSaveDTO;
+import callofproject.dev.environment.dto.UniversitySaveDTO;
 import callofproject.dev.environment.service.EnvironmentService;
-import callofproject.dev.repository.environment.dto.CompanyDTO;
-import callofproject.dev.repository.environment.dto.CourseOrganizationDTO;
-import callofproject.dev.repository.environment.dto.UniversityDTO;
+import callofproject.dev.repository.environment.entity.Company;
+import callofproject.dev.repository.environment.entity.Course;
+import callofproject.dev.repository.environment.entity.CourseOrganization;
+import callofproject.dev.repository.environment.entity.University;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,36 +27,55 @@ public class EnvironmentController
     }
 
     @PostMapping("save/university")
-    public ResponseEntity<Object> saveUniversity(@RequestBody UniversityDTO universityDTO)
+    public University saveUniversity(@RequestBody UniversitySaveDTO universityDTO)
     {
-        return ok(m_environmentService.saveUniversity(universityDTO));
+        return m_environmentService.saveUniversity(universityDTO);
     }
 
-    @PostMapping("save/course-organization")
-    public ResponseEntity<Object> saveCourseOrganizator(@RequestBody CourseOrganizationDTO courseOrganizatorDTO)
+    @PostMapping("save/course")
+    public Course saveCourse(@RequestBody CourseSaveDTO courseSaveDTO)
     {
-        return ok(m_environmentService.saveCourseOrganizator(courseOrganizatorDTO));
+        return m_environmentService.saveCourse(courseSaveDTO);
     }
 
     @PostMapping("save/company")
-    public ResponseEntity<Object> saveCompany(@RequestBody CompanyDTO companyDTO)
+    public Company saveCompany(@RequestBody CompanySaveDTO companyDTO)
     {
-        return ok(m_environmentService.saveCompany(companyDTO));
+        return m_environmentService.saveCompany(companyDTO);
     }
 
+    @PostMapping("save/course-organization")
+    public CourseOrganization saveCourseOrganization(@RequestBody CourseOrganizationSaveDTO courseOrganizationSaveDTO)
+    {
+        return m_environmentService.saveCourseOrganization(courseOrganizationSaveDTO);
+    }
+
+    // ------------------------------------------------------------------------
     @GetMapping("find/university/name")
     public ResponseEntity<Object> findUniversityByName(@RequestParam("name") String name)
     {
         return ok(m_environmentService.findUniversityByName(name));
     }
 
-    @GetMapping("find/university/all")
-    public ResponseEntity<Object> findAllUniversities()
+    @GetMapping("find/company/name")
+    public ResponseEntity<Object> findCompanyByName(@RequestParam("name") String name)
     {
-        return ok(m_environmentService.findAllUniversity());
+        return ok(m_environmentService.findCompanyByName(name));
     }
 
+    @GetMapping("find/course/name")
+    public ResponseEntity<Object> findCourseByName(@RequestParam("name") String name)
+    {
+        return ok(m_environmentService.findCourseByName(name));
+    }
 
+    @GetMapping("find/course-organization/name")
+    public ResponseEntity<Object> findCourseOrganizationByName(@RequestParam("name") String name)
+    {
+        return ok(m_environmentService.findCourseOrganizationByName(name));
+    }
+
+    // ------------------------------------------------------------------------
     @GetMapping("find/university/all/contains")
     public ResponseEntity<Object> findAllUniversitiesContains(@RequestParam("n") String name)
     {
@@ -65,9 +89,15 @@ public class EnvironmentController
     }
 
 
-    @GetMapping("find/course-organizators/all/contains")
-    public ResponseEntity<Object> findAllCourseOrganizatorsContains(@RequestParam("n") String name)
+    @GetMapping("find/course/all/contains")
+    public ResponseEntity<Object> findAllCourseContains(@RequestParam("n") String name)
     {
-        return ok(m_environmentService.findAllByCourseOrganizatorsNameContainingIgnoreCase(name));
+        return ok(m_environmentService.findAllByCourseNameContainingIgnoreCase(name));
+    }
+
+    @GetMapping("find/course-organization/all/contains")
+    public ResponseEntity<Object> findAllCourseOrganizationsContains(@RequestParam("n") String name)
+    {
+        return ok(m_environmentService.findAllByCourseOrganizationsNameContainingIgnoreCase(name));
     }
 }

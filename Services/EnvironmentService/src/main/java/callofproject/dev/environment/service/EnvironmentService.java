@@ -1,11 +1,16 @@
 package callofproject.dev.environment.service;
 
+import callofproject.dev.environment.dto.*;
 import callofproject.dev.environment.mapper.ICompanyMapper;
+import callofproject.dev.environment.mapper.ICourseMapper;
 import callofproject.dev.environment.mapper.ICourseOrganizationMapper;
 import callofproject.dev.environment.mapper.IUniversityMapper;
 import callofproject.dev.repository.environment.BeanName;
 import callofproject.dev.repository.environment.dal.EnvironmentServiceHelper;
-import callofproject.dev.repository.environment.dto.*;
+import callofproject.dev.repository.environment.entity.Company;
+import callofproject.dev.repository.environment.entity.Course;
+import callofproject.dev.repository.environment.entity.CourseOrganization;
+import callofproject.dev.repository.environment.entity.University;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -23,16 +28,18 @@ public class EnvironmentService
     private final EnvironmentServiceHelper m_serviceHelper;
     private final IUniversityMapper m_universityMapper;
     private final ICompanyMapper m_companyMapper;
+    private final ICourseMapper m_courseMapper;
     private final ICourseOrganizationMapper m_courseOrganizatorMapper;
 
     public EnvironmentService(@Qualifier(BeanName.SERVICE_HELPER) EnvironmentServiceHelper serviceHelper,
                               IUniversityMapper universityMapper,
                               ICompanyMapper companyMapper,
-                              ICourseOrganizationMapper courseOrganizatorMapper)
+                              ICourseMapper courseMapper, ICourseOrganizationMapper courseOrganizatorMapper)
     {
         m_serviceHelper = serviceHelper;
         m_universityMapper = universityMapper;
         m_companyMapper = companyMapper;
+        m_courseMapper = courseMapper;
         m_courseOrganizatorMapper = courseOrganizatorMapper;
     }
 
@@ -42,11 +49,18 @@ public class EnvironmentService
         return m_companyMapper.toCompaniesDTO(stream(companies.spliterator(), false).map(m_companyMapper::toCompanyDTO).toList());
     }
 
-    public CourseOrganizationsDTO findAllCourseOrganizator()
+    public CoursesDTO findAllCourse()
     {
-        var organizators = m_serviceHelper.findAllCourseOrganizator();
+        var courses = m_serviceHelper.findAllCourses();
 
-        return m_courseOrganizatorMapper.toCourseOrganizationsDTO(stream(organizators.spliterator(), false)
+        return m_courseMapper.toCoursesDTO(stream(courses.spliterator(), false)
+                .map(m_courseMapper::toCourseDTO).toList());
+    }
+
+    public CourseOrganizationsDTO findAllCourseOrganizations()
+    {
+        var organizations = m_serviceHelper.findAllCourseOrganizations();
+        return m_courseOrganizatorMapper.toCourseOrganizationsDTO(stream(organizations.spliterator(), false)
                 .map(m_courseOrganizatorMapper::toCourseOrganizationDTO).toList());
     }
 
@@ -62,24 +76,29 @@ public class EnvironmentService
         return str.trim().toUpperCase(ENGLISH).replaceAll("\\s+", "_");
     }
 
-    public UniversityDTO saveUniversity(UniversityDTO university)
+    public University saveUniversity(UniversitySaveDTO university)
     {
-        university.setUniversityName(convert(university.getUniversityName()));
-        return m_universityMapper.toUniversityDTO(m_serviceHelper.saveUniversity(m_universityMapper.toUniversity(university)));
+        var uni = new University();
+        uni.setUniversityName(convert(university.getUniversityName()));
+        return m_serviceHelper.saveUniversity(uni);
     }
 
-    public CompanyDTO saveCompany(CompanyDTO company)
+    public Company saveCompany(CompanySaveDTO company)
     {
-        company.setCompanyName(convert(company.getCompanyName()));
-        return m_companyMapper.toCompanyDTO(m_serviceHelper.saveCompany(m_companyMapper.toCompany(company)));
+        var companyCls = new Company(convert(company.companyName()));
+        return m_serviceHelper.saveCompany(companyCls);
     }
 
-    public CourseOrganizationDTO saveCourseOrganizator(CourseOrganizationDTO organizator)
+    public CourseOrganization saveCourseOrganization(CourseOrganizationSaveDTO courseOrganizationDTO)
     {
-        System.out.println(organizator.getCourseOrganizationName());
-        organizator.setCourseOrganizationName(convert(organizator.getCourseOrganizationName()));
-        var org = m_serviceHelper.saveCourseOrganizator(m_courseOrganizatorMapper.toCourseOrganization(organizator));
-        return m_courseOrganizatorMapper.toCourseOrganizationDTO(org);
+        var courseOrganization = new CourseOrganization(convert(courseOrganizationDTO.courseName()));
+        return m_serviceHelper.saveCourseOrganization(courseOrganization);
+    }
+
+    public Course saveCourse(CourseSaveDTO courseSaveDTO)
+    {
+        var course = new Course(convert(courseSaveDTO.getCourseName()));
+        return m_serviceHelper.saveCourse(course);
     }
 
     // ------------------------------------------------------------------------
@@ -90,11 +109,18 @@ public class EnvironmentService
         return university.map(m_universityMapper::toUniversityDTO);
     }
 
-    public Optional<CourseOrganizationDTO> findCourseOrganizatorByName(String organizator)
+    public Optional<CourseDTO> findCourseByName(String courseName)
     {
-        var org = m_serviceHelper.findByOrganizatorNameIgnoreCase(organizator);
+        var course = m_serviceHelper.findCourseByNameIgnoreCase(courseName);
 
-        return org.map(m_courseOrganizatorMapper::toCourseOrganizationDTO);
+        return course.map(m_courseMapper::toCourseDTO);
+    }
+
+    public Optional<CourseOrganizationDTO> findCourseOrganizationByName(String courseOrganizationName)
+    {
+        var courseOrganization = m_serviceHelper.findByOrganizationNameIgnoreCase(courseOrganizationName);
+
+        return courseOrganization.map(m_courseOrganizatorMapper::toCourseOrganizationDTO);
     }
 
     public Optional<CompanyDTO> findCompanyByName(String companyName)
@@ -134,39 +160,62 @@ public class EnvironmentService
     }
 
 
-    public Optional<CourseOrganizationDTO> findCourseOrganizatorById(String id)
+    public Optional<CourseDTO> findCourseById(String id)
     {
-        var organizator = m_serviceHelper.findCourseOrganizatorById(id);
+        var course = m_serviceHelper.findCourseById(id);
 
-        return organizator.map(m_courseOrganizatorMapper::toCourseOrganizationDTO);
+        return course.map(m_courseMapper::toCourseDTO);
     }
 
-    public CourseOrganizationsDTO findCourseOrganizatorByIds(Collection<String> ids)
+    public CoursesDTO findCourseByIds(Collection<String> ids)
     {
-        var organizators = m_serviceHelper.findCourseOrganizatorByIds(ids);
+        var courses = m_serviceHelper.findCourseByIds(ids);
 
-        return m_courseOrganizatorMapper.toCourseOrganizationsDTO(stream(organizators.spliterator(), false)
+        return m_courseMapper.toCoursesDTO(stream(courses.spliterator(), false)
+                .map(m_courseMapper::toCourseDTO).toList());
+    }
+
+    public Optional<CourseOrganizationDTO> findCourseOrganizationById(String id)
+    {
+        var courseOrganization = m_serviceHelper.findCourseOrganizationById(id);
+
+        return courseOrganization.map(m_courseOrganizatorMapper::toCourseOrganizationDTO);
+    }
+
+    public CourseOrganizationsDTO findCourseOrganizationByIds(Collection<String> ids)
+    {
+        var courseOrganizations = m_serviceHelper.findCourseOrganizationByIds(ids);
+
+        return m_courseOrganizatorMapper.toCourseOrganizationsDTO(stream(courseOrganizations.spliterator(), false)
                 .map(m_courseOrganizatorMapper::toCourseOrganizationDTO).toList());
     }
 
 
+    // ------------------------------------------------------------------------
+
+    public CoursesDTO findAllByCourseNameContainingIgnoreCase(String name)
+    {
+        var courses = m_serviceHelper.findAllCoursesByCourseNameContainingIgnoreCase(name);
+        return m_courseMapper.toCoursesDTO(stream(courses.spliterator(), false).map(m_courseMapper::toCourseDTO).toList());
+    }
+
     public UniversitiesDTO findAllByUniversityNameContainingIgnoreCase(String name)
     {
-        var universites = m_serviceHelper.findAllByUniversityNameContainingIgnoreCase(name);
-        return m_universityMapper.toUniversitiesDTO(stream(universites.spliterator(), false)
+        var universities = m_serviceHelper.findAllUniversitiesByUniversityNameContainingIgnoreCase(name);
+        return m_universityMapper.toUniversitiesDTO(stream(universities.spliterator(), false)
                 .map(m_universityMapper::toUniversityDTO).toList());
     }
 
-    public CourseOrganizationsDTO findAllByCourseOrganizatorsNameContainingIgnoreCase(String name)
+    public CourseOrganizationsDTO findAllByCourseOrganizationsNameContainingIgnoreCase(String name)
     {
-        var organizators = m_serviceHelper.findAllByCourseOrganizatorNameContainingIgnoreCase(name);
-        return m_courseOrganizatorMapper.toCourseOrganizationsDTO(stream(organizators.spliterator(), false)
+        var organizations = m_serviceHelper.findAllCourseOrganizationsByCourseNameContainingIgnoreCase(name);
+        return m_courseOrganizatorMapper.toCourseOrganizationsDTO(stream(organizations.spliterator(), false)
                 .map(m_courseOrganizatorMapper::toCourseOrganizationDTO).toList());
     }
 
     public CompaniesDTO findAllByCompanyNameContainingIgnoreCase(String name)
     {
-        var companies = m_serviceHelper.findAllByCompanyNameContainingIgnoreCase(name);
+        var companies = m_serviceHelper.findAllCompaniesByCompanyNameContainingIgnoreCase(name);
         return m_companyMapper.toCompaniesDTO(stream(companies.spliterator(), false).map(m_companyMapper::toCompanyDTO).toList());
     }
 }

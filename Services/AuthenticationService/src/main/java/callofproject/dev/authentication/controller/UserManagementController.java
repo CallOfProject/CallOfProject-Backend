@@ -1,6 +1,11 @@
 package callofproject.dev.authentication.controller;
 
 import callofproject.dev.authentication.dto.*;
+import callofproject.dev.authentication.dto.client.CompanySaveDTO;
+import callofproject.dev.authentication.dto.client.CourseOrganizationSaveDTO;
+import callofproject.dev.authentication.dto.client.CourseSaveDTO;
+import callofproject.dev.authentication.dto.client.UniversitySaveDTO;
+import callofproject.dev.authentication.service.IEnvironmentClient;
 import callofproject.dev.authentication.service.UserManagementService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +22,12 @@ import static org.springframework.http.ResponseEntity.ok;
 public class UserManagementController
 {
     private final UserManagementService m_service;
+    private final IEnvironmentClient m_environmentClient;
 
-    public UserManagementController(UserManagementService service)
+    public UserManagementController(UserManagementService service, IEnvironmentClient environmentClient)
     {
         m_service = service;
+        m_environmentClient = environmentClient;
     }
 
     /**
@@ -99,4 +106,39 @@ public class UserManagementController
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
+    @PostMapping("save/course-organization")
+    public ResponseEntity<Object> saveCourseOrganization(@RequestBody CourseOrganizationUpsertDTO dto)
+    {
+        return subscribe(() -> ok(m_service.upsertCourseOrganization(dto)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+
+    @PostMapping("save/ms/university")
+    public ResponseEntity<Object> saveUniversity(@RequestBody UniversitySaveDTO dto)
+    {
+        return subscribe(() -> ok(m_environmentClient.saveUniversity(dto)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    @PostMapping("save/ms/course")
+    public ResponseEntity<Object> saveCourse(@RequestBody CourseSaveDTO organizationDTO)
+    {
+        return subscribe(() -> ok(m_environmentClient.saveCourse(organizationDTO)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    @PostMapping("save/ms/company")
+    public ResponseEntity<Object> saveCompany(@RequestBody CompanySaveDTO companyDTO)
+    {
+        return subscribe(() -> ok(m_environmentClient.saveCompany(companyDTO)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    @PostMapping("save/ms/course-organization")
+    public ResponseEntity<Object> saveCourseOrganization(@RequestBody CourseOrganizationSaveDTO courseOrganizationSaveDTO)
+    {
+        return subscribe(() -> ok(m_environmentClient.saveCourseOrganization(courseOrganizationSaveDTO)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
 }

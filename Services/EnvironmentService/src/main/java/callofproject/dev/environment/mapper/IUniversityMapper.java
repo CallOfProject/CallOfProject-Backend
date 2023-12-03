@@ -1,7 +1,8 @@
 package callofproject.dev.environment.mapper;
 
-import callofproject.dev.repository.environment.dto.UniversitiesDTO;
-import callofproject.dev.repository.environment.dto.UniversityDTO;
+import callofproject.dev.environment.dto.UniversitiesDTO;
+import callofproject.dev.environment.dto.UniversityDTO;
+import callofproject.dev.environment.dto.UniversitySaveDTO;
 import callofproject.dev.repository.environment.entity.University;
 import org.mapstruct.Mapper;
 
@@ -11,7 +12,9 @@ import java.util.List;
 public interface IUniversityMapper
 {
     UniversityDTO toUniversityDTO(University university);
-    University toUniversity(UniversityDTO dto);
+
+    University toUniversity(UniversitySaveDTO dto);
+
     default UniversitiesDTO toUniversitiesDTO(List<UniversityDTO> universityDTOs)
     {
         return new UniversitiesDTO(universityDTOs);

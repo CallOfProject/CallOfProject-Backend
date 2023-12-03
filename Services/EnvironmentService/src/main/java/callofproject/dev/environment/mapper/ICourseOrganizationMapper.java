@@ -1,7 +1,7 @@
 package callofproject.dev.environment.mapper;
 
-import callofproject.dev.repository.environment.dto.CourseOrganizationDTO;
-import callofproject.dev.repository.environment.dto.CourseOrganizationsDTO;
+import callofproject.dev.environment.dto.CourseOrganizationDTO;
+import callofproject.dev.environment.dto.CourseOrganizationsDTO;
 import callofproject.dev.repository.environment.entity.CourseOrganization;
 import org.mapstruct.Mapper;
 

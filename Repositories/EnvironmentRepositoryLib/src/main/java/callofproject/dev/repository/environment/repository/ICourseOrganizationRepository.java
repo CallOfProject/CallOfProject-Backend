@@ -7,12 +7,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-import static callofproject.dev.repository.environment.BeanName.COURSE_REPOSITORY;
+import static callofproject.dev.repository.environment.BeanName.COURSE_ORGANIZATION_REPOSITORY;
 
-@Repository(COURSE_REPOSITORY)
+@Repository(COURSE_ORGANIZATION_REPOSITORY)
 @Lazy
-public interface ICourseOrganizatorRepository extends MongoRepository<CourseOrganization, String>
+public interface ICourseOrganizationRepository extends MongoRepository<CourseOrganization, String>
 {
-    Optional<CourseOrganization> findByCourseOrganizationNameIgnoreCase(String organizatorName);
+    Optional<CourseOrganization> findByCourseOrganizationNameIgnoreCase(String courseOrganizationName);
+
     Iterable<CourseOrganization> findAllByCourseOrganizationNameContainsIgnoreCase(String name);
 }

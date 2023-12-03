@@ -19,6 +19,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
@@ -30,6 +31,7 @@ import java.time.LocalDate;
 import static callofproject.dev.authentication.util.Util.BASE_PACKAGE;
 import static callofproject.dev.authentication.util.Util.REPO_PACKAGE;
 
+@EnableFeignClients
 @SpringBootApplication
 @EnableDiscoveryClient
 @ComponentScan(basePackages = {REPO_PACKAGE, BASE_PACKAGE, "callofproject.dev.service.jwt", "callofproject.dev.nosql"})

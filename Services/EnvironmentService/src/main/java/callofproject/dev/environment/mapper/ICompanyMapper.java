@@ -1,7 +1,7 @@
 package callofproject.dev.environment.mapper;
 
-import callofproject.dev.repository.environment.dto.CompaniesDTO;
-import callofproject.dev.repository.environment.dto.CompanyDTO;
+import callofproject.dev.environment.dto.CompaniesDTO;
+import callofproject.dev.environment.dto.CompanyDTO;
 import callofproject.dev.repository.environment.entity.Company;
 import org.mapstruct.Mapper;
 

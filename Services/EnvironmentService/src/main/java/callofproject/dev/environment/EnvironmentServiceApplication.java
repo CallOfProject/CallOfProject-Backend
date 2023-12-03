@@ -1,8 +1,6 @@
 package callofproject.dev.environment;
 
 import callofproject.dev.environment.service.EnvironmentService;
-import callofproject.dev.repository.environment.dto.UniversityDTO;
-import callofproject.dev.repository.environment.entity.University;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

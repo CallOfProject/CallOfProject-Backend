@@ -14,6 +14,8 @@ public class Experience
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "experience_id")
     private UUID experience_id;
+    @Column(name = "company_unique_id", nullable = false, length = 50)
+    private String companyUniqueId;
     @Column(name = "company_name", nullable = false, length = 100)
     private String companyName;
     @Column(name = "description", length = 500)
@@ -24,15 +26,34 @@ public class Experience
     private LocalDate startDate;
     @Column(name = "finish_date", nullable = false)
     private LocalDate finishDate;
-
     @Column(name = "is_continue", nullable = false)
     private boolean isContinue;
-
     @ManyToMany(mappedBy = "experienceList", fetch = FetchType.EAGER)
     private Set<UserProfile> userProfiles;
 
     public Experience()
     {
+    }
+
+    public Experience(String companyUniqueId, String companyName, String description, String companyWebsiteLink, LocalDate startDate, LocalDate finishDate, boolean isContinue)
+    {
+        this.companyUniqueId = companyUniqueId;
+        this.companyName = companyName;
+        this.description = description;
+        this.companyWebsiteLink = companyWebsiteLink;
+        this.startDate = startDate;
+        this.finishDate = finishDate;
+        this.isContinue = isContinue;
+    }
+
+    public String getCompanyUniqueId()
+    {
+        return companyUniqueId;
+    }
+
+    public void setCompanyUniqueId(String companyUniqueId)
+    {
+        this.companyUniqueId = companyUniqueId;
     }
 
     public Set<UserProfile> getUserProfiles()

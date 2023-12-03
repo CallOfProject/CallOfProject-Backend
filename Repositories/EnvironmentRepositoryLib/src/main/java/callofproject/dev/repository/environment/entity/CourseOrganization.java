@@ -1,5 +1,6 @@
 package callofproject.dev.repository.environment.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -9,9 +10,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class CourseOrganization
 {
     @Id
-    private String courseOrganizationId;
-
+    private String id;
     @Indexed(unique = true)
+    @JsonProperty("course_organization_name")
     private String courseOrganizationName;
 
     public CourseOrganization(String courseOrganizationName)
@@ -23,14 +24,14 @@ public class CourseOrganization
     {
     }
 
-    public String getCourseOrganizationId()
+    public String getId()
     {
-        return courseOrganizationId;
+        return id;
     }
 
-    public void setCourseOrganizationId(String courseOrganizationId)
+    public void setId(String id)
     {
-        this.courseOrganizationId = courseOrganizationId;
+        this.id = id;
     }
 
     public String getCourseOrganizationName()

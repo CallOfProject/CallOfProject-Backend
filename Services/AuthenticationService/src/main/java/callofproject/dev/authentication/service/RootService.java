@@ -82,7 +82,11 @@ public class RootService
         if (user.isEmpty())
             throw new DataServiceException("User does not exists!");
 
-        var role = user.get().getRoles().stream().filter(r -> r.getAuthority().equals(RoleEnum.ROLE_ADMIN.getRole())).findFirst();
+        var role = user.get()
+                .getRoles()
+                .stream()
+                .filter(r -> r.getAuthority().equals(RoleEnum.ROLE_ADMIN.getRole()))
+                .findFirst();
 
         if (role.isEmpty())
             throw new DataServiceException("User does not have admin role!");

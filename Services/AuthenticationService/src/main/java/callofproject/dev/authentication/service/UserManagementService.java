@@ -3,6 +3,9 @@ package callofproject.dev.authentication.service;
 
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
 import callofproject.dev.authentication.dto.*;
+import callofproject.dev.authentication.dto.client.CourseOrganizationSaveDTO;
+import callofproject.dev.authentication.dto.client.CourseSaveDTO;
+import callofproject.dev.authentication.dto.client.UniversitySaveDTO;
 import callofproject.dev.authentication.mapper.*;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.nosql.dal.MatchServiceHelper;
@@ -38,10 +41,14 @@ public class UserManagementService
     private final ICourseMapper m_courseMapper;
     private final IExperienceMapper m_experienceMapper;
     private final ILinkMapper m_linkMapper;
+    private final ICourseOrganizationMapper m_courseOrganizationMapper;
+    private final IEnvironmentClient m_environmentClient;
 
     public UserManagementService(KafkaProducer userProducer, @Qualifier(USER_MANAGEMENT_DAL_BEAN) UserManagementServiceHelper serviceHelper,
                                  MatchServiceHelper matchDbRepository,
-                                 IUserMapper userMapper, IEducationMapper educationMapper, ICourseMapper courseMapper, IExperienceMapper experienceMapper, ILinkMapper linkMapper)
+                                 IUserMapper userMapper, IEducationMapper educationMapper, ICourseMapper courseMapper,
+                                 IExperienceMapper experienceMapper, ILinkMapper linkMapper,
+                                 ICourseOrganizationMapper courseOrganizationMapper, IEnvironmentClient environmentClient)
     {
         m_userProducer = userProducer;
         m_serviceHelper = serviceHelper;
@@ -51,6 +58,8 @@ public class UserManagementService
         m_courseMapper = courseMapper;
         m_experienceMapper = experienceMapper;
         m_linkMapper = linkMapper;
+        m_courseOrganizationMapper = courseOrganizationMapper;
+        m_environmentClient = environmentClient;
     }
 
     /**
@@ -113,6 +122,10 @@ public class UserManagementService
 
     public MessageResponseDTO<Object> upsertEducation(EducationUpsertDTO dto)
     {
+        var uni = m_environmentClient.saveUniversity(new UniversitySaveDTO(dto.getSchoolName()));
+        dto.setSchoolName(uni.getUniversityName());
+        dto.setUniversityId(uni.getId());
+
         var upsertedEducation = m_serviceHelper.getEducationServiceHelper().saveEducation(m_educationMapper.toEducation(dto));
 
         return new MessageResponseDTO<>("Education upserted successfully!", 200, upsertedEducation);
@@ -120,13 +133,31 @@ public class UserManagementService
 
     public MessageResponseDTO<Object> upsertExperience(ExperienceUpsertDTO dto)
     {
+        //var experience = m_serviceHelper.getExperienceServiceHelper().saveExperience(new Exper);
         var upsertedExperience = m_serviceHelper.getExperienceServiceHelper().saveExperience(m_experienceMapper.toExperience(dto));
 
         return new MessageResponseDTO<>("Experience upserted successfully!", 200, upsertedExperience);
     }
 
+    public MessageResponseDTO<Object> upsertCourseOrganization(CourseOrganizationUpsertDTO dto)
+    {
+        var courseOrganization = m_environmentClient
+                .saveCourseOrganization(new CourseOrganizationSaveDTO(dto.getCourseOrganizationName()));
+        dto.setCourseOrganizationName(courseOrganization.getCourseOrganizationName());
+        dto.setId(courseOrganization.getId());
+
+        var upsertedCourseOrganization = m_serviceHelper.getCourseOrganizationServiceHelper()
+                .saveCourseOrganization(m_courseOrganizationMapper.toCourseOrganization(dto));
+
+        return new MessageResponseDTO<>("Course organization upserted successfully!", 200, upsertedCourseOrganization);
+    }
+
     public MessageResponseDTO<Object> upsertCourse(CourseUpsertDTO dto)
     {
+        var course = m_environmentClient.saveCourse(new CourseSaveDTO(dto.getCourseName()));
+        dto.setCourseName(course.getCourseName());
+        dto.setCourseId(course.getId());
+
         var upsertedCourse = m_serviceHelper.getCourseServiceHelper().saveCourse(m_courseMapper.toCourse(dto));
 
         return new MessageResponseDTO<>("Course upserted successfully!", 200, upsertedCourse);
@@ -134,7 +165,7 @@ public class UserManagementService
 
     public MessageResponseDTO<Object> upsertLink(LinkUpsertDTO dto)
     {
-        var upsertedLink = m_serviceHelper.getLinkServiceHelper().saveLink(m_linkMapper.toLink(dto));
+        var upsertedLink = doForDataService(() -> m_serviceHelper.getLinkServiceHelper().saveLink(m_linkMapper.toLink(dto)), "Link cannot be upserted!");
 
         return new MessageResponseDTO<>("Link upserted successfully!", 200, upsertedLink);
     }
@@ -184,6 +215,7 @@ public class UserManagementService
         try
         {
             var list = new ArrayList<User>();
+
             for (var userDTO : userDTOs)
             {
                 var user = m_userMapper.toUser(userDTO);

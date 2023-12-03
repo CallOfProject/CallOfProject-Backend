@@ -1,20 +1,23 @@
-package callofproject.dev.repository.environment.dto;
+package callofproject.dev.authentication.dto.client;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class UniversityDTO
+public class UniversitySaveDTO
 {
     @JsonProperty("university_name")
     private String universityName;
 
-    public UniversityDTO()
+
+    public UniversitySaveDTO()
     {
     }
 
-    public UniversityDTO(String universityName)
+
+    public UniversitySaveDTO(String universityName)
     {
         this.universityName = universityName;
     }
+
     @JsonProperty("university_name")
     public String getUniversityName()
     {

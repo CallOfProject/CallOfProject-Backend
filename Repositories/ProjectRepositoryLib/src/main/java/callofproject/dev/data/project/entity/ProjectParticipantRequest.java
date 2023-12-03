@@ -26,7 +26,6 @@ public class ProjectParticipantRequest
     private User m_user;
     @Column(name = "is_accepted", nullable = false)
     private boolean m_isAccepted = false;
-
     @Column(name = "request_date", nullable = false)
     private LocalDateTime m_requestDate;
 

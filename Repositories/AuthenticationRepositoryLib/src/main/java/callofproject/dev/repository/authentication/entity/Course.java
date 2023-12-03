@@ -10,14 +10,12 @@ import java.util.UUID;
 @Table(name = "course")
 public class Course
 {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "course_id")
     private UUID course_id;
-
-    @Column(name = "organizator", nullable = false, length = 80)
-    private String organizator;
+    @Column(name = "unique_course_id", nullable = false, length = 50)
+    private String uniqueCourseId;
     @Column(name = "course_name", nullable = false, length = 100)
     private String courseName;
     @Column(name = "start_date", nullable = false, length = 30)
@@ -31,9 +29,53 @@ public class Course
     @ManyToMany(mappedBy = "courseList", fetch = FetchType.EAGER)
     private Set<UserProfile> userProfiles;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "course_organization_id", nullable = false)
+    private CourseOrganization courseOrganization;
 
     public Course()
     {
+    }
+
+    public Course(String uniqueCourseId, String courseName, LocalDate startDate, LocalDate finishDate, boolean isContinue, String description)
+    {
+        this.uniqueCourseId = uniqueCourseId;
+        this.courseName = courseName;
+        this.startDate = startDate;
+        this.finishDate = finishDate;
+        this.isContinue = isContinue;
+        this.description = description;
+    }
+
+    public Course(String uniqueCourseId, String courseName, LocalDate startDate, LocalDate finishDate, boolean isContinue, String description, CourseOrganization courseOrganization)
+    {
+        this.uniqueCourseId = uniqueCourseId;
+        this.courseName = courseName;
+        this.startDate = startDate;
+        this.finishDate = finishDate;
+        this.isContinue = isContinue;
+        this.description = description;
+        this.courseOrganization = courseOrganization;
+    }
+
+    public CourseOrganization getCourseOrganization()
+    {
+        return courseOrganization;
+    }
+
+    public void setCourseOrganization(CourseOrganization courseOrganization)
+    {
+        this.courseOrganization = courseOrganization;
+    }
+
+    public String getUniqueCourseId()
+    {
+        return uniqueCourseId;
+    }
+
+    public void setUniqueCourseId(String uniqueCourseId)
+    {
+        this.uniqueCourseId = uniqueCourseId;
     }
 
     public Set<UserProfile> getUserProfiles()
@@ -54,16 +96,6 @@ public class Course
     public void setCourse_id(UUID course_id)
     {
         this.course_id = course_id;
-    }
-
-    public String getOrganizator()
-    {
-        return organizator;
-    }
-
-    public void setOrganizator(String organizator)
-    {
-        this.organizator = organizator;
     }
 
     public String getCourseName()
