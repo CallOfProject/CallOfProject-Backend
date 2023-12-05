@@ -2,6 +2,7 @@ package callofproject.dev.authentication.util;
 
 public final class Util
 {
+    public static final int VERIFICATION_CODE_LENGTH = 6;
     public static final String REPO_PACKAGE = "callofproject.dev.repository.authentication";
     public static final String BASE_PACKAGE = "callofproject.dev.authentication";
     public static final String TEST_PROPERTIES_FILE = "classpath:application-test.properties";

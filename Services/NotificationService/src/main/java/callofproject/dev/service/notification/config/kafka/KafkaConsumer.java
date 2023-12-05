@@ -20,7 +20,7 @@ public class KafkaConsumer
     @KafkaListener(topics = "${spring.kafka.consumer.topic-name}", groupId = "${spring.kafka.consumer.group-id}")
     public void projectServiceListener(NotificationUserResponseDTO message)
     {
-        System.out.println("Received Message in group foo: " + message);
+        System.out.println("Received Message" + message);
 
         var notification = new Notification.Builder()
                 .setMessage(message.message())

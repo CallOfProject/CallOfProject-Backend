@@ -1,7 +1,10 @@
 package callofproject.dev.authentication.service;
 
+import callofproject.dev.authentication.config.kafka.KafkaProducer;
 import callofproject.dev.authentication.dto.ForgotPasswordDTO;
 import callofproject.dev.authentication.dto.MessageResponseDTO;
+import callofproject.dev.data.common.dto.EmailTopic;
+import callofproject.dev.data.common.enums.EmailType;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserServiceHelper;
 import callofproject.dev.service.jwt.JwtUtil;
@@ -27,10 +30,13 @@ public class ForgotPasswordService
     @Value("${authentication.url.forgot-password}")
     private String m_forgotPasswordUrl;
 
-    public ForgotPasswordService(UserServiceHelper userServiceHelper, PasswordEncoder passwordEncoder)
+    private final KafkaProducer m_kafkaProducer;
+
+    public ForgotPasswordService(UserServiceHelper userServiceHelper, PasswordEncoder passwordEncoder, KafkaProducer kafkaProducer)
     {
         m_userServiceHelper = userServiceHelper;
         m_passwordEncoder = passwordEncoder;
+        m_kafkaProducer = kafkaProducer;
     }
 
     /**
@@ -75,9 +81,10 @@ public class ForgotPasswordService
         var passwordResetToken = generateToken(claims, user.get().getUsername());
 
         var url = format(m_forgotPasswordUrl, passwordResetToken);
-        System.out.println(url);
-        // send email
-        throw new UnsupportedOperationException("TODO:");
+        var message = format("Hello %s, \n\nYou can reset your password by clicking the link below: \n%s", user.get().getUsername(), url);
+        var emailTopic = new EmailTopic(EmailType.PASSWORD_RESET, user.get().getEmail(), "Reset Password", message, null);
+        m_kafkaProducer.sendEmail(emailTopic);
+        return new MessageResponseDTO<>("Reset password link sent to your email!", 200, true);
     }
 
     /**

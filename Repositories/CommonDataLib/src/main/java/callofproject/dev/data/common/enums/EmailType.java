@@ -1,4 +1,4 @@
-package callofproject.dev.authentication.dto;
+package callofproject.dev.data.common.enums;
 
 public enum EmailType
 {

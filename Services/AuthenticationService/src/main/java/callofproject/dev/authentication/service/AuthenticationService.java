@@ -1,12 +1,11 @@
 package callofproject.dev.authentication.service;
 
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
-import callofproject.dev.authentication.dto.EmailTopic;
-import callofproject.dev.authentication.dto.EmailType;
 import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.dto.auth.AuthenticationResponse;
 import callofproject.dev.authentication.dto.auth.RegisterRequest;
+import callofproject.dev.data.common.dto.EmailTopic;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.enumeration.RoleEnum;
@@ -27,8 +26,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static callofproject.dev.authentication.util.Util.AUTHENTICATION_SERVICE;
-import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
+import static callofproject.dev.authentication.util.Util.*;
+import static callofproject.dev.data.common.enums.EmailType.EMAIL_VERIFICATION;
+import static callofproject.dev.data.common.util.VerificationCodeGenerator.generateVerificationCode;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 
 @Service(AUTHENTICATION_SERVICE)
@@ -101,8 +101,11 @@ public class AuthenticationService
 
         var user = m_userManagementService.saveUser(dto);
 
-        m_kafkaProducer.sedVerificationEmail(new EmailTopic(EmailType.EMAIL_VERIFICATION,
-                "canozturk309@gmail.com"));
+        var msg = "Your verification code is: " + generateVerificationCode(VERIFICATION_CODE_LENGTH);
+
+        var emailTopic = new EmailTopic(EMAIL_VERIFICATION, request.getEmail(), "Verification Email", msg, null);
+        m_kafkaProducer.sendEmail(emailTopic);
+
         return new AuthenticationResponse(user.accessToken(), user.refreshToken(), true, RoleEnum.ROLE_USER.getRole(), user.userId());
     }
 

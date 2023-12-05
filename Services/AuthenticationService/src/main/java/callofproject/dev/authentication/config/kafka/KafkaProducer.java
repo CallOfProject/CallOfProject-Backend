@@ -1,7 +1,7 @@
 package callofproject.dev.authentication.config.kafka;
 
-import callofproject.dev.authentication.dto.EmailTopic;
 import callofproject.dev.authentication.dto.UserKafkaDTO;
+import callofproject.dev.data.common.dto.EmailTopic;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -21,8 +21,7 @@ public class KafkaProducer
     private final KafkaTemplate<String, UserKafkaDTO> m_kafkaTemplate;
     private final KafkaTemplate<String, EmailTopic> m_emailKafkaTemplate;
 
-    public KafkaProducer(NewTopic topic, @Qualifier("emailTopic") NewTopic emailTopic, KafkaTemplate<String, UserKafkaDTO> kafkaTemplate,
-                         KafkaTemplate<String, EmailTopic> emailKafkaTemplate)
+    public KafkaProducer(NewTopic topic, @Qualifier("emailTopic") NewTopic emailTopic, KafkaTemplate<String, UserKafkaDTO> kafkaTemplate, KafkaTemplate<String, EmailTopic> emailKafkaTemplate)
     {
         m_topic = topic;
         m_emailTopic = emailTopic;
@@ -45,13 +44,13 @@ public class KafkaProducer
         m_kafkaTemplate.send(msg);
     }
 
-    public void sedVerificationEmail(EmailTopic emailTopic)
+    public void sendEmail(EmailTopic emailTopic)
     {
         var msg = MessageBuilder
                 .withPayload(emailTopic)
                 .setHeader(TOPIC, m_emailTopic.name())
                 .build();
 
-        m_kafkaTemplate.send(msg);
+        m_emailKafkaTemplate.send(msg);
     }
 }

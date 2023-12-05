@@ -30,6 +30,11 @@
 
         <dependency>
             <groupId>callofproject.dev</groupId>
+            <artifactId>common-data-lib</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>callofproject.dev</groupId>
             <artifactId>AuthenticationRepositoryLib</artifactId>
             <version>1.0.0</version>
         </dependency>
