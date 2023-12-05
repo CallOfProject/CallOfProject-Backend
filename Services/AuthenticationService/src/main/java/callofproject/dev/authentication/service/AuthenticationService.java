@@ -1,5 +1,8 @@
 package callofproject.dev.authentication.service;
 
+import callofproject.dev.authentication.config.kafka.KafkaProducer;
+import callofproject.dev.authentication.dto.EmailTopic;
+import callofproject.dev.authentication.dto.EmailType;
 import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.dto.auth.AuthenticationResponse;
@@ -35,15 +38,17 @@ public class AuthenticationService
     private final UserManagementService m_userManagementService;
     private final PasswordEncoder m_passwordEncoder;
     private final AuthenticationProvider m_authenticationProvider;
+    private final KafkaProducer m_kafkaProducer;
 
 
     public AuthenticationService(@Qualifier(USER_MANAGEMENT_SERVICE) UserManagementService userManagementService,
                                  AuthenticationProvider authenticationProvider,
-                                 PasswordEncoder passwordEncoder)
+                                 PasswordEncoder passwordEncoder, KafkaProducer kafkaProducer)
     {
         m_passwordEncoder = passwordEncoder;
         m_userManagementService = userManagementService;
         m_authenticationProvider = authenticationProvider;
+        m_kafkaProducer = kafkaProducer;
     }
 
     /**
@@ -89,13 +94,15 @@ public class AuthenticationService
      */
     private AuthenticationResponse registerUserCallback(RegisterRequest request)
     {
-        var dto = new UserSignUpRequestDTO(request.getEmail(), request.getFirstName(),
-                request.getMiddleName(), request.getLastName(), request.getUsername(),
-                m_passwordEncoder.encode(request.getPassword()), request.getBirthDate(),
+        var dto = new UserSignUpRequestDTO(request.getEmail(), request.getFirst_name(),
+                request.getMiddle_name(), request.getLast_name(), request.getUsername(),
+                m_passwordEncoder.encode(request.getPassword()), request.getBirth_date(),
                 RoleEnum.ROLE_USER);
 
         var user = m_userManagementService.saveUser(dto);
 
+        m_kafkaProducer.sedVerificationEmail(new EmailTopic(EmailType.EMAIL_VERIFICATION,
+                "canozturk309@gmail.com"));
         return new AuthenticationResponse(user.accessToken(), user.refreshToken(), true, RoleEnum.ROLE_USER.getRole(), user.userId());
     }
 
@@ -111,12 +118,12 @@ public class AuthenticationService
         for (var request : requests)
         {
             var dto = new UserSignUpRequestDTO(request.getEmail(),
-                    request.getFirstName(),
-                    request.getMiddleName(),
-                    request.getLastName(),
+                    request.getFirst_name(),
+                    request.getMiddle_name(),
+                    request.getLast_name(),
                     request.getUsername(),
                     m_passwordEncoder.encode(request.getPassword()),
-                    request.getBirthDate(),
+                    request.getBirth_date(),
                     RoleEnum.ROLE_USER);
 
             list.add(dto);

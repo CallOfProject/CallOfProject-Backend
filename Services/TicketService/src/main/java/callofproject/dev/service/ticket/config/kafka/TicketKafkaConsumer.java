@@ -8,12 +8,12 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 @Service
-public class KafkaConsumer
+public class TicketKafkaConsumer
 {
     private final TicketService m_ticketService;
     private final ITicketMapper m_ticketMapper;
 
-    public KafkaConsumer(TicketService ticketService, ITicketMapper ticketMapper)
+    public TicketKafkaConsumer(TicketService ticketService, ITicketMapper ticketMapper)
     {
         m_ticketService = ticketService;
         m_ticketMapper = ticketMapper;

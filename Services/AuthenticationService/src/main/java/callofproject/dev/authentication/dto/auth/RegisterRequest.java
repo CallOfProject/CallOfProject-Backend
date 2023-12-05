@@ -12,15 +12,15 @@ public class RegisterRequest
     @JsonProperty("first_name")
     @NotBlank(message = "first name cannot be empty")
     @NotEmpty
-    private String m_firstName;
+    private String first_name;
     @JsonProperty("last_name")
     @NotBlank(message = "last name cannot be empty")
     @NotEmpty
-    private String m_lastName;
+    private String last_name;
     @JsonProperty("middle_name")
     @NotBlank(message = "middle name cannot be empty")
     @NotEmpty
-    private String m_middleName;
+    private String middle_name;
     @JsonProperty("username")
     @NotBlank(message = "username cannot be empty")
     @NotEmpty
@@ -35,7 +35,7 @@ public class RegisterRequest
     @NotEmpty
     @JsonProperty("birth_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    private LocalDate m_birthDate;
+    private LocalDate birth_date;
 
 
     public RegisterRequest()
@@ -44,43 +44,43 @@ public class RegisterRequest
 
     public RegisterRequest(String firstName, String lastName, String middleName, String username, String email, String password, LocalDate birthDate)
     {
-        m_firstName = firstName;
-        m_lastName = lastName;
-        m_middleName = middleName;
+        first_name = firstName;
+        last_name = lastName;
+        middle_name = middleName;
         m_username = username;
         this.email = email;
         this.password = password;
-        m_birthDate = birthDate;
+        birth_date = birthDate;
     }
 
-    public String getFirstName()
+    public String getFirst_name()
     {
-        return m_firstName;
+        return first_name;
     }
 
-    public void setFirstName(String firstName)
+    public void setFirst_name(String first_name)
     {
-        m_firstName = firstName;
+        this.first_name = first_name;
     }
 
-    public String getLastName()
+    public String getLast_name()
     {
-        return m_lastName;
+        return last_name;
     }
 
-    public void setLastName(String lastName)
+    public void setLast_name(String last_name)
     {
-        m_lastName = lastName;
+        this.last_name = last_name;
     }
 
-    public String getMiddleName()
+    public String getMiddle_name()
     {
-        return m_middleName;
+        return middle_name;
     }
 
-    public void setMiddleName(String middleName)
+    public void setMiddle_name(String middle_name)
     {
-        m_middleName = middleName;
+        this.middle_name = middle_name;
     }
 
     public String getUsername()
@@ -113,13 +113,13 @@ public class RegisterRequest
         this.password = password;
     }
 
-    public LocalDate getBirthDate()
+    public LocalDate getBirth_date()
     {
-        return m_birthDate;
+        return birth_date;
     }
 
-    public void setBirthDate(LocalDate birthDate)
+    public void setBirth_date(LocalDate birth_date)
     {
-        m_birthDate = birthDate;
+        this.birth_date = birth_date;
     }
 }

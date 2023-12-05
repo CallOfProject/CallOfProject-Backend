@@ -1,6 +1,9 @@
 package callofproject.dev.service.ticket.service;
 
 import callofproject.dev.data.common.enums.EOperation;
+import callofproject.dev.data.common.status.Status;
+import callofproject.dev.service.ticket.config.kafka.TicketKafkaProducer;
+import callofproject.dev.service.ticket.dto.NotificationDTO;
 import callofproject.dev.service.ticket.entity.Ticket;
 import callofproject.dev.service.ticket.repository.ITicketRepository;
 import org.springframework.context.annotation.Lazy;
@@ -22,10 +25,12 @@ public class TicketService
 {
     private final int m_defaultPageSize = 30;
     private final ITicketRepository ticketRepository;
+    private final TicketKafkaProducer m_ticketKafkaProducer;
 
-    public TicketService(ITicketRepository ticketRepository)
+    public TicketService(ITicketRepository ticketRepository, TicketKafkaProducer ticketKafkaProducer)
     {
         this.ticketRepository = ticketRepository;
+        m_ticketKafkaProducer = ticketKafkaProducer;
     }
 
     public Ticket upsertTicket(Ticket ticket)
@@ -108,5 +113,11 @@ public class TicketService
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
         return doForDataService(() -> ticketRepository.findAllByDateBetween(start, end, pageable), "TicketService::findAllByDateBetween");
+    }
+
+    public int sendFeedback(NotificationDTO notificationDTO)
+    {
+        doForDataService(() -> m_ticketKafkaProducer.sendNotification(notificationDTO), "TicketService::sendFeedback");
+        return Status.OK;
     }
 }
