@@ -13,7 +13,7 @@ import static callofproject.dev.repository.environment.BeanName.COMPANY_REPOSITO
 @Lazy
 public interface ICompanyRepository extends MongoRepository<Company, String>
 {
-    boolean existsByCompanyNameIgnoreCase(String companyName);
+    boolean existsByCompanyNameContainsIgnoreCase(String companyName);
 
     Optional<Company> findByCompanyNameIgnoreCase(String companyName);
 

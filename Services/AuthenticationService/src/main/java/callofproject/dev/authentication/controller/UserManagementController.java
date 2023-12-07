@@ -5,6 +5,7 @@ import callofproject.dev.authentication.dto.client.CompanySaveDTO;
 import callofproject.dev.authentication.dto.client.CourseOrganizationSaveDTO;
 import callofproject.dev.authentication.dto.client.CourseSaveDTO;
 import callofproject.dev.authentication.dto.client.UniversitySaveDTO;
+import callofproject.dev.authentication.dto.environments.*;
 import callofproject.dev.authentication.service.IEnvironmentClientService;
 import callofproject.dev.authentication.service.UserManagementService;
 import callofproject.dev.data.common.clas.ResponseMessage;
@@ -104,13 +105,6 @@ public class UserManagementController
     public ResponseEntity<Object> saveCourse(@RequestBody CourseUpsertDTO dto)
     {
         return subscribe(() -> ok(m_service.upsertCourse(dto)),
-                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
-    }
-
-    @PostMapping("save/course-organization")
-    public ResponseEntity<Object> saveCourseOrganization(@RequestBody CourseOrganizationUpsertDTO dto)
-    {
-        return subscribe(() -> ok(m_service.upsertCourseOrganization(dto)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 

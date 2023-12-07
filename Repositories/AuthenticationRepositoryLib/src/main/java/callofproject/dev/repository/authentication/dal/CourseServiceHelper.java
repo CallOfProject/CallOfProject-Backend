@@ -27,6 +27,15 @@ public class CourseServiceHelper
     {
         return m_courseRepository.findAllById(ids);
     }
+    public boolean existsByCourseNameContainsIgnoreCase(String courseName)
+    {
+        return m_courseRepository.existsByCourseNameContainsIgnoreCase(courseName);
+    }
+
+    public Optional<Course> findByCourseNameContainsIgnoreCase(String courseName)
+    {
+        return m_courseRepository.findByCourseNameContainsIgnoreCase(courseName);
+    }
 
     public void removeCourses(Iterable<Course> courses)
     {

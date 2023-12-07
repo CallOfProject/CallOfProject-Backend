@@ -3,22 +3,27 @@ package callofproject.dev.authentication.service;
 
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
 import callofproject.dev.authentication.dto.*;
+import callofproject.dev.authentication.dto.client.CompanySaveDTO;
 import callofproject.dev.authentication.dto.client.CourseOrganizationSaveDTO;
 import callofproject.dev.authentication.dto.client.CourseSaveDTO;
 import callofproject.dev.authentication.dto.client.UniversitySaveDTO;
+import callofproject.dev.authentication.dto.environments.CourseUpsertDTO;
+import callofproject.dev.authentication.dto.environments.EducationUpsertDTO;
+import callofproject.dev.authentication.dto.environments.ExperienceUpsertDTO;
+import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
 import callofproject.dev.authentication.mapper.*;
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.nosql.dal.MatchServiceHelper;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
-import callofproject.dev.repository.authentication.entity.User;
-import callofproject.dev.repository.authentication.entity.UserProfile;
+import callofproject.dev.repository.authentication.entity.*;
 import callofproject.dev.service.jwt.JwtUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,6 +34,7 @@ import static callofproject.dev.library.exception.util.CopDataUtil.doForDataServ
 import static callofproject.dev.repository.authentication.BeanName.USER_MANAGEMENT_DAL_BEAN;
 import static callofproject.dev.util.stream.StreamUtil.toListConcurrent;
 import static java.lang.String.format;
+import static java.util.Optional.of;
 
 
 @Service(USER_MANAGEMENT_SERVICE)
@@ -121,13 +127,27 @@ public class UserManagementService
         return doForDataService(() -> upsertUserProfileCallback(dto), "UserManagementService::upsertUserProfile");
     }
 
+    private String convert(String str)
+    {
+        str = Normalizer.normalize(str, Normalizer.Form.NFD);
+        return str.replaceAll("[^\\p{ASCII}]", "").trim().toUpperCase().replaceAll("\\s+", "_");
+    }
 
     public ResponseMessage<Object> upsertEducation(EducationUpsertDTO dto)
     {
         var uni = m_environmentClient.saveUniversity(new UniversitySaveDTO(dto.getSchoolName()));
+        var user = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(dto.getUserId());
+
+        if (user.isEmpty())
+            throw new DataServiceException("User does not exists!");
+
+        var isExistsSchool = user.get().getEducationList().stream().anyMatch(education -> education.getSchoolName().equals(dto.getSchoolName()));
+
+        if (isExistsSchool)
+            return new ResponseMessage<>("School already exists!", 400, null);
+
         dto.setSchoolName(uni.getUniversityName());
         dto.setUniversityId(uni.getId());
-
         var upsertedEducation = m_serviceHelper.getEducationServiceHelper().saveEducation(m_educationMapper.toEducation(dto));
 
         return new ResponseMessage<>("Education upserted successfully!", 200, upsertedEducation);
@@ -135,34 +155,77 @@ public class UserManagementService
 
     public ResponseMessage<Object> upsertExperience(ExperienceUpsertDTO dto)
     {
-        //var experience = m_serviceHelper.getExperienceServiceHelper().saveExperience(new Exper);
-        var upsertedExperience = m_serviceHelper.getExperienceServiceHelper().saveExperience(m_experienceMapper.toExperience(dto));
+        // save to environment client if not exists
+        var experienceOnClient = m_environmentClient.saveCompany(new CompanySaveDTO(dto.getCompanyName()));
 
-        return new ResponseMessage<>("Experience upserted successfully!", 200, upsertedExperience);
-    }
+        // find user profile
+        var userProfile = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(dto.getUserId());
 
-    public ResponseMessage<Object> upsertCourseOrganization(CourseOrganizationUpsertDTO dto)
-    {
-        var courseOrganization = m_environmentClient
-                .saveCourseOrganization(new CourseOrganizationSaveDTO(dto.getCourseOrganizationName()));
-        dto.setCourseOrganizationName(courseOrganization.getCourseOrganizationName());
-        dto.setId(courseOrganization.getId());
+        // if user profile not exists, throw exception
+        if (userProfile.isEmpty())
+            throw new DataServiceException("User does not exists!");
 
-        var upsertedCourseOrganization = m_serviceHelper.getCourseOrganizationServiceHelper()
-                .saveCourseOrganization(m_courseOrganizationMapper.toCourseOrganization(dto));
+        // check if course exists
+        var isExistsExperience = userProfile.get().getExperienceList().stream()
+                .anyMatch(c -> c.getCompanyName().equals(experienceOnClient.getCompanyName()));
 
-        return new ResponseMessage<>("Course organization upserted successfully!", 200, upsertedCourseOrganization);
+        if (isExistsExperience)
+            return new ResponseMessage<>("Experience already exists!", 400, null);
+
+        // save course organization
+        var experience = new Experience(dto.getId(), experienceOnClient.getCompanyName(), dto.getDescription(),
+                dto.getCompanyWebsite(), dto.getStartDate(), dto.getFinishDate(), dto.isContinue());
+
+        var savedExperience = m_serviceHelper.getExperienceServiceHelper().saveExperience(experience);
+
+        userProfile.get().addExperience(savedExperience);
+        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile.get());
+
+        return new ResponseMessage<>("Course upserted successfully!", 200, savedExperience);
     }
 
     public ResponseMessage<Object> upsertCourse(CourseUpsertDTO dto)
     {
-        var course = m_environmentClient.saveCourse(new CourseSaveDTO(dto.getCourseName()));
-        dto.setCourseName(course.getCourseName());
-        dto.setCourseId(course.getId());
+        // save to environment client if not exists
+        var courseOnClient = m_environmentClient.saveCourse(new CourseSaveDTO(dto.getCourseName()));
 
-        var upsertedCourse = m_serviceHelper.getCourseServiceHelper().saveCourse(m_courseMapper.toCourse(dto));
+        // save course organization not exists
+        var organizationOnClient = m_environmentClient.saveCourseOrganization(new CourseOrganizationSaveDTO(dto.getOrganizator()));
 
-        return new ResponseMessage<>("Course upserted successfully!", 200, upsertedCourse);
+        // find user profile
+        var userProfile = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(dto.getUserId());
+
+        // if user profile not exists, throw exception
+        if (userProfile.isEmpty())
+            throw new DataServiceException("User does not exists!");
+
+        // check if course exists
+        var isExistsCourse = userProfile.get().getCourseList().stream()
+                .anyMatch(c -> c.getCourseName().equals(courseOnClient.getCourseName()) && c.getCourseOrganization()
+                        .getCourseOrganizationName().equals(organizationOnClient.getCourseOrganizationName()));
+
+        if (isExistsCourse)
+            return new ResponseMessage<>("Course already exists!", 400, null);
+
+        // check course organization exists
+        var existingOrganization = m_serviceHelper.getCourseOrganizationServiceHelper()
+                .findByCourseOrganizationNameContainsIgnoreCase(organizationOnClient.getCourseOrganizationName());
+
+        // if not exists, save course organization
+        if (existingOrganization.isEmpty())
+            existingOrganization = of(m_serviceHelper.getCourseOrganizationServiceHelper()
+                    .saveCourseOrganization(new CourseOrganization(organizationOnClient.getCourseOrganizationName())));
+
+        // save course organization
+        var course = new Course(courseOnClient.getId(), courseOnClient.getCourseName(), dto.getStartDate(), dto.getFinishDate(), dto.isContinue(),
+                dto.getDescription(), existingOrganization.get());
+
+        var savedCourse = m_serviceHelper.getCourseServiceHelper().saveCourse(course);
+
+        userProfile.get().addCourse(course);
+        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile.get());
+
+        return new ResponseMessage<>("Course upserted successfully!", 200, savedCourse);
     }
 
     public ResponseMessage<Object> upsertLink(LinkUpsertDTO dto)

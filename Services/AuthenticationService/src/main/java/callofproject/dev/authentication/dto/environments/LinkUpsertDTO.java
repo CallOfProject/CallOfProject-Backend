@@ -1,4 +1,4 @@
-package callofproject.dev.authentication.dto;
+package callofproject.dev.authentication.dto.environments;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

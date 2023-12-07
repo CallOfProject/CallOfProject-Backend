@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.text.Normalizer;
 import java.util.Collection;
 import java.util.Optional;
 
-import static java.util.Locale.ENGLISH;
 import static java.util.stream.StreamSupport.stream;
 
 @Service("callofproject.dev.environment.service")
@@ -73,32 +73,38 @@ public class EnvironmentService
 
     private String convert(String str)
     {
-        return str.trim().toUpperCase(ENGLISH).replaceAll("\\s+", "_");
+        str = Normalizer.normalize(str, Normalizer.Form.NFD);
+        return str.replaceAll("[^\\p{ASCII}]", "").trim().toUpperCase().replaceAll("\\s+", "_");
     }
 
     public University saveUniversity(UniversitySaveDTO university)
     {
-        var uni = new University();
-        uni.setUniversityName(convert(university.getUniversityName()));
-        return m_serviceHelper.saveUniversity(uni);
+        var universityName = convert(university.getUniversityName());
+        var universityOpt = m_serviceHelper.findByUniversityNameIgnoreCase(universityName);
+
+        return universityOpt.orElseGet(() -> m_serviceHelper.saveUniversity(new University(universityName)));
     }
 
     public Company saveCompany(CompanySaveDTO company)
     {
-        var companyCls = new Company(convert(company.companyName()));
-        return m_serviceHelper.saveCompany(companyCls);
+        var companyName = convert(company.companyName());
+        var companyOpt = m_serviceHelper.findByCompanyNameIgnoreCase(companyName);
+        return companyOpt.orElseGet(() -> m_serviceHelper.saveCompany(new Company(companyName)));
     }
 
     public CourseOrganization saveCourseOrganization(CourseOrganizationSaveDTO courseOrganizationDTO)
     {
-        var courseOrganization = new CourseOrganization(convert(courseOrganizationDTO.courseName()));
-        return m_serviceHelper.saveCourseOrganization(courseOrganization);
+        var courseOrganizationName = convert(courseOrganizationDTO.courseName());
+        var courseOrganizationOpt = m_serviceHelper.findByOrganizationNameIgnoreCase(courseOrganizationName);
+        return courseOrganizationOpt.orElseGet(() -> m_serviceHelper.saveCourseOrganization(new CourseOrganization(courseOrganizationName)));
     }
 
     public Course saveCourse(CourseSaveDTO courseSaveDTO)
     {
-        var course = new Course(convert(courseSaveDTO.getCourseName()));
-        return m_serviceHelper.saveCourse(course);
+        var courseName = convert(courseSaveDTO.getCourseName());
+        var courseOpt = m_serviceHelper.findCourseByNameIgnoreCase(courseName);
+
+        return courseOpt.orElseGet(() -> m_serviceHelper.saveCourse(new Course(courseName)));
     }
 
     // ------------------------------------------------------------------------

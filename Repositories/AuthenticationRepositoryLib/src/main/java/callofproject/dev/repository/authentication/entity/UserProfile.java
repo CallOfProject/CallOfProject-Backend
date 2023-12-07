@@ -63,6 +63,39 @@ public class UserProfile
         this.aboutMe = aboutMe;
     }
 
+    public void addCourse(Course course)
+    {
+        if (courseList == null)
+            courseList = new HashSet<>();
+
+        courseList.add(course);
+    }
+
+    public void addExperience(Experience experience)
+    {
+        if (experienceList == null)
+            experienceList = new HashSet<>();
+
+        experienceList.add(experience);
+    }
+
+    public void addLink(Link link)
+    {
+        if (linkList == null)
+            linkList = new HashSet<>();
+
+        linkList.add(link);
+    }
+
+    public void addEducation(Education education)
+    {
+        if (educationList == null)
+            educationList = new HashSet<>();
+
+        educationList.add(education);
+    }
+
+
     public void clearAllEnvironments()
     {
         if (educationList != null)
@@ -198,11 +231,5 @@ public class UserProfile
         this.linkList = linkList;
     }
 
-    public void addEducation(Education education)
-    {
-        if (educationList == null)
-            educationList = new HashSet<>();
 
-        educationList.add(education);
-    }
 }

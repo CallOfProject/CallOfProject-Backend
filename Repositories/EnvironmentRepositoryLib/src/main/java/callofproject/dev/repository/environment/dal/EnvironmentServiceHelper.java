@@ -60,36 +60,45 @@ public class EnvironmentServiceHelper
     }
     // ------------------------------------------------------------------------
 
+    public boolean existsByCompanyNameContainsIgnoreCase(String companyName)
+    {
+        return m_companyRepository.existsByCompanyNameContainsIgnoreCase(companyName.trim().toUpperCase(Locale.ENGLISH));
+    }
+
+    public boolean existsByCourseOrganizationNameContainsIgnoreCase(String courseOrganizationName)
+    {
+        return m_organizationRepository.existsByCourseOrganizationNameContainsIgnoreCase(courseOrganizationName.trim().toUpperCase(Locale.ENGLISH));
+    }
+
+    public boolean existsByCourseNameContainsIgnoreCase(String courseName)
+    {
+        return m_courseRepository.existsByCourseNameContainsIgnoreCase(courseName.trim().toUpperCase(Locale.ENGLISH));
+    }
+
+    public boolean existsByUniversityNameContainsIgnoreCase(String universityName)
+    {
+        return m_universityRepository.existsByUniversityNameContainsIgnoreCase(universityName.trim().toUpperCase(Locale.ENGLISH));
+    }
+
+    // ------------------------------------------------------------------------
     public University saveUniversity(University university)
     {
-        var universityOpt = findByUniversityNameIgnoreCase(university.getUniversityName());
-
-        return universityOpt.orElseGet(() -> m_universityRepository.save(university));
-
+        return m_universityRepository.save(university);
     }
 
     public CourseOrganization saveCourseOrganization(CourseOrganization courseOrganization)
     {
-        var courseOrganizationOpt = m_organizationRepository.findByCourseOrganizationNameIgnoreCase(courseOrganization.getCourseOrganizationName());
-
-        return courseOrganizationOpt.orElseGet(() -> m_organizationRepository.save(courseOrganization));
-
+        return m_organizationRepository.save(courseOrganization);
     }
 
     public Company saveCompany(Company company)
     {
-        var companyOpt = findByCompanyNameIgnoreCase(company.getCompanyName());
-
-        return companyOpt.orElseGet(() -> m_companyRepository.save(company));
-
+        return m_companyRepository.save(company);
     }
 
     public Course saveCourse(Course course)
     {
-        var courseOpt = findCourseByNameIgnoreCase(course.getCourseName());
-
-        return courseOpt.orElseGet(() -> m_courseRepository.save(course));
-
+        return m_courseRepository.save(course);
     }
 
     // ------------------------------------------------------------------------

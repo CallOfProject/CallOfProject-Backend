@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static callofproject.dev.repository.authentication.BeanName.EXPERIENCE_REPOSITORY_BEAN;
@@ -13,4 +14,7 @@ import static callofproject.dev.repository.authentication.BeanName.EXPERIENCE_RE
 @Lazy
 public interface IExperienceRepository extends CrudRepository<Experience, UUID>
 {
+    boolean existsExperienceByCompanyNameContainsIgnoreCase(String companyName);
+
+    Optional<Experience> findByCompanyNameContainsIgnoreCase(String companyName);
 }

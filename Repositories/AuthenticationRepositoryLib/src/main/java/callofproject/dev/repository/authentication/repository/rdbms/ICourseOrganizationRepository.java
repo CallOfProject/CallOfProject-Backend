@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static callofproject.dev.repository.authentication.BeanName.COURSE_ORGANIZATION_REPOSITORY_BEAN;
@@ -13,4 +14,7 @@ import static callofproject.dev.repository.authentication.BeanName.COURSE_ORGANI
 @Lazy
 public interface ICourseOrganizationRepository extends CrudRepository<CourseOrganization, UUID>
 {
+    boolean existsByCourseOrganizationNameContainsIgnoreCase(String courseOrganizationName);
+
+    Optional<CourseOrganization> findByCourseOrganizationNameContainsIgnoreCase(String courseOrganizationName);
 }

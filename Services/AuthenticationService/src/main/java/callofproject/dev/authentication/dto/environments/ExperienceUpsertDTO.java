@@ -1,11 +1,14 @@
-package callofproject.dev.authentication.dto;
+package callofproject.dev.authentication.dto.environments;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public class ExperienceUpsertDTO
 {
+    @JsonProperty("user_id")
+    private UUID userId;
     @JsonProperty("experience_id")
     private String id;
     @JsonProperty("company_name")
@@ -20,8 +23,9 @@ public class ExperienceUpsertDTO
     @JsonProperty("is_continue")
     private boolean isContinue;
 
-    public ExperienceUpsertDTO(String id, String companyName, String description, String companyWebsite, LocalDate startDate, LocalDate finishDate, boolean isContinue)
+    public ExperienceUpsertDTO(UUID userId, String id, String companyName, String description, String companyWebsite, LocalDate startDate, LocalDate finishDate, boolean isContinue)
     {
+        this.userId = userId;
         this.id = id;
         this.companyName = companyName;
         this.description = description;
@@ -29,6 +33,16 @@ public class ExperienceUpsertDTO
         this.startDate = startDate;
         this.finishDate = finishDate;
         this.isContinue = isContinue;
+    }
+
+    public UUID getUserId()
+    {
+        return userId;
+    }
+
+    public void setUserId(UUID userId)
+    {
+        this.userId = userId;
     }
 
     public String getId()

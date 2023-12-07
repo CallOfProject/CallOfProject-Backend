@@ -13,7 +13,7 @@ import static callofproject.dev.repository.environment.BeanName.UNIVERSITY_REPOS
 @Lazy
 public interface IUniversityRepository extends MongoRepository<University, String>
 {
-    boolean existsByUniversityNameIgnoreCase(String universityName);
+    boolean existsByUniversityNameContainsIgnoreCase(String universityName);
 
     Optional<University> findByUniversityNameIgnoreCase(String universityName);
 

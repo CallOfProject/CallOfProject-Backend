@@ -5,6 +5,8 @@ import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Objects;
+
 
 @Document("course")
 public class Course
@@ -43,5 +45,23 @@ public class Course
     public void setCourseName(String courseName)
     {
         this.courseName = courseName;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Course course = (Course) o;
+
+        return courseName.equals(course.courseName);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(id, courseName);
     }
 }

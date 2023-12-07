@@ -28,10 +28,21 @@ public class EducationServiceHelper
         return m_educationRepository.findAllById(ids);
     }
 
+    public boolean existsEducationBySchoolNameContainsIgnoreCase(String schoolName)
+    {
+        return m_educationRepository.existsEducationBySchoolNameContainsIgnoreCase(schoolName);
+    }
+
+    public Optional<Education> findBySchoolNameContainsIgnoreCase(String schoolName)
+    {
+        return m_educationRepository.findBySchoolNameContainsIgnoreCase(schoolName);
+    }
+
     public void removeEducations(Iterable<Education> educations)
     {
         m_educationRepository.deleteAll(educations);
     }
+
     public Education saveEducation(Education education)
     {
         return m_educationRepository.save(education);

@@ -1,6 +1,6 @@
 package callofproject.dev.authentication.mapper;
 
-import callofproject.dev.authentication.dto.CourseOrganizationUpsertDTO;
+import callofproject.dev.authentication.dto.environments.CourseOrganizationUpsertDTO;
 import callofproject.dev.repository.authentication.entity.CourseOrganization;
 import org.mapstruct.Mapper;
 

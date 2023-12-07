@@ -28,10 +28,21 @@ public class ExperienceServiceHelper
         return m_experienceRepository.findAllById(ids);
     }
 
+    boolean existsExperienceByCompanyNameContainsIgnoreCase(String companyName)
+    {
+        return m_experienceRepository.existsExperienceByCompanyNameContainsIgnoreCase(companyName);
+    }
+
+    public Optional<Experience> findByCompanyNameContainsIgnoreCase(String companyName)
+    {
+        return m_experienceRepository.findByCompanyNameContainsIgnoreCase(companyName);
+    }
+
     public void removeExperiences(Iterable<Experience> experiences)
     {
         m_experienceRepository.deleteAll(experiences);
     }
+
     public Experience saveExperience(Experience experience)
     {
         return m_experienceRepository.save(experience);

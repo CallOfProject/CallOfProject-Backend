@@ -1,13 +1,16 @@
-package callofproject.dev.authentication.dto;
+package callofproject.dev.authentication.dto.environments;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public class EducationUpsertDTO
 {
+    @JsonProperty("user_id")
+    private UUID userId;
     @JsonProperty("university_id")
     @JsonIgnore
     private String universityId;
@@ -30,6 +33,16 @@ public class EducationUpsertDTO
 
     public EducationUpsertDTO()
     {
+    }
+
+    public UUID getUserId()
+    {
+        return userId;
+    }
+
+    public void setUserId(UUID userId)
+    {
+        this.userId = userId;
     }
 
     public String getUniversityId()

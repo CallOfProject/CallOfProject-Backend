@@ -38,6 +38,16 @@ public class CourseOrganizationServiceHelper
         return m_courseOrganizationRepository.save(courseOrganization);
     }
 
+    public Optional<CourseOrganization> findByCourseOrganizationNameContainsIgnoreCase(String courseOrganizationName)
+    {
+        return m_courseOrganizationRepository.findByCourseOrganizationNameContainsIgnoreCase(courseOrganizationName);
+    }
+
+    public boolean existsByCourseOrganizationNameContainsIgnoreCase(String courseOrganizationName)
+    {
+        return m_courseOrganizationRepository.existsByCourseOrganizationNameContainsIgnoreCase(courseOrganizationName);
+    }
+
     public void removeCourseOrganization(CourseOrganization courseOrganization)
     {
         m_courseOrganizationRepository.delete(courseOrganization);

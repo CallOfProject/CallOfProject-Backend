@@ -13,6 +13,7 @@ import static callofproject.dev.repository.environment.BeanName.COURSE_REPOSITOR
 @Lazy
 public interface ICourseRepository extends MongoRepository<Course, String>
 {
+    boolean existsByCourseNameContainsIgnoreCase(String courseName);
     Optional<Course> findByCourseNameIgnoreCase(String courseName);
 
     Iterable<Course> findAllByCourseNameContainsIgnoreCase(String name);

@@ -1,13 +1,18 @@
-package callofproject.dev.authentication.dto;
+package callofproject.dev.authentication.dto.environments;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public class CourseUpsertDTO
 {
+    @JsonProperty("user_id")
+    private UUID userId;
     @JsonProperty("course_id")
+    @JsonIgnore
     private String courseId;
     @JsonProperty("organizator")
     private String organizator;
@@ -23,15 +28,25 @@ public class CourseUpsertDTO
     private boolean isContinue;
     private String description;
 
-    public CourseUpsertDTO(String courseId, String organizator, String courseName, LocalDate startDate, LocalDate finishDate, boolean isContinue, String description)
+    public CourseUpsertDTO(UUID userId, String organizator, String courseName, LocalDate startDate, LocalDate finishDate, boolean isContinue, String description)
     {
-        this.courseId = courseId;
+        this.userId = userId;
         this.organizator = organizator;
         this.courseName = courseName;
         this.startDate = startDate;
         this.finishDate = finishDate;
         this.isContinue = isContinue;
         this.description = description;
+    }
+
+    public UUID getUserId()
+    {
+        return userId;
+    }
+
+    public void setUserId(UUID userId)
+    {
+        this.userId = userId;
     }
 
     public String getCourseId()

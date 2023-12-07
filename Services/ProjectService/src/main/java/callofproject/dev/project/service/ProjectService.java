@@ -147,7 +147,7 @@ public class ProjectService
     {
         for (var tag : tags)
         {
-            if (m_tagServiceHelper.existsByTagNameContainsIgnoreCase(tag.replace(" ", ""))) // If tag already exists then save project tag
+            if (m_tagServiceHelper.existsByTagNameContainsIgnoreCase(tag.replaceAll(" ", ""))) // If tag already exists then save project tag
                 m_projectTagServiceHelper.saveProjectTag(new ProjectTag(tag, savedProject.getProjectId()));
 
             else // If tag not exists then save tag and project tag
@@ -163,12 +163,15 @@ public class ProjectService
         //projectTags.stream().filter(projectTag -> !tags.contains(projectTag.getTagName())).forEach(m_projectTagServiceHelper::removeProjectTag);
     }
 
-    /**
-     * Find project by id.
-     *
-     * @param userId represent the user id
-     * @return ProjectDTO class.
-     */
+
+
+
+        /**
+         * Find project by id.
+         *
+         * @param userId represent the user id
+         * @return ProjectDTO class.
+         */
 
     public ResponseMessage<Object> findProjectsByUserId(String userId)
     {
