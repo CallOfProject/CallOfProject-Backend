@@ -23,7 +23,8 @@ public class TicketKafkaProducer
 
     public void sendNotification(NotificationDTO notificationDTO)
     {
-        var message = MessageBuilder.withPayload(notificationDTO)
+        var message = MessageBuilder
+                .withPayload(notificationDTO)
                 .setHeader(KafkaHeaders.TOPIC, m_topic.name())
                 .build();
 

@@ -77,7 +77,7 @@ public class AuthenticationServiceApplication implements ApplicationRunner
 
         if (m_userRepository.findByUsername("cop_root").isEmpty())
         {
-            var rootUser = new User("cop_root", "root", "root", "root", "canozturk309@gmail.com",
+            var rootUser = new User("cop_root", "root", "root", "root", "nuricanozturk02@gmail.com",
                     m_passwordEncoder.encode("cop123"), LocalDate.now(), new Role(RoleEnum.ROLE_ROOT.getRole()));
 
             rootUser.addRoleToUser(new Role(RoleEnum.ROLE_USER.getRole()));

@@ -1,6 +1,6 @@
 package callofproject.dev.authentication.service;
 
-import callofproject.dev.authentication.dto.MessageResponseDTO;
+import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
 import callofproject.dev.repository.authentication.entity.Role;
@@ -28,7 +28,7 @@ public class RootService
      * @param username represent the user.
      * @return boolean value.
      */
-    public MessageResponseDTO<Boolean> giveAdminRoleByUsername(String username)
+    public ResponseMessage<Boolean> giveAdminRoleByUsername(String username)
     {
         return doForDataService(() -> giveAdminRoleByUsernameCallback(username), "RootService::giveAdminRoleByUsername");
     }
@@ -39,7 +39,7 @@ public class RootService
      * @param username represent the user.
      * @return boolean value.
      */
-    public MessageResponseDTO<Boolean> removeAdminRoleByUsername(String username)
+    public ResponseMessage<Boolean> removeAdminRoleByUsername(String username)
     {
         return doForDataService(() -> removeAdminRoleByUsernameCallback(username), "RootService::removeAdminRoleByUsername");
     }
@@ -52,7 +52,7 @@ public class RootService
      * @param username represent the user.
      * @return boolean value.
      */
-    private MessageResponseDTO<Boolean> giveAdminRoleByUsernameCallback(String username)
+    private ResponseMessage<Boolean> giveAdminRoleByUsernameCallback(String username)
     {
         var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(username);
 
@@ -66,7 +66,7 @@ public class RootService
 
         m_managementServiceHelper.getUserServiceHelper().saveUser(user.get());
 
-        return new MessageResponseDTO<>("Success!", HttpStatus.SC_OK, true);
+        return new ResponseMessage<>("Success!", HttpStatus.SC_OK, true);
     }
 
     /**
@@ -75,7 +75,7 @@ public class RootService
      * @param username represent the user.
      * @return boolean value.
      */
-    private MessageResponseDTO<Boolean> removeAdminRoleByUsernameCallback(String username)
+    private ResponseMessage<Boolean> removeAdminRoleByUsernameCallback(String username)
     {
         var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(username);
 
@@ -95,6 +95,6 @@ public class RootService
 
         m_managementServiceHelper.getUserServiceHelper().saveUser(user.get());
 
-        return new MessageResponseDTO<>("Success!", HttpStatus.SC_OK, true);
+        return new ResponseMessage<>("Success!", HttpStatus.SC_OK, true);
     }
 }

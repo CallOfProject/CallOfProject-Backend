@@ -76,7 +76,6 @@ public record ProjectSaveDTO(
         @JsonProperty("project_interview_type")
         @NotNull(message = "project interview type cannot be empty")
         EInterviewType interviewType,
-
         @JsonProperty("feedback_time_range")
         @NotNull(message = "feedback time range cannot be empty")
         EFeedbackTimeRange feedbackTimeRange,

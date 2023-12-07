@@ -5,6 +5,7 @@ import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -69,7 +70,7 @@ public class UserServiceHelper
         return doForRepository(() -> m_userRepository.findAll(), "UserRepository::findAll");
     }
 
-    public Iterable<User> findAllPageable(int page)
+    public Page<User> findAllPageable(int page)
     {
         var pageable = of(page - 1, m_defaultPageSize);
         return doForRepository(() -> m_userRepository.findAll(pageable), "UserRepository::findAllPageable");
@@ -96,40 +97,40 @@ public class UserServiceHelper
     }
 
 
-    public Iterable<User> findUsersByBirthDate(LocalDate localDate, int page)
+    public Page<User> findUsersByBirthDate(LocalDate localDate, int page)
     {
         var pageable = of(page - 1, m_defaultPageSize);
         return doForRepository(() -> m_userRepository.findUsersByBirthDate(localDate, pageable), "UserRepository::findUsersByBirthDate");
     }
 
-    public Iterable<User> findUsersByBirthDateBetween(LocalDate start, LocalDate end, int page)
+    public Page<User> findUsersByBirthDateBetween(LocalDate start, LocalDate end, int page)
     {
         var pageable = of(page - 1, m_defaultPageSize);
         return doForRepository(() -> m_userRepository.findUsersByBirthDateBetween(start, end, pageable), "UserRepository::findUsersByBirthDateBetween");
     }
 
 
-    public Iterable<User> findUsersByUsernameNotContainsIgnoreCase(String namePart, int page)
+    public Page<User> findUsersByUsernameNotContainsIgnoreCase(String namePart, int page)
     {
         var pageable = of(page - 1, m_defaultPageSize);
         return doForRepository(() -> m_userRepository.findUsersByUsernameNotContainsIgnoreCase(namePart, pageable), "UserRepository::findUsersByUsernameNotContainsIgnoreCase");
     }
 
 
-    public Iterable<User> findUsersByUsernameContainsIgnoreCase(String namePart, int page)
+    public Page<User> findUsersByUsernameContainsIgnoreCase(String namePart, int page)
     {
         var pageable = of(page - 1, m_defaultPageSize);
         return doForRepository(() -> m_userRepository.findUsersByUsernameContainsIgnoreCase(namePart, pageable), "UserRepository::findUsersByUsernameContainsIgnoreCase");
     }
 
 
-    public Iterable<User> findUsersByCreationDate(LocalDate creationDate, int page)
+    public Page<User> findUsersByCreationDate(LocalDate creationDate, int page)
     {
         var pageable = of(page - 1, m_defaultPageSize);
         return doForRepository(() -> m_userRepository.findUsersByCreationDate(creationDate, pageable), "UserRepository::findUsersByCreationDate");
     }
 
-    public Iterable<User> findUsersByCreationDateBetween(LocalDate start, LocalDate end, int page)
+    public Page<User> findUsersByCreationDateBetween(LocalDate start, LocalDate end, int page)
     {
         var pageable = of(page - 1, m_defaultPageSize);
         return doForRepository(() -> m_userRepository.findUsersByCreationDateBetween(start, end, pageable), "UserRepository::findUsersByCreationDateBetween");

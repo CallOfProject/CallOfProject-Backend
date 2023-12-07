@@ -16,6 +16,7 @@ import callofproject.dev.nosql.enums.NotificationType;
 import callofproject.dev.project.config.kafka.KafkaProducer;
 import callofproject.dev.project.dto.*;
 import callofproject.dev.project.mapper.IProjectMapper;
+import callofproject.dev.project.mapper.IProjectParticipantMapper;
 import callofproject.dev.project.util.Policy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,8 +31,7 @@ import static callofproject.dev.data.project.ProjectRepositoryBeanName.PROJECT_S
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static callofproject.dev.nosql.NoSqlBeanName.PROJECT_TAG_SERVICE_HELPER_BEAN_NAME;
 import static callofproject.dev.nosql.NoSqlBeanName.TAG_SERVICE_HELPER_BEAN_NAME;
-import static callofproject.dev.util.stream.StreamUtil.toStream;
-import static callofproject.dev.util.stream.StreamUtil.toStreamConcurrent;
+import static callofproject.dev.util.stream.StreamUtil.*;
 import static java.lang.String.format;
 
 @Service
@@ -44,11 +44,12 @@ public class ProjectService
     private final IProjectMapper m_projectMapper;
     private final KafkaProducer m_kafkaProducer;
     private final ObjectMapper m_objectMapper;
+    private final IProjectParticipantMapper m_projectParticipantMapper;
 
     public ProjectService(@Qualifier(PROJECT_SERVICE_HELPER_BEAN) ProjectServiceHelper serviceHelper,
                           @Qualifier(PROJECT_TAG_SERVICE_HELPER_BEAN_NAME) ProjectTagServiceHelper projectTagServiceHelper,
                           @Qualifier(TAG_SERVICE_HELPER_BEAN_NAME) TagServiceHelper tagServiceHelper,
-                          IProjectMapper projectMapper, KafkaProducer kafkaProducer, ObjectMapper objectMapper)
+                          IProjectMapper projectMapper, KafkaProducer kafkaProducer, ObjectMapper objectMapper, IProjectParticipantMapper projectParticipantMapper)
     {
         m_serviceHelper = serviceHelper;
         m_projectTagServiceHelper = projectTagServiceHelper;
@@ -56,6 +57,7 @@ public class ProjectService
         m_projectMapper = projectMapper;
         m_kafkaProducer = kafkaProducer;
         m_objectMapper = objectMapper;
+        m_projectParticipantMapper = projectParticipantMapper;
     }
 
 
@@ -495,5 +497,54 @@ public class ProjectService
         var overviewDTO = m_projectMapper.toProjectOverviewDTO(project, tagList);
 
         return new ResponseMessage<>("Project is updated!", Status.OK, overviewDTO);
+    }
+
+    public MultipleResponseMessagePageable<Object> findAllOwnerProjectsByUserId(UUID userId, int page)
+    {
+        var user = m_serviceHelper.findUserById(userId);
+
+        if (user.isEmpty())
+            throw new DataServiceException(format("User with id: %s is not found!", userId));
+
+        var projects = m_serviceHelper.findAllProjectByProjectOwnerUserId(userId, page);
+
+        if (projects.isEmpty())
+            throw new DataServiceException(format("User with id: %s is not owner in any project!", userId));
+
+        var dtoList = m_projectMapper.toProjectsDetailDTO(toList(projects.getContent(),
+                obj -> m_projectMapper.toProjectDetailDTO(obj, findTagList(obj), findProjectParticipantsByProjectId(obj))));
+
+        return new MultipleResponseMessagePageable<>(projects.getTotalPages(), page, projects.stream().toList().size(), "Projects found!", dtoList);
+    }
+
+    public MultipleResponseMessagePageable<Object> findAllOwnerProjectsByUsername(String username, int page)
+    {
+        var user = m_serviceHelper.findUserByUsername(username);
+
+        if (user.isEmpty())
+            throw new DataServiceException(format("User with username: %s is not found!", username));
+
+        var participantList = m_serviceHelper.findAllProjectParticipantByUserId(user.get().getUserId());
+        var projects = m_serviceHelper.findAllProjectByProjectOwnerUserId(user.get().getUserId(), page);
+
+        if (projects.isEmpty())
+            throw new DataServiceException(format("User with username: %s is not owner in any project!", username));
+
+        var dtoList = m_projectMapper.toProjectsDetailDTO(toList(projects.getContent(),
+                obj -> m_projectMapper.toProjectDetailDTO(obj, findTagList(obj), findProjectParticipantsByProjectId(obj))));
+
+        return new MultipleResponseMessagePageable<>(projects.getTotalPages(), page, projects.stream().toList().size(), "Projects found!", dtoList);
+    }
+
+    private List<ProjectTag> findTagList(Project obj)
+    {
+        return toStream(m_projectTagServiceHelper.getAllProjectTagByProjectId(obj.getProjectId())).toList();
+    }
+
+
+    private ProjectsParticipantDTO findProjectParticipantsByProjectId(Project obj)
+    {
+        var participants = m_serviceHelper.findAllProjectParticipantByProjectId(obj.getProjectId());
+        return m_projectParticipantMapper.toProjectsParticipantDTO(toList(participants, m_projectParticipantMapper::toProjectParticipantDTO));
     }
 }

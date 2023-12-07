@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(name = "${environment.name}", url = "${environment.url}")
-public interface IEnvironmentClient
+public interface IEnvironmentClientService
 {
     @PostMapping("save/university")
     UniversityDTO saveUniversity(@RequestBody UniversitySaveDTO universityDTO);

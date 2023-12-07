@@ -2,8 +2,6 @@ package callofproject.dev.service.ticket;
 
 public final class BeanName
 {
-
-
     private BeanName()
     {
     }

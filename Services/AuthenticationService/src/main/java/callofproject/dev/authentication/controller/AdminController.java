@@ -1,12 +1,11 @@
 package callofproject.dev.authentication.controller;
 
 import callofproject.dev.authentication.dto.ErrorMessage;
-import callofproject.dev.authentication.dto.MultipleMessageResponseDTO;
 import callofproject.dev.authentication.dto.admin.UserUpdateDTOAdmin;
 import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.service.AdminService;
+import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +32,6 @@ public class AdminController
      * @return if success returns AuthenticationResponse that include token and status else return ErrorMessage.
      */
     @PostMapping("/login")
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> authenticate(@RequestBody AuthenticationRequest request)
     {
         return subscribe(() -> ok(m_adminService.authenticate(request)),
@@ -63,7 +61,7 @@ public class AdminController
     public ResponseEntity<Object> findUsersByUsernameContainsIgnoreCase(@RequestParam("p") int page, String word)
     {
         return subscribe(() -> ok(m_adminService.findUsersByUsernameContainsIgnoreCase(page, word)),
-                msg -> internalServerError().body(new MultipleMessageResponseDTO<>(0, 0, 0, "", null)));
+                msg -> internalServerError().body(new MultipleResponseMessagePageable<>(0, 0, 0, "", null)));
     }
 
     /**

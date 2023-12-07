@@ -4,11 +4,14 @@ import callofproject.dev.repository.authentication.entity.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.UUID;
 
 public record UserShowingAdminDTO(String username,
+
+                                  @JsonProperty("user_id")
+                                  UUID userId,
                                   Set<Role> roles,
                                   String email,
                                   @JsonProperty("is_account_blocked")

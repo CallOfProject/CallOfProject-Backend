@@ -72,7 +72,7 @@ public class Project
     @JoinColumn(name = "user_id", nullable = false)
     private User m_projectOwner;
 
-    @OneToMany(mappedBy = "m_project", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "m_project", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<ProjectParticipant> m_projectParticipants; // Approval requests
 

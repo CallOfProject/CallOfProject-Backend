@@ -5,8 +5,9 @@ import callofproject.dev.authentication.dto.client.CompanySaveDTO;
 import callofproject.dev.authentication.dto.client.CourseOrganizationSaveDTO;
 import callofproject.dev.authentication.dto.client.CourseSaveDTO;
 import callofproject.dev.authentication.dto.client.UniversitySaveDTO;
-import callofproject.dev.authentication.service.IEnvironmentClient;
+import callofproject.dev.authentication.service.IEnvironmentClientService;
 import callofproject.dev.authentication.service.UserManagementService;
+import callofproject.dev.data.common.clas.ResponseMessage;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +23,9 @@ import static org.springframework.http.ResponseEntity.ok;
 public class UserManagementController
 {
     private final UserManagementService m_service;
-    private final IEnvironmentClient m_environmentClient;
+    private final IEnvironmentClientService m_environmentClient;
 
-    public UserManagementController(UserManagementService service, IEnvironmentClient environmentClient)
+    public UserManagementController(UserManagementService service, IEnvironmentClientService environmentClient)
     {
         m_service = service;
         m_environmentClient = environmentClient;
@@ -52,7 +53,7 @@ public class UserManagementController
     @GetMapping("find/user/username")
     public ResponseEntity<Object> findUserByUsername(@RequestParam("n") String username)
     {
-        return subscribe(() -> ok(new MessageResponseDTO<UserDTO>("User found Successfully!", SC_OK, m_service.findUserByUsername(username))),
+        return subscribe(() -> ok(new ResponseMessage<UserDTO>("User found Successfully!", SC_OK, m_service.findUserByUsername(username))),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 

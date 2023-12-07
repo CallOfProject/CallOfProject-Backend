@@ -2,7 +2,6 @@ package callofproject.dev.service.ticket.config.kafka;
 
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.service.ticket.dto.TicketDTO;
-import callofproject.dev.service.ticket.mapper.ITicketMapper;
 import callofproject.dev.service.ticket.service.TicketService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -11,12 +10,10 @@ import org.springframework.stereotype.Service;
 public class TicketKafkaConsumer
 {
     private final TicketService m_ticketService;
-    private final ITicketMapper m_ticketMapper;
 
-    public TicketKafkaConsumer(TicketService ticketService, ITicketMapper ticketMapper)
+    public TicketKafkaConsumer(TicketService ticketService)
     {
         m_ticketService = ticketService;
-        m_ticketMapper = ticketMapper;
     }
 
     @KafkaListener(topics = {"${spring.kafka.topic-name}"}, groupId = "${spring.kafka.consumer.group-id}")
@@ -24,7 +21,7 @@ public class TicketKafkaConsumer
     {
         switch (ticketDTO.getStatus())
         {
-            case CREATE, UPDATE -> m_ticketService.upsertTicket(m_ticketMapper.toTicket(ticketDTO));
+            case CREATE, UPDATE -> m_ticketService.upsertTicket(ticketDTO);
             default -> throw new DataServiceException("Invalid status");
         }
     }

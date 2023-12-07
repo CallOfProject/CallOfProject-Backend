@@ -1,18 +1,21 @@
 package callofproject.dev.service.ticket.service;
 
+import callofproject.dev.data.common.clas.MultipleResponseMessage;
+import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
+import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.enums.EOperation;
 import callofproject.dev.data.common.status.Status;
 import callofproject.dev.service.ticket.config.kafka.TicketKafkaProducer;
 import callofproject.dev.service.ticket.dto.NotificationDTO;
+import callofproject.dev.service.ticket.dto.TicketDTO;
 import callofproject.dev.service.ticket.entity.Ticket;
+import callofproject.dev.service.ticket.mapper.ITicketMapper;
 import callofproject.dev.service.ticket.repository.ITicketRepository;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
@@ -26,36 +29,45 @@ public class TicketService
     private final int m_defaultPageSize = 30;
     private final ITicketRepository ticketRepository;
     private final TicketKafkaProducer m_ticketKafkaProducer;
+    private final ITicketMapper m_ticketMapper;
 
-    public TicketService(ITicketRepository ticketRepository, TicketKafkaProducer ticketKafkaProducer)
+    public TicketService(ITicketRepository ticketRepository, TicketKafkaProducer ticketKafkaProducer, ITicketMapper ticketMapper)
     {
         this.ticketRepository = ticketRepository;
         m_ticketKafkaProducer = ticketKafkaProducer;
+        m_ticketMapper = ticketMapper;
     }
 
-    public Ticket upsertTicket(Ticket ticket)
+    public ResponseMessage<Object> upsertTicket(TicketDTO ticket)
     {
-        return doForDataService(() -> ticketRepository.save(ticket), "TicketService::upsertTicket");
+        return doForDataService(() -> new ResponseMessage<>("ticket upserted successfully!", Status.CREATED,
+                ticketRepository.save(m_ticketMapper.toTicket(ticket))), "TicketService::upsertTicket");
     }
 
-    public Optional<Ticket> getTicketById(String ticketId)
+
+    public ResponseMessage<Object> getTicketById(String ticketId)
     {
-        return doForDataService(() -> ticketRepository.findById(ticketId), "TicketService::getTicketById");
+        var ticket = doForDataService(() -> ticketRepository.findById(ticketId), "TicketService::getTicketById");
+
+        return new ResponseMessage<>("ticket retrieved successfully!", Status.OK, ticket.orElse(null));
     }
 
-    public void deleteTicket(String ticketId)
+    public ResponseMessage<Object> deleteTicket(String ticketId)
     {
         doForDataService(() -> ticketRepository.deleteById(ticketId), "TicketService::deleteTicket");
+        return new ResponseMessage<>("ticket deleted successfully!", Status.OK, true);
     }
 
-    public void deleteAllTickets()
+    public ResponseMessage<Object> deleteAllTickets()
     {
         doForDataService(() -> ticketRepository.deleteAll(), "TicketService::deleteAllTickets");
+        return new ResponseMessage<>("All tickets deleted successfully!", Status.OK, true);
     }
 
-    public void deleteTicket(Ticket ticket)
+    public ResponseMessage<Object> deleteTicket(Ticket ticket)
     {
-        ticketRepository.delete(ticket);
+        doForDataService(() -> ticketRepository.delete(ticket), "TicketService::deleteTicket");
+        return new ResponseMessage<>("ticket deleted successfully!", Status.OK, true);
     }
 
     public boolean isTicketExist(String ticketId)
@@ -68,56 +80,73 @@ public class TicketService
         return doForDataService(() -> ticketRepository.count(), "TicketService::countTickets");
     }
 
-    public Iterable<Ticket> getAllTickets()
+    public MultipleResponseMessage<Object> getAllTickets()
     {
-        return doForDataService(() -> ticketRepository.findAll(), "TicketService::getAllTickets");
+        var tickets = doForDataService(() -> ticketRepository.findAll(), "TicketService::getAllTickets");
+        return new MultipleResponseMessage<>(tickets.size(), "tickets retrieved successfully!", tickets);
     }
 
-    public Iterable<Ticket> getAllTicketsByUserId(UUID userId, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-        return ticketRepository.findAllByUserId(userId, pageable);
-    }
-
-    public Iterable<Ticket> getAllTicketsByUsername(String username, int page)
+    public MultipleResponseMessagePageable<Object> getAllTicketsByUserId(UUID userId, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-        return doForDataService(() -> ticketRepository.findAllByUsername(username, pageable), "TicketService::getAllTicketsByUsername");
+        var tickets = doForDataService(() -> ticketRepository.findAllByUserId(userId, pageable), "TicketService::getAllTicketsByUserId");
+        return new MultipleResponseMessagePageable<>(tickets.getTotalPages(), page, tickets.stream().toList().size(), "tickets retrieved successfully!", tickets.stream().toList());
     }
 
-    public Page<Ticket> findAllByDate(LocalDate date, int page)
+    public MultipleResponseMessagePageable<Object> getAllTicketsByUsername(String username, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-        return doForDataService(() -> ticketRepository.findAllByDate(date, pageable), "TicketService::findAllByDate");
+        var tickets = doForDataService(() -> ticketRepository.findAllByUsername(username, pageable), "TicketService::getAllTicketsByUsername");
+        return new MultipleResponseMessagePageable<>(tickets.getTotalPages(), page, tickets.stream().toList().size(), "tickets retrieved successfully!", tickets.stream().toList());
     }
 
-    public Page<Ticket> findAllByStatus(EOperation status, int page)
+    public MultipleResponseMessagePageable<Object> findAllByDate(LocalDate date, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-        return doForDataService(() -> ticketRepository.findAllByStatus(status, pageable), "TicketService::findAllByStatus");
+        var tickets = doForDataService(() -> ticketRepository.findAllByDate(date, pageable), "TicketService::findAllByDate");
+        return new MultipleResponseMessagePageable<>(tickets.getTotalPages(), page, tickets.stream().toList().size(), "tickets retrieved successfully!", tickets.stream().toList());
     }
 
-    public Page<Ticket> findAllByDateAfter(LocalDate date, int page)
+    public MultipleResponseMessagePageable<Object> findAllByStatus(EOperation status, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-        return doForDataService(() -> ticketRepository.findAllByDateAfter(date, pageable), "TicketService::findAllByDateAfter");
+        var tickets = doForDataService(() -> ticketRepository.findAllByStatus(status, pageable), "TicketService::findAllByStatus");
+        return new MultipleResponseMessagePageable<>(tickets.getTotalPages(), page, tickets.stream().toList().size(), "tickets retrieved successfully!", tickets.stream().toList());
     }
 
-    public Page<Ticket> findAllByDateBefore(LocalDate date, int page)
+    public MultipleResponseMessagePageable<Object> findAllByDateAfter(LocalDate date, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-        return doForDataService(() -> ticketRepository.findAllByDateBefore(date, pageable), "TicketService::findAllByDateBefore");
+        var tickets = doForDataService(() -> ticketRepository.findAllByDateAfter(date, pageable), "TicketService::findAllByDateAfter");
+        return new MultipleResponseMessagePageable<>(tickets.getTotalPages(), page, tickets.stream().toList().size(), "tickets retrieved successfully!", tickets.stream().toList());
     }
 
-    public Page<Ticket> findAllByDateBetween(LocalDate start, LocalDate end, int page)
+    public MultipleResponseMessagePageable<Object> findAllByDateBefore(LocalDate date, int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-        return doForDataService(() -> ticketRepository.findAllByDateBetween(start, end, pageable), "TicketService::findAllByDateBetween");
+        var tickets = doForDataService(() -> ticketRepository.findAllByDateBefore(date, pageable), "TicketService::findAllByDateBefore");
+        return new MultipleResponseMessagePageable<>(tickets.getTotalPages(), page, tickets.stream().toList().size(), "tickets retrieved successfully!", tickets.stream().toList());
     }
 
-    public int sendFeedback(NotificationDTO notificationDTO)
+    public MultipleResponseMessagePageable<Object> findAllByDateBetween(LocalDate start, LocalDate end, int page)
+    {
+        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
+        var tickets = doForDataService(() -> ticketRepository.findAllByDateBetween(start, end, pageable), "TicketService::findAllByDateBetween");
+        return new MultipleResponseMessagePageable<>(tickets.getTotalPages(), page, tickets.stream().toList().size(), "tickets retrieved successfully!", tickets.stream().toList());
+    }
+
+    public MultipleResponseMessagePageable<Object> findAllTickets(int page)
+    {
+        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
+        var tickets = doForDataService(() -> ticketRepository.findAllTickets(pageable), "TicketService::findAllTickets");
+        var totalPage = tickets.getTotalPages();
+
+        return new MultipleResponseMessagePageable<>(totalPage, page, tickets.stream().toList().size(), "tickets retrieved successfully!", tickets.stream().toList());
+    }
+
+    public ResponseMessage<Object> sendFeedback(NotificationDTO notificationDTO)
     {
         doForDataService(() -> m_ticketKafkaProducer.sendNotification(notificationDTO), "TicketService::sendFeedback");
-        return Status.OK;
+        return new ResponseMessage<>("feedback sent successfully!", Status.OK, true);
     }
 }

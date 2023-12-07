@@ -5,8 +5,11 @@ import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.dto.auth.AuthenticationResponse;
 import callofproject.dev.authentication.dto.auth.RegisterRequest;
+import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.dto.EmailTopic;
+import callofproject.dev.data.common.status.Status;
 import callofproject.dev.library.exception.service.DataServiceException;
+import callofproject.dev.repository.authentication.dal.UserServiceHelper;
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.enumeration.RoleEnum;
 import callofproject.dev.service.jwt.JwtUtil;
@@ -14,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -22,14 +26,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static callofproject.dev.authentication.util.Util.*;
+import static callofproject.dev.authentication.util.Util.AUTHENTICATION_SERVICE;
+import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
 import static callofproject.dev.data.common.enums.EmailType.EMAIL_VERIFICATION;
-import static callofproject.dev.data.common.util.VerificationCodeGenerator.generateVerificationCode;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
+import static callofproject.dev.service.jwt.JwtUtil.extractClaim;
+import static callofproject.dev.service.jwt.JwtUtil.extractUsername;
+import static java.time.LocalDateTime.parse;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 
 @Service(AUTHENTICATION_SERVICE)
 @Lazy
@@ -39,16 +48,23 @@ public class AuthenticationService
     private final PasswordEncoder m_passwordEncoder;
     private final AuthenticationProvider m_authenticationProvider;
     private final KafkaProducer m_kafkaProducer;
+    private final UserServiceHelper m_serviceHelper;
+    @Value("${authentication.url.verify-user}")
+    private String m_url;
+
+    @Value("${account.verification.time.minute.expire-time}")
+    private int m_verifyUserTokenExpirationTime;
 
 
     public AuthenticationService(@Qualifier(USER_MANAGEMENT_SERVICE) UserManagementService userManagementService,
                                  AuthenticationProvider authenticationProvider,
-                                 PasswordEncoder passwordEncoder, KafkaProducer kafkaProducer)
+                                 PasswordEncoder passwordEncoder, KafkaProducer kafkaProducer, UserServiceHelper serviceHelper)
     {
         m_passwordEncoder = passwordEncoder;
         m_userManagementService = userManagementService;
         m_authenticationProvider = authenticationProvider;
         m_kafkaProducer = kafkaProducer;
+        m_serviceHelper = serviceHelper;
     }
 
     /**
@@ -99,14 +115,48 @@ public class AuthenticationService
                 m_passwordEncoder.encode(request.getPassword()), request.getBirth_date(),
                 RoleEnum.ROLE_USER);
 
-        var user = m_userManagementService.saveUser(dto);
+        var claims = createClaimsForRegister();
 
-        var msg = "Your verification code is: " + generateVerificationCode(VERIFICATION_CODE_LENGTH);
+        var token = JwtUtil.generateToken(claims, dto.getUsername());
+        var message = String.format(m_url, token);
+        var emailTopic = new EmailTopic(EMAIL_VERIFICATION, request.getEmail(), "Verification Link", message, null);
 
-        var emailTopic = new EmailTopic(EMAIL_VERIFICATION, request.getEmail(), "Verification Email", msg, null);
         m_kafkaProducer.sendEmail(emailTopic);
 
+        var user = m_userManagementService.saveUser(dto);
+
         return new AuthenticationResponse(user.accessToken(), user.refreshToken(), true, RoleEnum.ROLE_USER.getRole(), user.userId());
+    }
+
+    private HashMap<String, Object> createClaimsForRegister()
+    {
+        var claims = new HashMap<String, Object>();
+        var dateTime = LocalDateTime.now();
+
+        claims.put("endTime", dateTime
+                .plusMinutes(m_verifyUserTokenExpirationTime)
+                .format(ISO_DATE_TIME));
+
+        return claims;
+    }
+
+    public ResponseMessage<Object> verifyUserAndRegister(String token)
+    {
+        var username = extractUsername(token);
+        var endTime = parse((String) extractClaim(token, date -> date.get("endTime")), ISO_DATE_TIME);
+
+        var user = m_serviceHelper.findByUsername(username);
+
+        if (user.isEmpty())
+            throw new DataServiceException("User not found!");
+
+        if (endTime.isBefore(LocalDateTime.now()))
+            throw new DataServiceException("Token expired!");
+
+        user.get().setAccountBlocked(false);
+        m_serviceHelper.saveUser(user.get());
+
+        return new ResponseMessage<>("User verified!", Status.OK, true);
     }
 
     /**
@@ -207,7 +257,7 @@ public class AuthenticationService
             return false;
 
         refreshToken = authHeader.substring(7);
-        username = JwtUtil.extractUsername(refreshToken);
+        username = extractUsername(refreshToken);
         if (username != null)
         {
             var user = m_userManagementService.findUserByUsernameForAuthenticationService(username);
@@ -234,7 +284,7 @@ public class AuthenticationService
      */
     private boolean validateTokenCallback(String token)
     {
-        var username = JwtUtil.extractUsername(token);
+        var username = extractUsername(token);
 
         if (username == null || username.isBlank() || username.isEmpty())
             throw new DataServiceException("User not found!");

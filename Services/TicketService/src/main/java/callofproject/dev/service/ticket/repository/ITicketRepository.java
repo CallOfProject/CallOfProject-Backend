@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -17,6 +18,8 @@ import static callofproject.dev.service.ticket.BeanName.TICKET_REPOSITORY;
 @Lazy
 public interface ITicketRepository extends MongoRepository<Ticket, String>
 {
+    @Query("{}")
+    Page<Ticket> findAllTickets(Pageable pageable);
     Page<Ticket> findAllByUserId(UUID userId, Pageable pageable);
 
     Page<Ticket> findAllByUsername(String username, Pageable pageable);

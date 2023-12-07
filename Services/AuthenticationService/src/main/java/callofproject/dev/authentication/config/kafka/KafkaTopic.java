@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class KafkaTopic
 {
     @Value("${spring.kafka.topic-name}")
-    private String m_topicName;
+    private String m_authenticationTopic;
 
     @Value("${spring.kafka.email-topic-name}")
     private String m_emailTopicName;
@@ -25,7 +25,7 @@ public class KafkaTopic
     @Primary
     public NewTopic provideTopic()
     {
-        return TopicBuilder.name(m_topicName).build();
+        return TopicBuilder.name(m_authenticationTopic).build();
     }
 
     @Bean("emailTopic")

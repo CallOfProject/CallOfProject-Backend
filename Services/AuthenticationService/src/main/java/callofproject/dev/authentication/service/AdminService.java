@@ -1,8 +1,6 @@
 package callofproject.dev.authentication.service;
 
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
-import callofproject.dev.authentication.dto.MessageResponseDTO;
-import callofproject.dev.authentication.dto.MultipleMessageResponseDTO;
 import callofproject.dev.authentication.dto.Operation;
 import callofproject.dev.authentication.dto.UserKafkaDTO;
 import callofproject.dev.authentication.dto.admin.UserShowingAdminDTO;
@@ -11,6 +9,8 @@ import callofproject.dev.authentication.dto.admin.UsersShowingAdminDTO;
 import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.dto.auth.AuthenticationResponse;
 import callofproject.dev.authentication.mapper.IUserMapper;
+import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
+import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
 import callofproject.dev.repository.authentication.entity.Role;
@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
+import static callofproject.dev.util.stream.StreamUtil.toList;
 import static java.time.LocalDate.now;
-import static java.util.stream.StreamSupport.stream;
 
 @Service
 @Lazy
@@ -55,7 +55,7 @@ public class AdminService
      * @param page represent the page
      * @return the UsersShowingAdminDTO
      */
-    public MultipleMessageResponseDTO<UsersShowingAdminDTO> findAllUsersPageable(int page)
+    public MultipleResponseMessagePageable<UsersShowingAdminDTO> findAllUsersPageable(int page)
     {
         return doForDataService(() -> findAllUsersPageableCallback(page), "AdminService::findAllUsersPageable");
     }
@@ -66,7 +66,7 @@ public class AdminService
      * @param username represent the username
      * @return boolean value.
      */
-    public MessageResponseDTO<Boolean> removeUser(String username)
+    public ResponseMessage<Boolean> removeUser(String username)
     {
         return doForDataService(() -> removeUserCallback(username), "AdminService::removeUser");
     }
@@ -78,7 +78,7 @@ public class AdminService
      * @param word represent the part of username
      * @return UsersShowingAdminDTO
      */
-    public MultipleMessageResponseDTO<UsersShowingAdminDTO> findUsersByUsernameContainsIgnoreCase(int page, String word)
+    public MultipleResponseMessagePageable<UsersShowingAdminDTO> findUsersByUsernameContainsIgnoreCase(int page, String word)
     {
         return doForDataService(() -> findUsersByUsernameContainsIgnoreCaseCallback(page, word),
                 "AdminService::findUsersByUsernameContainsIgnoreCase");
@@ -91,7 +91,7 @@ public class AdminService
      * @param word represent the part of username
      * @return UsersShowingAdminDTO
      */
-    public MultipleMessageResponseDTO<UsersShowingAdminDTO> findUsersByUsernameNotContainsIgnoreCase(int page, String word)
+    public MultipleResponseMessagePageable<UsersShowingAdminDTO> findUsersByUsernameNotContainsIgnoreCase(int page, String word)
     {
         return doForDataService(() -> findUsersByUsernameNotContainsIgnoreCaseCallback(page, word),
                 "AdminService::findUsersByUsernameNotContainsIgnoreCase");
@@ -104,7 +104,7 @@ public class AdminService
      * @param userUpdateDTO represent the updating information
      * @return UserShowingAdminDTO class.
      */
-    public MessageResponseDTO<UserShowingAdminDTO> updateUser(UserUpdateDTOAdmin userUpdateDTO)
+    public ResponseMessage<UserShowingAdminDTO> updateUser(UserUpdateDTOAdmin userUpdateDTO)
     {
         return doForDataService(() -> updateUserCallbackAdmin(userUpdateDTO),
                 "AdminService::updateUser");
@@ -133,16 +133,6 @@ public class AdminService
     }
     //-------------------------------------------CALLBACKS-------------------------------------------------------------
 
-    /**
-     * Get total page
-     *
-     * @return the total page
-     */
-    private long getTotalPage()
-    {
-        return m_managementServiceHelper.getUserServiceHelper().getPageSize();
-    }
-
 
     /**
      * Update user with given UserUpdateDTOAdmin class
@@ -150,7 +140,7 @@ public class AdminService
      * @param userUpdateDTO represent the updating information
      * @return UserShowingAdminDTO class.
      */
-    private MessageResponseDTO<UserShowingAdminDTO> updateUserCallback(UserUpdateDTOAdmin userUpdateDTO)
+    private ResponseMessage<UserShowingAdminDTO> updateUserCallback(UserUpdateDTOAdmin userUpdateDTO)
     {
         var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(userUpdateDTO.username());
 
@@ -172,7 +162,7 @@ public class AdminService
 
         var userDto = m_userMapper.toUserShowingAdminDTO(savedUser);
 
-        return new MessageResponseDTO<>("User updated successfully!", HttpStatus.SC_OK, userDto);
+        return new ResponseMessage<>("User updated successfully!", HttpStatus.SC_OK, userDto);
     }
 
     /**
@@ -202,7 +192,7 @@ public class AdminService
      * @param userUpdateDTO represent the updating information
      * @return UserShowingAdminDTO class.
      */
-    private MessageResponseDTO<UserShowingAdminDTO> updateUserCallbackAdmin(UserUpdateDTOAdmin userUpdateDTO)
+    private ResponseMessage<UserShowingAdminDTO> updateUserCallbackAdmin(UserUpdateDTOAdmin userUpdateDTO)
     {
         var authorizedPerson = m_managementServiceHelper.getUserServiceHelper().findById(UUID.fromString(userUpdateDTO.adminId()));
 
@@ -238,7 +228,7 @@ public class AdminService
 
         var userDto = m_userMapper.toUserShowingAdminDTO(savedUser);
 
-        return new MessageResponseDTO<>("User updated successfully!", HttpStatus.SC_OK, userDto);
+        return new ResponseMessage<>("User updated successfully!", HttpStatus.SC_OK, userDto);
     }
 
 
@@ -248,7 +238,7 @@ public class AdminService
      * @param username represent the username
      * @return boolean value.
      */
-    private MessageResponseDTO<Boolean> removeUserCallback(String username)
+    private ResponseMessage<Boolean> removeUserCallback(String username)
     {
         var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(username);
 
@@ -258,12 +248,12 @@ public class AdminService
         if (user.get().isAdminOrRoot())
             throw new DataServiceException("You cannot remove this user!");
         var toProjectServiceDTO = new UserKafkaDTO(user.get().getUserId(), user.get().getUsername(), user.get().getEmail(),
-                user.get().getFirstName(), user.get().getMiddleName(), user.get().getLastName(), Operation.DELETE,0,0,0);
+                user.get().getFirstName(), user.get().getMiddleName(), user.get().getLastName(), Operation.DELETE, 0, 0, 0);
 
         m_kafkaProducer.sendMessage(toProjectServiceDTO);
         m_managementServiceHelper.getUserServiceHelper().removeUser(user.get());
 
-        return new MessageResponseDTO<>("User removed Successfully!", HttpStatus.SC_OK, true);
+        return new ResponseMessage<>("User removed Successfully!", HttpStatus.SC_OK, true);
     }
 
     /**
@@ -272,15 +262,16 @@ public class AdminService
      * @param page represent the page
      * @return the UsersShowingAdminDTO
      */
-    private MultipleMessageResponseDTO<UsersShowingAdminDTO> findAllUsersPageableCallback(int page)
+    private MultipleResponseMessagePageable<UsersShowingAdminDTO> findAllUsersPageableCallback(int page)
     {
-        var dtoList = m_userMapper.toUsersShowingAdminDTO(stream(m_managementServiceHelper.getUserServiceHelper()
-                .findAllPageable(page).spliterator(), true)
-                .map(m_userMapper::toUserShowingAdminDTO).toList());
+        var userListPageable = m_managementServiceHelper.getUserServiceHelper().findAllPageable(page);
+
+        var dtoList = m_userMapper.toUsersShowingAdminDTO(toList(userListPageable.getContent(),
+                m_userMapper::toUserShowingAdminDTO));
 
         var msg = String.format("%d user found!", dtoList.users().size());
 
-        return new MultipleMessageResponseDTO<>(getTotalPage(), page, dtoList.users().size(), msg, dtoList);
+        return new MultipleResponseMessagePageable<>(userListPageable.getTotalPages(), page, dtoList.users().size(), msg, dtoList);
     }
 
     /**
@@ -290,15 +281,16 @@ public class AdminService
      * @param word represent the part of username
      * @return UsersShowingAdminDTO
      */
-    private MultipleMessageResponseDTO<UsersShowingAdminDTO> findUsersByUsernameContainsIgnoreCaseCallback(int page, String word)
+    private MultipleResponseMessagePageable<UsersShowingAdminDTO> findUsersByUsernameContainsIgnoreCaseCallback(int page, String word)
     {
-        var dtoList = m_userMapper.toUsersShowingAdminDTO(stream(m_managementServiceHelper.getUserServiceHelper()
-                .findUsersByUsernameContainsIgnoreCase(word, page).spliterator(), true)
-                .map(m_userMapper::toUserShowingAdminDTO).toList());
+        var userListPageable = m_managementServiceHelper.getUserServiceHelper().findUsersByUsernameContainsIgnoreCase(word, page);
+
+        var dtoList = m_userMapper.toUsersShowingAdminDTO(toList(userListPageable.getContent(),
+                m_userMapper::toUserShowingAdminDTO));
 
         var msg = String.format("%d user found!", dtoList.users().size());
 
-        return new MultipleMessageResponseDTO<>(getTotalPage(), page, dtoList.users().size(), msg, dtoList);
+        return new MultipleResponseMessagePageable<>(userListPageable.getTotalPages(), page, dtoList.users().size(), msg, dtoList);
     }
 
 
@@ -309,15 +301,15 @@ public class AdminService
      * @param word not contains word
      * @return UsersShowingAdminDTO
      */
-    private MultipleMessageResponseDTO<UsersShowingAdminDTO> findUsersByUsernameNotContainsIgnoreCaseCallback(int page, String word)
+    private MultipleResponseMessagePageable<UsersShowingAdminDTO> findUsersByUsernameNotContainsIgnoreCaseCallback(int page, String word)
     {
-        var dtoList = m_userMapper.toUsersShowingAdminDTO(stream(m_managementServiceHelper.getUserServiceHelper()
-                .findUsersByUsernameNotContainsIgnoreCase(word, page).spliterator(), true)
-                .map(m_userMapper::toUserShowingAdminDTO).toList());
+        var userListPageable = m_managementServiceHelper.getUserServiceHelper().findUsersByUsernameNotContainsIgnoreCase(word, page);
+        var dtoList = m_userMapper.toUsersShowingAdminDTO(toList(userListPageable.getContent(),
+                m_userMapper::toUserShowingAdminDTO));
 
         var msg = String.format("%d user found!", dtoList.users().size());
 
-        return new MultipleMessageResponseDTO<>(getTotalPage(), page, dtoList.users().size(), msg, dtoList);
+        return new MultipleResponseMessagePageable<>(userListPageable.getTotalPages(), page, dtoList.users().size(), msg, dtoList);
     }
 
 

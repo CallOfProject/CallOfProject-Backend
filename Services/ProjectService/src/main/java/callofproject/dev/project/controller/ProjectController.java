@@ -110,5 +110,17 @@ public class ProjectController
                 msg -> badRequest().body(msg.getMessage()));
     }
 
+    @GetMapping("find/all/owner-id")
+    public ResponseEntity<Object> findAllOwnerProjectsByUserId(@RequestParam("uid") UUID userId, @RequestParam("p") int page)
+    {
+        return subscribe(() -> ok(m_projectService.findAllOwnerProjectsByUserId(userId, page)),
+                msg -> badRequest().body(msg.getMessage()));
+    }
 
+    @GetMapping("find/all/owner-username")
+    public ResponseEntity<Object> findAllParticipantProjectsByUserId(String username, int page)
+    {
+        return subscribe(() -> ok(m_projectService.findAllOwnerProjectsByUsername(username, page)),
+                msg -> badRequest().body(msg.getMessage()));
+    }
 }

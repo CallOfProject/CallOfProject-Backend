@@ -1,5 +1,6 @@
 package callofproject.dev.project.dto;
 
+import callofproject.dev.data.project.entity.enums.EFeedbackTimeRange;
 import callofproject.dev.nosql.entity.ProjectTag;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,6 +9,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record ProjectOverviewDTO(
+        @JsonProperty("project_id")
+        String projectId,
         @JsonProperty("project_image_path")
         String projectImagePath,
         @JsonProperty("project_title")
@@ -25,6 +28,8 @@ public record ProjectOverviewDTO(
         @JsonProperty("application_deadline")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
         LocalDate applicationDeadline,
+        @JsonProperty("feedback_time_range")
+        EFeedbackTimeRange feedbackTimeRange,
         @JsonProperty("expected_completion_date")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
         LocalDate expectedCompletionDate,

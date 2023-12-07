@@ -32,6 +32,8 @@ public class AuthenticationController
 {
     private final AuthenticationService m_authenticationService;
 
+
+
     public AuthenticationController(@Qualifier(Util.AUTHENTICATION_SERVICE) AuthenticationService service)
     {
         this.m_authenticationService = service;
@@ -47,6 +49,13 @@ public class AuthenticationController
     public ResponseEntity<Object> register(@Valid @RequestBody RegisterRequest request)
     {
         return subscribe(() -> ok(m_authenticationService.register(request)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    @GetMapping("/register/verify")
+    public ResponseEntity<Object> verify(@RequestParam("token") String token)
+    {
+        return subscribe(() -> ok(m_authenticationService.verifyUserAndRegister(token)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 

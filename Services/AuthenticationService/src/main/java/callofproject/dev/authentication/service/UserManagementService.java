@@ -7,6 +7,8 @@ import callofproject.dev.authentication.dto.client.CourseOrganizationSaveDTO;
 import callofproject.dev.authentication.dto.client.CourseSaveDTO;
 import callofproject.dev.authentication.dto.client.UniversitySaveDTO;
 import callofproject.dev.authentication.mapper.*;
+import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
+import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.nosql.dal.MatchServiceHelper;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
@@ -25,8 +27,8 @@ import java.util.List;
 import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static callofproject.dev.repository.authentication.BeanName.USER_MANAGEMENT_DAL_BEAN;
+import static callofproject.dev.util.stream.StreamUtil.toListConcurrent;
 import static java.lang.String.format;
-import static java.util.stream.StreamSupport.stream;
 
 
 @Service(USER_MANAGEMENT_SERVICE)
@@ -42,13 +44,13 @@ public class UserManagementService
     private final IExperienceMapper m_experienceMapper;
     private final ILinkMapper m_linkMapper;
     private final ICourseOrganizationMapper m_courseOrganizationMapper;
-    private final IEnvironmentClient m_environmentClient;
+    private final IEnvironmentClientService m_environmentClient;
 
     public UserManagementService(KafkaProducer userProducer, @Qualifier(USER_MANAGEMENT_DAL_BEAN) UserManagementServiceHelper serviceHelper,
                                  MatchServiceHelper matchDbRepository,
                                  IUserMapper userMapper, IEducationMapper educationMapper, ICourseMapper courseMapper,
                                  IExperienceMapper experienceMapper, ILinkMapper linkMapper,
-                                 ICourseOrganizationMapper courseOrganizationMapper, IEnvironmentClient environmentClient)
+                                 ICourseOrganizationMapper courseOrganizationMapper, IEnvironmentClientService environmentClient)
     {
         m_userProducer = userProducer;
         m_serviceHelper = serviceHelper;
@@ -102,7 +104,7 @@ public class UserManagementService
      * @param word represent the containing word.
      * @return UsersDTO class.
      */
-    public MultipleMessageResponseDTO<UsersDTO> findAllUsersPageableByContainsWord(int page, String word)
+    public MultipleResponseMessagePageable<Object> findAllUsersPageableByContainsWord(int page, String word)
     {
         return doForDataService(() -> findAllUsersPageableByContainsWordCallback(page, word), "UserManagementService::findAllUsersPageableByContainsWord");
     }
@@ -114,13 +116,13 @@ public class UserManagementService
      * @param dto represent the dto class
      * @return MessageResponseDTO.
      */
-    public MessageResponseDTO<Object> upsertUserProfile(UserProfileUpdateDTO dto)
+    public ResponseMessage<Object> upsertUserProfile(UserProfileUpdateDTO dto)
     {
         return doForDataService(() -> upsertUserProfileCallback(dto), "UserManagementService::upsertUserProfile");
     }
 
 
-    public MessageResponseDTO<Object> upsertEducation(EducationUpsertDTO dto)
+    public ResponseMessage<Object> upsertEducation(EducationUpsertDTO dto)
     {
         var uni = m_environmentClient.saveUniversity(new UniversitySaveDTO(dto.getSchoolName()));
         dto.setSchoolName(uni.getUniversityName());
@@ -128,18 +130,18 @@ public class UserManagementService
 
         var upsertedEducation = m_serviceHelper.getEducationServiceHelper().saveEducation(m_educationMapper.toEducation(dto));
 
-        return new MessageResponseDTO<>("Education upserted successfully!", 200, upsertedEducation);
+        return new ResponseMessage<>("Education upserted successfully!", 200, upsertedEducation);
     }
 
-    public MessageResponseDTO<Object> upsertExperience(ExperienceUpsertDTO dto)
+    public ResponseMessage<Object> upsertExperience(ExperienceUpsertDTO dto)
     {
         //var experience = m_serviceHelper.getExperienceServiceHelper().saveExperience(new Exper);
         var upsertedExperience = m_serviceHelper.getExperienceServiceHelper().saveExperience(m_experienceMapper.toExperience(dto));
 
-        return new MessageResponseDTO<>("Experience upserted successfully!", 200, upsertedExperience);
+        return new ResponseMessage<>("Experience upserted successfully!", 200, upsertedExperience);
     }
 
-    public MessageResponseDTO<Object> upsertCourseOrganization(CourseOrganizationUpsertDTO dto)
+    public ResponseMessage<Object> upsertCourseOrganization(CourseOrganizationUpsertDTO dto)
     {
         var courseOrganization = m_environmentClient
                 .saveCourseOrganization(new CourseOrganizationSaveDTO(dto.getCourseOrganizationName()));
@@ -149,10 +151,10 @@ public class UserManagementService
         var upsertedCourseOrganization = m_serviceHelper.getCourseOrganizationServiceHelper()
                 .saveCourseOrganization(m_courseOrganizationMapper.toCourseOrganization(dto));
 
-        return new MessageResponseDTO<>("Course organization upserted successfully!", 200, upsertedCourseOrganization);
+        return new ResponseMessage<>("Course organization upserted successfully!", 200, upsertedCourseOrganization);
     }
 
-    public MessageResponseDTO<Object> upsertCourse(CourseUpsertDTO dto)
+    public ResponseMessage<Object> upsertCourse(CourseUpsertDTO dto)
     {
         var course = m_environmentClient.saveCourse(new CourseSaveDTO(dto.getCourseName()));
         dto.setCourseName(course.getCourseName());
@@ -160,17 +162,17 @@ public class UserManagementService
 
         var upsertedCourse = m_serviceHelper.getCourseServiceHelper().saveCourse(m_courseMapper.toCourse(dto));
 
-        return new MessageResponseDTO<>("Course upserted successfully!", 200, upsertedCourse);
+        return new ResponseMessage<>("Course upserted successfully!", 200, upsertedCourse);
     }
 
-    public MessageResponseDTO<Object> upsertLink(LinkUpsertDTO dto)
+    public ResponseMessage<Object> upsertLink(LinkUpsertDTO dto)
     {
         var upsertedLink = doForDataService(() -> m_serviceHelper.getLinkServiceHelper().saveLink(m_linkMapper.toLink(dto)), "Link cannot be upserted!");
 
-        return new MessageResponseDTO<>("Link upserted successfully!", 200, upsertedLink);
+        return new ResponseMessage<>("Link upserted successfully!", 200, upsertedLink);
     }
 
-    private MessageResponseDTO<Object> upsertUserProfileCallback(UserProfileUpdateDTO dto)
+    private ResponseMessage<Object> upsertUserProfileCallback(UserProfileUpdateDTO dto)
     {
         var user = m_serviceHelper.getUserServiceHelper().findById(dto.userId());
 
@@ -199,7 +201,7 @@ public class UserManagementService
 
         var savedUserProfile = m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile.get());
 
-        return new MessageResponseDTO<>("User profile updated successfully!", 200, savedUserProfile);
+        return new ResponseMessage<>("User profile updated successfully!", 200, savedUserProfile);
     }
 
     //-----------------------------------------------------CALLBACK-----------------------------------------------------
@@ -234,17 +236,6 @@ public class UserManagementService
     }
 
     /**
-     * find total page.
-     *
-     * @return total page.
-     */
-    private long getTotalPage()
-    {
-        return m_serviceHelper.getUserServiceHelper().getPageSize();
-    }
-
-
-    /**
      * Save User with given dto class.
      *
      * @param userDTO represent the dto class
@@ -253,7 +244,7 @@ public class UserManagementService
     public UserSaveDTO saveUserCallback(UserSignUpRequestDTO userDTO)
     {
         var user = m_userMapper.toUser(userDTO);
-
+        user.setAccountBlocked(true);
         var userProfile = new UserProfile();
 
         userProfile.setUser(user);
@@ -319,16 +310,16 @@ public class UserManagementService
      * @param word represent the containing word.
      * @return UsersDTO class.
      */
-    public MultipleMessageResponseDTO<UsersDTO> findAllUsersPageableByContainsWordCallback(int page, String word)
+    public MultipleResponseMessagePageable<Object> findAllUsersPageableByContainsWordCallback(int page, String word)
     {
-        var dtoList = m_userMapper.toUsersDTO(stream(m_serviceHelper.getUserServiceHelper()
-                .findUsersByUsernameContainsIgnoreCase(word, page).spliterator(), true)
-                .map(m_userMapper::toUserDTO)
-                .toList());
+        var userListPageable = m_serviceHelper.getUserServiceHelper().findUsersByUsernameContainsIgnoreCase(word, page);
+
+
+        var dtoList = m_userMapper.toUsersDTO(toListConcurrent(userListPageable.getContent(), m_userMapper::toUserDTO));
 
         var msg = format("%d user found!", dtoList.users().size());
 
-        return new MultipleMessageResponseDTO<>(getTotalPage(), page, dtoList.users().size(), msg, dtoList);
+        return new MultipleResponseMessagePageable<>(userListPageable.getTotalPages(), page, dtoList.users().size(), msg, dtoList);
     }
 
 

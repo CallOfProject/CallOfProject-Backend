@@ -2,7 +2,7 @@ package callofproject.dev.authentication.service;
 
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
 import callofproject.dev.authentication.dto.ForgotPasswordDTO;
-import callofproject.dev.authentication.dto.MessageResponseDTO;
+import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.dto.EmailTopic;
 import callofproject.dev.data.common.enums.EmailType;
 import callofproject.dev.library.exception.service.DataServiceException;
@@ -45,7 +45,7 @@ public class ForgotPasswordService
      * @param email represent the email.
      * @return the boolean value.
      */
-    public MessageResponseDTO<Object> sendResetPasswordLink(String email)
+    public ResponseMessage<Object> sendResetPasswordLink(String email)
     {
         return doForDataService(() -> sendResetPasswordLinkCallback(email), "ForgotPasswordService::sendResetPasswordLink");
     }
@@ -56,7 +56,7 @@ public class ForgotPasswordService
      * @param forgotPasswordDTO represent the necessary information for change password.
      * @return the boolean value.
      */
-    public MessageResponseDTO<Object> resetPassword(ForgotPasswordDTO forgotPasswordDTO)
+    public ResponseMessage<Object> resetPassword(ForgotPasswordDTO forgotPasswordDTO)
     {
         return doForDataService(() -> resetPasswordCallback(forgotPasswordDTO), "ForgotPasswordService::resetPassword");
     }
@@ -69,7 +69,7 @@ public class ForgotPasswordService
      * @param email represent the email.
      * @return the boolean value.
      */
-    private MessageResponseDTO<Object> sendResetPasswordLinkCallback(String email)
+    private ResponseMessage<Object> sendResetPasswordLinkCallback(String email)
     {
         var user = m_userServiceHelper.findByEmail(email);
 
@@ -84,7 +84,7 @@ public class ForgotPasswordService
         var message = format("Hello %s, \n\nYou can reset your password by clicking the link below: \n%s", user.get().getUsername(), url);
         var emailTopic = new EmailTopic(EmailType.PASSWORD_RESET, user.get().getEmail(), "Reset Password", message, null);
         m_kafkaProducer.sendEmail(emailTopic);
-        return new MessageResponseDTO<>("Reset password link sent to your email!", 200, true);
+        return new ResponseMessage<>("Reset password link sent to your email!", 200, true);
     }
 
     /**
@@ -93,7 +93,7 @@ public class ForgotPasswordService
      * @param forgotPasswordDTO represent the necessary information for change password.
      * @return the boolean value.
      */
-    private MessageResponseDTO<Object> resetPasswordCallback(ForgotPasswordDTO forgotPasswordDTO)
+    private ResponseMessage<Object> resetPasswordCallback(ForgotPasswordDTO forgotPasswordDTO)
     {
         try
         {
@@ -111,7 +111,7 @@ public class ForgotPasswordService
 
             m_userServiceHelper.saveUser(user.get());
 
-            return new MessageResponseDTO<>("Password changed Successfully!", 200, true);
+            return new ResponseMessage<>("Password changed Successfully!", 200, true);
 
         } catch (Exception ex)
         {

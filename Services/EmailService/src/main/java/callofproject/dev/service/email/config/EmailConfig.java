@@ -8,15 +8,32 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
+/**
+ * Configure the email.
+ * CopyRight(C) 2023 by Call Of Project Teams.
+ */
 @Configuration
 public class EmailConfig
 {
     @Value("${spring.mail.username}")
-    private String username;
+    private String m_email;
 
     @Value("${spring.mail.password}")
-    private String password;
+    private String m_password;
 
+    /**
+     * The default constructor.
+     */
+    public EmailConfig()
+    {
+
+    }
+
+    /**
+     * Configure the JavaMailSender.
+     *
+     * @return The JavaMailSender.
+     */
     @Bean
     public JavaMailSender getJavaMailSender()
     {
@@ -24,8 +41,8 @@ public class EmailConfig
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
 
-        mailSender.setUsername(username);
-        mailSender.setPassword(password);
+        mailSender.setUsername(m_email);
+        mailSender.setPassword(m_password);
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
