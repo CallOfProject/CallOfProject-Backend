@@ -1,5 +1,6 @@
 package callofproject.dev.data.project.entity;
 
+import callofproject.dev.data.project.entity.enums.AdminOperationStatus;
 import callofproject.dev.data.project.entity.enums.EFeedbackTimeRange;
 import callofproject.dev.data.project.entity.enums.EProjectStatus;
 import callofproject.dev.library.exception.repository.RepositoryException;
@@ -86,6 +87,9 @@ public class Project
     @Enumerated(EnumType.STRING)
     @Column(name = "project_status")
     private EProjectStatus m_projectStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "admin_operation_status")
+    private AdminOperationStatus m_adminOperationStatus;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "feedback_time_range")
@@ -117,6 +121,13 @@ public class Project
         m_projectStatus = EProjectStatus.FINISHED;
         m_completionDate = now();
     }
+
+    public void blockProject()
+    {
+        m_projectStatus = EProjectStatus.CANCELED;
+        m_adminOperationStatus = AdminOperationStatus.BLOCKED;
+    }
+
     public void addProjectParticipant(User user)
     {
         if (m_projectParticipants == null)
@@ -316,11 +327,21 @@ public class Project
         public Project build()
         {
             m_project.m_projectStatus = m_project.m_startDate.isEqual(now()) ? EProjectStatus.IN_PROGRESS : EProjectStatus.NOT_STARTED;
+            m_project.m_adminOperationStatus = AdminOperationStatus.ACTIVE;
             return m_project;
         }
     }
 
 
+    public AdminOperationStatus getAdminOperationStatus()
+    {
+        return m_adminOperationStatus;
+    }
+
+    public void setAdminOperationStatus(AdminOperationStatus adminOperationStatus)
+    {
+        m_adminOperationStatus = adminOperationStatus;
+    }
 
     public UUID getProjectId()
     {

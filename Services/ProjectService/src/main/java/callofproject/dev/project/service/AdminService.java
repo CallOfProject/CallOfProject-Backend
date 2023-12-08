@@ -5,14 +5,17 @@ import callofproject.dev.data.common.status.Status;
 import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.data.project.entity.User;
-import callofproject.dev.data.project.entity.enums.EProjectStatus;
 import callofproject.dev.library.exception.service.DataServiceException;
+import callofproject.dev.nosql.dal.ProjectTagServiceHelper;
+import callofproject.dev.project.mapper.IProjectMapper;
+import callofproject.dev.util.stream.StreamUtil;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
+import static callofproject.dev.util.stream.StreamUtil.toStream;
 import static java.lang.String.format;
 
 @Service
@@ -20,10 +23,14 @@ import static java.lang.String.format;
 public class AdminService
 {
     private final ProjectServiceHelper m_projectServiceHelper;
+    private final ProjectTagServiceHelper m_tagServiceHelper;
+    private final IProjectMapper m_projectMapper;
 
-    public AdminService(ProjectServiceHelper projectServiceHelper)
+    public AdminService(ProjectServiceHelper projectServiceHelper, ProjectTagServiceHelper tagServiceHelper, IProjectMapper projectMapper)
     {
         m_projectServiceHelper = projectServiceHelper;
+        m_tagServiceHelper = tagServiceHelper;
+        m_projectMapper = projectMapper;
     }
 
 
@@ -42,9 +49,10 @@ public class AdminService
     public ResponseMessage<Object> cancelProjectCallback(UUID projectId)
     {
         var project = findProjectIfExistsByProjectId(projectId);
-        project.setProjectStatus(EProjectStatus.BLOCKED);
+        project.blockProject();
         m_projectServiceHelper.saveProject(project);
-        return new ResponseMessage<>("Project is canceled!", Status.OK, project);
+        var tags = toStream(m_tagServiceHelper.getAllProjectTagByProjectId(projectId)).toList();
+        return new ResponseMessage<>("Project is canceled!", Status.OK, m_projectMapper.toProjectOverviewDTO(project, tags));
     }
 
 

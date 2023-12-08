@@ -5,6 +5,7 @@ import callofproject.dev.project.service.AdminService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
@@ -14,7 +15,7 @@ import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-@RequestMapping("/api/admin/project")
+@RequestMapping("api/admin/project")
 public class AdminController
 {
     private final AdminService m_adminService;
@@ -24,8 +25,8 @@ public class AdminController
         m_adminService = adminService;
     }
 
-    @PostMapping("cancel")
-    public ResponseEntity<Object> cancelProject(UUID projectId)
+    @PostMapping("/cancel")
+    public ResponseEntity<Object> cancelProject(@RequestParam("pid") UUID projectId)
     {
         return subscribe(() -> ok(m_adminService.cancelProject(projectId)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));

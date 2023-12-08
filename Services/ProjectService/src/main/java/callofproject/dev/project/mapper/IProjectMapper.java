@@ -34,6 +34,7 @@ public interface IProjectMapper
             @Mapping(source = "project.projectAccessType.projectAccessType", target = "projectAccessType"),
             @Mapping(source = "project.degree.degree", target = "degree"),
             @Mapping(source = "project.projectLevel.projectLevel", target = "projectLevel"),
+            @Mapping(source = "project.professionLevel.projectProfessionLevel", target = "professionLevel"),
             @Mapping(source = "projectsParticipantDTO.projectParticipants", target = "projectParticipants"),
     })
     ProjectDetailDTO toProjectDetailDTO(Project project, List<ProjectTag> projectTags,

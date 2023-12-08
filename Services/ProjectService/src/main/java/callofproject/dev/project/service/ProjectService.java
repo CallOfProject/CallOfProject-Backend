@@ -364,7 +364,7 @@ public class ProjectService
         if (user.isEmpty())
             throw new DataServiceException(format("User with username: %s is not found!", username));
 
-        var participantList = m_serviceHelper.findAllProjectParticipantByUserId(user.get().getUserId());
+        //var participantList = m_serviceHelper.findAllProjectParticipantByUserId(user.get().getUserId());
         var projects = m_serviceHelper.findAllProjectByProjectOwnerUserId(user.get().getUserId(), page);
 
         if (projects.isEmpty())
