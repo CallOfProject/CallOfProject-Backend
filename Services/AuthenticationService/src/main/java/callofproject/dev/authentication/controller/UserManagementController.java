@@ -1,20 +1,21 @@
 package callofproject.dev.authentication.controller;
 
-import callofproject.dev.authentication.dto.*;
-import callofproject.dev.authentication.dto.client.CompanySaveDTO;
-import callofproject.dev.authentication.dto.client.CourseOrganizationSaveDTO;
-import callofproject.dev.authentication.dto.client.CourseSaveDTO;
-import callofproject.dev.authentication.dto.client.UniversitySaveDTO;
-import callofproject.dev.authentication.dto.environments.*;
+import callofproject.dev.authentication.dto.ErrorMessage;
+import callofproject.dev.authentication.dto.UserProfileUpdateDTO;
+import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
+import callofproject.dev.authentication.dto.environments.CourseUpsertDTO;
+import callofproject.dev.authentication.dto.environments.EducationUpsertDTO;
+import callofproject.dev.authentication.dto.environments.ExperienceUpsertDTO;
+import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
 import callofproject.dev.authentication.service.IEnvironmentClientService;
 import callofproject.dev.authentication.service.UserManagementService;
-import callofproject.dev.data.common.clas.ResponseMessage;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
-import static org.apache.hc.core5.http.HttpStatus.SC_OK;
 import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -54,7 +55,7 @@ public class UserManagementController
     @GetMapping("find/user/username")
     public ResponseEntity<Object> findUserByUsername(@RequestParam("n") String username)
     {
-        return subscribe(() -> ok(new ResponseMessage<UserDTO>("User found Successfully!", SC_OK, m_service.findUserByUsername(username))),
+        return subscribe(() -> ok(m_service.findUserByUsername(username)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
@@ -77,6 +78,13 @@ public class UserManagementController
     public ResponseEntity<Object> updateUserProfile(@RequestBody UserProfileUpdateDTO dto)
     {
         return subscribe(() -> ok(m_service.upsertUserProfile(dto)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    @GetMapping("find/user/profile/username")
+    public ResponseEntity<Object> findUserProfileByUsername(@RequestParam("n") String username)
+    {
+        return subscribe(() -> ok(m_service.findUserProfileByUsername(username)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
@@ -109,31 +117,13 @@ public class UserManagementController
     }
 
 
-    @PostMapping("save/ms/university")
-    public ResponseEntity<Object> saveUniversity(@RequestBody UniversitySaveDTO dto)
+    @DeleteMapping("delete/education")
+    public ResponseEntity<Object> removeEducation(@RequestParam("uid") UUID userId,@RequestParam("eid") UUID id)
     {
-        return subscribe(() -> ok(m_environmentClient.saveUniversity(dto)),
+
+        return subscribe(() -> ok(m_service.removeEducation(userId, id)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
-    @PostMapping("save/ms/course")
-    public ResponseEntity<Object> saveCourse(@RequestBody CourseSaveDTO organizationDTO)
-    {
-        return subscribe(() -> ok(m_environmentClient.saveCourse(organizationDTO)),
-                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
-    }
 
-    @PostMapping("save/ms/company")
-    public ResponseEntity<Object> saveCompany(@RequestBody CompanySaveDTO companyDTO)
-    {
-        return subscribe(() -> ok(m_environmentClient.saveCompany(companyDTO)),
-                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
-    }
-
-    @PostMapping("save/ms/course-organization")
-    public ResponseEntity<Object> saveCourseOrganization(@RequestBody CourseOrganizationSaveDTO courseOrganizationSaveDTO)
-    {
-        return subscribe(() -> ok(m_environmentClient.saveCourseOrganization(courseOrganizationSaveDTO)),
-                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
-    }
 }

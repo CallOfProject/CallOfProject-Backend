@@ -13,7 +13,6 @@ import java.util.List;
 @Mapper(implementationName = "UserMapperImpl", componentModel = "spring")
 public interface IUserMapper
 {
-
     User toUser(UserSignUpRequestDTO dto);
 
     UserShowingAdminDTO toUserShowingAdminDTO(User user);

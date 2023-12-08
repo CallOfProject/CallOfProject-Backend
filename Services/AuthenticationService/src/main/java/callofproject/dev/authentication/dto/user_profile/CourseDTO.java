@@ -1,17 +1,18 @@
-package callofproject.dev.authentication.dto.environments;
+package callofproject.dev.authentication.dto.user_profile;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
-public record EducationDTO(
-        @JsonProperty("school_name")
-        String schoolName,
-        @JsonProperty("department")
-        String department,
-        @JsonProperty("description")
-        String description,
+public record CourseDTO(
+        @JsonProperty("course_id")
+        UUID courseId,
+        @JsonProperty("organization")
+        String organization,
+        @JsonProperty("course_name")
+        String courseName,
         @JsonProperty("start_date")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
         LocalDate startDate,
@@ -20,8 +21,6 @@ public record EducationDTO(
         LocalDate finishDate,
         @JsonProperty("is_continue")
         boolean isContinue,
-        @JsonProperty("gpa")
-        double gpa
-)
+        String description)
 {
 }

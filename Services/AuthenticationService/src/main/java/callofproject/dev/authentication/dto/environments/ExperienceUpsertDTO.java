@@ -1,5 +1,6 @@
 package callofproject.dev.authentication.dto.environments;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
@@ -9,30 +10,44 @@ public class ExperienceUpsertDTO
 {
     @JsonProperty("user_id")
     private UUID userId;
-    @JsonProperty("experience_id")
-    private String id;
     @JsonProperty("company_name")
     private String companyName;
     private String description;
     @JsonProperty("company_website")
     private String companyWebsite;
+
+    @JsonProperty("job_definition")
+    private String jobDefinition;
     @JsonProperty("start_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate startDate;
     @JsonProperty("finish_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate finishDate;
     @JsonProperty("is_continue")
     private boolean isContinue;
 
-    public ExperienceUpsertDTO(UUID userId, String id, String companyName, String description, String companyWebsite, LocalDate startDate, LocalDate finishDate, boolean isContinue)
+    public ExperienceUpsertDTO(UUID userId, String companyName, String description, String companyWebsite,
+                               LocalDate startDate, LocalDate finishDate, boolean isContinue, String jobDefinition)
     {
+        this.jobDefinition = jobDefinition;
         this.userId = userId;
-        this.id = id;
         this.companyName = companyName;
         this.description = description;
         this.companyWebsite = companyWebsite;
         this.startDate = startDate;
         this.finishDate = finishDate;
         this.isContinue = isContinue;
+    }
+
+    public String getJobDefinition()
+    {
+        return jobDefinition;
+    }
+
+    public void setJobDefinition(String jobDefinition)
+    {
+        this.jobDefinition = jobDefinition;
     }
 
     public UUID getUserId()
@@ -45,15 +60,6 @@ public class ExperienceUpsertDTO
         this.userId = userId;
     }
 
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
-    }
 
     public String getCompanyName()
     {
@@ -110,7 +116,7 @@ public class ExperienceUpsertDTO
         return isContinue;
     }
 
-    public void setContinue(boolean aContinue)
+    public void setIsContinue(boolean aContinue)
     {
         isContinue = aContinue;
     }

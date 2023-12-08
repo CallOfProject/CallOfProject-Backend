@@ -291,6 +291,6 @@ public class AuthenticationService
 
         var user = m_userManagementService.findUserByUsername(username);
 
-        return JwtUtil.isTokenValid(token, user.username());
+        return JwtUtil.isTokenValid(token, user.getObject().username());
     }
 }

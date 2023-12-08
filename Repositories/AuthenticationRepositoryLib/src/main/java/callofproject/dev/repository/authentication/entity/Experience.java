@@ -28,6 +28,9 @@ public class Experience
     private LocalDate finishDate;
     @Column(name = "is_continue", nullable = false)
     private boolean isContinue;
+
+    @Column(name = "job_definition", length = 200, nullable = false)
+    private String jobDefinition;
     @ManyToMany(mappedBy = "experienceList", fetch = FetchType.EAGER)
     private Set<UserProfile> userProfiles;
 
@@ -35,8 +38,10 @@ public class Experience
     {
     }
 
-    public Experience(String companyUniqueId, String companyName, String description, String companyWebsiteLink, LocalDate startDate, LocalDate finishDate, boolean isContinue)
+    public Experience(String companyUniqueId, String companyName, String description, String companyWebsiteLink,
+                      LocalDate startDate, LocalDate finishDate, boolean isContinue, String jobDefinition)
     {
+        this.jobDefinition = jobDefinition;
         this.companyUniqueId = companyUniqueId;
         this.companyName = companyName;
         this.description = description;
@@ -44,6 +49,16 @@ public class Experience
         this.startDate = startDate;
         this.finishDate = finishDate;
         this.isContinue = isContinue;
+    }
+
+    public String getJobDefinition()
+    {
+        return jobDefinition;
+    }
+
+    public void setJobDefinition(String jobDefinition)
+    {
+        this.jobDefinition = jobDefinition;
     }
 
     public String getCompanyUniqueId()
