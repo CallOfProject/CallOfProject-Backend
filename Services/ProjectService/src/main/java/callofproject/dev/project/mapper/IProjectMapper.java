@@ -11,8 +11,8 @@ import org.mapstruct.Mappings;
 
 import java.util.List;
 
-@Mapper(implementationName = "ProjectMapperImpl", componentModel = "spring", uses = {ProjectTag.class,
-        Project.class, User.class, ProjectParticipant.class})
+@Mapper(implementationName = "ProjectMapperImpl", componentModel = "spring",
+        uses = {ProjectTag.class, Project.class, User.class, ProjectParticipant.class})
 public interface IProjectMapper
 {
     @Mappings({
@@ -36,7 +36,8 @@ public interface IProjectMapper
             @Mapping(source = "project.projectLevel.projectLevel", target = "projectLevel"),
             @Mapping(source = "projectsParticipantDTO.projectParticipants", target = "projectParticipants"),
     })
-    ProjectDetailDTO toProjectDetailDTO(Project project, List<ProjectTag> projectTags, ProjectsParticipantDTO projectsParticipantDTO);
+    ProjectDetailDTO toProjectDetailDTO(Project project, List<ProjectTag> projectTags,
+                                        ProjectsParticipantDTO projectsParticipantDTO);
 
     default ProjectsDetailDTO toProjectsDetailDTO(List<ProjectDetailDTO> projectDetailDTOs)
     {

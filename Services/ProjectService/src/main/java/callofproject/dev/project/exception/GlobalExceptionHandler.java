@@ -26,5 +26,4 @@ public class GlobalExceptionHandler
         var errorMessage = ex.getMessage();
         return ResponseEntity.badRequest().body(errorMessage);
     }
-
 }

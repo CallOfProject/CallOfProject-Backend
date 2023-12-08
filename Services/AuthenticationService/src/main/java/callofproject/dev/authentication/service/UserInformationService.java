@@ -11,6 +11,7 @@ import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
 import callofproject.dev.authentication.mapper.MapperConfiguration;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.library.exception.service.DataServiceException;
+import callofproject.dev.nosql.dal.MatchServiceHelper;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
 import callofproject.dev.repository.authentication.entity.*;
 import org.springframework.context.annotation.Lazy;
@@ -27,12 +28,15 @@ import static java.util.Optional.of;
 public class UserInformationService
 {
     private final UserManagementServiceHelper m_serviceHelper;
+    private final MatchServiceHelper m_matchServiceHelper;
     private final IEnvironmentClientService m_environmentClient;
     private final MapperConfiguration m_mapperConfig;
 
-    public UserInformationService(UserManagementServiceHelper serviceHelper, IEnvironmentClientService environmentClient, MapperConfiguration mapperConfig)
+    public UserInformationService(UserManagementServiceHelper serviceHelper, MatchServiceHelper matchServiceHelper,
+                                  IEnvironmentClientService environmentClient, MapperConfiguration mapperConfig)
     {
         m_serviceHelper = serviceHelper;
+        m_matchServiceHelper = matchServiceHelper;
         m_environmentClient = environmentClient;
         m_mapperConfig = mapperConfig;
     }

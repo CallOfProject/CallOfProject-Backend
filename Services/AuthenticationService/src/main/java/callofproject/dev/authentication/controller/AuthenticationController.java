@@ -22,7 +22,7 @@ import static org.springframework.http.ResponseEntity.ok;
 
 /**
  * Authentication Controller
- * Copyleft (C), 2021, Cal-of-Project Developers.
+ * Copyleft (C), 2023, Cal-of-Project-Teams Developers.
  * All Rights free.
  */
 @RestController
@@ -51,6 +51,12 @@ public class AuthenticationController
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
+    /**
+     * Verify the user and register to application.
+     *
+     * @param token represent the token that sent to user.
+     * @return if success AuthenticationResponse else return ErrorMessage.
+     */
     @GetMapping("/register/verify")
     public ResponseEntity<Object> verify(@RequestParam("token") String token)
     {

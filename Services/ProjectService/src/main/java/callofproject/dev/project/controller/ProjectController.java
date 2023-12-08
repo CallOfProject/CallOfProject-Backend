@@ -53,6 +53,7 @@ public class ProjectController
     /**
      * Find all project
      *
+     * @param page is page number
      * @return if success ProjectDTO else return Error Message
      */
     @GetMapping("/all")
@@ -76,6 +77,8 @@ public class ProjectController
     /**
      * Find all project
      *
+     * @param userId is user id
+     * @param page   is page number
      * @return if success ProjectDTO else return Error Message
      */
     @PostMapping("/participant/user-id")
@@ -85,10 +88,11 @@ public class ProjectController
                 msg -> badRequest().body(msg.getMessage()));
     }
 
-
     /**
      * Send Project Participant Request
      *
+     * @param projectId is project id
+     * @param userId    is user id
      * @return if success ProjectDTO else return Error Message
      */
     @PostMapping("/participant/request")
@@ -110,6 +114,13 @@ public class ProjectController
                 msg -> badRequest().body(msg.getMessage()));
     }
 
+    /**
+     * Find all owner of project by given user id and page
+     *
+     * @param userId is user id
+     * @param page   is page number
+     * @return if success ProjectDTO else return Error Message
+     */
     @GetMapping("find/all/owner-id")
     public ResponseEntity<Object> findAllOwnerProjectsByUserId(@RequestParam("uid") UUID userId, @RequestParam("p") int page)
     {
@@ -117,10 +128,31 @@ public class ProjectController
                 msg -> badRequest().body(msg.getMessage()));
     }
 
+    /**
+     * Find all participant of project by given user id and page
+     *
+     * @param username is user id
+     * @param page     is page number
+     * @return if success ProjectDTO else return Error Message
+     */
     @GetMapping("find/all/owner-username")
     public ResponseEntity<Object> findAllParticipantProjectsByUserId(String username, int page)
     {
         return subscribe(() -> ok(m_projectService.findAllOwnerProjectsByUsername(username, page)),
+                msg -> badRequest().body(msg.getMessage()));
+    }
+
+    /**
+     * Find all participant of project by given user id and page
+     *
+     * @param userId    is user id
+     * @param projectId is project id
+     * @return if success ProjectDetailDTO else return Error Message
+     */
+    @PostMapping("finish")
+    public ResponseEntity<Object> finishProject(@RequestParam("uid") UUID userId, @RequestParam("pid") UUID projectId)
+    {
+        return subscribe(() -> ok(m_projectService.finishProject(userId, projectId)),
                 msg -> badRequest().body(msg.getMessage()));
     }
 }
