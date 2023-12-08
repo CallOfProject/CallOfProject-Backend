@@ -1,7 +1,7 @@
 package callofproject.dev.authentication.service;
 
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
-import callofproject.dev.authentication.dto.Operation;
+
 import callofproject.dev.authentication.dto.UserKafkaDTO;
 import callofproject.dev.authentication.dto.admin.UserShowingAdminDTO;
 import callofproject.dev.authentication.dto.admin.UserUpdateDTOAdmin;
@@ -11,6 +11,7 @@ import callofproject.dev.authentication.dto.auth.AuthenticationResponse;
 import callofproject.dev.authentication.mapper.IUserMapper;
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.data.common.enums.EOperation;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
 import callofproject.dev.repository.authentication.entity.Role;
@@ -222,7 +223,7 @@ public class AdminService
         var savedUser = m_managementServiceHelper.getUserServiceHelper().saveUser(user.get());
 
         var toProjectServiceDTO = new UserKafkaDTO(savedUser.getUserId(), savedUser.getUsername(), savedUser.getEmail(),
-                savedUser.getFirstName(), savedUser.getMiddleName(), savedUser.getLastName(), Operation.UPDATE, 0, 0, 0);
+                savedUser.getFirstName(), savedUser.getMiddleName(), savedUser.getLastName(), EOperation.UPDATE, 0, 0, 0);
 
         m_kafkaProducer.sendMessage(toProjectServiceDTO);
 
@@ -248,7 +249,7 @@ public class AdminService
         if (user.get().isAdminOrRoot())
             throw new DataServiceException("You cannot remove this user!");
         var toProjectServiceDTO = new UserKafkaDTO(user.get().getUserId(), user.get().getUsername(), user.get().getEmail(),
-                user.get().getFirstName(), user.get().getMiddleName(), user.get().getLastName(), Operation.DELETE, 0, 0, 0);
+                user.get().getFirstName(), user.get().getMiddleName(), user.get().getLastName(), EOperation.DELETE, 0, 0, 0);
 
         m_kafkaProducer.sendMessage(toProjectServiceDTO);
         m_managementServiceHelper.getUserServiceHelper().removeUser(user.get());

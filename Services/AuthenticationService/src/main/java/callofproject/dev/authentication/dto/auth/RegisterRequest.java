@@ -2,6 +2,7 @@ package callofproject.dev.authentication.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -35,6 +36,7 @@ public class RegisterRequest
     @NotEmpty
     @JsonProperty("birth_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    @Schema(description = "date format: dd/MM/yyyy", type = "string")
     private LocalDate birth_date;
 
 

@@ -1,5 +1,6 @@
 package callofproject.dev.authentication.dto;
 
+import callofproject.dev.data.common.enums.EOperation;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.UUID;
@@ -15,7 +16,7 @@ public record UserKafkaDTO(
         String middleName,
         @JsonProperty("last_name")
         String lastName,
-        Operation operation,
+        EOperation operation,
         int ownerProjectCount,
         int participantProjectCount,
         int totalProjectCount

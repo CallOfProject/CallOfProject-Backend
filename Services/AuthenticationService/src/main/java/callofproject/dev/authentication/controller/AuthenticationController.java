@@ -1,11 +1,11 @@
 package callofproject.dev.authentication.controller;
 
 
-import callofproject.dev.authentication.dto.ErrorMessage;
 import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.dto.auth.RegisterRequest;
 import callofproject.dev.authentication.service.AuthenticationService;
 import callofproject.dev.authentication.util.Util;
+import callofproject.dev.data.common.clas.ErrorMessage;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,7 +31,6 @@ import static org.springframework.http.ResponseEntity.ok;
 public class AuthenticationController
 {
     private final AuthenticationService m_authenticationService;
-
 
 
     public AuthenticationController(@Qualifier(Util.AUTHENTICATION_SERVICE) AuthenticationService service)

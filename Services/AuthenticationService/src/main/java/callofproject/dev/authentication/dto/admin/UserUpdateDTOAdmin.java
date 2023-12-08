@@ -2,13 +2,13 @@ package callofproject.dev.authentication.dto.admin;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
 import java.time.LocalDate;
 
 public record UserUpdateDTOAdmin(
-
         @JsonProperty("admin_id")
         String adminId,
         @NotBlank(message = "username name cannot be empty")
@@ -40,19 +40,20 @@ public record UserUpdateDTOAdmin(
         @NotEmpty
         @JsonProperty("birth_date")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+        @Schema(description = "date format: dd/MM/yyyy", type = "string")
         LocalDate birthDate
 )
 {
-        @Override
-        public String toString()
-        {
-                return "UserUpdateDTOAdmin{" +
-                        "firstName='" + firstName + '\'' +
-                        ", lastName='" + lastName + '\'' +
-                        ", middleName='" + middleName + '\'' +
-                        ", email='" + email + '\'' +
-                        ", isAccountBlocked=" + isAccountBlocked +
-                        ", birthDate=" + birthDate +
-                        '}';
-        }
+    @Override
+    public String toString()
+    {
+        return "UserUpdateDTOAdmin{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", middleName='" + middleName + '\'' +
+                ", email='" + email + '\'' +
+                ", isAccountBlocked=" + isAccountBlocked +
+                ", birthDate=" + birthDate +
+                '}';
+    }
 }

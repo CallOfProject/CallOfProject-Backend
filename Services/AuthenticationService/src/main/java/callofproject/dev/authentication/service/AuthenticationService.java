@@ -125,7 +125,7 @@ public class AuthenticationService
 
         var user = m_userManagementService.saveUser(dto);
 
-        return new AuthenticationResponse(user.accessToken(), user.refreshToken(), true, RoleEnum.ROLE_USER.getRole(), user.userId());
+        return new AuthenticationResponse(user.getObject().accessToken(), user.getObject().refreshToken(), true, RoleEnum.ROLE_USER.getRole(), user.getObject().userId());
     }
 
     private HashMap<String, Object> createClaimsForRegister()

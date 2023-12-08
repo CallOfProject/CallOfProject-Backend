@@ -3,6 +3,7 @@ package callofproject.dev.authentication.dto.environments;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -21,14 +22,18 @@ public class EducationUpsertDTO
     @JsonProperty("description")
     private String description;
     @JsonProperty("start_date")
+    @Schema(description = "date format: dd/MM/yyyy", type = "string")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate startDate;
     @JsonProperty("finish_date")
+    @Schema(description = "date format: dd/MM/yyyy", type = "string")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate finishDate;
     @JsonProperty("is_continue")
+    @Schema(description = "true/false", type = "boolean")
     private boolean isContinue;
     @JsonProperty("gpa")
+    @Schema(description = "gpa like: 3.1, 2.43. 1.53...", type = "double")
     private double gpa;
 
     public EducationUpsertDTO()
@@ -84,6 +89,7 @@ public class EducationUpsertDTO
     {
         this.description = description;
     }
+
 
     public LocalDate getStartDate()
     {

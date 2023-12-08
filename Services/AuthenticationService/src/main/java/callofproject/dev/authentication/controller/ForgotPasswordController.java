@@ -1,8 +1,8 @@
 package callofproject.dev.authentication.controller;
 
-import callofproject.dev.authentication.dto.ErrorMessage;
 import callofproject.dev.authentication.dto.ForgotPasswordDTO;
 import callofproject.dev.authentication.service.ForgotPasswordService;
+import callofproject.dev.data.common.clas.ErrorMessage;
 import jakarta.validation.constraints.Email;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

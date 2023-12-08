@@ -16,7 +16,6 @@ public class Link
     private String linkTitle;
     @Column(name = "link", length = 100)
     private String link;
-
     @ManyToMany(mappedBy = "linkList", fetch = FetchType.EAGER)
     private Set<UserProfile> userProfiles;
 

@@ -3,36 +3,29 @@ package callofproject.dev.authentication.service;
 
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
 import callofproject.dev.authentication.dto.*;
-import callofproject.dev.authentication.dto.client.CompanySaveDTO;
-import callofproject.dev.authentication.dto.client.CourseOrganizationSaveDTO;
-import callofproject.dev.authentication.dto.client.CourseSaveDTO;
-import callofproject.dev.authentication.dto.client.UniversitySaveDTO;
-import callofproject.dev.authentication.dto.environments.CourseUpsertDTO;
-import callofproject.dev.authentication.dto.environments.EducationUpsertDTO;
-import callofproject.dev.authentication.dto.environments.ExperienceUpsertDTO;
-import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
 import callofproject.dev.authentication.dto.user_profile.UserProfileDTO;
-import callofproject.dev.authentication.mapper.*;
+import callofproject.dev.authentication.dto.user_profile.UserWithProfileDTO;
+import callofproject.dev.authentication.mapper.MapperConfiguration;
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.data.common.enums.EOperation;
 import callofproject.dev.library.exception.service.DataServiceException;
-import callofproject.dev.nosql.dal.MatchServiceHelper;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
-import callofproject.dev.repository.authentication.entity.*;
+import callofproject.dev.repository.authentication.entity.User;
+import callofproject.dev.repository.authentication.entity.UserProfile;
 import callofproject.dev.service.jwt.JwtUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.text.Normalizer;
 import java.util.*;
 
+import static callofproject.dev.authentication.util.Util.MAPPER_CONFIG_BEAN;
 import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static callofproject.dev.repository.authentication.BeanName.USER_MANAGEMENT_DAL_BEAN;
 import static callofproject.dev.util.stream.StreamUtil.toListConcurrent;
 import static java.lang.String.format;
-import static java.util.Optional.of;
 
 
 @Service(USER_MANAGEMENT_SERVICE)
@@ -41,33 +34,15 @@ public class UserManagementService
 {
     private final KafkaProducer m_userProducer;
     private final UserManagementServiceHelper m_serviceHelper;
-    private final MatchServiceHelper m_matchDbRepository;
-    private final IUserMapper m_userMapper;
-    private final IUserProfileMapper m_userProfileMapper;
-    private final IEducationMapper m_educationMapper;
-    private final ICourseMapper m_courseMapper;
-    private final IExperienceMapper m_experienceMapper;
-    private final ILinkMapper m_linkMapper;
-    private final IUserRateMapper m_rateMapper;
-    private final IEnvironmentClientService m_environmentClient;
+    private final MapperConfiguration m_mapperConfig;
 
-    public UserManagementService(KafkaProducer userProducer, @Qualifier(USER_MANAGEMENT_DAL_BEAN) UserManagementServiceHelper serviceHelper,
-                                 MatchServiceHelper matchDbRepository,
-                                 IUserMapper userMapper, IUserProfileMapper userProfileMapper, IEducationMapper educationMapper, ICourseMapper courseMapper,
-                                 IExperienceMapper experienceMapper, ILinkMapper linkMapper,
-                                 IUserRateMapper rateMapper, IEnvironmentClientService environmentClient)
+    public UserManagementService(@Qualifier(USER_MANAGEMENT_DAL_BEAN) UserManagementServiceHelper serviceHelper,
+                                 @Qualifier(MAPPER_CONFIG_BEAN) MapperConfiguration mapperConfig,
+                                 KafkaProducer userProducer)
     {
         m_userProducer = userProducer;
         m_serviceHelper = serviceHelper;
-        m_matchDbRepository = matchDbRepository;
-        m_userMapper = userMapper;
-        m_userProfileMapper = userProfileMapper;
-        m_educationMapper = educationMapper;
-        m_courseMapper = courseMapper;
-        m_experienceMapper = experienceMapper;
-        m_linkMapper = linkMapper;
-        m_rateMapper = rateMapper;
-        m_environmentClient = environmentClient;
+        m_mapperConfig = mapperConfig;
     }
 
     /**
@@ -76,7 +51,7 @@ public class UserManagementService
      * @param userDTO represent the dto class
      * @return UserSaveDTO.
      */
-    public UserSaveDTO saveUser(UserSignUpRequestDTO userDTO)
+    public ResponseMessage<UserSaveDTO> saveUser(UserSignUpRequestDTO userDTO)
     {
         return doForDataService(() -> saveUserCallback(userDTO), "User cannot be saved!");
     }
@@ -127,147 +102,104 @@ public class UserManagementService
         return doForDataService(() -> upsertUserProfileCallback(dto), "UserManagementService::upsertUserProfile");
     }
 
+    /**
+     * Find user profile with given user id.
+     *
+     * @param userId represent the user id.
+     * @return UserProfileDTO class.
+     */
     public ResponseMessage<Object> findUserProfileByUserId(UUID userId)
     {
         return doForDataService(() -> findUserProfileByUserIdCallback(userId), "UserManagementService::findUserProfileByUserId");
     }
 
+    /**
+     * Find user profile with given username.
+     *
+     * @param username represent the username.
+     * @return UserProfileDTO class.
+     */
     public ResponseMessage<Object> findUserProfileByUsername(String username)
     {
         return doForDataService(() -> findUserProfileByUserUsernameCallback(username), "UserManagementService::findUserProfileByUserId");
     }
 
-
-    private String convert(String str)
+    /**
+     * Find user and his/her profile with given id.
+     *
+     * @param userId represent the user id.
+     * @return UserWithProfileDTO class.
+     */
+    public ResponseMessage<Object> findUserWithProfile(UUID userId)
     {
-        str = Normalizer.normalize(str, Normalizer.Form.NFD);
-        return str.replaceAll("[^\\p{ASCII}]", "").trim().toUpperCase().replaceAll("\\s+", "_");
+        return doForDataService(() -> findUserWithProfileCallback(userId), "UserManagementService::findUserWithProfile");
     }
 
-    public ResponseMessage<Object> upsertEducation(EducationUpsertDTO dto)
+    //-----------------------------------------------------CALLBACK-----------------------------------------------------
+    public ResponseMessage<UserSaveDTO> saveUserCallback(UserSignUpRequestDTO userDTO)
     {
+        var user = m_mapperConfig.userMapper.toUser(userDTO);
+        user.setAccountBlocked(true);
 
-        // save to environment client if not exists
-        var educationOnClient = m_environmentClient.saveUniversity(new UniversitySaveDTO(dto.getSchoolName()));
+        var userProfile = new UserProfile();
 
-        // find user profile
-        var userProfile = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(dto.getUserId());
+        userProfile.setUser(user);
+        user.setUserProfile(userProfile);
 
-        // if user profile not exists, throw exception
-        if (userProfile.isEmpty())
-            throw new DataServiceException("User does not exists!");
+        var savedUser = m_serviceHelper.getUserServiceHelper().saveUser(user);
 
-        // check if course exists
-        var isExistsEducation = userProfile.get().getEducationList().stream()
-                .anyMatch(c ->
-                        c.getSchoolName().equals(educationOnClient.getUniversityName()) &&
-                                convert(c.getDepartment()).equals(convert(dto.getDepartment())));
+        if (savedUser == null)
+            throw new DataServiceException("User cannot be saved!");
 
-        if (isExistsEducation)
-            return new ResponseMessage<>("Education already exists!", 400, null);
+        var claims = new HashMap<String, Object>();
+        var authorities = JwtUtil.populateAuthorities(user.getRoles());
+        claims.put("authorities", authorities);
 
-        // save course organization
-        var education = new Education(educationOnClient.getId(), educationOnClient.getUniversityName(), dto.getDepartment(),
-                dto.getDescription(), dto.getStartDate(), dto.getFinishDate(), dto.isContinue(), dto.getGpa());
+        var token = JwtUtil.generateToken(claims, user.getUsername());
+        var refreshToken = JwtUtil.generateToken(claims, user.getUsername());
 
-        var savedEducation = m_serviceHelper.getEducationServiceHelper().saveEducation(education);
+        var kafkaMessage = new UserKafkaDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(),
+                user.getMiddleName(), user.getLastName(), EOperation.CREATE, 0, 0, 0);
 
-        userProfile.get().addEducation(savedEducation);
-        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile.get());
+        m_userProducer.sendMessage(kafkaMessage);
 
-        return new ResponseMessage<>("Education upserted successfully!", 200, savedEducation);
+        return new ResponseMessage<>("User saved successfully!", 200, new UserSaveDTO(token, refreshToken, true, savedUser.getUserId()));
     }
 
-    public ResponseMessage<Object> upsertExperience(ExperienceUpsertDTO dto)
+    public ResponseMessage<UserDTO> findUserByUsernameCallback(String username)
     {
-        // save to environment client if not exists
-        var experienceOnClient = m_environmentClient.saveCompany(new CompanySaveDTO(dto.getCompanyName()));
+        var user = doForDataService(() -> m_serviceHelper.getUserServiceHelper().findByUsername(username),
+                "User does not exists!");
 
-        // find user profile
-        var userProfile = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(dto.getUserId());
+        return user.map(value -> new ResponseMessage<>("User found!", 200, m_mapperConfig.userMapper.toUserDTO(value)))
+                .orElseGet(() -> new ResponseMessage<>("User does not exists!", 400, null));
 
-        // if user profile not exists, throw exception
-        if (userProfile.isEmpty())
-            throw new DataServiceException("User does not exists!");
-
-        // check if course exists
-        var isExistsExperience = userProfile.get().getExperienceList().stream()
-                .anyMatch(c -> c.getCompanyName().equals(experienceOnClient.getCompanyName()) &&
-                        c.getJobDefinition().equals(dto.getJobDefinition()));
-
-        if (isExistsExperience)
-            return new ResponseMessage<>("Experience already exists!", 400, null);
-
-        // save course organization
-        var experience = new Experience(experienceOnClient.getId(), experienceOnClient.getCompanyName(), dto.getDescription(),
-                dto.getCompanyWebsite(), dto.getStartDate(), dto.getFinishDate(), dto.isContinue(), dto.getJobDefinition());
-
-        var savedExperience = m_serviceHelper.getExperienceServiceHelper().saveExperience(experience);
-
-        userProfile.get().addExperience(savedExperience);
-        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile.get());
-
-        return new ResponseMessage<>("Course upserted successfully!", 200, savedExperience);
     }
 
-    public ResponseMessage<Object> upsertCourse(CourseUpsertDTO dto)
+    public UserResponseDTO<User> findUserByUsernameForAuthenticationServiceCallback(String username)
     {
-        // save to environment client if not exists
-        var courseOnClient = m_environmentClient.saveCourse(new CourseSaveDTO(dto.getCourseName()));
+        var user = m_serviceHelper.getUserServiceHelper().findByUsername(username);
 
-        // save course organization not exists
-        var organizationOnClient = m_environmentClient.saveCourseOrganization(new CourseOrganizationSaveDTO(dto.getOrganizator()));
+        if (user.isEmpty())
+            throw new DataServiceException("User does not exists");
 
-        // find user profile
-        var userProfile = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(dto.getUserId());
-
-        // if user profile not exists, throw exception
-        if (userProfile.isEmpty())
-            throw new DataServiceException("User does not exists!");
-
-        // check if course exists
-        var isExistsCourse = userProfile.get().getCourseList().stream()
-                .anyMatch(c -> c.getCourseName().equals(courseOnClient.getCourseName()) && c.getCourseOrganization()
-                        .getCourseOrganizationName().equals(organizationOnClient.getCourseOrganizationName()));
-
-        if (isExistsCourse)
-            return new ResponseMessage<>("Course already exists!", 400, null);
-
-        // check course organization exists
-        var existingOrganization = m_serviceHelper.getCourseOrganizationServiceHelper()
-                .findByCourseOrganizationNameContainsIgnoreCase(organizationOnClient.getCourseOrganizationName());
-
-        // if not exists, save course organization
-        if (existingOrganization.isEmpty())
-            existingOrganization = of(m_serviceHelper.getCourseOrganizationServiceHelper()
-                    .saveCourseOrganization(new CourseOrganization(organizationOnClient.getCourseOrganizationName())));
-
-        // save course organization
-        var course = new Course(courseOnClient.getId(), courseOnClient.getCourseName(), dto.getStartDate(), dto.getFinishDate(), dto.isContinue(),
-                dto.getDescription(), existingOrganization.get());
-
-        var savedCourse = m_serviceHelper.getCourseServiceHelper().saveCourse(course);
-
-        userProfile.get().addCourse(course);
-        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile.get());
-
-        return new ResponseMessage<>("Course upserted successfully!", 200, savedCourse);
+        return new UserResponseDTO<User>(true, user.get());
     }
 
-    public ResponseMessage<Object> upsertLink(LinkUpsertDTO dto)
+    public MultipleResponseMessagePageable<Object> findAllUsersPageableByContainsWordCallback(int page, String word)
     {
-        var upsertedLink = doForDataService(() -> m_serviceHelper.getLinkServiceHelper().saveLink(m_linkMapper.toLink(dto)), "Link cannot be upserted!");
+        var userListPageable = m_serviceHelper.getUserServiceHelper().findUsersByUsernameContainsIgnoreCase(word, page);
 
-        return new ResponseMessage<>("Link upserted successfully!", 200, upsertedLink);
+        var dtoList = m_mapperConfig.userMapper.toUsersDTO(toListConcurrent(userListPageable.getContent(), m_mapperConfig.userMapper::toUserDTO));
+
+        var msg = format("%d user found!", dtoList.users().size());
+
+        return new MultipleResponseMessagePageable<>(userListPageable.getTotalPages(), page, dtoList.users().size(), msg, dtoList);
     }
 
     private ResponseMessage<Object> upsertUserProfileCallback(UserProfileUpdateDTO dto)
     {
-
-        var user = m_serviceHelper.getUserServiceHelper().findById(dto.userId());
-
-        if (user.isEmpty())
-            throw new DataServiceException("User does not exists!");
+        var user = getUserIfExists(dto.userId());
 
         var userProfile = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(dto.userId());
 
@@ -280,10 +212,15 @@ public class UserManagementService
 
         m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile.get());
 
-        return new ResponseMessage<>("User profile updated successfully!", 200, getUserProfile(user.get()));
+        return new ResponseMessage<>("User profile updated successfully!", 200, getUserProfile(user));
     }
 
-    //-----------------------------------------------------CALLBACK-----------------------------------------------------
+    private ResponseMessage<Object> findUserProfileByUserIdCallback(UUID userId)
+    {
+        var profileMap = getUserProfile(getUserIfExists(userId));
+
+        return new ResponseMessage<>("User profile found!", 200, profileMap);
+    }
 
     private ResponseMessage<Object> findUserProfileByUserUsernameCallback(String username)
     {
@@ -297,42 +234,43 @@ public class UserManagementService
         return new ResponseMessage<>("User profile found!", 200, profileMap);
     }
 
+    private ResponseMessage<Object> findUserWithProfileCallback(UUID uuid)
+    {
+        var user = getUserIfExists(uuid);
+        var userProfile = getUserProfile(user);
+        var userWithProfile = new UserWithProfileDTO(user.getUserId(), m_mapperConfig.userMapper.toUserDTO(user), userProfile);
+
+        return new ResponseMessage<>("User with profile found!", 200, userWithProfile);
+    }
+
+    // Helper classes
     private UserProfileDTO getUserProfile(User user)
     {
         var userProfile = user.getUserProfile();
 
-        var educations = m_educationMapper.toEducationsDTO(toListConcurrent(userProfile.getEducationList(),
-                m_educationMapper::toEducationDTO));
+        var educations = m_mapperConfig.educationMapper.toEducationsDTO(toListConcurrent(userProfile.getEducationList(), m_mapperConfig.educationMapper::toEducationDTO));
 
-        var experiences = m_experienceMapper.toExperiencesDTO(toListConcurrent(userProfile.getExperienceList(), m_experienceMapper::toExperienceDTO));
+        var experiences = m_mapperConfig.experienceMapper.toExperiencesDTO(toListConcurrent(userProfile.getExperienceList(), m_mapperConfig.experienceMapper::toExperienceDTO));
 
-        var courses = m_courseMapper.toCoursesDTO(toListConcurrent(userProfile.getCourseList(), m_courseMapper::toCourseDTO));
+        var courses = m_mapperConfig.courseMapper.toCoursesDTO(toListConcurrent(userProfile.getCourseList(), m_mapperConfig.courseMapper::toCourseDTO));
 
-        var links = m_linkMapper.toLinksDTO(toListConcurrent(userProfile.getLinkList(), m_linkMapper::toLinkDTO));
+        var links = m_mapperConfig.linkMapper.toLinksDTO(toListConcurrent(userProfile.getLinkList(), m_mapperConfig.linkMapper::toLinkDTO));
 
-        var userRate = m_rateMapper.toUserRateDTO(userProfile.getUserRate());
+        var userRate = m_mapperConfig.userRateMapper.toUserRateDTO(userProfile.getUserRate());
 
-        return m_userProfileMapper.toUserProfileDTO(userProfile, educations, experiences, courses, links, userRate);
+        return m_mapperConfig.userProfileMapper.toUserProfileDTO(userProfile, educations, experiences, courses, links, userRate);
     }
 
-    private ResponseMessage<Object> findUserProfileByUserIdCallback(UUID userId)
+    private User getUserIfExists(UUID userId)
     {
         var user = m_serviceHelper.getUserServiceHelper().findById(userId);
 
         if (user.isEmpty())
             throw new DataServiceException("User does not exists!");
 
-        var profileMap = getUserProfile(user.get());
-
-        return new ResponseMessage<>("User profile found!", 200, profileMap);
+        return user.get();
     }
 
-    /**
-     * Save User with given dto class.
-     *
-     * @param userDTOs represent the dto class
-     * @return Iterable<User>.
-     */
     public Iterable<User> saveUsers(List<UserSignUpRequestDTO> userDTOs) throws DataServiceException
     {
         try
@@ -341,7 +279,7 @@ public class UserManagementService
 
             for (var userDTO : userDTOs)
             {
-                var user = m_userMapper.toUser(userDTO);
+                var user = m_mapperConfig.userMapper.toUser(userDTO);
                 var userProfile = new UserProfile();
 
                 userProfile.setUser(user);
@@ -354,115 +292,5 @@ public class UserManagementService
         {
             return Collections.emptyList();
         }
-    }
-
-    /**
-     * Save User with given dto class.
-     *
-     * @param userDTO represent the dto class
-     * @return UserSaveDTO.
-     */
-    public UserSaveDTO saveUserCallback(UserSignUpRequestDTO userDTO)
-    {
-        var user = m_userMapper.toUser(userDTO);
-        user.setAccountBlocked(true);
-        var userProfile = new UserProfile();
-
-        userProfile.setUser(user);
-        user.setUserProfile(userProfile);
-
-        var savedUser = m_serviceHelper.getUserServiceHelper().saveUser(user);
-
-        if (savedUser == null)
-            throw new DataServiceException("User cannot be saved!");
-
-        var claims = new HashMap<String, Object>();
-
-        var authorities = JwtUtil.populateAuthorities(user.getRoles());
-        claims.put("authorities", authorities);
-
-        var token = JwtUtil.generateToken(claims, user.getUsername());
-        var refreshToken = JwtUtil.generateToken(claims, user.getUsername());
-
-        var kafkaMessage = new UserKafkaDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(),
-                user.getMiddleName(), user.getLastName(), Operation.CREATE, 0, 0, 0);
-
-        m_userProducer.sendMessage(kafkaMessage);
-
-        return new UserSaveDTO(token, refreshToken, true, savedUser.getUserId());
-    }
-
-    /**
-     * Find user with given username
-     *
-     * @param username represent the username.
-     * @return UserDTO class.
-     */
-    public ResponseMessage<UserDTO> findUserByUsernameCallback(String username)
-    {
-        var user = doForDataService(() -> m_serviceHelper.getUserServiceHelper().findByUsername(username),
-                "User does not exists!");
-
-        return user.map(value -> new ResponseMessage<>("User found!", 200, m_userMapper.toUserDTO(value)))
-                .orElseGet(() -> new ResponseMessage<>("User does not exists!", 400, null));
-
-    }
-
-    /**
-     * Find User with given username but returns the user entity.
-     *
-     * @param username represent the username.
-     * @return User class.
-     */
-    public UserResponseDTO<User> findUserByUsernameForAuthenticationServiceCallback(String username)
-    {
-        var user = m_serviceHelper.getUserServiceHelper().findByUsername(username);
-
-        if (user.isEmpty())
-            throw new DataServiceException("User does not exists");
-
-        return new UserResponseDTO<User>(true, user.get());
-    }
-
-    /**
-     * Find all users with given word and page.
-     *
-     * @param page represent the page.
-     * @param word represent the containing word.
-     * @return UsersDTO class.
-     */
-    public MultipleResponseMessagePageable<Object> findAllUsersPageableByContainsWordCallback(int page, String word)
-    {
-        var userListPageable = m_serviceHelper.getUserServiceHelper().findUsersByUsernameContainsIgnoreCase(word, page);
-
-        var dtoList = m_userMapper.toUsersDTO(toListConcurrent(userListPageable.getContent(), m_userMapper::toUserDTO));
-
-        var msg = format("%d user found!", dtoList.users().size());
-
-        return new MultipleResponseMessagePageable<>(userListPageable.getTotalPages(), page, dtoList.users().size(), msg, dtoList);
-    }
-
-
-    public boolean removeEducation(UUID userId, UUID id)
-    {
-
-        var user = m_serviceHelper.getUserServiceHelper().findById(userId);
-
-        if (user.isEmpty())
-            throw new DataServiceException("User does not exists!");
-
-        var userProfile = user.get().getUserProfile();
-
-        var education = userProfile.getEducationList().stream().filter(e -> e.getEducation_id().equals(id)).findFirst();
-
-        if (education.isEmpty())
-            throw new DataServiceException("Education does not exists!");
-
-        userProfile.getEducationList().remove(education.get());
-
-        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile);
-        m_serviceHelper.getEducationServiceHelper().removeEducation(education.get());
-
-        return true;
     }
 }

@@ -1,9 +1,9 @@
 package callofproject.dev.authentication.controller;
 
-import callofproject.dev.authentication.dto.ErrorMessage;
 import callofproject.dev.authentication.dto.admin.UserUpdateDTOAdmin;
 import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.service.AdminService;
+import callofproject.dev.data.common.clas.ErrorMessage;
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;

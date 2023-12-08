@@ -2,6 +2,7 @@ package callofproject.dev.authentication.dto.environments;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -20,9 +21,11 @@ public class ExperienceUpsertDTO
     private String jobDefinition;
     @JsonProperty("start_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    @Schema(description = "date format: dd/MM/yyyy", type = "string")
     private LocalDate startDate;
     @JsonProperty("finish_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    @Schema(description = "date format: dd/MM/yyyy", type = "string")
     private LocalDate finishDate;
     @JsonProperty("is_continue")
     private boolean isContinue;

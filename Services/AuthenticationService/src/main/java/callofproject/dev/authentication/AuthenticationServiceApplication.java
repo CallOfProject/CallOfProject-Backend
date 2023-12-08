@@ -1,8 +1,8 @@
 package callofproject.dev.authentication;
 
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
-import callofproject.dev.authentication.dto.Operation;
 import callofproject.dev.authentication.dto.UserKafkaDTO;
+import callofproject.dev.data.common.enums.EOperation;
 import callofproject.dev.nosql.dal.MatchServiceHelper;
 import callofproject.dev.nosql.repository.IUserTagRepository;
 import callofproject.dev.repository.authentication.entity.Role;
@@ -99,10 +99,10 @@ public class AuthenticationServiceApplication implements ApplicationRunner
             m_userRepository.save(adminUser);
 
             m_kafkaProducer.sendMessage(new UserKafkaDTO(rootUser.getUserId(), rootUser.getUsername(), rootUser.getEmail(),
-                    rootUser.getFirstName(), rootUser.getMiddleName(), rootUser.getLastName(), Operation.CREATE, 0, 0, 0));
+                    rootUser.getFirstName(), rootUser.getMiddleName(), rootUser.getLastName(), EOperation.CREATE, 0, 0, 0));
 
             m_kafkaProducer.sendMessage(new UserKafkaDTO(adminUser.getUserId(), adminUser.getUsername(), adminUser.getEmail(),
-                    adminUser.getFirstName(), adminUser.getMiddleName(), adminUser.getLastName(), Operation.CREATE, 0, 0, 0));
+                    adminUser.getFirstName(), adminUser.getMiddleName(), adminUser.getLastName(), EOperation.CREATE, 0, 0, 0));
         }
     }
 }
