@@ -5,52 +5,59 @@ import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.data.project.entity.User;
+import callofproject.dev.data.project.entity.enums.AdminOperationStatus;
+import callofproject.dev.data.project.entity.enums.EProjectStatus;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.nosql.dal.ProjectTagServiceHelper;
 import callofproject.dev.nosql.dal.TagServiceHelper;
 import callofproject.dev.nosql.entity.ProjectTag;
 import callofproject.dev.nosql.entity.Tag;
-import callofproject.dev.project.dto.ProjectSaveDTO;
-import callofproject.dev.project.dto.ProjectUpdateDTO;
-import callofproject.dev.project.dto.ProjectsParticipantDTO;
-import callofproject.dev.project.dto.overview.ProjectOverviewDTO;
+import callofproject.dev.nosql.enums.NotificationType;
+import callofproject.dev.project.config.kafka.KafkaProducer;
+import callofproject.dev.project.dto.*;
 import callofproject.dev.project.mapper.IProjectMapper;
 import callofproject.dev.project.mapper.IProjectParticipantMapper;
 import callofproject.dev.project.util.Policy;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static callofproject.dev.data.common.status.Status.*;
+import static callofproject.dev.data.common.util.UtilityMethod.convert;
 import static callofproject.dev.data.project.ProjectRepositoryBeanName.PROJECT_SERVICE_HELPER_BEAN;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static callofproject.dev.nosql.NoSqlBeanName.PROJECT_TAG_SERVICE_HELPER_BEAN_NAME;
 import static callofproject.dev.nosql.NoSqlBeanName.TAG_SERVICE_HELPER_BEAN_NAME;
+import static callofproject.dev.project.util.Constants.PROJECT_SERVICE;
 import static callofproject.dev.util.stream.StreamUtil.*;
 import static java.lang.String.format;
 
-@Service
+@Service(PROJECT_SERVICE)
 @Lazy
 public class ProjectService
 {
     private final ProjectServiceHelper m_serviceHelper;
     private final ProjectTagServiceHelper m_projectTagServiceHelper;
     private final TagServiceHelper m_tagServiceHelper;
+    private final KafkaProducer m_kafkaProducer;
+    private final ObjectMapper m_objectMapper;
     private final IProjectMapper m_projectMapper;
     private final IProjectParticipantMapper m_projectParticipantMapper;
 
     public ProjectService(@Qualifier(PROJECT_SERVICE_HELPER_BEAN) ProjectServiceHelper serviceHelper,
                           @Qualifier(PROJECT_TAG_SERVICE_HELPER_BEAN_NAME) ProjectTagServiceHelper projectTagServiceHelper,
-                          @Qualifier(TAG_SERVICE_HELPER_BEAN_NAME) TagServiceHelper tagServiceHelper,
+                          @Qualifier(TAG_SERVICE_HELPER_BEAN_NAME) TagServiceHelper tagServiceHelper, KafkaProducer kafkaProducer, ObjectMapper objectMapper,
                           IProjectMapper projectMapper, IProjectParticipantMapper projectParticipantMapper)
     {
         m_serviceHelper = serviceHelper;
         m_projectTagServiceHelper = projectTagServiceHelper;
         m_tagServiceHelper = tagServiceHelper;
+        m_kafkaProducer = kafkaProducer;
+        m_objectMapper = objectMapper;
         m_projectMapper = projectMapper;
         m_projectParticipantMapper = projectParticipantMapper;
     }
@@ -151,8 +158,76 @@ public class ProjectService
         return doForDataService(() -> findProjectOverviewCallback(projectId), "ProjectService::findProjectOverview");
     }
 
+    /**
+     * Add project join request with given project id and user id.
+     *
+     * @param projectId represent the project id
+     * @param userId    represent the user id
+     * @return ResponseMessage.
+     */
+    public ResponseMessage<Object> addProjectJoinRequest(UUID projectId, UUID userId)
+    {
+        return doForDataService(() -> addProjectJoinRequestCallback(projectId, userId), "ProjectService::addProjectJoinRequest");
+    }
 
     //-----------------------------------CALLBACKS---------------------------------------------
+
+    private ResponseMessage<Object> addProjectJoinRequestCallback(UUID projectId, UUID userId)
+    {
+        var user = m_serviceHelper.findUserById(userId);
+        var project = m_serviceHelper.findProjectById(projectId);
+
+        if (user.isEmpty() || project.isEmpty())
+            throw new DataServiceException(format("User with id: %s or Project with id: %s is not found!", userId, projectId));
+
+        if (user.get().getParticipantProjectCount() >= Policy.MAX_PARTICIPANT_PROJECT_COUNT)
+            return new ResponseMessage<>(format("You are participant %d projects already!", Policy.MAX_PARTICIPANT_PROJECT_COUNT),
+                    NOT_ACCEPTED, false);
+
+
+        if (user.get().getTotalProjectCount() >= Policy.MAX_PROJECT_COUNT)
+            return new ResponseMessage<>(format("You cannot create or join to project! Max project count is: %d", Policy.MAX_PROJECT_COUNT),
+                    NOT_ACCEPTED, false);
+
+        var result = doForDataService(() -> m_serviceHelper.sendParticipantRequestToProject(projectId, userId),
+                "ProjectService::addProjectJoinRequest");
+
+        if (!result)
+            return new ResponseMessage<>("You are participant of project already! ", NOT_ACCEPTED, false);
+
+        // Send notification to project owner (Approve Message)
+        sendNotificationToProjectOwner(userId, projectId);
+
+        return new ResponseMessage<>("Participant request is sent!", OK, true);
+    }
+
+    private void sendNotificationToProjectOwner(UUID userId, UUID projectId)
+    {
+        var user = findUserIfExists(userId);
+        var project = findProjectIfExistsByProjectId(projectId);
+
+        var msg = format("%s wants to join your %s project!", user.getUsername(), project.getProjectName());
+
+        // Create notification data
+        var data = new NotificationObject(project.getProjectId(), user.getUserId());
+
+        // Convert data to json.
+        var dataToJson = doForDataService(() -> m_objectMapper.writeValueAsString(data), "Converter Error!");
+
+        // Project owner to user message
+        var notificationMessage = new ProjectParticipantRequestDTO.Builder()
+                .setFromUserId(user.getUserId())
+                .setToUserId(project.getProjectOwner().getUserId())
+                .setMessage(msg)
+                .setNotificationType(NotificationType.INFORMATION)
+                .setNotificationData(dataToJson)
+                .setNotificationLink("none")
+                .build();
+
+        // Send notification to project owner
+        doForDataService(() -> m_kafkaProducer.sendProjectParticipantNotification(notificationMessage),
+                "ProjectService::sendNotificationToProjectOwner");
+    }
 
     private ResponseMessage<Object> findProjectOverviewCallback(UUID projectId)
     {
@@ -188,39 +263,26 @@ public class ProjectService
 
     private ResponseMessage<Object> saveProjectCallback(ProjectSaveDTO projectDTO)
     {
-        var user = m_serviceHelper.findUserById(projectDTO.userId());
+        var user = findUserIfExists(projectDTO.userId());
 
-        if (user.isEmpty())
-            throw new DataServiceException(format("User with id: %s is not found!", projectDTO.userId()));
-
-        if (user.get().getOwnerProjectCount() >= Policy.OWNER_MAX_PROJECT_COUNT)
+        if (user.getOwnerProjectCount() >= Policy.OWNER_MAX_PROJECT_COUNT)
             return new ResponseMessage<>(format("You are owner of %d projects already!", Policy.OWNER_MAX_PROJECT_COUNT),
                     NOT_ACCEPTED, false);
 
-        if (user.get().getTotalProjectCount() >= Policy.MAX_PROJECT_COUNT)
+        if (user.getTotalProjectCount() >= Policy.MAX_PROJECT_COUNT)
             return new ResponseMessage<>(format("You cannot create or join to project! Max project count is: %d", Policy.MAX_PROJECT_COUNT),
                     NOT_ACCEPTED, false);
-
-        var projectAccessType = m_serviceHelper.findProjectAccessTypeByProjectAccessType(projectDTO.projectAccessType());
-        var projectLevelType = m_serviceHelper.findProjectLevelByProjectLevel(projectDTO.projectLevel());
-        var professionLevelType = m_serviceHelper.findProjectProfessionLevelByProjectProfessionLevel(projectDTO.professionLevel());
-        var sectorType = m_serviceHelper.findSectorBySector(projectDTO.sector());
-        var degreeType = m_serviceHelper.findDegreeByDegree(projectDTO.degree());
-        var interviewTypeType = m_serviceHelper.findInterviewTypeByInterviewType(projectDTO.interviewType());
-
-        if (projectAccessType.isEmpty() || projectLevelType.isEmpty() || professionLevelType.isEmpty() || sectorType.isEmpty() || degreeType.isEmpty() || interviewTypeType.isEmpty())
-            throw new DataServiceException("Project Access Type or Project Level or Profession Level or Sector or Degree or Interview Type is not found!");
 
         var project = new Project.Builder()
                 .setStartDate(projectDTO.startDate())
                 .setFeedbackTimeRange(projectDTO.feedbackTimeRange())
-                .setProjectAccessType(projectAccessType.get())
-                .setProjectOwner(user.get())
-                .setProjectLevel(projectLevelType.get())
-                .setProfessionLevel(professionLevelType.get())
-                .setSector(sectorType.get())
-                .setDegree(degreeType.get())
-                .setInterviewType(interviewTypeType.get())
+                .setProjectAccessType(projectDTO.projectAccessType())
+                .setProjectOwner(user)
+                .setProjectLevel(projectDTO.projectLevel())
+                .setProfessionLevel(projectDTO.professionLevel())
+                .setSector(projectDTO.sector())
+                .setDegree(projectDTO.degree())
+                .setInterviewType(projectDTO.interviewType())
                 .setProjectAim(projectDTO.projectAim())
                 .setDescription(projectDTO.projectDescription())
                 .setExpectedCompletionDate(projectDTO.expectedCompletionDate())
@@ -241,9 +303,9 @@ public class ProjectService
                 .getAllProjectTagByProjectId(savedProject.getProjectId()))
                 .toList();
 
-        user.get().setOwnerProjectCount(user.get().getOwnerProjectCount() + 1);
-        user.get().setTotalProjectCount(user.get().getTotalProjectCount() + 1);
-        m_serviceHelper.addUser(user.get());
+        user.setOwnerProjectCount(user.getOwnerProjectCount() + 1);
+        user.setTotalProjectCount(user.getTotalProjectCount() + 1);
+        m_serviceHelper.addUser(user);
 
         return new ResponseMessage<>("Project Created Successfully!", CREATED, m_projectMapper.toProjectOverviewDTO(savedProject, tagList));
     }
@@ -255,33 +317,20 @@ public class ProjectService
         var projects = toStreamConcurrent(projectPageable).toList();
         var totalPage = projectPageable.getTotalPages();
 
-        if (projects.isEmpty())
-            throw new DataServiceException(format("User with id: %s is not participant in any project!", userId));
+        var projectOverviewsDTO = m_projectMapper.toProjectOverviewsDTO(toListConcurrent(projects,
+                project -> m_projectMapper.toProjectOverviewDTO(project, findTagList(project))));
 
-        var projectOverviewList = new ArrayList<ProjectOverviewDTO>();
-
-        for (var project : projects)
-        {
-            var tags = toStreamConcurrent(m_projectTagServiceHelper.getAllProjectTagByProjectId(project.getProjectId())).toList();
-            projectOverviewList.add(m_projectMapper.toProjectOverviewDTO(project, tags));
-        }
-
-        var projectWithParticipants = doForDataService(() -> m_projectMapper.toProjectOverviewsDTO(projectOverviewList), "ProjectService::findAllParticipantProjectByUserId");
-
-        return new MultipleResponseMessagePageable<>(totalPage, page, projectOverviewList.size(), "Projects found!", projectWithParticipants);
+        return new MultipleResponseMessagePageable<>(totalPage, page, projectPageable.getNumberOfElements(), "Projects found!", projectOverviewsDTO);
     }
 
     private MultipleResponseMessagePageable<Object> findAllOwnerProjectsByUserIdCallback(UUID userId, int page)
     {
         var projects = m_serviceHelper.findAllProjectByProjectOwnerUserId(userId, page);
 
-        if (projects.isEmpty())
-            throw new DataServiceException(format("User with id: %s is not owner in any project!", userId));
-
-        var dtoList = m_projectMapper.toProjectsDetailDTO(toList(projects.getContent(),
+        var projectsDetailDTO = m_projectMapper.toProjectsDetailDTO(toList(projects.getContent(),
                 obj -> m_projectMapper.toProjectDetailDTO(obj, findTagList(obj), findProjectParticipantsByProjectId(obj))));
 
-        return new MultipleResponseMessagePageable<>(projects.getTotalPages(), page, projects.stream().toList().size(), "Projects found!", dtoList);
+        return new MultipleResponseMessagePageable<>(projects.getTotalPages(), page, projects.stream().toList().size(), "Projects found!", projectsDetailDTO);
     }
 
     private MultipleResponseMessagePageable<Object> findAllOwnerProjectsByUsernameCallback(String username, int page)
@@ -290,8 +339,6 @@ public class ProjectService
 
         var projects = m_serviceHelper.findAllProjectByProjectOwnerUserId(user.getUserId(), page);
 
-        if (projects.isEmpty())
-            return new MultipleResponseMessagePageable<>(projects.getTotalPages(), page, projects.stream().toList().size(), "Projects not found!", null);
 
         var dtoList = m_projectMapper.toProjectsDetailDTO(toList(projects.getContent(),
                 obj -> m_projectMapper.toProjectDetailDTO(obj, findTagList(obj), findProjectParticipantsByProjectId(obj))));
@@ -332,42 +379,32 @@ public class ProjectService
         return user.get();
     }
 
-
-    private Project findProjectById(UUID projectId)
+    private void checkProjectPermission(Project project, UUID userId)
     {
-        var project = doForDataService(() -> m_serviceHelper.findProjectById(projectId), "ProjectService::findProjectById");
+        if (project.getAdminOperationStatus() == AdminOperationStatus.BLOCKED)
+            throw new DataServiceException("Project is blocked!");
 
-        if (project.isEmpty())
-            throw new DataServiceException(format("Project with id: %s is not found!", projectId));
+        if (project.getProjectStatus() == EProjectStatus.CANCELED)
+            throw new DataServiceException("Project is canceled!");
 
-        return project.get();
+        if (!project.getProjectOwner().getUserId().equals(userId))
+            throw new DataServiceException("You are not owner of this project!");
     }
 
     private ResponseMessage<Object> updateProjectCallback(ProjectUpdateDTO projectDTO)
     {
-        var project = findProjectById(projectDTO.projectId());
+        var project = findProjectIfExistsByProjectId(projectDTO.projectId());
 
-        if (!project.getProjectOwner().getUserId().equals(projectDTO.userId()))
-            throw new DataServiceException("You are not owner of this project!");
-
-        var projectAccessType = m_serviceHelper.findProjectAccessTypeByProjectAccessType(projectDTO.projectAccessType());
-        var projectLevelType = m_serviceHelper.findProjectLevelByProjectLevel(projectDTO.projectLevel());
-        var professionLevelType = m_serviceHelper.findProjectProfessionLevelByProjectProfessionLevel(projectDTO.professionLevel());
-        var sectorType = m_serviceHelper.findSectorBySector(projectDTO.sector());
-        var degreeType = m_serviceHelper.findDegreeByDegree(projectDTO.degree());
-        var interviewTypeType = m_serviceHelper.findInterviewTypeByInterviewType(projectDTO.interviewType());
-
-        if (projectAccessType.isEmpty() || projectLevelType.isEmpty() || professionLevelType.isEmpty() || sectorType.isEmpty() || degreeType.isEmpty() || interviewTypeType.isEmpty())
-            throw new DataServiceException("Project Access Type or Project Level or Profession Level or Sector or Degree or Interview Type is not found!");
+        checkProjectPermission(project, projectDTO.userId());
 
         project.setStartDate(projectDTO.startDate());
         project.setFeedbackTimeRange(projectDTO.feedbackTimeRange());
-        project.setProjectAccessType(projectAccessType.get());
-        project.setProjectLevel(projectLevelType.get());
-        project.setProfessionLevel(professionLevelType.get());
-        project.setSector(sectorType.get());
-        project.setDegree(degreeType.get());
-        project.setInterviewType(interviewTypeType.get());
+        project.setProjectAccessType(projectDTO.projectAccessType());
+        project.setProjectLevel(projectDTO.projectLevel());
+        project.setProfessionLevel(projectDTO.professionLevel());
+        project.setSector(projectDTO.sector());
+        project.setDegree(projectDTO.degree());
+        project.setInterviewType(projectDTO.interviewType());
         project.setProjectAim(projectDTO.projectAim());
         project.setDescription(projectDTO.projectDescription());
         project.setExpectedCompletionDate(projectDTO.expectedCompletionDate());
@@ -382,10 +419,11 @@ public class ProjectService
         m_serviceHelper.saveProject(project);
         // Save new tags to db.
         saveTagsIfNotExists(projectDTO.tags(), project);
+
         // Mevcut projenin tagları
         var tagList = toStream(m_projectTagServiceHelper.getAllProjectTagByProjectId(project.getProjectId())).toList();
 
-        var overviewDTO = m_projectMapper.toProjectOverviewDTO(project, tagList);
+        var overviewDTO = m_projectMapper.toProjectDetailDTO(project, tagList, findProjectParticipantsByProjectId(project));
 
         return new ResponseMessage<>("Project is updated!", OK, overviewDTO);
     }
@@ -405,13 +443,14 @@ public class ProjectService
     {
         for (var tag : tags)
         {
-            if (m_tagServiceHelper.existsByTagNameContainsIgnoreCase(tag.replaceAll(" ", ""))) // If tag already exists then save project tag
-                m_projectTagServiceHelper.saveProjectTag(new ProjectTag(tag, savedProject.getProjectId()));
+            var tagName = convert(tag);
+            if (m_tagServiceHelper.existsByTagNameContainsIgnoreCase(tagName)) // If tag already exists then save project tag
+                m_projectTagServiceHelper.saveProjectTag(new ProjectTag(tagName, savedProject.getProjectId()));
 
             else // If tag not exists then save tag and project tag
             {
-                m_tagServiceHelper.saveTag(new Tag(tag));
-                m_projectTagServiceHelper.saveProjectTag(new ProjectTag(tag, savedProject.getProjectId()));
+                m_tagServiceHelper.saveTag(new Tag(tagName));
+                m_projectTagServiceHelper.saveProjectTag(new ProjectTag(tagName, savedProject.getProjectId()));
             }
         }
 

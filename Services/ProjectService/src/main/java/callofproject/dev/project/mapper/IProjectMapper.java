@@ -24,10 +24,6 @@ public interface IProjectMapper
     @Mappings({
             @Mapping(source = "project.projectOwner.username", target = "projectOwnerName"),
             @Mapping(source = "project.projectName", target = "projectTitle"),
-            @Mapping(source = "project.interviewType.interviewType", target = "interviewType"),
-            @Mapping(source = "project.degree.degree", target = "degree"),
-            @Mapping(source = "project.projectLevel.projectLevel", target = "projectLevel"),
-            @Mapping(source = "project.professionLevel.projectProfessionLevel", target = "professionLevel"),
     })
     ProjectOverviewDTO toProjectOverviewDTO(Project project, List<ProjectTag> projectTags);
 
@@ -40,11 +36,6 @@ public interface IProjectMapper
     @Mappings({
             @Mapping(source = "project.projectOwner.username", target = "projectOwnerName"),
             @Mapping(source = "project.projectName", target = "projectTitle"),
-            @Mapping(source = "project.sector.sector", target = "sector"),
-            @Mapping(source = "project.interviewType.interviewType", target = "interviewType"),
-            @Mapping(source = "project.degree.degree", target = "degree"),
-            @Mapping(source = "project.projectLevel.projectLevel", target = "projectLevel"),
-            @Mapping(source = "project.professionLevel.projectProfessionLevel", target = "professionLevel"),
             @Mapping(source = "projectsParticipantDTO.projectParticipants", target = "projectParticipants"),
     })
     ProjectDetailDTO toProjectDetailDTO(Project project, List<ProjectTag> projectTags, ProjectsParticipantDTO projectsParticipantDTO);
@@ -71,12 +62,6 @@ public interface IProjectMapper
     @Mappings({
             @Mapping(source = "project.projectOwner.username", target = "projectOwnerName"),
             @Mapping(source = "project.projectName", target = "projectTitle"),
-            @Mapping(source = "project.sector.sector", target = "sector"),
-            @Mapping(source = "project.interviewType.interviewType", target = "interviewType"),
-            @Mapping(source = "project.projectAccessType.projectAccessType", target = "projectAccessType"),
-            @Mapping(source = "project.degree.degree", target = "degree"),
-            @Mapping(source = "project.projectLevel.projectLevel", target = "projectLevel"),
-            @Mapping(source = "project.professionLevel.projectProfessionLevel", target = "professionLevel"),
             @Mapping(source = "projectsParticipantDTO.projectParticipants", target = "projectParticipants"),
     })
     ProjectOwnerViewDTO toProjectOwnerViewDTO(Project project, List<ProjectTag> projectTags, ProjectsParticipantDTO projectsParticipantDTO);

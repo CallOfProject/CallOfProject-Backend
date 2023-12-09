@@ -1,8 +1,6 @@
 package callofproject.dev.data.project.entity;
 
-import callofproject.dev.data.project.entity.enums.AdminOperationStatus;
-import callofproject.dev.data.project.entity.enums.EFeedbackTimeRange;
-import callofproject.dev.data.project.entity.enums.EProjectStatus;
+import callofproject.dev.data.project.entity.enums.*;
 import callofproject.dev.library.exception.repository.RepositoryException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -50,24 +48,24 @@ public class Project
     private String m_technicalRequirements;
     @Column(name = "special_requirements", length = 200)
     private String m_specialRequirements;
-    @ManyToOne
-    @JoinColumn(name = "project_access_type_id", nullable = false)
-    private ProjectAccessType m_projectAccessType;
-    @ManyToOne
-    @JoinColumn(name = "project_profession_level_id", nullable = false)
-    private ProjectProfessionLevel m_professionLevel;
-    @ManyToOne
-    @JoinColumn(name = "sector_id", nullable = false)
-    private Sector m_sector;
-    @ManyToOne
-    @JoinColumn(name = "degree_id", nullable = false)
-    private Degree m_degree;
-    @ManyToOne
-    @JoinColumn(name = "project_level_id", nullable = false)
-    private ProjectLevel m_projectLevel;
-    @ManyToOne
-    @JoinColumn(name = "interview_type_id", nullable = false)
-    private InterviewType m_interviewType;
+    @Enumerated(EnumType.STRING)
+    @JoinColumn(name = "project_access_type", nullable = false)
+    private EProjectAccessType m_projectAccessType;
+    @Enumerated(EnumType.STRING)
+    @JoinColumn(name = "project_profession_level", nullable = false)
+    private EProjectProfessionLevel m_professionLevel;
+    @Enumerated(EnumType.STRING)
+    @JoinColumn(name = "sector", nullable = false)
+    private ESector m_sector;
+    @Enumerated(EnumType.STRING)
+    @JoinColumn(name = "degree", nullable = false)
+    private EDegree m_degree;
+    @Enumerated(EnumType.STRING)
+    @JoinColumn(name = "project_level", nullable = false)
+    private EProjectLevel m_projectLevel;
+    @Enumerated(EnumType.STRING)
+    @JoinColumn(name = "interview_type", nullable = false)
+    private EInterviewType m_interviewType;
 
     @ManyToOne(cascade = ALL)
     @JoinColumn(name = "user_id", nullable = false)
@@ -269,37 +267,37 @@ public class Project
             return this;
         }
 
-        public Builder setProjectAccessType(ProjectAccessType projectAccessType)
+        public Builder setProjectAccessType(EProjectAccessType projectAccessType)
         {
             m_project.m_projectAccessType = projectAccessType;
             return this;
         }
 
-        public Builder setProfessionLevel(ProjectProfessionLevel professionLevel)
+        public Builder setProfessionLevel(EProjectProfessionLevel professionLevel)
         {
             m_project.m_professionLevel = professionLevel;
             return this;
         }
 
-        public Builder setSector(Sector sector)
+        public Builder setSector(ESector sector)
         {
             m_project.m_sector = sector;
             return this;
         }
 
-        public Builder setDegree(Degree degree)
+        public Builder setDegree(EDegree degree)
         {
             m_project.m_degree = degree;
             return this;
         }
 
-        public Builder setProjectLevel(ProjectLevel projectLevel)
+        public Builder setProjectLevel(EProjectLevel projectLevel)
         {
             m_project.m_projectLevel = projectLevel;
             return this;
         }
 
-        public Builder setInterviewType(InterviewType interviewType)
+        public Builder setInterviewType(EInterviewType interviewType)
         {
             m_project.m_interviewType = interviewType;
             return this;
@@ -413,32 +411,32 @@ public class Project
         return m_specialRequirements;
     }
 
-    public ProjectAccessType getProjectAccessType()
+    public EProjectAccessType getProjectAccessType()
     {
         return m_projectAccessType;
     }
 
-    public ProjectProfessionLevel getProfessionLevel()
+    public EProjectProfessionLevel getProfessionLevel()
     {
         return m_professionLevel;
     }
 
-    public Sector getSector()
+    public ESector getSector()
     {
         return m_sector;
     }
 
-    public Degree getDegree()
+    public EDegree getDegree()
     {
         return m_degree;
     }
 
-    public ProjectLevel getProjectLevel()
+    public EProjectLevel getProjectLevel()
     {
         return m_projectLevel;
     }
 
-    public InterviewType getInterviewType()
+    public EInterviewType getInterviewType()
     {
         return m_interviewType;
     }
@@ -538,32 +536,32 @@ public class Project
         m_specialRequirements = specialRequirements;
     }
 
-    public void setProjectAccessType(ProjectAccessType projectAccessType)
+    public void setProjectAccessType(EProjectAccessType projectAccessType)
     {
         m_projectAccessType = projectAccessType;
     }
 
-    public void setProfessionLevel(ProjectProfessionLevel professionLevel)
+    public void setProfessionLevel(EProjectProfessionLevel professionLevel)
     {
         m_professionLevel = professionLevel;
     }
 
-    public void setSector(Sector sector)
+    public void setSector(ESector sector)
     {
         m_sector = sector;
     }
 
-    public void setDegree(Degree degree)
+    public void setDegree(EDegree degree)
     {
         m_degree = degree;
     }
 
-    public void setProjectLevel(ProjectLevel projectLevel)
+    public void setProjectLevel(EProjectLevel projectLevel)
     {
         m_projectLevel = projectLevel;
     }
 
-    public void setInterviewType(InterviewType interviewType)
+    public void setInterviewType(EInterviewType interviewType)
     {
         m_interviewType = interviewType;
     }

@@ -5,6 +5,7 @@ import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.data.project.entity.ProjectParticipantRequest;
 import callofproject.dev.data.project.entity.User;
+import callofproject.dev.data.project.entity.enums.EProjectStatus;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.nosql.dal.ProjectTagServiceHelper;
 import callofproject.dev.nosql.entity.ProjectTag;
@@ -13,7 +14,6 @@ import callofproject.dev.project.config.kafka.KafkaProducer;
 import callofproject.dev.project.dto.*;
 import callofproject.dev.project.mapper.IProjectMapper;
 import callofproject.dev.project.mapper.IProjectParticipantMapper;
-import callofproject.dev.project.util.Policy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -48,17 +48,6 @@ public class ProjectOwnerService
         m_projectParticipantMapper = projectParticipantMapper;
     }
 
-    /**
-     * Add project join request with given project id and user id.
-     *
-     * @param projectId represent the project id
-     * @param userId    represent the user id
-     * @return ResponseMessage.
-     */
-    public ResponseMessage<Object> addProjectJoinRequest(UUID projectId, UUID userId)
-    {
-        return doForDataService(() -> addProjectJoinRequestCallback(projectId, userId), "ProjectService::addProjectJoinRequest");
-    }
 
     /**
      * Add participant with given project id and user id.
@@ -71,6 +60,19 @@ public class ProjectOwnerService
         return doForDataService(() -> m_projectServiceHelper.addProjectParticipant(dto.project_id(), dto.user_id()),
                 "ProjectService::addParticipant");
     }
+
+    /**
+     * Remove participant with given project id and user id.
+     *
+     * @param projectId represent the project id
+     * @param userId    represent the user id
+     * @return ResponseMessage.
+     */
+    public ResponseMessage<Object> removeParticipant(UUID projectId, UUID userId)
+    {
+        return doForDataService(() -> removeParticipantCallback(projectId, userId), "ProjectService::removeParticipant");
+    }
+
 
     /**
      * Approve or Reject Project Participant Request
@@ -94,6 +96,11 @@ public class ProjectOwnerService
         return doForDataService(() -> finishProjectCallback(userId, projectId), "ProjectService::finishProject");
     }
 
+    public ResponseMessage<Object> changeProjectStatus(UUID userId, UUID projectId, EProjectStatus projectStatus)
+    {
+        return doForDataService(() -> changeProjectStatusCallback(userId, projectId, projectStatus), "ProjectService::changeProjectStatus");
+    }
+
     private ResponseMessage<Object> approveParticipantRequestCallback(ParticipantRequestDTO requestDTO)
     {
         var participantRequest = findProjectParticipantRequestByRequestId(requestDTO.requestId());
@@ -114,6 +121,19 @@ public class ProjectOwnerService
             return deniedParticipantRequest(participantRequest, user, project, projectOwner);
 
         return approveParticipant(participantRequest, user, project, projectOwner);
+    }
+
+    private ResponseMessage<Object> removeParticipantCallback(UUID projectId, UUID userId)
+    {
+        var project = findProjectIfExistsByProjectId(projectId);
+        var user = findUserIfExists(userId);
+
+        project.getProjectParticipants().removeIf(p -> p.getUser().getUserId().equals(user.getUserId()));
+        m_projectServiceHelper.saveProject(project);
+
+        var message = format("%s removed you from %s project!", project.getProjectOwner().getFullName(), project.getProjectName());
+
+        return new ResponseMessage<>(message, OK, true);
     }
 
     private ResponseMessage<Object> deniedParticipantRequest(ProjectParticipantRequest participantRequest, User user, Project project, User projectOwner)
@@ -191,65 +211,6 @@ public class ProjectOwnerService
         return request.get();
     }
 
-    private ResponseMessage<Object> addProjectJoinRequestCallback(UUID projectId, UUID userId)
-    {
-        var user = m_projectServiceHelper.findUserById(userId);
-        var project = m_projectServiceHelper.findProjectById(projectId);
-
-        if (user.isEmpty() || project.isEmpty())
-            throw new DataServiceException(format("User with id: %s or Project with id: %s is not found!", userId, projectId));
-
-        if (user.get().getParticipantProjectCount() >= Policy.MAX_PARTICIPANT_PROJECT_COUNT)
-            return new ResponseMessage<>(format("You are participant %d projects already!", Policy.MAX_PARTICIPANT_PROJECT_COUNT),
-                    NOT_ACCEPTED, false);
-
-
-        if (user.get().getTotalProjectCount() >= Policy.MAX_PROJECT_COUNT)
-            return new ResponseMessage<>(format("You cannot create or join to project! Max project count is: %d", Policy.MAX_PROJECT_COUNT),
-                    NOT_ACCEPTED, false);
-
-        var result = doForDataService(() -> m_projectServiceHelper.sendParticipantRequestToProject(projectId, userId),
-                "ProjectService::addProjectJoinRequest");
-
-        if (!result)
-            return new ResponseMessage<>("You are participant of project already! ", NOT_ACCEPTED, false);
-
-        // Send notification to project owner (Approve Message)
-        sendNotificationToProjectOwner(userId, projectId);
-
-        return new ResponseMessage<>("Participant request is sent!", OK, true);
-    }
-
-    private void sendNotificationToProjectOwner(UUID userId, UUID projectId)
-    {
-        var user = m_projectServiceHelper.findUserById(userId);
-        var project = m_projectServiceHelper.findProjectById(projectId);
-
-        if (user.isEmpty() || project.isEmpty())
-            throw new DataServiceException(format("User with id: %s or Project with id: %s is not found!", userId, projectId));
-
-        var msg = format("%s wants to join your %s project!", user.get().getUsername(), project.get().getProjectName());
-
-        // Create notification data
-        var data = new NotificationObject(project.get().getProjectId(), user.get().getUserId());
-
-        // Convert data to json.
-        var dataToJson = doForDataService(() -> m_objectMapper.writeValueAsString(data), "Converter Error!");
-
-        // Project owner to user message
-        var notificationMessage = new ProjectParticipantRequestDTO.Builder()
-                .setFromUserId(user.get().getUserId())
-                .setToUserId(project.get().getProjectOwner().getUserId())
-                .setMessage(msg)
-                .setNotificationType(NotificationType.INFORMATION)
-                .setNotificationData(dataToJson)
-                .setNotificationLink("none")
-                .build();
-
-        // Send notification to project owner
-        doForDataService(() -> m_kafkaProducer.sendProjectParticipantNotification(notificationMessage),
-                "ProjectService::sendNotificationToProjectOwner");
-    }
 
     private List<ProjectTag> findTagList(Project obj)
     {
@@ -270,6 +231,22 @@ public class ProjectOwnerService
         var detailDTO = m_projectMapper.toProjectDetailDTO(savedProject, findTagList(savedProject), findProjectParticipantsByProjectId(savedProject));
 
         return new ResponseMessage<>("Project is finished!", OK, detailDTO);
+    }
+
+    private ResponseMessage<Object> changeProjectStatusCallback(UUID userId, UUID projectId, EProjectStatus projectStatus)
+    {
+        var user = findUserIfExists(userId);
+        var project = findProjectIfExistsByProjectId(projectId);
+
+        if (!project.getProjectOwner().getUserId().equals(user.getUserId()))
+            throw new DataServiceException("You are not owner of this project!");
+
+        project.setProjectStatus(projectStatus);
+        var savedProject = m_projectServiceHelper.saveProject(project);
+
+        var detailDTO = m_projectMapper.toProjectDetailDTO(savedProject, findTagList(savedProject), findProjectParticipantsByProjectId(savedProject));
+
+        return new ResponseMessage<>(format("Project status changed to %s!", projectStatus), OK, detailDTO);
     }
 
     private ProjectsParticipantDTO findProjectParticipantsByProjectId(Project obj)
@@ -297,4 +274,6 @@ public class ProjectOwnerService
 
         return user.get();
     }
+
+
 }

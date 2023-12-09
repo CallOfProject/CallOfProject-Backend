@@ -64,23 +64,23 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>
 
     Page<Project> findAllByInviteLink(String link, Pageable pageable);
 
-    @Query("FROM Project WHERE m_projectAccessType.m_projectAccessType = :accessType")
+    @Query("FROM Project WHERE m_projectAccessType = :accessType")
     Page<Project> findAllByProjectAccessType(@Param("accessType") EProjectAccessType accessType, Pageable pageable);
 
 
-    @Query("FROM Project WHERE m_professionLevel.m_projectProfessionLevel = :professionLevel")
+    @Query("FROM Project WHERE m_professionLevel = :professionLevel")
     Page<Project> findAllByProfessionLevel(@Param("professionLevel") EProjectProfessionLevel professionLevel, Pageable pageable);
 
-    @Query("FROM Project WHERE m_sector.m_sector = :sector")
+    @Query("FROM Project WHERE m_sector = :sector")
     Page<Project> findAllBySector(@Param("sector") ESector sector, Pageable pageable);
 
-    @Query("FROM Project WHERE m_degree.m_degree = :degree")
+    @Query("FROM Project WHERE m_degree = :degree")
     Page<Project> findAllByDegree(@Param("degree") EDegree degree, Pageable pageable);
 
-    @Query("FROM Project WHERE m_projectLevel.m_projectLevel = :projectLevel")
+    @Query("FROM Project WHERE m_projectLevel = :projectLevel")
     Page<Project> findAllByProjectLevel(@Param("projectLevel") EProjectLevel projectLevel, Pageable pageable);
 
-    @Query("FROM Project WHERE m_interviewType.m_interviewType = :interviewType")
+    @Query("FROM Project WHERE m_interviewType = :interviewType")
     Page<Project> findAllByInterviewType(@Param("interviewType") EInterviewType interviewType, Pageable pageable);
 
     Page<Project> findAllByProjectNameAndDescriptionAndProjectSummaryAndProjectAimContainsIgnoreCase(String projectName, String description, String projectSummary, String projectAim, Pageable pageable);
@@ -108,7 +108,7 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>
     @Query("""
             from Project where (m_projectStatus = 'NOT_STARTED' or m_projectStatus = 'IN_PROGRESS')
             and m_adminOperationStatus = 'ACTIVE'
-            and m_projectAccessType.m_projectAccessType = 'PUBLIC'
+            and m_projectAccessType = 'PUBLIC'
             """)
     Page<Project> findAllByProjectStatusAndAdminOperationStatusAndProjectAccessType(Pageable pageable);
 

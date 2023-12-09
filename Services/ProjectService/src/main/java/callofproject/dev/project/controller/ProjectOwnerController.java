@@ -1,5 +1,6 @@
 package callofproject.dev.project.controller;
 
+import callofproject.dev.data.project.entity.enums.EProjectStatus;
 import callofproject.dev.project.dto.ParticipantRequestDTO;
 import callofproject.dev.project.dto.SaveProjectParticipantDTO;
 import callofproject.dev.project.service.ProjectOwnerService;
@@ -24,7 +25,7 @@ public class ProjectOwnerController
     }
 
     /**
-     * Find all participant of project by given user id and page
+     * set project status to finish
      *
      * @param userId    is user id
      * @param projectId is project id
@@ -38,30 +39,33 @@ public class ProjectOwnerController
     }
 
     /**
-     * Send Project Participant Request
+     * Change project status
      *
-     * @param projectId is project id
      * @param userId    is user id
-     * @return if success ProjectDTO else return Error Message
+     * @param projectId is project id
+     * @param status    is project status
+     * @return if success ProjectDetailDTO else return Error Message
      */
-    @PostMapping("/participant/request")
-    public ResponseEntity<Object> addProjectJoinRequest(@RequestParam("pid") UUID projectId, @RequestParam("uid") UUID userId)
+    @PostMapping("change/status")
+    public ResponseEntity<Object> changeProjectStatus(@RequestParam("uid") UUID userId, @RequestParam("pid") UUID projectId, @RequestParam("status") EProjectStatus status)
     {
-        return subscribe(() -> ok(m_projectOwnerService.addProjectJoinRequest(projectId, userId)),
-                msg -> badRequest().body(msg.getMessage()));
+        return subscribe(() -> ok(m_projectOwnerService.changeProjectStatus(userId, projectId, status)), msg -> badRequest().body(msg.getMessage()));
     }
 
 
+    //---------------------------------------------------PARTICIPANT----------------------------------------------------
+
     /**
-     * Approve or Reject Project Participant Request
+     * Remove participant from project
      *
-     * @return if success ProjectDTO else return Error Message
+     * @param userId    is user id
+     * @param projectId is project id
+     * @return if success ProjectDetailDTO else return Error Message
      */
-    @PostMapping("/participant/request/approve")
-    public ResponseEntity<Object> approveProjectParticipantRequest(@RequestBody ParticipantRequestDTO dto)
+    @DeleteMapping("participant/remove")
+    public ResponseEntity<Object> removeParticipant(@RequestParam("pid") UUID projectId, @RequestParam("uid") UUID userId)
     {
-        return subscribe(() -> ok(m_projectOwnerService.approveParticipantRequest(dto)),
-                msg -> badRequest().body(msg.getMessage()));
+        return subscribe(() -> ok(m_projectOwnerService.removeParticipant(projectId, userId)), msg -> badRequest().body(msg.getMessage()));
     }
 
     /**
@@ -74,5 +78,17 @@ public class ProjectOwnerController
     public ResponseEntity<Object> addParticipant(@RequestBody SaveProjectParticipantDTO dto)
     {
         return subscribe(() -> ok(m_projectOwnerService.addParticipant(dto)), msg -> badRequest().body(msg.getMessage()));
+    }
+
+    /**
+     * Approve or Reject Project Participant Request
+     *
+     * @return if success ProjectDTO else return Error Message
+     */
+    @PostMapping("/participant/request/approve")
+    public ResponseEntity<Object> approveProjectParticipantRequest(@RequestBody ParticipantRequestDTO dto)
+    {
+        return subscribe(() -> ok(m_projectOwnerService.approveParticipantRequest(dto)),
+                msg -> badRequest().body(msg.getMessage()));
     }
 }

@@ -1,9 +1,7 @@
 package callofproject.dev.project.controller;
 
-import callofproject.dev.project.dto.ParticipantRequestDTO;
 import callofproject.dev.project.dto.ProjectSaveDTO;
 import callofproject.dev.project.dto.ProjectUpdateDTO;
-import callofproject.dev.project.dto.SaveProjectParticipantDTO;
 import callofproject.dev.project.service.ProjectService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -140,8 +138,17 @@ public class ProjectController
         return subscribe(() -> ok(m_projectService.findAllProjectDiscoveryView(page)), msg -> badRequest().body(msg.getMessage()));
     }
 
-
-    //---------------------------------------------------PARTICIPANT----------------------------------------------------
-
-
+    /**
+     * Send Project Participant Request
+     *
+     * @param projectId is project id
+     * @param userId    is user id
+     * @return if success ProjectDTO else return Error Message
+     */
+    @PostMapping("/participant/request")
+    public ResponseEntity<Object> addProjectJoinRequest(@RequestParam("pid") UUID projectId, @RequestParam("uid") UUID userId)
+    {
+        return subscribe(() -> ok(m_projectService.addProjectJoinRequest(projectId, userId)),
+                msg -> badRequest().body(msg.getMessage()));
+    }
 }
