@@ -14,8 +14,10 @@ import java.util.List;
 public interface IProjectParticipantMapper
 {
     @Mappings({
+            @Mapping(target = "userId", source = "user.userId"),
             @Mapping(target = "username", source = "user.username"),
             @Mapping(target = "fullName", source = "user.fullName"),
+            @Mapping(target = "projectId", source = "project.projectId")
     })
     ProjectParticipantDTO toProjectParticipantDTO(ProjectParticipant projectParticipantDTO);
 

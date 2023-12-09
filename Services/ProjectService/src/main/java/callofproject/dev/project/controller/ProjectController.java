@@ -28,6 +28,7 @@ public class ProjectController
 
     /**
      * Save project
+     * Projeyi kaydeder.
      *
      * @param saveDTO is projectSaveDTO
      * @return if success ProjectDTO else return Error Message
@@ -40,6 +41,7 @@ public class ProjectController
 
     /**
      * Update project
+     * Projeyi günceller.
      *
      * @param dto is projectUpdateDTO
      * @return if success ProjectDTO else return Error Message
@@ -50,32 +52,10 @@ public class ProjectController
         return subscribe(() -> ok(m_projectService.updateProject(dto)), msg -> badRequest().body(msg.getMessage()));
     }
 
-    /**
-     * Find all project
-     *
-     * @param page is page number
-     * @return if success ProjectDTO else return Error Message
-     */
-    @GetMapping("/all")
-    public ResponseEntity<Object> findAll(@RequestParam("p") int page)
-    {
-        return subscribe(() -> ok(m_projectService.findAll(page)), msg -> badRequest().body(msg.getMessage()));
-    }
 
     /**
-     * Find project by id
-     *
-     * @param dto is projectSaveDTO
-     * @return if success ProjectDTO else return Error Message
-     */
-    @PostMapping("participant/add")
-    public ResponseEntity<Object> addParticipant(@RequestBody SaveProjectParticipantDTO dto)
-    {
-        return subscribe(() -> ok(m_projectService.addParticipant(dto)), msg -> badRequest().body(msg.getMessage()));
-    }
-
-    /**
-     * Find all project
+     * Find all project by user id who is participant in project.
+     * Kullanıcının katılımcı olduğu projeleri sayfa sayfa getirir.
      *
      * @param userId is user id
      * @param page   is page number
@@ -88,34 +68,10 @@ public class ProjectController
                 msg -> badRequest().body(msg.getMessage()));
     }
 
-    /**
-     * Send Project Participant Request
-     *
-     * @param projectId is project id
-     * @param userId    is user id
-     * @return if success ProjectDTO else return Error Message
-     */
-    @PostMapping("/participant/request")
-    public ResponseEntity<Object> addProjectJoinRequest(@RequestParam("pid") UUID projectId, @RequestParam("uid") UUID userId)
-    {
-        return subscribe(() -> ok(m_projectService.addProjectJoinRequest(projectId, userId)),
-                msg -> badRequest().body(msg.getMessage()));
-    }
-
-    /**
-     * Approve or Reject Project Participant Request
-     *
-     * @return if success ProjectDTO else return Error Message
-     */
-    @PostMapping("/participant/request/approve")
-    public ResponseEntity<Object> approveProjectParticipantRequest(@RequestBody ParticipantRequestDTO dto)
-    {
-        return subscribe(() -> ok(m_projectService.approveParticipantRequest(dto)),
-                msg -> badRequest().body(msg.getMessage()));
-    }
 
     /**
      * Find all owner of project by given user id and page
+     * Kullanıcının sahip olduğu projeleri sayfa sayfa getirir.
      *
      * @param userId is user id
      * @param page   is page number
@@ -129,30 +85,63 @@ public class ProjectController
     }
 
     /**
-     * Find all participant of project by given user id and page
+     * Find all participant of project by given username and page
+     * Kullanıcının sahip olduğu projeleri sayfa sayfa getirir.
      *
-     * @param username is user id
+     * @param username is username
      * @param page     is page number
      * @return if success ProjectDTO else return Error Message
      */
     @GetMapping("find/all/owner-username")
-    public ResponseEntity<Object> findAllParticipantProjectsByUserId(String username, int page)
+    public ResponseEntity<Object> findAllOwnerProjectsByUsername(String username, int page)
     {
         return subscribe(() -> ok(m_projectService.findAllOwnerProjectsByUsername(username, page)),
                 msg -> badRequest().body(msg.getMessage()));
     }
 
     /**
-     * Find all participant of project by given user id and page
+     * Find project Overview by project id
+     * Projenin genel bilgilerini getirir.
+     *
+     * @param projectId is project id
+     * @return if success ProjectDTO else return Error Message
+     */
+    @GetMapping("find/overview")
+    public ResponseEntity<Object> findProjectOverview(@RequestParam("pid") UUID projectId)
+    {
+        return subscribe(() -> ok(m_projectService.findProjectOverview(projectId)),
+                msg -> badRequest().body(msg.getMessage()));
+    }
+
+    /**
+     * Find project by view of owner
+     * Projenin sahibi tarafından görüntülenmesini sağlar.
      *
      * @param userId    is user id
      * @param projectId is project id
      * @return if success ProjectDetailDTO else return Error Message
      */
-    @PostMapping("finish")
-    public ResponseEntity<Object> finishProject(@RequestParam("uid") UUID userId, @RequestParam("pid") UUID projectId)
+    @GetMapping("find/detail/owner")
+    public ResponseEntity<Object> findProjectOwnerView(@RequestParam("uid") UUID userId, @RequestParam("pid") UUID projectId)
     {
-        return subscribe(() -> ok(m_projectService.finishProject(userId, projectId)),
+        return subscribe(() -> ok(m_projectService.findProjectOwnerView(userId, projectId)),
                 msg -> badRequest().body(msg.getMessage()));
     }
+
+    /**
+     * Find projects by view of discovery
+     * Projelerin keşif görünümünü getirir.
+     *
+     * @return if success ProjectsDiscoveryDTO else return Error Message
+     */
+    @GetMapping("discovery/all")
+    public ResponseEntity<Object> findAllProjectDiscoveryView(@RequestParam("p") int page)
+    {
+        return subscribe(() -> ok(m_projectService.findAllProjectDiscoveryView(page)), msg -> badRequest().body(msg.getMessage()));
+    }
+
+
+    //---------------------------------------------------PARTICIPANT----------------------------------------------------
+
+
 }

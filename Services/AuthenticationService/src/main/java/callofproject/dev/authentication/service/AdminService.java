@@ -1,7 +1,6 @@
 package callofproject.dev.authentication.service;
 
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
-
 import callofproject.dev.authentication.dto.UserKafkaDTO;
 import callofproject.dev.authentication.dto.admin.UserShowingAdminDTO;
 import callofproject.dev.authentication.dto.admin.UserUpdateDTOAdmin;
@@ -107,8 +106,7 @@ public class AdminService
      */
     public ResponseMessage<UserShowingAdminDTO> updateUser(UserUpdateDTOAdmin userUpdateDTO)
     {
-        return doForDataService(() -> updateUserCallbackAdmin(userUpdateDTO),
-                "AdminService::updateUser");
+        return doForDataService(() -> updateUserCallbackAdmin(userUpdateDTO), "AdminService::updateUser");
     }
 
     /**
@@ -129,18 +127,13 @@ public class AdminService
      */
     public long findNewUsersLastNday(long day)
     {
-        return doForDataService(() -> m_managementServiceHelper.getUserServiceHelper().countUsersByCreationDateAfter(now().minusDays(day)),
-                "AdminService::findNewUsersLastNday");
+        return doForDataService(() -> m_managementServiceHelper.getUserServiceHelper()
+                .countUsersByCreationDateAfter(now().minusDays(day)), "AdminService::findNewUsersLastNday");
     }
-    //-------------------------------------------CALLBACKS-------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    //####################################################-CALLBACKS-###################################################
+    //------------------------------------------------------------------------------------------------------------------
 
-
-    /**
-     * Update user with given UserUpdateDTOAdmin class
-     *
-     * @param userUpdateDTO represent the updating information
-     * @return UserShowingAdminDTO class.
-     */
     private ResponseMessage<UserShowingAdminDTO> updateUserCallback(UserUpdateDTOAdmin userUpdateDTO)
     {
         var user = m_managementServiceHelper.getUserServiceHelper().findByUsername(userUpdateDTO.username());

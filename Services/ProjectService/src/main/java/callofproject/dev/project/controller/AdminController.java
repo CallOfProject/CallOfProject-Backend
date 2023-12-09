@@ -3,16 +3,12 @@ package callofproject.dev.project.controller;
 import callofproject.dev.data.common.clas.ErrorMessage;
 import callofproject.dev.project.service.AdminService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
-import static org.springframework.http.ResponseEntity.internalServerError;
-import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.*;
 
 @RestController
 @RequestMapping("api/admin/project")
@@ -30,6 +26,18 @@ public class AdminController
     {
         return subscribe(() -> ok(m_adminService.cancelProject(projectId)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    /**
+     * Find all project
+     *
+     * @param page is page number
+     * @return if success ProjectDTO else return Error Message
+     */
+    @GetMapping("/all")
+    public ResponseEntity<Object> findAll(@RequestParam("p") int page)
+    {
+        return subscribe(() -> ok(m_adminService.findAll(page)), msg -> badRequest().body(msg.getMessage()));
     }
 
 }

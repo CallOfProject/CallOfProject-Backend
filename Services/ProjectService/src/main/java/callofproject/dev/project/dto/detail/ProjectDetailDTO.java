@@ -1,7 +1,8 @@
-package callofproject.dev.project.dto;
+package callofproject.dev.project.dto.detail;
 
 import callofproject.dev.data.project.entity.enums.*;
 import callofproject.dev.nosql.entity.ProjectTag;
+import callofproject.dev.project.dto.ProjectParticipantDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -13,87 +14,55 @@ public class ProjectDetailDTO
 {
     @JsonProperty("project_id")
     private String projectId;
-
     @JsonProperty("project_image_path")
     private String projectImagePath;
-
     @JsonProperty("project_title")
     private String projectTitle;
-
-    @JsonProperty("project_description")
-    private String description;
-
     @JsonProperty("project_summary")
     private String projectSummary;
-
     @JsonProperty("project_aim")
     private String projectAim;
-
-    @JsonProperty("project_owner_name")
-    private String projectOwnerName;
-
-    @JsonProperty("techinical_requirements")
-    private String technicalRequirements;
-
-    @JsonProperty("special_requirements")
-    private String specialRequirements;
-
-    @JsonProperty("invite_link")
-    private String inviteLink;
-
-    @JsonProperty("admin_note")
-    private String adminNote;
-
-    @JsonProperty("max_participant")
-    private int maxParticipant;
-
+    @JsonProperty("project_description")
+    private String description;
     @JsonProperty("application_deadline")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate applicationDeadline;
-
     @JsonProperty("expected_completion_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate expectedCompletionDate;
-
     @JsonProperty("start_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate startDate;
-
-    @JsonProperty("completion_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    private LocalDate completionDate;
-
-    @JsonProperty("feedback_time_range")
-    private EFeedbackTimeRange feedbackTimeRange;
-
-    @JsonProperty("project_access_type")
-    private EProjectAccessType projectAccessType;
-
+    @JsonProperty("max_participant")
+    private int maxParticipant;
+    @JsonProperty("techinical_requirements")
+    private String technicalRequirements;
+    @JsonProperty("special_requirements")
+    private String specialRequirements;
     @JsonProperty("project_profession_level")
     private EProjectProfessionLevel professionLevel;
-
     @JsonProperty("project_sector")
     private ESector sector;
-
     @JsonProperty("project_degree")
     private EDegree degree;
-
     @JsonProperty("project_level")
     private EProjectLevel projectLevel;
-
     @JsonProperty("interview_type")
     private EInterviewType interviewType;
-
     @JsonProperty("project_status")
     private EProjectStatus projectStatus;
-
+    @JsonProperty("feedback_time_range")
+    private EFeedbackTimeRange feedbackTimeRange;
+    @JsonProperty("project_owner_name")
+    private String projectOwnerName;
+    @JsonProperty("admin_note")
+    private String adminNote;
     @JsonProperty("project_tags")
     private List<ProjectTag> projectTags;
-
     @JsonProperty("project_participants")
     private List<ProjectParticipantDTO> projectParticipants;
 
-
+    //------------------------------------------------------------------------------------------------------------------
     public ProjectDetailDTO()
     {
     }
@@ -188,16 +157,6 @@ public class ProjectDetailDTO
         this.specialRequirements = specialRequirements;
     }
 
-    public String getInviteLink()
-    {
-        return inviteLink;
-    }
-
-    public void setInviteLink(String inviteLink)
-    {
-        this.inviteLink = inviteLink;
-    }
-
     public String getAdminNote()
     {
         return adminNote;
@@ -248,16 +207,6 @@ public class ProjectDetailDTO
         this.startDate = startDate;
     }
 
-    public LocalDate getCompletionDate()
-    {
-        return completionDate;
-    }
-
-    public void setCompletionDate(LocalDate completionDate)
-    {
-        this.completionDate = completionDate;
-    }
-
     public EFeedbackTimeRange getFeedbackTimeRange()
     {
         return feedbackTimeRange;
@@ -266,16 +215,6 @@ public class ProjectDetailDTO
     public void setFeedbackTimeRange(EFeedbackTimeRange feedbackTimeRange)
     {
         this.feedbackTimeRange = feedbackTimeRange;
-    }
-
-    public EProjectAccessType getProjectAccessType()
-    {
-        return projectAccessType;
-    }
-
-    public void setProjectAccessType(EProjectAccessType projectAccessType)
-    {
-        this.projectAccessType = projectAccessType;
     }
 
     public EProjectProfessionLevel getProfessionLevel()

@@ -1,6 +1,6 @@
-package callofproject.dev.project.dto;
+package callofproject.dev.project.dto.overview;
 
-import callofproject.dev.data.project.entity.enums.EFeedbackTimeRange;
+import callofproject.dev.data.project.entity.enums.*;
 import callofproject.dev.nosql.entity.ProjectTag;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,20 +19,33 @@ public record ProjectOverviewDTO(
         String projectSummary,
         @JsonProperty("project_aim")
         String projectAim,
-        @JsonProperty("project_owner_name")
-        String projectOwnerName,
+        @JsonProperty("application_deadline")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+        LocalDate applicationDeadline,
+        @JsonProperty("expected_completion_date")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+        LocalDate expectedCompletionDate,
+        @JsonProperty("start_date")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+        LocalDate startDate,
+        @JsonProperty("max_participant")
+        int maxParticipant,
         @JsonProperty("techinical_requirements")
         String technicalRequirements,
         @JsonProperty("special_requirements")
         String specialRequirements,
-        @JsonProperty("application_deadline")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-        LocalDate applicationDeadline,
+        @JsonProperty("project_profession_level")
+        EProjectProfessionLevel professionLevel,
+        @JsonProperty("project_degree")
+        EDegree degree,
+        @JsonProperty("project_level")
+        EProjectLevel projectLevel,
+        @JsonProperty("interview_type")
+        EInterviewType interviewType,
+        @JsonProperty("project_owner_name")
+        String projectOwnerName,
         @JsonProperty("feedback_time_range")
         EFeedbackTimeRange feedbackTimeRange,
-        @JsonProperty("expected_completion_date")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-        LocalDate expectedCompletionDate,
         @JsonProperty("project_tags")
         List<ProjectTag> projectTags
 )

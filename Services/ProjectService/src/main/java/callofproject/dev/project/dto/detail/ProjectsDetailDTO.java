@@ -1,4 +1,4 @@
-package callofproject.dev.project.dto;
+package callofproject.dev.project.dto.detail;
 
 import java.util.List;
 

@@ -811,4 +811,13 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::removeParticipantRequest");
     }
 
+    public Page<Project> findAllValidProjects(int page)
+    {
+        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
+
+        return doForRepository(() -> m_facade.m_projectRepository
+                        .findAllByProjectStatusAndAdminOperationStatusAndProjectAccessType(pageable),
+                "ProjectServiceHelper::findAllValidProjects");
+    }
+
 }

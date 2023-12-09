@@ -27,7 +27,6 @@ import static callofproject.dev.repository.authentication.BeanName.USER_MANAGEME
 import static callofproject.dev.util.stream.StreamUtil.toListConcurrent;
 import static java.lang.String.format;
 
-
 @Service(USER_MANAGEMENT_SERVICE)
 @Lazy
 public class UserManagementService
@@ -135,7 +134,10 @@ public class UserManagementService
         return doForDataService(() -> findUserWithProfileCallback(userId), "UserManagementService::findUserWithProfile");
     }
 
-    //-----------------------------------------------------CALLBACK-----------------------------------------------------
+
+    //------------------------------------------------------------------------------------------------------------------
+    //####################################################-CALLBACKS-###################################################
+    //------------------------------------------------------------------------------------------------------------------
     public ResponseMessage<UserSaveDTO> saveUserCallback(UserSignUpRequestDTO userDTO)
     {
         var user = m_mapperConfig.userMapper.toUser(userDTO);
@@ -243,7 +245,9 @@ public class UserManagementService
         return new ResponseMessage<>("User with profile found!", 200, userWithProfile);
     }
 
-    // Helper classes
+    //------------------------------------------------------------------------------------------------------------------
+    //##################################################-HELPER METHODS-################################################
+    //------------------------------------------------------------------------------------------------------------------
     private UserProfileDTO getUserProfile(User user)
     {
         var userProfile = user.getUserProfile();

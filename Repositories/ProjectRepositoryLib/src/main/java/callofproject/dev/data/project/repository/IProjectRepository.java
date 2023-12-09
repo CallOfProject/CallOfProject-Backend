@@ -105,5 +105,11 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>
     @Query("FROM Project p WHERE :userId IN (select w.m_user.m_userId FROM p.m_projectParticipantRequests as w)")
     Iterable<Project> findAllByUserUserId(UUID userId);
 
+    @Query("""
+            from Project where (m_projectStatus = 'NOT_STARTED' or m_projectStatus = 'IN_PROGRESS')
+            and m_adminOperationStatus = 'ACTIVE'
+            and m_projectAccessType.m_projectAccessType = 'PUBLIC'
+            """)
+    Page<Project> findAllByProjectStatusAndAdminOperationStatusAndProjectAccessType(Pageable pageable);
 
 }

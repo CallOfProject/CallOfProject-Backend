@@ -145,7 +145,9 @@ public class UserInformationService
         return doForDataService(() -> removeCourseOrganizationCallback(userId, id), "Course organization cannot be removed!");
     }
 
-    //-----------------------------------------------------CALLBACK-----------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
+    //####################################################-CALLBACKS-###################################################
+    //------------------------------------------------------------------------------------------------------------------
     private UserProfile getUserProfile(UUID userId)
     {
         var userProfile = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(userId);
