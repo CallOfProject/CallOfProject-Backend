@@ -51,3 +51,39 @@ org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-21
 2023-12-08 20:00:41 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "select u1_0.user_id,u1_0.email,u1_0.first_name,u1_0.last_name,u1_0.middle_name,u1_0.owner_project_count,u1_0.participant_project_count,u1_0.total_project_count,u1_0.username from [*]user u1_0 where u1_0.username=?"; expected "identifier"; SQL statement:
 select u1_0.user_id,u1_0.email,u1_0.first_name,u1_0.last_name,u1_0.middle_name,u1_0.owner_project_count,u1_0.participant_project_count,u1_0.total_project_count,u1_0.username from user u1_0 where u1_0.username=? [42001-214]
+2023-12-14 15:09:21 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table [*]user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, owner_project_count integer not null, participant_project_count integer not null, total_project_count integer not null, username varchar(255) not null, primary key (user_id))"; expected "identifier"; SQL statement:
+create table user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, owner_project_count integer not null, participant_project_count integer not null, total_project_count integer not null, username varchar(255) not null, primary key (user_id)) [42001-214]
+2023-12-14 15:09:21 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references user [42001-214]
+2023-12-14 15:09:21 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references user [42001-214]
+2023-12-14 15:09:21 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references user [42001-214]
+2023-12-14 15:09:47 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table [*]user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, owner_project_count integer not null, participant_project_count integer not null, total_project_count integer not null, username varchar(255) not null, primary key (user_id))"; expected "identifier"; SQL statement:
+create table user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, owner_project_count integer not null, participant_project_count integer not null, total_project_count integer not null, username varchar(255) not null, primary key (user_id)) [42001-214]
+2023-12-14 15:09:47 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references user [42001-214]
+2023-12-14 15:09:47 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references user [42001-214]
+2023-12-14 15:09:47 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references user [42001-214]
+2023-12-14 15:10:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table [*]user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, owner_project_count integer not null, participant_project_count integer not null, total_project_count integer not null, username varchar(255) not null, primary key (user_id))"; expected "identifier"; SQL statement:
+create table user (user_id uuid not null, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, middle_name varchar(255) not null, owner_project_count integer not null, participant_project_count integer not null, total_project_count integer not null, username varchar(255) not null, primary key (user_id)) [42001-214]
+2023-12-14 15:10:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project add constraint FKo06v2e9kuapcugnyhttqa1vpt foreign key (user_id) references user [42001-214]
+2023-12-14 15:10:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant add constraint FKbulk9pbt93ydex9307yj5aph8 foreign key (user_id) references user [42001-214]
+2023-12-14 15:10:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references [*]user"; expected "identifier"; SQL statement:
+alter table if exists project_participant_request add constraint FKff1cltbsbyyxsn1ub68dphqdm foreign key (user_id) references user [42001-214]

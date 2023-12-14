@@ -5,27 +5,32 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ResponseMessage<T>
 {
     @JsonProperty("message")
-    private final String m_message;
+    private final String message;
     @JsonProperty("status_code")
-    private final int m_statusCode;
+    private final int statusCode;
     @JsonProperty("object")
-    private final T m_object;
+    private final T object;
 
     public ResponseMessage(String message, int statusCode, T object)
     {
-        m_message = message;
-        m_statusCode = statusCode;
-        m_object = object;
+        this.message = message;
+        this.statusCode = statusCode;
+        this.object = object;
     }
 
     public String getMessage()
     {
-        return m_message;
+        return message;
     }
 
 
     public T getObject()
     {
-        return m_object;
+        return object;
+    }
+
+    public int getStatusCode()
+    {
+        return statusCode;
     }
 }

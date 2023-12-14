@@ -52,7 +52,23 @@ public class UserManagementService
      */
     public ResponseMessage<UserSaveDTO> saveUser(UserSignUpRequestDTO userDTO)
     {
-        return doForDataService(() -> saveUserCallback(userDTO), "User cannot be saved!");
+
+        var result = doForDataService(() -> saveUserCallback(userDTO), "User cannot be saved!");
+
+        if (result.getStatusCode() == 200)
+            PublishUser(result.getObject().userId());
+
+        return result;
+    }
+
+    private void PublishUser(UUID uuid)
+    {
+        var user = getUserIfExists(uuid);
+
+        var kafkaMessage = new UserKafkaDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(),
+                user.getMiddleName(), user.getLastName(), EOperation.CREATE, 0, 0, 0);
+
+        m_userProducer.sendMessage(kafkaMessage);
     }
 
     /**
@@ -160,11 +176,6 @@ public class UserManagementService
         var token = JwtUtil.generateToken(claims, user.getUsername());
         var refreshToken = JwtUtil.generateToken(claims, user.getUsername());
 
-        var kafkaMessage = new UserKafkaDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(),
-                user.getMiddleName(), user.getLastName(), EOperation.CREATE, 0, 0, 0);
-
-        m_userProducer.sendMessage(kafkaMessage);
-
         return new ResponseMessage<>("User saved successfully!", 200, new UserSaveDTO(token, refreshToken, true, savedUser.getUserId()));
     }
 
@@ -265,7 +276,7 @@ public class UserManagementService
         return m_mapperConfig.userProfileMapper.toUserProfileDTO(userProfile, educations, experiences, courses, links, userRate);
     }
 
-    private User getUserIfExists(UUID userId)
+    public User getUserIfExists(UUID userId)
     {
         var user = m_serviceHelper.getUserServiceHelper().findById(userId);
 
