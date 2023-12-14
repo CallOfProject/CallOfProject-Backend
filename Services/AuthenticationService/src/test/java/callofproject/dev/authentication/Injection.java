@@ -1,7 +1,7 @@
 package callofproject.dev.authentication;
 
-import callofproject.dev.authentication.service.AuthenticationService;
-import callofproject.dev.authentication.service.UserManagementService;
+import callofproject.dev.authentication.service.*;
+import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Component;
@@ -12,8 +12,31 @@ public class Injection
 {
     @Autowired
     private UserManagementService ms_userManagementService;
+
     @Autowired
     private AuthenticationService ms_authenticationService;
+
+    @Autowired
+    private AdminService m_adminService;
+
+    @Autowired
+    private UserInformationService m_userInformationService;
+
+    @Autowired
+    private RootService m_rootService;
+
+    @Autowired
+    private IUserRepository m_userRepository;
+
+    public UserInformationService getUserInformationService()
+    {
+        return m_userInformationService;
+    }
+
+    public AdminService getAdminService()
+    {
+        return m_adminService;
+    }
 
     public UserManagementService getUserManagementService()
     {
@@ -23,5 +46,15 @@ public class Injection
     public AuthenticationService getAuthenticationService()
     {
         return ms_authenticationService;
+    }
+
+    public IUserRepository getUserRepository()
+    {
+        return m_userRepository;
+    }
+
+    public RootService getRootService()
+    {
+        return m_rootService;
     }
 }

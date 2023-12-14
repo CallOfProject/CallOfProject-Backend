@@ -56,6 +56,7 @@ public class UserManagementServiceTest
                 "securePassword",
                 LocalDate.of(1985, 9, 8)
         );
+
         var savedUser1 = m_injection.getUserManagementService().saveUserCallback(user1);
         var savedUser2 = m_injection.getUserManagementService().saveUserCallback(user2);
 

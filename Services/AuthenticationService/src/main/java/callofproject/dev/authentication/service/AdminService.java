@@ -68,7 +68,12 @@ public class AdminService
      */
     public ResponseMessage<Boolean> removeUser(String username)
     {
-        return doForDataService(() -> removeUserCallback(username), "AdminService::removeUser");
+        var removedUser = doForDataService(() -> removeUserCallback(username), "AdminService::removeUser");
+
+        if (removedUser.getObject())
+            PublishUser(username, EOperation.DELETE);
+
+        return removedUser;
     }
 
     /**
@@ -106,8 +111,14 @@ public class AdminService
      */
     public ResponseMessage<UserShowingAdminDTO> updateUser(UserUpdateDTOAdmin userUpdateDTO)
     {
-        return doForDataService(() -> updateUserCallbackAdmin(userUpdateDTO), "AdminService::updateUser");
+        var updatedUser = doForDataService(() -> updateUserCallbackAdmin(userUpdateDTO), "AdminService::updateUser");
+
+        if (updatedUser.getObject() != null)
+            PublishUser(updatedUser.getObject().userId(), EOperation.UPDATE);
+
+        return updatedUser;
     }
+
 
     /**
      * Find total user count.
@@ -203,7 +214,7 @@ public class AdminService
 
         var compareResult = compareRole(authorizedPersonRole, userRole);
 
-        if (compareResult == 0 || compareResult == -1)
+        if (compareResult > 0)
             throw new DataServiceException("You cannot edit this user!");
 
         user.get().setEmail(userUpdateDTO.email());
@@ -214,11 +225,6 @@ public class AdminService
         user.get().setAccountBlocked(userUpdateDTO.isAccountBlocked());
 
         var savedUser = m_managementServiceHelper.getUserServiceHelper().saveUser(user.get());
-
-        var toProjectServiceDTO = new UserKafkaDTO(savedUser.getUserId(), savedUser.getUsername(), savedUser.getEmail(),
-                savedUser.getFirstName(), savedUser.getMiddleName(), savedUser.getLastName(), EOperation.UPDATE, 0, 0, 0);
-
-        m_kafkaProducer.sendMessage(toProjectServiceDTO);
 
         var userDto = m_userMapper.toUserShowingAdminDTO(savedUser);
 
@@ -241,10 +247,7 @@ public class AdminService
 
         if (user.get().isAdminOrRoot())
             throw new DataServiceException("You cannot remove this user!");
-        var toProjectServiceDTO = new UserKafkaDTO(user.get().getUserId(), user.get().getUsername(), user.get().getEmail(),
-                user.get().getFirstName(), user.get().getMiddleName(), user.get().getLastName(), EOperation.DELETE, 0, 0, 0);
 
-        m_kafkaProducer.sendMessage(toProjectServiceDTO);
         m_managementServiceHelper.getUserServiceHelper().removeUser(user.get());
 
         return new ResponseMessage<>("User removed Successfully!", HttpStatus.SC_OK, true);
@@ -359,5 +362,34 @@ public class AdminService
 
         return new AuthenticationResponse(jwtToken, refreshToken, true, findTopRole(user.get()),
                 user.get().getIsAccountBlocked(), user.get().getUserId());
+    }
+
+    private void PublishUser(UUID uuid, EOperation operation)
+    {
+        var savedUser = m_managementServiceHelper.getUserServiceHelper().findById(uuid);
+
+        if (savedUser.isPresent())
+        {
+            var toProjectServiceDTO = new UserKafkaDTO(savedUser.get().getUserId(), savedUser.get().getUsername(), savedUser.get().getEmail(),
+                    savedUser.get().getFirstName(), savedUser.get().getMiddleName(), savedUser.get().getLastName(), operation,
+                    0, 0, 0);
+
+            m_kafkaProducer.sendMessage(toProjectServiceDTO);
+        }
+    }
+
+
+    private void PublishUser(String username, EOperation operation)
+    {
+        var savedUser = m_managementServiceHelper.getUserServiceHelper().findByUsername(username);
+
+        if (savedUser.isPresent())
+        {
+            var toProjectServiceDTO = new UserKafkaDTO(savedUser.get().getUserId(), savedUser.get().getUsername(), savedUser.get().getEmail(),
+                    savedUser.get().getFirstName(), savedUser.get().getMiddleName(), savedUser.get().getLastName(), operation,
+                    0, 0, 0);
+
+            m_kafkaProducer.sendMessage(toProjectServiceDTO);
+        }
     }
 }

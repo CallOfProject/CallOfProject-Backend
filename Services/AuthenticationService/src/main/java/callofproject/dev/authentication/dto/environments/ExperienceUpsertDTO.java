@@ -3,6 +3,10 @@ package callofproject.dev.authentication.dto.environments;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -12,9 +16,11 @@ public class ExperienceUpsertDTO
     @JsonProperty("user_id")
     private UUID userId;
     @JsonProperty("company_name")
+    @NotBlank(message = "Company name cannot be blank")
     private String companyName;
     private String description;
     @JsonProperty("company_website")
+    @Pattern(regexp = "^(http|https)://.*$", message = "Invalid URL format. It should start with http:// or https://")
     private String companyWebsite;
 
     @JsonProperty("job_definition")
@@ -22,10 +28,12 @@ public class ExperienceUpsertDTO
     @JsonProperty("start_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Schema(description = "date format: dd/MM/yyyy", type = "string")
+    @NotNull(message = "Start date cannot be null")
     private LocalDate startDate;
     @JsonProperty("finish_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Schema(description = "date format: dd/MM/yyyy", type = "string")
+    @FutureOrPresent(message = "Finish date must be in the future or present")
     private LocalDate finishDate;
     @JsonProperty("is_continue")
     private boolean isContinue;

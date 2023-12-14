@@ -5,22 +5,47 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class MultipleResponseMessagePageable<T>
 {
     @JsonProperty("total_page")
-    private final long m_totalPage;
+    private final long totalPage;
     @JsonProperty("page")
-    private final int m_page;
+    private final int page;
     @JsonProperty("item_count")
-    private final int m_itemCount;
+    private final int itemCount;
     @JsonProperty("message")
-    private final String m_message;
+    private final String message;
     @JsonProperty("object")
-    private final T m_object;
+    private final T object;
 
     public MultipleResponseMessagePageable(long totalPage, int page, int itemCount, String message, T object)
     {
-        m_totalPage = totalPage;
-        m_page = page;
-        m_itemCount = itemCount;
-        m_message = message;
-        m_object = object;
+        this.totalPage = totalPage;
+        this.page = page;
+        this.itemCount = itemCount;
+        this.message = message;
+        this.object = object;
+    }
+
+    public long getTotalPage()
+    {
+        return totalPage;
+    }
+
+    public int getPage()
+    {
+        return page;
+    }
+
+    public int getItemCount()
+    {
+        return itemCount;
+    }
+
+    public String getMessage()
+    {
+        return message;
+    }
+
+    public T getObject()
+    {
+        return object;
     }
 }

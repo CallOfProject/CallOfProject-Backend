@@ -1,8 +1,6 @@
 package callofproject.dev.authentication;
 
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
-import callofproject.dev.authentication.dto.UserKafkaDTO;
-import callofproject.dev.data.common.enums.EOperation;
 import callofproject.dev.nosql.dal.MatchServiceHelper;
 import callofproject.dev.nosql.repository.IUserTagRepository;
 import callofproject.dev.repository.authentication.entity.Role;
@@ -14,7 +12,6 @@ import callofproject.dev.repository.authentication.repository.rdbms.IUserReposit
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -45,7 +42,7 @@ import static callofproject.dev.authentication.util.Util.REPO_PACKAGE;
         bearerFormat = "JWT",
         scheme = "bearer"
 )
-public class AuthenticationServiceApplication implements ApplicationRunner
+public class AuthenticationServiceApplication /*implements ApplicationRunner*/
 {
     private final IUserRepository m_userRepository;
     private final PasswordEncoder m_passwordEncoder;
@@ -71,7 +68,9 @@ public class AuthenticationServiceApplication implements ApplicationRunner
     }
 
 
+/*
     @Override
+*/
     public void run(ApplicationArguments args) throws Exception
     {
 
@@ -98,11 +97,11 @@ public class AuthenticationServiceApplication implements ApplicationRunner
             adminUser.setUserProfile(profile2);
             m_userRepository.save(adminUser);
 
-            m_kafkaProducer.sendMessage(new UserKafkaDTO(rootUser.getUserId(), rootUser.getUsername(), rootUser.getEmail(),
+          /*  m_kafkaProducer.sendMessage(new UserKafkaDTO(rootUser.getUserId(), rootUser.getUsername(), rootUser.getEmail(),
                     rootUser.getFirstName(), rootUser.getMiddleName(), rootUser.getLastName(), EOperation.CREATE, 0, 0, 0));
 
             m_kafkaProducer.sendMessage(new UserKafkaDTO(adminUser.getUserId(), adminUser.getUsername(), adminUser.getEmail(),
-                    adminUser.getFirstName(), adminUser.getMiddleName(), adminUser.getLastName(), EOperation.CREATE, 0, 0, 0));
+                    adminUser.getFirstName(), adminUser.getMiddleName(), adminUser.getLastName(), EOperation.CREATE, 0, 0, 0));*/
         }
     }
 }
