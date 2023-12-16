@@ -70,7 +70,7 @@ public class UserServiceHelper
         return doForRepository(() -> m_userRepository.findAll(), "UserRepository::findAll");
     }
 
-    public Page<User> findAllPageable(int page)
+    public Page <User> findAllPageable(int page)
     {
         var pageable = of(page - 1, m_defaultPageSize);
         return doForRepository(() -> m_userRepository.findAll(pageable), "UserRepository::findAllPageable");

@@ -5,7 +5,6 @@ import callofproject.dev.authentication.Injection;
 import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.library.exception.service.DataServiceException;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import static callofproject.dev.authentication.util.Util.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @EntityScan(basePackages = REPO_PACKAGE)
@@ -60,8 +59,8 @@ public class UserManagementServiceTest
         var savedUser1 = m_injection.getUserManagementService().saveUserCallback(user1);
         var savedUser2 = m_injection.getUserManagementService().saveUserCallback(user2);
 
-        Assertions.assertNotNull(savedUser1);
-        Assertions.assertNotNull(savedUser2);
+        assertNotNull(savedUser1);
+        assertNotNull(savedUser2);
 
         user1Id = savedUser1.getObject().userId();
         user2Id = savedUser2.getObject().userId();
@@ -81,8 +80,8 @@ public class UserManagementServiceTest
         var user1 = m_injection.getUserManagementService().getUserIfExists(user1Id);
         var user2 = m_injection.getUserManagementService().getUserIfExists(user2Id);
 
-        Assertions.assertNotNull(user1);
-        Assertions.assertNotNull(user2);
+        assertNotNull(user1);
+        assertNotNull(user2);
     }
 
 
@@ -92,7 +91,7 @@ public class UserManagementServiceTest
         var exception = assertThrows(DataServiceException.class,
                 () -> m_injection.getUserManagementService().getUserIfExists(UUID.randomUUID()));
 
-        Assertions.assertEquals("Message: User does not exists! ", exception.getMessage());
+        assertEquals("Message: User does not exists! ", exception.getMessage());
     }
 
     @Test
@@ -101,8 +100,8 @@ public class UserManagementServiceTest
         var user1 = m_injection.getUserManagementService().findUserByUsernameCallback("canozturk");
         var user2 = m_injection.getUserManagementService().findUserByUsernameCallback("halil");
 
-        Assertions.assertNotNull(user1);
-        Assertions.assertNotNull(user2);
+        assertNotNull(user1);
+        assertNotNull(user2);
     }
 
     @Test
@@ -110,8 +109,8 @@ public class UserManagementServiceTest
     {
         var user = m_injection.getUserManagementService().findUserByUsernameCallback("no_name");
 
-        Assertions.assertNotEquals(user.getStatusCode(), 200);
-        Assertions.assertNull(user.getObject());
+        assertNotEquals(user.getStatusCode(), 200);
+        assertNull(user.getObject());
     }
 
     @Test
@@ -119,9 +118,9 @@ public class UserManagementServiceTest
     {
         var user = m_injection.getUserManagementService().findUserProfileByUsername("canozturk");
 
-        Assertions.assertNotNull(user);
-        Assertions.assertNotNull(user.getObject());
-        Assertions.assertEquals(user.getStatusCode(), 200);
+        assertNotNull(user);
+        assertNotNull(user.getObject());
+        assertEquals(user.getStatusCode(), 200);
     }
 
     @Test
@@ -130,8 +129,7 @@ public class UserManagementServiceTest
         var exception = assertThrows(DataServiceException.class,
                 () -> m_injection.getUserManagementService().findUserProfileByUsername("no_name"));
 
-        Assertions.assertEquals("Message: UserManagementService::findUserProfileByUserId , Cause Message:Message: User does not exists! "
-                , exception.getMessage());
+        assertEquals("Message: UserManagementService::findUserProfileByUserId , Cause Message:Message: User does not exists! ", exception.getMessage());
     }
 
     @Test
@@ -139,9 +137,9 @@ public class UserManagementServiceTest
     {
         var user = m_injection.getUserManagementService().findUserProfileByUserId(user1Id);
 
-        Assertions.assertNotNull(user);
-        Assertions.assertNotNull(user.getObject());
-        Assertions.assertEquals(user.getStatusCode(), 200);
+        assertNotNull(user);
+        assertNotNull(user.getObject());
+        assertEquals(user.getStatusCode(), 200);
     }
 
     @Test
@@ -150,7 +148,7 @@ public class UserManagementServiceTest
         var exception = assertThrows(DataServiceException.class,
                 () -> m_injection.getUserManagementService().findUserProfileByUserId(UUID.randomUUID()));
 
-        Assertions.assertEquals("Message: UserManagementService::findUserProfileByUserId , Cause Message:Message: User does not exists! "
+        assertEquals("Message: UserManagementService::findUserProfileByUserId , Cause Message:Message: User does not exists! "
                 , exception.getMessage());
     }
 
@@ -159,9 +157,9 @@ public class UserManagementServiceTest
     {
         var user = m_injection.getUserManagementService().findUserWithProfile(user1Id);
 
-        Assertions.assertNotNull(user);
-        Assertions.assertNotNull(user.getObject());
-        Assertions.assertEquals(user.getStatusCode(), 200);
+        assertNotNull(user);
+        assertNotNull(user.getObject());
+        assertEquals(user.getStatusCode(), 200);
     }
 
     @Test
@@ -170,7 +168,6 @@ public class UserManagementServiceTest
         var exception = assertThrows(DataServiceException.class,
                 () -> m_injection.getUserManagementService().findUserWithProfile(UUID.randomUUID()));
 
-        Assertions.assertEquals("Message: UserManagementService::findUserWithProfile , Cause Message:Message: User does not exists! "
-                , exception.getMessage());
+        assertEquals("Message: UserManagementService::findUserWithProfile , Cause Message:Message: User does not exists! ", exception.getMessage());
     }
 }

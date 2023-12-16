@@ -3,15 +3,12 @@ package callofproject.dev.authentication;
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
 import callofproject.dev.nosql.dal.MatchServiceHelper;
 import callofproject.dev.nosql.repository.IUserTagRepository;
-import callofproject.dev.repository.authentication.entity.Role;
-import callofproject.dev.repository.authentication.entity.User;
-import callofproject.dev.repository.authentication.entity.UserProfile;
-import callofproject.dev.repository.authentication.enumeration.RoleEnum;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserProfileRepository;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -22,8 +19,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.time.LocalDate;
 
 import static callofproject.dev.authentication.util.Util.BASE_PACKAGE;
 import static callofproject.dev.authentication.util.Util.REPO_PACKAGE;
@@ -42,7 +37,7 @@ import static callofproject.dev.authentication.util.Util.REPO_PACKAGE;
         bearerFormat = "JWT",
         scheme = "bearer"
 )
-public class AuthenticationServiceApplication /*implements ApplicationRunner*/
+public class AuthenticationServiceApplication implements ApplicationRunner
 {
     private final IUserRepository m_userRepository;
     private final PasswordEncoder m_passwordEncoder;
@@ -68,13 +63,11 @@ public class AuthenticationServiceApplication /*implements ApplicationRunner*/
     }
 
 
-/*
     @Override
-*/
     public void run(ApplicationArguments args) throws Exception
     {
 
-        if (m_userRepository.findByUsername("cop_root").isEmpty())
+       /* if (m_userRepository.findByUsername("cop_root").isEmpty())
         {
             var rootUser = new User("cop_root", "root", "root", "root", "nuricanozturk02@gmail.com",
                     m_passwordEncoder.encode("cop123"), LocalDate.now(), new Role(RoleEnum.ROLE_ROOT.getRole()));
@@ -97,11 +90,11 @@ public class AuthenticationServiceApplication /*implements ApplicationRunner*/
             adminUser.setUserProfile(profile2);
             m_userRepository.save(adminUser);
 
-          /*  m_kafkaProducer.sendMessage(new UserKafkaDTO(rootUser.getUserId(), rootUser.getUsername(), rootUser.getEmail(),
+            m_kafkaProducer.sendMessage(new UserKafkaDTO(rootUser.getUserId(), rootUser.getUsername(), rootUser.getEmail(),
                     rootUser.getFirstName(), rootUser.getMiddleName(), rootUser.getLastName(), EOperation.CREATE, 0, 0, 0));
 
             m_kafkaProducer.sendMessage(new UserKafkaDTO(adminUser.getUserId(), adminUser.getUsername(), adminUser.getEmail(),
-                    adminUser.getFirstName(), adminUser.getMiddleName(), adminUser.getLastName(), EOperation.CREATE, 0, 0, 0));*/
-        }
+                    adminUser.getFirstName(), adminUser.getMiddleName(), adminUser.getLastName(), EOperation.CREATE, 0, 0, 0));
+        }*/
     }
 }

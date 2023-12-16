@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
 
@@ -12,29 +14,26 @@ public class RegisterRequest
 {
     @JsonProperty("first_name")
     @NotBlank(message = "first name cannot be empty")
-    @NotEmpty
+    @NotEmpty(message = "first name cannot be empty")
     private String first_name;
     @JsonProperty("last_name")
     @NotBlank(message = "last name cannot be empty")
-    @NotEmpty
+    @NotEmpty(message = "last name cannot be empty")
     private String last_name;
     @JsonProperty("middle_name")
-    @NotBlank(message = "middle name cannot be empty")
-    @NotEmpty
     private String middle_name;
     @JsonProperty("username")
     @NotBlank(message = "username cannot be empty")
-    @NotEmpty
-    private String m_username;
+    @NotEmpty(message = "username cannot be empty")
+    private String username;
     @NotBlank(message = "email cannot be empty")
-    @NotEmpty
+    @NotEmpty(message = "email cannot be empty")
+    @Pattern(regexp = "^[\\w-]+(\\.[\\w-]+)*@[\\w-]+(\\.[\\w-]+)+$", message = "invalid email format")
     private String email;
     @NotBlank(message = "password cannot be empty")
-    @NotEmpty
+    @NotEmpty(message = "password cannot be empty")
     private String password;
-    @NotBlank(message = "birthdate cannot be empty")
-    @NotEmpty
-    @JsonProperty("birth_date")
+    @NotNull(message = "birth date cannot be empty")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Schema(description = "date format: dd/MM/yyyy", type = "string")
     private LocalDate birth_date;
@@ -49,7 +48,7 @@ public class RegisterRequest
         first_name = firstName;
         last_name = lastName;
         middle_name = middleName;
-        m_username = username;
+        this.username = username;
         this.email = email;
         this.password = password;
         birth_date = birthDate;
@@ -87,12 +86,12 @@ public class RegisterRequest
 
     public String getUsername()
     {
-        return m_username;
+        return username;
     }
 
     public void setUsername(String username)
     {
-        m_username = username;
+        this.username = username;
     }
 
     public String getEmail()

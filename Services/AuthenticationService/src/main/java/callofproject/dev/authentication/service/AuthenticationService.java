@@ -75,7 +75,14 @@ public class AuthenticationService
      */
     public AuthenticationResponse register(RegisterRequest request)
     {
-        return doForDataService(() -> registerUserCallback(request), "AuthenticationService::register");
+        var result = doForDataService(() -> registerUserCallback(request), "AuthenticationService::register");
+
+        if (result.isSuccess())
+            sendAuthenticationEmail(new UserSignUpRequestDTO(request.getEmail(), request.getFirst_name(),
+                    request.getMiddle_name(), request.getLast_name(), request.getUsername(),
+                    m_passwordEncoder.encode(request.getPassword()), request.getBirth_date(),
+                    RoleEnum.ROLE_USER));
+        return result;
     }
 
     /**
@@ -110,24 +117,26 @@ public class AuthenticationService
      * @param request represent the request.
      * @return AuthenticationResponse.
      */
-    private AuthenticationResponse registerUserCallback(RegisterRequest request)
+    public AuthenticationResponse registerUserCallback(RegisterRequest request)
     {
         var dto = new UserSignUpRequestDTO(request.getEmail(), request.getFirst_name(),
                 request.getMiddle_name(), request.getLast_name(), request.getUsername(),
                 m_passwordEncoder.encode(request.getPassword()), request.getBirth_date(),
                 RoleEnum.ROLE_USER);
 
-        var claims = createClaimsForRegister();
-
-        var token = JwtUtil.generateToken(claims, dto.getUsername());
-        var message = String.format(m_url, token);
-        var emailTopic = new EmailTopic(EMAIL_VERIFICATION, request.getEmail(), "Verification Link", message, null);
-
-        m_kafkaProducer.sendEmail(emailTopic);
-
         var user = m_userManagementService.saveUser(dto);
 
         return new AuthenticationResponse(user.getObject().accessToken(), user.getObject().refreshToken(), true, RoleEnum.ROLE_USER.getRole(), user.getObject().userId());
+    }
+
+    public void sendAuthenticationEmail(UserSignUpRequestDTO dto)
+    {
+        var claims = createClaimsForRegister();
+        var token = JwtUtil.generateToken(claims, dto.getUsername());
+        var message = String.format(m_url, token);
+        var emailTopic = new EmailTopic(EMAIL_VERIFICATION, dto.getEmail(), "Verification Link", message, null);
+
+        m_kafkaProducer.sendEmail(emailTopic);
     }
 
     private HashMap<String, Object> createClaimsForRegister()
@@ -195,6 +204,8 @@ public class AuthenticationService
      */
     private AuthenticationResponse authenticateCallback(AuthenticationRequest request)
     {
+        if (request == null)
+            throw new DataServiceException("AuthenticationRequest is null!");
         m_authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
         var user = m_userManagementService.findUserByUsernameForAuthenticationService(request.username());
 

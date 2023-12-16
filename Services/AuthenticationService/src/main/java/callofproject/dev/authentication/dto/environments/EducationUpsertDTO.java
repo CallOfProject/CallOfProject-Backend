@@ -62,12 +62,6 @@ public class EducationUpsertDTO
     @DecimalMax("4.0")
     @Digits(integer = 1, fraction = 2)
     private double gpa;
-
-
-    public EducationUpsertDTO()
-    {
-    }
-
     public EducationUpsertDTO(UUID userId, String schoolName, String department, String description, LocalDate startDate, LocalDate finishDate, boolean isContinue, double gpa)
     {
         this.userId = userId;
@@ -79,6 +73,12 @@ public class EducationUpsertDTO
         this.isContinue = isContinue;
         this.gpa = gpa;
     }
+
+    public EducationUpsertDTO()
+    {
+    }
+
+
 
     public UUID getUserId()
     {

@@ -157,5 +157,4 @@ public class RootServiceTest
         System.out.println("cleaning up");
         m_databaseCleaner.clearH2Database();
     }
-
 }

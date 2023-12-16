@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
@@ -69,13 +67,13 @@ public class AuthenticationController
      *
      * @param request represent the Register information.
      * @return if success AuthenticationResponse else return ErrorMessage.
-     */
+     *//*
     @PostMapping("/register-all")
     public ResponseEntity<Object> register(@RequestBody List<RegisterRequest> request)
     {
         return subscribe(() -> ok(m_authenticationService.registerAll(request)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
-    }
+    }*/
 
     /**
      * Login operation for application.
@@ -84,7 +82,7 @@ public class AuthenticationController
      * @return if success returns AuthenticationResponse that include token and status else return ErrorMessage.
      */
     @PostMapping("/login")
-    public ResponseEntity<Object> authenticate(@RequestBody AuthenticationRequest request)
+    public ResponseEntity<Object> authenticate(@RequestBody @Valid AuthenticationRequest request)
     {
         return subscribe(() -> ok(m_authenticationService.authenticate(request)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
@@ -97,6 +95,7 @@ public class AuthenticationController
      * @param response from Servlet
      * @return success or not. Return type is boolean.
      */
+    @Deprecated
     @PostMapping("/refresh-token")
     public ResponseEntity<Object> refreshToken(HttpServletRequest request, HttpServletResponse response)
     {
