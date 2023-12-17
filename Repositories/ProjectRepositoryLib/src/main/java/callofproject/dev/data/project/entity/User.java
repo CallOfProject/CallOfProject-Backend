@@ -10,7 +10,7 @@ import java.util.UUID;
 import static jakarta.persistence.CascadeType.*;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User
 {
     @Id
@@ -59,6 +59,9 @@ public class User
         m_firstName = firstName;
         m_middleName = middleName;
         m_lastName = lastName;
+        m_totalProjectCount = 0;
+        m_ownerProjectCount = 0;
+        m_participantProjectCount = 0;
     }
 
 

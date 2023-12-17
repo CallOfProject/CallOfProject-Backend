@@ -74,12 +74,12 @@ public final class Util
     {
         return new UsersDTO(List.of(createUserDTO()));
     }
+
     public static UserProfileDTO createUserProfileDTO()
     {
-        UserRateDTO userRateDTO = new UserRateDTO(4.5, 4.2);
+        var userRateDTO = new UserRateDTO(4.5, 4.2);
 
-        // Create CourseDTO objects
-        CourseDTO course1 = new CourseDTO(
+        var course1 = new CourseDTO(
                 UUID.randomUUID(),
                 "Example University",
                 "Computer Science 101",
@@ -89,7 +89,7 @@ public final class Util
                 "This is a computer science course."
         );
 
-        CourseDTO course2 = new CourseDTO(
+        var course2 = new CourseDTO(
                 UUID.randomUUID(),
                 "Another College",
                 "Mathematics Fundamentals",
@@ -99,8 +99,7 @@ public final class Util
                 "Fundamental math concepts."
         );
 
-        // Create EducationDTO objects
-        EducationDTO education1 = new EducationDTO(
+        var education1 = new EducationDTO(
                 UUID.randomUUID(),
                 "University of Example",
                 "Computer Science",
@@ -111,7 +110,7 @@ public final class Util
                 3.8
         );
 
-        EducationDTO education2 = new EducationDTO(
+        var education2 = new EducationDTO(
                 UUID.randomUUID(),
                 "College of Another",
                 "Mathematics",
@@ -122,8 +121,7 @@ public final class Util
                 3.5
         );
 
-        // Create ExperienceDTO objects
-        ExperienceDTO experience1 = new ExperienceDTO(
+        var experience1 = new ExperienceDTO(
                 UUID.randomUUID(),
                 "Tech Company XYZ",
                 "Worked on software development projects.",
@@ -134,7 +132,7 @@ public final class Util
                 "Software Engineer"
         );
 
-        ExperienceDTO experience2 = new ExperienceDTO(
+        var experience2 = new ExperienceDTO(
                 UUID.randomUUID(),
                 "Startup ABC",
                 "Led a team of developers.",
@@ -145,31 +143,27 @@ public final class Util
                 "Team Lead"
         );
 
-        // Create LinkDTO objects
-        LinkDTO link1 = new LinkDTO(1, "Portfolio Website", "https://www.example.com/portfolio");
-        LinkDTO link2 = new LinkDTO(2, "LinkedIn Profile", "https://www.linkedin.com/in/johndoe");
+        var link1 = new LinkDTO(1, "Portfolio Website", "https://www.example.com/portfolio");
+        var link2 = new LinkDTO(2, "LinkedIn Profile", "https://www.linkedin.com/in/johndoe");
 
-        // Create a List of CourseDTO objects
         List<CourseDTO> courses = new ArrayList<>();
         courses.add(course1);
         courses.add(course2);
 
-        // Create a List of EducationDTO objects
         List<EducationDTO> educations = new ArrayList<>();
         educations.add(education1);
         educations.add(education2);
 
-        // Create a List of ExperienceDTO objects
+
         List<ExperienceDTO> experiences = new ArrayList<>();
         experiences.add(experience1);
         experiences.add(experience2);
 
-        // Create a List of LinkDTO objects
         List<LinkDTO> links = new ArrayList<>();
         links.add(link1);
         links.add(link2);
 
-        UserProfileDTO userProfileDTO = new UserProfileDTO();
+        var userProfileDTO = new UserProfileDTO();
         userProfileDTO.cv = "Sample CV Text";
         userProfileDTO.profilePhoto = "https://example.com/profile.jpg";
         userProfileDTO.aboutMe = "About me information";

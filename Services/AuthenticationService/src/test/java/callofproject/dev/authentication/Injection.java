@@ -1,6 +1,5 @@
 package callofproject.dev.authentication;
 
-import callofproject.dev.authentication.controller.AdminController;
 import callofproject.dev.authentication.service.*;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +28,6 @@ public class Injection
     @Autowired
     private IUserRepository m_userRepository;
 
-    @Autowired
-    private AdminController m_adminController;
-
-    public AdminController getAdminController()
-    {
-        return m_adminController;
-    }
     public UserInformationService getUserInformationService()
     {
         return m_userInformationService;
