@@ -3,15 +3,12 @@ package callofproject.dev.project.service;
 import callofproject.dev.project.DatabaseCleaner;
 import callofproject.dev.project.Injection;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.TestPropertySource;
-
-import java.time.LocalDate;
 
 import static callofproject.dev.project.util.Constants.*;
 

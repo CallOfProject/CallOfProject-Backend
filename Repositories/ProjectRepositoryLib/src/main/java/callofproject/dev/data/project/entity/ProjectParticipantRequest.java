@@ -21,7 +21,7 @@ public class ProjectParticipantRequest
     @JoinColumn(name = "project_id", nullable = false)
     private Project m_project;
 
-    @ManyToOne(cascade = {DETACH, MERGE, PERSIST, REFRESH})
+    @ManyToOne(cascade = {PERSIST, REFRESH})
     @JoinColumn(name = "user_id", nullable = false)
     private User m_user;
     @Column(name = "is_accepted", nullable = false)

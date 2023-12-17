@@ -315,6 +315,7 @@ public class ProjectService
 
     private MultipleResponseMessagePageable<Object> findAllParticipantProjectByUserIdCallback(UUID userId, int page)
     {
+        findUserIfExists(userId);
         var projectPageable = m_serviceHelper.findAllParticipantProjectByUserId(userId, page);
         var projects = toStreamConcurrent(projectPageable).toList();
         var totalPage = projectPageable.getTotalPages();
@@ -327,6 +328,7 @@ public class ProjectService
 
     private MultipleResponseMessagePageable<Object> findAllOwnerProjectsByUserIdCallback(UUID userId, int page)
     {
+        findUserIfExists(userId);
         var projects = m_serviceHelper.findAllProjectByProjectOwnerUserId(userId, page);
 
         var projectsDetailDTO = m_projectMapper.toProjectsDetailDTO(toList(projects.getContent(),

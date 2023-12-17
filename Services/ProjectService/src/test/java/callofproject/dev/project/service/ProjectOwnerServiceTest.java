@@ -88,7 +88,6 @@ public class ProjectOwnerServiceTest
 
         m_project = m_injection.getProjectServiceHelper().saveProject(testProject);
         testProjectId = m_project.getProjectId();
-        System.out.println("saved");
     }
 
     @Test
