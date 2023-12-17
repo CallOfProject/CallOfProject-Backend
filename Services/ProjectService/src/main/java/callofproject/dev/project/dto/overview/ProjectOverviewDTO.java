@@ -46,8 +46,12 @@ public record ProjectOverviewDTO(
         String projectOwnerName,
         @JsonProperty("feedback_time_range")
         EFeedbackTimeRange feedbackTimeRange,
+        @JsonProperty("project_status")
+        EProjectStatus projectStatus,
         @JsonProperty("project_tags")
         List<ProjectTag> projectTags
+
+
 )
 {
 }
