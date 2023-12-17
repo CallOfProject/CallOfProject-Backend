@@ -75,7 +75,7 @@ public class Project
     @JsonIgnore
     private Set<ProjectParticipant> m_projectParticipants; // Approval requests
 
-    @OneToMany(mappedBy = "m_project", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "m_project", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<ProjectParticipantRequest> m_projectParticipantRequests;
 

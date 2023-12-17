@@ -3,6 +3,7 @@ package callofproject.dev.project.service;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.data.project.entity.Project;
+import callofproject.dev.data.project.entity.ProjectParticipant;
 import callofproject.dev.data.project.entity.ProjectParticipantRequest;
 import callofproject.dev.data.project.entity.User;
 import callofproject.dev.data.project.entity.enums.EProjectStatus;
@@ -81,7 +82,20 @@ public class ProjectOwnerService
      */
     public ResponseMessage<Object> approveParticipantRequest(ParticipantRequestDTO requestDTO)
     {
-        return doForDataService(() -> approveParticipantRequestCallback(requestDTO), "ProjectService::approveParticipantRequest");
+        var result = doForDataService(() -> approveParticipantRequestCallback(requestDTO), "ProjectService::approveParticipantRequest");
+
+        if (result.getStatusCode() == ACCEPTED && result.getObject() instanceof ParticipantStatusDTO dto && dto.isAccepted())
+        {
+            var message = format("%s accepted your request to join %s project!", dto.owner().getFullName(), dto.project().getProjectName());
+            sendNotificationToUser(dto.project(), dto.user(), dto.owner(), message);
+        }
+        if (result.getStatusCode() == NOT_ACCEPTED && result.getObject() instanceof ParticipantStatusDTO dto && !dto.isAccepted())
+        {
+            var message = format("%s denied your request to join %s project!", dto.owner().getFullName(), dto.project().getProjectName());
+            sendNotificationToUser(dto.project(), dto.user(), dto.owner(), message);
+        }
+
+        return new ResponseMessage<>(result.getMessage(), result.getStatusCode(), result.getStatusCode() == ACCEPTED);
     }
 
     /**
@@ -101,79 +115,79 @@ public class ProjectOwnerService
         return doForDataService(() -> changeProjectStatusCallback(userId, projectId, projectStatus), "ProjectService::changeProjectStatus");
     }
 
-    private ResponseMessage<Object> approveParticipantRequestCallback(ParticipantRequestDTO requestDTO)
+    public ResponseMessage<Object> approveParticipantRequestCallback(ParticipantRequestDTO requestDTO)
     {
         var participantRequest = findProjectParticipantRequestByRequestId(requestDTO.requestId());
         var project = participantRequest.getProject();
         var user = participantRequest.getUser();
         var projectOwner = project.getProjectOwner();
 
+        project.getProjectParticipantRequests().remove(participantRequest);
+        user.getProjectParticipantRequests().remove(participantRequest);
+
+        m_projectServiceHelper.saveProject(project);
+        m_projectServiceHelper.addUser(user);
+        m_projectServiceHelper.removeParticipantRequestByRequestId(participantRequest.getParticipantRequestId());
+
         var isExistsUser = project.getProjectParticipants()
                 .stream()
                 .anyMatch(p -> p.getUser().getUserId().equals(user.getUserId()) && p.getProject().getProjectId().equals(project.getProjectId()));
+
+
         if (isExistsUser)
-        {
-            m_projectServiceHelper.removeParticipantRequestByRequestId(participantRequest.getParticipantRequestId());
             return new ResponseMessage<>("User is already participant in this project!", NOT_ACCEPTED, false);
-        }
+
 
         if (!requestDTO.isAccepted()) // if not  accepted then call denied
-            return deniedParticipantRequest(participantRequest, user, project, projectOwner);
+            return deniedParticipantRequest(user, project, projectOwner);
 
-        return approveParticipant(participantRequest, user, project, projectOwner);
+        return approveParticipant(user, project, projectOwner);
     }
 
-    private ResponseMessage<Object> removeParticipantCallback(UUID projectId, UUID userId)
+    public ResponseMessage<Object> removeParticipantCallback(UUID projectId, UUID userId)
     {
         var project = findProjectIfExistsByProjectId(projectId);
         var user = findUserIfExists(userId);
 
-        project.getProjectParticipants().removeIf(p -> p.getUser().getUserId().equals(user.getUserId()));
+        var participant = project
+                .getProjectParticipants()
+                .stream()
+                .filter(p -> p.getUser().getUserId().equals(user.getUserId()))
+                .findFirst();
+
+        if (participant.isEmpty())
+            return new ResponseMessage<>("User is not participant of this project", OK, false);
+
+        project.getProjectParticipants().remove(participant.get());
+        m_projectServiceHelper.removeParticipant(participant.get().getProjectId());
         m_projectServiceHelper.saveProject(project);
+        m_projectServiceHelper.addUser(user);
 
         var message = format("%s removed you from %s project!", project.getProjectOwner().getFullName(), project.getProjectName());
 
         return new ResponseMessage<>(message, OK, true);
     }
 
-    private ResponseMessage<Object> deniedParticipantRequest(ProjectParticipantRequest participantRequest, User user, Project project, User projectOwner)
+    private ResponseMessage<Object> deniedParticipantRequest(User user, Project project, User projectOwner)
     {
-        var msg = format("%s denied your request to join %s project!", projectOwner.getFullName(), project.getProjectName());
-
-        var data = new NotificationObject(project.getProjectId(), user.getUserId());
-
-        var dataToJson = doForDataService(() -> m_objectMapper.writeValueAsString(data), "Converter Error!");
-
-        // Project owner to user message
-        var notificationMessage = new ProjectParticipantRequestDTO.Builder()
-                .setFromUserId(projectOwner.getUserId())
-                .setToUserId(user.getUserId())
-                .setMessage(msg)
-                .setNotificationType(NotificationType.INFORMATION)
-                .setNotificationData(dataToJson)
-                .setNotificationLink("none")
-                .build();
-
-        // Send notification to user
-        doForDataService(() -> m_kafkaProducer.sendProjectParticipantNotification(notificationMessage), "ProjectService::approveParticipantRequest");
-
-        m_projectServiceHelper.removeParticipantRequestByRequestId(participantRequest.getParticipantRequestId());
-
-        return new ResponseMessage<>("Participant request is not accepted!", NOT_ACCEPTED, false);
+        return new ResponseMessage<>("Participant request is not accepted!", NOT_ACCEPTED, new ParticipantStatusDTO(project, user, projectOwner, false));
     }
 
-    private ResponseMessage<Object> approveParticipant(ProjectParticipantRequest participantRequest, User user, Project project, User owner)
+    private ResponseMessage<Object> approveParticipant(User user, Project project, User owner)
     {
         // Add participant to project
-        addParticipant(new SaveProjectParticipantDTO(user.getUserId(), project.getProjectId()));
+        project.addProjectParticipant(new ProjectParticipant(project, user));
+        m_projectServiceHelper.saveProject(project);
 
-        // Remove participant request
-        doForDataService(() -> m_projectServiceHelper.removeParticipantRequestByRequestId(participantRequest.getParticipantRequestId()),
-                "ProjectService::approveParticipant::removeParticipantRequestByRequestId");
+        // update user
+        user.setParticipantProjectCount(user.getParticipantProjectCount() + 1);
+        user.setTotalProjectCount(user.getTotalProjectCount() + 1);
+        m_projectServiceHelper.addUser(user);
+        return new ResponseMessage<>("Participant request is accepted!", ACCEPTED, new ParticipantStatusDTO(project, user, owner, true));
+    }
 
-        var message = format("%s accepted your request to join %s project!", owner.getFullName(), project.getProjectName());
-
-        // Project owner to user message
+    private void sendNotificationToUser(Project project, User user, User owner, String message)
+    {
         var data = new NotificationObject(project.getProjectId(), user.getUserId());
         var dataToJson = doForDataService(() -> m_objectMapper.writeValueAsString(data), "Converter Error!");
 
@@ -185,17 +199,31 @@ public class ProjectOwnerService
                 .setNotificationData(dataToJson)
                 .setNotificationLink("none")
                 .build();
+        // Send notification to user
+        doForDataService(() -> m_kafkaProducer.sendProjectParticipantNotification(notificationMessage), "ProjectService::approveParticipantRequest");
+    }
 
-        // update user
-        user.setParticipantProjectCount(user.getParticipantProjectCount() + 1);
-        user.setTotalProjectCount(user.getTotalProjectCount() + 1);
-        m_projectServiceHelper.addUser(user);
+   /* private void sendFailNotificationToUser(Project project, User user, User owner)
+    {
+        var msg = format("%s denied your request to join %s project!", owner.getFullName(), project.getProjectName());
+
+        var data = new NotificationObject(project.getProjectId(), user.getUserId());
+
+        var dataToJson = doForDataService(() -> m_objectMapper.writeValueAsString(data), "Converter Error!");
+
+        // Project owner to user message
+        var notificationMessage = new ProjectParticipantRequestDTO.Builder()
+                .setFromUserId(owner.getUserId())
+                .setToUserId(user.getUserId())
+                .setMessage(msg)
+                .setNotificationType(NotificationType.INFORMATION)
+                .setNotificationData(dataToJson)
+                .setNotificationLink("none")
+                .build();
 
         // Send notification to user
         doForDataService(() -> m_kafkaProducer.sendProjectParticipantNotification(notificationMessage), "ProjectService::approveParticipantRequest");
-
-        return new ResponseMessage<>("Participant request is accepted!", ACCEPTED, true);
-    }
+    }*/
 
     private ProjectParticipantRequest findProjectParticipantRequestByRequestId(UUID requestId)
     {

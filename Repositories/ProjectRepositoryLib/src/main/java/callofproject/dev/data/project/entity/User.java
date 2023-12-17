@@ -34,15 +34,15 @@ public class User
     @Column(name = "total_project_count", nullable = false)
     private int m_totalProjectCount;
 
-    @OneToMany(mappedBy = "m_projectOwner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "m_projectOwner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<Project> m_projects; // projects that he owns
 
-    @OneToMany(mappedBy = "m_user", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "m_user", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<ProjectParticipant> m_projectParticipants; // projects that he owns
 
-    @OneToMany(mappedBy = "m_user", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "m_user", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<ProjectParticipantRequest> m_projectParticipantRequests; // Project Join requests
 

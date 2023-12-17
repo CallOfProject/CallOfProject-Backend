@@ -167,12 +167,17 @@ public class ProjectService
      */
     public ResponseMessage<Object> addProjectJoinRequest(UUID projectId, UUID userId)
     {
-        return doForDataService(() -> addProjectJoinRequestCallback(projectId, userId), "ProjectService::addProjectJoinRequest");
+        var result = doForDataService(() -> addProjectJoinRequestCallback(projectId, userId), "ProjectService::addProjectJoinRequest");
+
+        if ((Boolean) result.getObject())
+            sendNotificationToProjectOwner(userId, projectId);
+
+        return result;
     }
 
     //-----------------------------------CALLBACKS---------------------------------------------
 
-    private ResponseMessage<Object> addProjectJoinRequestCallback(UUID projectId, UUID userId)
+    public ResponseMessage<Object> addProjectJoinRequestCallback(UUID projectId, UUID userId)
     {
         var user = m_serviceHelper.findUserById(userId);
         var project = m_serviceHelper.findProjectById(projectId);
@@ -194,9 +199,6 @@ public class ProjectService
 
         if (!result)
             return new ResponseMessage<>("You are participant of project already! ", NOT_ACCEPTED, false);
-
-        // Send notification to project owner (Approve Message)
-        sendNotificationToProjectOwner(userId, projectId);
 
         return new ResponseMessage<>("Participant request is sent!", OK, true);
     }
