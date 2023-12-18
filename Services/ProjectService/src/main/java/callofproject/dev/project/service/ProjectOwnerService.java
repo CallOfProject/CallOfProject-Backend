@@ -54,12 +54,17 @@ public class ProjectOwnerService
      * Add participant with given project id and user id.
      *
      * @param dto represent the SaveProjectParticipantDTO class
-     * @return true if success else false.
+     * @return ResponseMessage<Object>
      */
-    public boolean addParticipant(SaveProjectParticipantDTO dto)
+    public ResponseMessage<Boolean> addParticipant(SaveProjectParticipantDTO dto)
     {
-        return doForDataService(() -> m_projectServiceHelper.addProjectParticipant(dto.project_id(), dto.user_id()),
+        var response = doForDataService(() -> m_projectServiceHelper.addProjectParticipant(dto.project_id(), dto.user_id()),
                 "ProjectService::addParticipant");
+
+        if (response)
+            return new ResponseMessage<>("Participant added to project!", OK, true);
+
+        return new ResponseMessage<>("Participant is already added to project!", NOT_ACCEPTED, false);
     }
 
     /**

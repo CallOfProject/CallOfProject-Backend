@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
-import static org.springframework.http.ResponseEntity.badRequest;
-import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.*;
 
 @RestController
 @RequestMapping("api/project")
@@ -34,7 +33,7 @@ public class ProjectController
     @PostMapping("/create")
     public ResponseEntity<Object> save(@RequestBody @Valid ProjectSaveDTO saveDTO)
     {
-        return subscribe(() -> ok(m_projectService.saveProject(saveDTO)), msg -> badRequest().body(msg.getMessage()));
+        return subscribe(() -> ok(m_projectService.saveProject(saveDTO)), msg -> internalServerError().body(msg.getMessage()));
     }
 
     /**
@@ -47,7 +46,7 @@ public class ProjectController
     @PutMapping("/update")
     public ResponseEntity<Object> updateProject(@RequestBody ProjectUpdateDTO dto)
     {
-        return subscribe(() -> ok(m_projectService.updateProject(dto)), msg -> badRequest().body(msg.getMessage()));
+        return subscribe(() -> ok(m_projectService.updateProject(dto)), msg -> internalServerError().body(msg.getMessage()));
     }
 
 
@@ -63,7 +62,7 @@ public class ProjectController
     public ResponseEntity<Object> findAllParticipantProjectByUserId(@RequestParam("uid") String userId, @RequestParam("p") int page)
     {
         return subscribe(() -> ok(m_projectService.findAllParticipantProjectByUserId(UUID.fromString(userId), page)),
-                msg -> badRequest().body(msg.getMessage()));
+                msg -> internalServerError().body(msg.getMessage()));
     }
 
 
@@ -79,7 +78,7 @@ public class ProjectController
     public ResponseEntity<Object> findAllOwnerProjectsByUserId(@RequestParam("uid") UUID userId, @RequestParam("p") int page)
     {
         return subscribe(() -> ok(m_projectService.findAllOwnerProjectsByUserId(userId, page)),
-                msg -> badRequest().body(msg.getMessage()));
+                msg -> internalServerError().body(msg.getMessage()));
     }
 
     /**
@@ -94,7 +93,7 @@ public class ProjectController
     public ResponseEntity<Object> findAllOwnerProjectsByUsername(String username, int page)
     {
         return subscribe(() -> ok(m_projectService.findAllOwnerProjectsByUsername(username, page)),
-                msg -> badRequest().body(msg.getMessage()));
+                msg -> internalServerError().body(msg.getMessage()));
     }
 
     /**
@@ -108,7 +107,7 @@ public class ProjectController
     public ResponseEntity<Object> findProjectOverview(@RequestParam("pid") UUID projectId)
     {
         return subscribe(() -> ok(m_projectService.findProjectOverview(projectId)),
-                msg -> badRequest().body(msg.getMessage()));
+                msg -> internalServerError().body(msg.getMessage()));
     }
 
     /**
@@ -123,7 +122,7 @@ public class ProjectController
     public ResponseEntity<Object> findProjectOwnerView(@RequestParam("uid") UUID userId, @RequestParam("pid") UUID projectId)
     {
         return subscribe(() -> ok(m_projectService.findProjectOwnerView(userId, projectId)),
-                msg -> badRequest().body(msg.getMessage()));
+                msg -> internalServerError().body(msg.getMessage()));
     }
 
     /**
@@ -135,7 +134,7 @@ public class ProjectController
     @GetMapping("discovery/all")
     public ResponseEntity<Object> findAllProjectDiscoveryView(@RequestParam("p") int page)
     {
-        return subscribe(() -> ok(m_projectService.findAllProjectDiscoveryView(page)), msg -> badRequest().body(msg.getMessage()));
+        return subscribe(() -> ok(m_projectService.findAllProjectDiscoveryView(page)), msg -> internalServerError().body(msg.getMessage()));
     }
 
     /**
@@ -149,6 +148,6 @@ public class ProjectController
     public ResponseEntity<Object> addProjectJoinRequest(@RequestParam("pid") UUID projectId, @RequestParam("uid") UUID userId)
     {
         return subscribe(() -> ok(m_projectService.addProjectJoinRequest(projectId, userId)),
-                msg -> badRequest().body(msg.getMessage()));
+                msg -> internalServerError().body(msg.getMessage()));
     }
 }

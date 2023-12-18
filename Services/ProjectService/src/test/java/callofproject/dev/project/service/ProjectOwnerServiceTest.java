@@ -96,7 +96,7 @@ public class ProjectOwnerServiceTest
         // Add a participant to the project
         var participantResult = m_injection.getProjectOwnerService()
                 .addParticipant(new SaveProjectParticipantDTO(testUser.getUserId(), testProjectId));
-        assertTrue(participantResult);
+        assertTrue(participantResult.getObject());
         var updatedProject = m_injection.getProjectServiceHelper().findProjectById(testProjectId);
         assertTrue(updatedProject.isPresent());
         assertTrue(updatedProject.get().getProjectParticipants().stream().map(ProjectParticipant::getUser)
@@ -120,7 +120,7 @@ public class ProjectOwnerServiceTest
         var participantResult = m_injection.getProjectOwnerService()
                 .addParticipant(new SaveProjectParticipantDTO(testUser.getUserId(), project.get().getProjectId()));
 
-        assertTrue(participantResult);
+        assertTrue(participantResult.getObject());
 
         var removeResult = m_injection
                 .getProjectOwnerService()
@@ -142,7 +142,7 @@ public class ProjectOwnerServiceTest
         var participantResult = m_injection.getProjectOwnerService()
                 .addParticipant(new SaveProjectParticipantDTO(testUser.getUserId(), project.get().getProjectId()));
 
-        assertTrue(participantResult);
+        assertTrue(participantResult.getObject());
 
         var invalidId = randomUUID();
         var removeResult = assertThrows(DataServiceException.class,
