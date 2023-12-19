@@ -220,7 +220,7 @@ public class UserInformationService
         userProfile.get().addExperience(savedExperience);
         m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile.get());
 
-        return new ResponseMessage<>("Course upserted successfully!", 200, savedExperience);
+        return new ResponseMessage<>("Experience upserted successfully!", 200, savedExperience);
     }
 
     private ResponseMessage<Object> upsertCourseCallback(CourseUpsertDTO dto)

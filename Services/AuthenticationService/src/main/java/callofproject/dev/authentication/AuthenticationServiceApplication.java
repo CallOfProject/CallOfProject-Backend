@@ -67,7 +67,7 @@ public class AuthenticationServiceApplication implements ApplicationRunner
     public void run(ApplicationArguments args) throws Exception
     {
 
-       /* if (m_userRepository.findByUsername("cop_root").isEmpty())
+        /*if (m_userRepository.findByUsername("cop_root").isEmpty())
         {
             var rootUser = new User("cop_root", "root", "root", "root", "nuricanozturk02@gmail.com",
                     m_passwordEncoder.encode("cop123"), LocalDate.now(), new Role(RoleEnum.ROLE_ROOT.getRole()));

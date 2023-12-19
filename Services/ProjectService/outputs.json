@@ -1,0 +1,41 @@
+{
+  "message": "Project Created Successfully!",
+  "status_code": 1999,
+  "object": {
+    "project_id": "29a1ab21-ccec-456e-a9b0-c2f90c51459e",
+    "project_image_path": "img-3",
+    "project_title": "Title-3",
+    "project_summary": "Summary -3",
+    "project_aim": "Aim-3",
+    "application_deadline": "12/07/2023",
+    "expected_completion_date": "12/07/2023",
+    "start_date": "12/07/2023",
+    "max_participant": 10,
+    "techinical_requirements": "technical",
+    "special_requirements": "special",
+    "project_profession_level": "Entry_Level",
+    "project_degree": "BACHELOR",
+    "project_level": "ENTRY_LEVEL",
+    "interview_type": "CODE",
+    "project_owner_name": "ali",
+    "feedback_time_range": "ONE_WEEK",
+    "project_status": "NOT_STARTED",
+    "project_tags": [
+      {
+        "id": "658178f762191337617b8357",
+        "tagName": "PYTHON",
+        "projectId": "29a1ab21-ccec-456e-a9b0-c2f90c51459e"
+      },
+      {
+        "id": "658178f762191337617b8359",
+        "tagName": "FAST_API",
+        "projectId": "29a1ab21-ccec-456e-a9b0-c2f90c51459e"
+      },
+      {
+        "id": "658178f762191337617b835b",
+        "tagName": "REACT_JS",
+        "projectId": "29a1ab21-ccec-456e-a9b0-c2f90c51459e"
+      }
+    ]
+  }
+}
