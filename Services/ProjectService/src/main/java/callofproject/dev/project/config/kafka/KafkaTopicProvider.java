@@ -11,8 +11,7 @@ public class KafkaTopicProvider
 {
     @Value("${spring.kafka.notification-topic-name}")
     private String m_notificationTopicName;
-
-
+    
     /**
      * Create a new topic.
      *
