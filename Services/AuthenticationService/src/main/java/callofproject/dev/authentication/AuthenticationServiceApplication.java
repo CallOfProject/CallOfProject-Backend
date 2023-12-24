@@ -67,7 +67,7 @@ public class AuthenticationServiceApplication implements ApplicationRunner
     public void run(ApplicationArguments args) throws Exception
     {
 
-        /*if (m_userRepository.findByUsername("cop_root").isEmpty())
+       /* if (m_userRepository.findByUsername("cop_root").isEmpty())
         {
             var rootUser = new User("cop_root", "root", "root", "root", "nuricanozturk02@gmail.com",
                     m_passwordEncoder.encode("cop123"), LocalDate.now(), new Role(RoleEnum.ROLE_ROOT.getRole()));
@@ -91,10 +91,10 @@ public class AuthenticationServiceApplication implements ApplicationRunner
             m_userRepository.save(adminUser);
 
             m_kafkaProducer.sendMessage(new UserKafkaDTO(rootUser.getUserId(), rootUser.getUsername(), rootUser.getEmail(),
-                    rootUser.getFirstName(), rootUser.getMiddleName(), rootUser.getLastName(), EOperation.CREATE, 0, 0, 0));
+                    rootUser.getFirstName(), rootUser.getMiddleName(), rootUser.getLastName(), EOperation.CREATE, rootUser.getPassword(), rootUser.getRoles(), 0, 0, 0));
 
             m_kafkaProducer.sendMessage(new UserKafkaDTO(adminUser.getUserId(), adminUser.getUsername(), adminUser.getEmail(),
-                    adminUser.getFirstName(), adminUser.getMiddleName(), adminUser.getLastName(), EOperation.CREATE, 0, 0, 0));
+                    adminUser.getFirstName(), adminUser.getMiddleName(), adminUser.getLastName(), EOperation.CREATE, adminUser.getPassword(), adminUser.getRoles(), 0, 0, 0));
         }*/
     }
 }

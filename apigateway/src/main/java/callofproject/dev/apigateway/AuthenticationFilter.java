@@ -1,4 +1,4 @@
-package callofproject.dev.apigateway.config;
+package callofproject.dev.apigateway;
 
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;

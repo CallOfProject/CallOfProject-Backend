@@ -1,4 +1,4 @@
-package callofproject.dev.apigateway.service;
+package callofproject.dev.apigateway;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;

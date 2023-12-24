@@ -7,8 +7,10 @@ import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.nosql.dal.ProjectTagServiceHelper;
-import callofproject.dev.project.dto.overview.ProjectOverviewDTO;
+import callofproject.dev.project.dto.ProjectsParticipantDTO;
+import callofproject.dev.project.dto.detail.ProjectDetailDTO;
 import callofproject.dev.project.mapper.IProjectMapper;
+import callofproject.dev.project.mapper.IProjectParticipantMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +18,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
-import static callofproject.dev.util.stream.StreamUtil.toStream;
-import static callofproject.dev.util.stream.StreamUtil.toStreamConcurrent;
+import static callofproject.dev.util.stream.StreamUtil.*;
 import static java.lang.String.format;
 
 @Service
@@ -27,13 +28,15 @@ public class AdminService
     private final ProjectServiceHelper m_projectServiceHelper;
     private final ProjectTagServiceHelper m_tagServiceHelper;
     private final ProjectTagServiceHelper m_projectTagServiceHelper;
+    private final IProjectParticipantMapper m_participantMapper;
     private final IProjectMapper m_projectMapper;
 
-    public AdminService(ProjectServiceHelper projectServiceHelper, ProjectTagServiceHelper tagServiceHelper, ProjectTagServiceHelper projectTagServiceHelper, IProjectMapper projectMapper)
+    public AdminService(ProjectServiceHelper projectServiceHelper, ProjectTagServiceHelper tagServiceHelper, ProjectTagServiceHelper projectTagServiceHelper, IProjectParticipantMapper participantMapper, IProjectMapper projectMapper)
     {
         m_projectServiceHelper = projectServiceHelper;
         m_tagServiceHelper = tagServiceHelper;
         m_projectTagServiceHelper = projectTagServiceHelper;
+        m_participantMapper = participantMapper;
         m_projectMapper = projectMapper;
     }
 
@@ -85,17 +88,23 @@ public class AdminService
         if (projects.isEmpty())
             return new MultipleResponseMessagePageable<>(totalPage, page, 0, "Projects not found!", null);
 
-        var projectOverviewList = new ArrayList<ProjectOverviewDTO>();
+        var projectOverviewList = new ArrayList<ProjectDetailDTO>();
 
         for (var project : projects)
         {
             var tags = toStreamConcurrent(m_projectTagServiceHelper.getAllProjectTagByProjectId(project.getProjectId())).toList();
-            projectOverviewList.add(m_projectMapper.toProjectOverviewDTO(project, tags));
+            projectOverviewList.add(m_projectMapper.toProjectDetailDTO(project, tags, findProjectParticipantsByProjectId(project)));
         }
 
-        var projectWithParticipants = doForDataService(() -> m_projectMapper.toProjectOverviewsDTO(projectOverviewList), "ProjectService::findAllParticipantProjectByUserId");
+        var projectWithParticipants = doForDataService(() -> m_projectMapper.toProjectsDetailDTO(projectOverviewList), "ProjectService::findAllParticipantProjectByUserId");
 
         return new MultipleResponseMessagePageable<>(totalPage, page, projectOverviewList.size(), "Projects found!", projectWithParticipants);
+    }
+
+    private ProjectsParticipantDTO findProjectParticipantsByProjectId(Project obj)
+    {
+        var participants = m_projectServiceHelper.findAllProjectParticipantByProjectId(obj.getProjectId());
+        return m_participantMapper.toProjectsParticipantDTO(toList(participants, m_participantMapper::toProjectParticipantDTO));
     }
 
     private Project findProjectIfExistsByProjectId(UUID projectId)

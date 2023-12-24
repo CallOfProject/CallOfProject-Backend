@@ -13,6 +13,7 @@ import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.entity.UserProfile;
+import callofproject.dev.repository.authentication.enumeration.RoleEnum;
 import callofproject.dev.service.jwt.JwtUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -66,7 +67,8 @@ public class UserManagementService
         var user = getUserIfExists(uuid);
 
         var kafkaMessage = new UserKafkaDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(),
-                user.getMiddleName(), user.getLastName(), EOperation.CREATE, 0, 0, 0);
+                user.getMiddleName(), user.getLastName(), EOperation.CREATE, user.getPassword(), user.getRoles(),
+                0, 0, 0);
 
         m_userProducer.sendMessage(kafkaMessage);
     }
@@ -208,6 +210,23 @@ public class UserManagementService
         var msg = format("%d user found!", dtoList.users().size());
 
         return new MultipleResponseMessagePageable<>(userListPageable.getTotalPages(), page, dtoList.users().size(), msg, dtoList);
+    }
+
+    private String findTopRole(User user)
+    {
+        var role = RoleEnum.ROLE_USER.getRole();
+
+        for (var r : user.getRoles())
+        {
+            if (r.getName().equals(RoleEnum.ROLE_ROOT.getRole()))
+            {
+                role = RoleEnum.ROLE_ROOT.getRole();
+                break;
+            }
+            if (r.getName().equals(RoleEnum.ROLE_ADMIN.getRole()))
+                role = RoleEnum.ROLE_ADMIN.getRole();
+        }
+        return role;
     }
 
     private ResponseMessage<Object> upsertUserProfileCallback(UserProfileUpdateDTO dto)

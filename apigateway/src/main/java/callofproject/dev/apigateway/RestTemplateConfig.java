@@ -1,4 +1,4 @@
-package callofproject.dev.apigateway.config;
+package callofproject.dev.apigateway;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;

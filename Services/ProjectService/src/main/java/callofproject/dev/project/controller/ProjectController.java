@@ -3,6 +3,7 @@ package callofproject.dev.project.controller;
 import callofproject.dev.project.dto.ProjectSaveDTO;
 import callofproject.dev.project.dto.ProjectUpdateDTO;
 import callofproject.dev.project.service.ProjectService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import static org.springframework.http.ResponseEntity.*;
 
 @RestController
 @RequestMapping("api/project")
+@SecurityRequirement(name = "Authorization")
 public class ProjectController
 {
     private final ProjectService m_projectService;

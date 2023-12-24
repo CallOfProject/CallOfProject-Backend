@@ -3,6 +3,8 @@ package callofproject.dev.project.dto;
 import callofproject.dev.data.common.enums.EOperation;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import callofproject.dev.data.project.entity.Role;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -18,6 +20,8 @@ public record UserDTO(
         @JsonProperty("last_name")
         String lastName,
         EOperation operation,
+        String password,
+        Set<Role> roles,
         int ownerProjectCount,
         int participantProjectCount,
         int totalProjectCount

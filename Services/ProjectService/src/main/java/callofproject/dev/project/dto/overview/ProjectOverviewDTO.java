@@ -49,9 +49,6 @@ public record ProjectOverviewDTO(
         @JsonProperty("project_status")
         EProjectStatus projectStatus,
         @JsonProperty("project_tags")
-        List<ProjectTag> projectTags
-
-
-)
+        List<ProjectTag> projectTags)
 {
 }

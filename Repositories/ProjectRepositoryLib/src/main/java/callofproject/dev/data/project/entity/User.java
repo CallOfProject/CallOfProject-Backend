@@ -26,7 +26,8 @@ public class User
     private String m_middleName;
     @Column(name = "last_name", nullable = false)
     private String m_lastName;
-
+    @Column(name = "password", nullable = false)
+    private String password;
     @Column(name = "owner_project_count", nullable = false)
     private int m_ownerProjectCount;
     @Column(name = "participant_project_count", nullable = false)
@@ -45,14 +46,30 @@ public class User
     @OneToMany(mappedBy = "m_user", cascade = {MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<ProjectParticipantRequest> m_projectParticipantRequests; // Project Join requests
-
+    @ManyToMany(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.ALL}
+    )
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = {@JoinColumn(
+                    name = "user_id",
+                    referencedColumnName = "user_id"
+            )},
+            inverseJoinColumns = {@JoinColumn(
+                    name = "role_id",
+                    referencedColumnName = "role_id"
+            )}
+    )
+    private Set<Role> roles;
 
     public User()
     {
     }
 
-    public User(UUID userId, String username, String email, String firstName, String middleName, String lastName)
+    public User(UUID userId, String username, String email, String firstName, String middleName, String lastName, Set<Role> roles)
     {
+        this.roles = roles;
         m_userId = userId;
         m_username = username;
         m_email = email;
@@ -62,6 +79,26 @@ public class User
         m_totalProjectCount = 0;
         m_ownerProjectCount = 0;
         m_participantProjectCount = 0;
+    }
+
+    public Set<Role> getRoles()
+    {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles)
+    {
+        this.roles = roles;
+    }
+
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public void setPassword(String password)
+    {
+        this.password = password;
     }
 
 

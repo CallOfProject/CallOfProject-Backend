@@ -4,6 +4,7 @@ import callofproject.dev.data.common.enums.EOperation;
 import callofproject.dev.data.common.status.Status;
 import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.data.project.entity.ProjectParticipant;
+import callofproject.dev.data.project.entity.Role;
 import callofproject.dev.data.project.entity.User;
 import callofproject.dev.data.project.entity.enums.*;
 import callofproject.dev.library.exception.service.DataServiceException;
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
+import java.util.Set;
 import java.util.UUID;
 
 import static callofproject.dev.data.project.ProjectRepositoryBeanName.BASE_PACKAGE_BEAN_NAME;
@@ -56,8 +58,10 @@ public class ProjectOwnerServiceTest
     @BeforeEach
     public void setUp()
     {
-        var userDTO = new UserDTO(randomUUID(), "nuricanozturk", "can@mail.com", "Nuri", "Can", "Ozturk", EOperation.CREATE, 0, 0, 0);
-        var testUserDTO = new UserDTO(randomUUID(), "halilcanozturk", "halilcan@mail.com", "Halil", "Can", "Ozturk", EOperation.CREATE, 0, 0, 0);
+        var userDTO = new UserDTO(randomUUID(), "nuricanozturk", "can@mail.com", "Nuri", "Can", "Ozturk", EOperation.CREATE,
+                "123", Set.of(new Role("ROLE_USER")), 0, 0, 0);
+        var testUserDTO = new UserDTO(randomUUID(), "halilcanozturk", "halilcan@mail.com", "Halil", "Can", "Ozturk", EOperation.CREATE,
+                "123", Set.of(new Role("ROLE_USER")), 0, 0, 0);
 
         projectOwner = m_injection.getProjectServiceHelper().addUser(m_userMapper.toUser(userDTO));
         testUser = m_injection.getProjectServiceHelper().addUser(m_userMapper.toUser(testUserDTO));

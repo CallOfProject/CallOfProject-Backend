@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -118,6 +119,11 @@ public class ProjectOwnerService
     public ResponseMessage<Object> changeProjectStatus(UUID userId, UUID projectId, EProjectStatus projectStatus)
     {
         return doForDataService(() -> changeProjectStatusCallback(userId, projectId, projectStatus), "ProjectService::changeProjectStatus");
+    }
+
+    public ResponseMessage<Object> removeProject(UUID userId, UUID projectId)
+    {
+        return doForDataService(() -> removeProjectCallback(userId, projectId), "ProjectService::removeProject");
     }
 
     public ResponseMessage<Object> approveParticipantRequestCallback(ParticipantRequestDTO requestDTO)
@@ -308,5 +314,28 @@ public class ProjectOwnerService
         return user.get();
     }
 
+    public ResponseMessage<Object> removeProjectCallback(UUID userId, UUID projectId)
+    {
+        var project = findProjectIfExistsByProjectId(projectId);
+        var user = findUserIfExists(userId);
+
+        if (!project.getProjectOwner().getUserId().equals(user.getUserId()))
+            throw new DataServiceException("You are not owner of this project!");
+
+        if (!project.getProjectParticipants().isEmpty())
+        {
+
+        }
+
+        if (project.getStartDate().isAfter(LocalDate.now())) {
+            project.getProjectParticipants().forEach(p -> {
+                var message = format("%s removed you from %s project!", project.getProjectOwner().getFullName(), project.getProjectName());
+                sendNotificationToUser(project, p.getUser(), project.getProjectOwner(), message);
+            });
+            m_projectServiceHelper.removeProjectById(projectId);
+        }
+
+        return null;
+    }
 
 }

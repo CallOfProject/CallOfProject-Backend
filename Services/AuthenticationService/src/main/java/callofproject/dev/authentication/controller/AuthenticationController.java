@@ -36,6 +36,13 @@ public class AuthenticationController
         this.m_authenticationService = service;
     }
 
+    @GetMapping("/find/username")
+    public ResponseEntity<Object> findUserByUsername(@RequestParam("username") String username)
+    {
+        return subscribe(() -> ok(m_authenticationService.findUserByUsername(username)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
     /**
      * Register to application.
      *

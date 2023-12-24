@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import static callofproject.dev.authentication.util.Util.AUTHENTICATION_SERVICE;
 import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
@@ -305,5 +306,10 @@ public class AuthenticationService
         var user = m_userManagementService.findUserByUsername(username);
 
         return JwtUtil.isTokenValid(token, user.getObject().username());
+    }
+
+    public Optional<User> findUserByUsername(String username)
+    {
+        return m_serviceHelper.findByUsername(username);
     }
 }

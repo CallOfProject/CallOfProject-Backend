@@ -4,6 +4,7 @@ import callofproject.dev.data.project.entity.enums.EProjectStatus;
 import callofproject.dev.project.dto.ParticipantRequestDTO;
 import callofproject.dev.project.dto.SaveProjectParticipantDTO;
 import callofproject.dev.project.service.ProjectOwnerService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("api/project-owner/project")
+@SecurityRequirement(name = "Authorization")
 public class ProjectOwnerController
 {
     private final ProjectOwnerService m_projectOwnerService;
@@ -52,6 +54,11 @@ public class ProjectOwnerController
         return subscribe(() -> ok(m_projectOwnerService.changeProjectStatus(userId, projectId, status)), msg -> badRequest().body(msg.getMessage()));
     }
 
+    @DeleteMapping("remove")
+    public ResponseEntity<Object> removeProject(@RequestParam("uid") UUID userId, @RequestParam("pid") UUID projectId)
+    {
+        return subscribe(() -> ok(m_projectOwnerService.removeProject(userId, projectId)), msg -> badRequest().body(msg.getMessage()));
+    }
 
     //---------------------------------------------------PARTICIPANT----------------------------------------------------
 
