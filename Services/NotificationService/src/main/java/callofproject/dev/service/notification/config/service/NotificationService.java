@@ -73,4 +73,9 @@ public class NotificationService
         return doForDataService(() -> m_notificationServiceHelper.findAllNotificationsByNotificationOwnerId(userId),
                 "NotificationService::findAllNotificationsByNotificationOwnerId");
     }
+
+    public void sendNotification(Notification notification)
+    {
+
+    }
 }

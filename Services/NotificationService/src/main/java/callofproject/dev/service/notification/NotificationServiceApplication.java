@@ -11,6 +11,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 
 import static callofproject.dev.nosql.NoSqlBeanName.NO_SQL_REPOSITORY_BEAN_NAME;
 import static callofproject.dev.service.notification.util.BeanName.NOTIFICATION_SERVICE;
@@ -19,6 +21,8 @@ import static callofproject.dev.service.notification.util.BeanName.NOTIFICATION_
 @ComponentScan(basePackages = {NO_SQL_REPOSITORY_BEAN_NAME, NOTIFICATION_SERVICE})
 @EnableMongoRepositories(basePackages = {NO_SQL_REPOSITORY_BEAN_NAME})
 @EnableDiscoveryClient
+@EnableWebSocket
+@EnableWebSocketMessageBroker
 public class NotificationServiceApplication implements CommandLineRunner
 {
     private final INotificationRepository m_notificationRepository;
