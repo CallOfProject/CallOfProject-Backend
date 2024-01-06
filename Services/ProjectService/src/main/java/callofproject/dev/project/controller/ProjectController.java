@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
-import static org.springframework.http.ResponseEntity.*;
+import static org.springframework.http.ResponseEntity.internalServerError;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("api/project")
@@ -150,6 +151,13 @@ public class ProjectController
     public ResponseEntity<Object> addProjectJoinRequest(@RequestParam("pid") UUID projectId, @RequestParam("uid") UUID userId)
     {
         return subscribe(() -> ok(m_projectService.addProjectJoinRequest(projectId, userId)),
+                msg -> internalServerError().body(msg.getMessage()));
+    }
+
+    @GetMapping("/find/detail")
+    public ResponseEntity<Object> findProjectDetail(@RequestParam("pid") UUID projectId)
+    {
+        return subscribe(() -> ok(m_projectService.findProjectDetail(projectId)),
                 msg -> internalServerError().body(msg.getMessage()));
     }
 }

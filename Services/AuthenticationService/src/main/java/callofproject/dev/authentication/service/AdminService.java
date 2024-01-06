@@ -35,7 +35,6 @@ import static java.time.LocalDate.now;
 @Lazy
 public class AdminService
 {
-
     private final UserManagementServiceHelper m_managementServiceHelper;
     private final KafkaProducer m_kafkaProducer;
     private final AuthenticationProvider m_authenticationProvider;

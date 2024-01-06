@@ -3,7 +3,6 @@ package callofproject.dev.authentication.controller;
 import callofproject.dev.authentication.dto.ForgotPasswordDTO;
 import callofproject.dev.authentication.service.ForgotPasswordService;
 import callofproject.dev.data.common.clas.ErrorMessage;
-import jakarta.validation.constraints.Email;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +28,7 @@ public class ForgotPasswordController
      * @return the boolean value.
      */
     @PostMapping("/password-reset-request")
-    public ResponseEntity<Object> SendPasswordResetEmail(@RequestParam("email") @Email String email)
+    public ResponseEntity<Object> SendPasswordResetEmail(@RequestParam("email") String email)
     {
         return subscribe(() -> ok(m_forgotPasswordService.sendResetPasswordLink(email)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));

@@ -88,17 +88,17 @@ public class AdminService
         if (projects.isEmpty())
             return new MultipleResponseMessagePageable<>(totalPage, page, 0, "Projects not found!", null);
 
-        var projectOverviewList = new ArrayList<ProjectDetailDTO>();
+        var projectDetails = new ArrayList<ProjectDetailDTO>();
 
         for (var project : projects)
         {
             var tags = toStreamConcurrent(m_projectTagServiceHelper.getAllProjectTagByProjectId(project.getProjectId())).toList();
-            projectOverviewList.add(m_projectMapper.toProjectDetailDTO(project, tags, findProjectParticipantsByProjectId(project)));
+            projectDetails.add(m_projectMapper.toProjectDetailDTO(project, tags, findProjectParticipantsByProjectId(project)));
         }
 
-        var projectWithParticipants = doForDataService(() -> m_projectMapper.toProjectsDetailDTO(projectOverviewList), "ProjectService::findAllParticipantProjectByUserId");
+        var projectWithParticipants = doForDataService(() -> m_projectMapper.toProjectsDetailDTO(projectDetails), "ProjectService::findAllParticipantProjectByUserId");
 
-        return new MultipleResponseMessagePageable<>(totalPage, page, projectOverviewList.size(), "Projects found!", projectWithParticipants);
+        return new MultipleResponseMessagePageable<>(totalPage, page, projectDetails.size(), "Projects found!", projectWithParticipants);
     }
 
     private ProjectsParticipantDTO findProjectParticipantsByProjectId(Project obj)

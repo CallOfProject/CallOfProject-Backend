@@ -2,7 +2,6 @@ package callofproject.dev.project.config;
 
 import callofproject.dev.service.jwt.filter.JWTTokenGeneratorFilter;
 import callofproject.dev.service.jwt.filter.JWTTokenValidatorFilter;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
@@ -14,11 +13,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,7 +41,8 @@ public class SecurityConfig
                 .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
                 .requestMatchers(antMatcher("/api/admin/project/**")).hasAnyRole("ADMIN", "ROOT")
                 .requestMatchers(antMatcher("/api/project/**")).hasAnyRole("ROOT", "USER", "ADMIN")
-                .requestMatchers(antMatcher("/api/project-owner/project/**")).hasAnyRole("ADMIN", "USER", "ROOT");
+                .requestMatchers(antMatcher("/api/project-owner/project/**")).hasAnyRole("ADMIN", "USER", "ROOT")
+                .requestMatchers(antMatcher("/api/storage/**")).hasAnyRole("ADMIN", "USER", "ROOT");
     }
 
 
@@ -59,7 +57,7 @@ public class SecurityConfig
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .cors(corsCustomizer -> corsCustomizer.configurationSource(this::setCorsConfig))
+                //.cors(corsCustomizer -> corsCustomizer.configurationSource(this::setCorsConfig))
                 .csrf(AbstractHttpConfigurer::disable);
 
         http.addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
@@ -67,15 +65,9 @@ public class SecurityConfig
                 .authorizeHttpRequests(SecurityConfig::customize)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .exceptionHandling(ex -> ex.accessDeniedHandler(new AccessDeniedHandler()
-                {
-                    @Override
-                    public void handle(HttpServletRequest request, HttpServletResponse response, org.springframework.security.access.AccessDeniedException accessDeniedException) throws IOException, ServletException
-                    {
-                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                        response.getWriter().write("Erişim reddedildi: " + accessDeniedException.getMessage());
-
-                    }
+                .exceptionHandling(ex -> ex.accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Access rejected: " + accessDeniedException.getMessage());
                 }));
 
         return http.build();

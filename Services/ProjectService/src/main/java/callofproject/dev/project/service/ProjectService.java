@@ -4,9 +4,9 @@ import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.data.project.entity.Project;
+import callofproject.dev.data.project.entity.ProjectParticipant;
 import callofproject.dev.data.project.entity.User;
 import callofproject.dev.data.project.entity.enums.AdminOperationStatus;
-import callofproject.dev.data.project.entity.enums.EFeedbackTimeRange;
 import callofproject.dev.data.project.entity.enums.EProjectStatus;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.nosql.dal.ProjectTagServiceHelper;
@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static callofproject.dev.data.common.status.Status.*;
@@ -36,6 +37,8 @@ import static callofproject.dev.nosql.NoSqlBeanName.TAG_SERVICE_HELPER_BEAN_NAME
 import static callofproject.dev.project.util.Constants.PROJECT_SERVICE;
 import static callofproject.dev.util.stream.StreamUtil.*;
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 @Service(PROJECT_SERVICE)
 @Lazy
@@ -47,12 +50,13 @@ public class ProjectService
     private final KafkaProducer m_kafkaProducer;
     private final ObjectMapper m_objectMapper;
     private final IProjectMapper m_projectMapper;
+    private final S3Service m_s3Service;
     private final IProjectParticipantMapper m_projectParticipantMapper;
 
     public ProjectService(@Qualifier(PROJECT_SERVICE_HELPER_BEAN) ProjectServiceHelper serviceHelper,
                           @Qualifier(PROJECT_TAG_SERVICE_HELPER_BEAN_NAME) ProjectTagServiceHelper projectTagServiceHelper,
                           @Qualifier(TAG_SERVICE_HELPER_BEAN_NAME) TagServiceHelper tagServiceHelper, KafkaProducer kafkaProducer, ObjectMapper objectMapper,
-                          IProjectMapper projectMapper, IProjectParticipantMapper projectParticipantMapper)
+                          IProjectMapper projectMapper, S3Service s3Service, IProjectParticipantMapper projectParticipantMapper)
     {
         m_serviceHelper = serviceHelper;
         m_projectTagServiceHelper = projectTagServiceHelper;
@@ -60,6 +64,7 @@ public class ProjectService
         m_kafkaProducer = kafkaProducer;
         m_objectMapper = objectMapper;
         m_projectMapper = projectMapper;
+        m_s3Service = s3Service;
         m_projectParticipantMapper = projectParticipantMapper;
     }
 
@@ -176,6 +181,18 @@ public class ProjectService
         return result;
     }
 
+    public ResponseMessage<Object> findProjectDetail(UUID projectId)
+    {
+        var project = findProjectIfExistsByProjectId(projectId);
+        var tags = findTagList(project);
+
+        var img = m_s3Service.getImage(project.getProjectImagePath());
+        project.setProjectImagePath(img);
+        var projectDetailDTO = m_projectMapper.toProjectDetailDTO(project, tags, findProjectParticipantsByProjectId(project));
+
+        return new ResponseMessage<>("Project is found!", OK, projectDetailDTO);
+    }
+
     //-----------------------------------CALLBACKS---------------------------------------------
 
     public ResponseMessage<Object> addProjectJoinRequestCallback(UUID projectId, UUID userId)
@@ -183,25 +200,47 @@ public class ProjectService
         var user = m_serviceHelper.findUserById(userId);
         var project = m_serviceHelper.findProjectById(projectId);
 
+        // If user or project not exists then throw exception.
         if (user.isEmpty() || project.isEmpty())
             throw new DataServiceException(format("User with id: %s or Project with id: %s is not found!", userId, projectId));
 
-        if (user.get().getParticipantProjectCount() >= Policy.MAX_PARTICIPANT_PROJECT_COUNT)
-            return new ResponseMessage<>(format("You are participant %d projects already!", Policy.MAX_PARTICIPANT_PROJECT_COUNT),
-                    NOT_ACCEPTED, false);
+        var projectChecked = checkProjectPolicies(user.get(), project.get());
 
-
-        if (user.get().getTotalProjectCount() >= Policy.MAX_PROJECT_COUNT)
-            return new ResponseMessage<>(format("You cannot create or join to project! Max project count is: %d", Policy.MAX_PROJECT_COUNT),
-                    NOT_ACCEPTED, false);
+        // If project checked is present then return error message.
+        if (projectChecked.isPresent())
+            return projectChecked.get();
 
         var result = doForDataService(() -> m_serviceHelper.sendParticipantRequestToProject(projectId, userId),
                 "ProjectService::addProjectJoinRequest");
 
-        if (!result)
-            return new ResponseMessage<>("You are participant of project already! ", NOT_ACCEPTED, false);
+        return new ResponseMessage<>("Participant request is sent!", OK, result);
+    }
 
-        return new ResponseMessage<>("Participant request is sent!", OK, true);
+    private Optional<ResponseMessage<Object>> checkProjectPolicies(User user, Project project)
+    {
+        // If user is owner of project then return error message.
+        if (user.getProjects().stream().map(Project::getProjectId).anyMatch(project.getProjectId()::equals))
+            return of(new ResponseMessage<>("You are owner of project!", NOT_ACCEPTED, false));
+
+        // If user is already joined to project then return error message.
+        if (user.getProjectParticipants().stream().map(ProjectParticipant::getProjectId).anyMatch(project.getProjectId()::equals))
+            return of(new ResponseMessage<>("you are participant of project already!", NOT_ACCEPTED, false));
+
+        // If user sent request already then return error message.
+        if (user.getProjectParticipantRequests().stream().map(p -> p.getProject().getProjectId()).anyMatch(project.getProjectId()::equals))
+            return of(new ResponseMessage<>("you sent request already!", NOT_ACCEPTED, false));
+
+        // If user participant project count is greater than or equals to max participant project count then return error message.
+        if (user.getParticipantProjectCount() >= Policy.MAX_PARTICIPANT_PROJECT_COUNT)
+            return of(new ResponseMessage<>(format("You are participant %d projects already!", Policy.MAX_PARTICIPANT_PROJECT_COUNT),
+                    NOT_ACCEPTED, false));
+
+        // If user total project count is greater than or equals to max project count then return error message.
+        if (user.getTotalProjectCount() >= Policy.MAX_PROJECT_COUNT)
+            return of(new ResponseMessage<>(format("You cannot create or join to project! Max project count is: %d", Policy.MAX_PROJECT_COUNT),
+                    NOT_ACCEPTED, false));
+
+        return empty();
     }
 
     private void sendNotificationToProjectOwner(UUID userId, UUID projectId)
@@ -237,6 +276,8 @@ public class ProjectService
         var project = findProjectIfExistsByProjectId(projectId);
         var tags = findTagList(project);
 
+        var img = m_s3Service.getImage(project.getProjectImagePath());
+        project.setProjectImagePath(img);
         var projectOverviewDTO = m_projectMapper.toProjectOverviewDTO(project, tags);
 
         return new ResponseMessage<>("Project is found!", OK, projectOverviewDTO);
@@ -245,10 +286,12 @@ public class ProjectService
     private MultipleResponseMessagePageable<Object> findAllProjectDiscoveryViewCallback(int page)
     {
         var projectPageable = m_serviceHelper.findAllValidProjects(page);
-        var resultDTO = m_projectMapper.toProjectsDiscoveryDTO(toListConcurrent(projectPageable.getContent(),
-                m_projectMapper::toProjectDiscoveryDTO));
 
-        return new MultipleResponseMessagePageable<>(projectPageable.getTotalPages(), page, projectPageable.getNumberOfElements(), "Projects found!", resultDTO);
+        var resultDTO = m_projectMapper.toProjectsDiscoveryDTO(toListConcurrent(projectPageable.getContent(), p ->
+                m_projectMapper.toProjectDiscoveryDTO(p, m_s3Service.getImage(p.getProjectImagePath()))));
+
+        return new MultipleResponseMessagePageable<>(projectPageable.getTotalPages(), page, projectPageable.getNumberOfElements(),
+                "Projects found!", resultDTO);
     }
 
     private ResponseMessage<Object> findProjectOwnerViewCallback(UUID userId, UUID projectId)

@@ -109,13 +109,15 @@ public class ForgotPasswordService
             if (!JwtUtil.isTokenValid(forgotPasswordDTO.user_token(), user.get().getUsername()))
                 throw new DataServiceException("Link is not valid!");
 
-            user.get().setPassword(m_passwordEncoder.encode(forgotPasswordDTO.new_password()));
+            var encodedPassword = m_passwordEncoder.encode(forgotPasswordDTO.new_password());
 
+            user.get().setPassword(encodedPassword);
             m_userServiceHelper.saveUser(user.get());
 
             return new ResponseMessage<>("Password changed Successfully!", 200, true);
 
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             throw new DataServiceException(ex.getMessage());
         }
