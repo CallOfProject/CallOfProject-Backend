@@ -43,7 +43,7 @@ public class NotificationServiceApplication implements CommandLineRunner
     @Override
     public void run(String... args) throws Exception
     {
-        var notifications = m_notificationRepository.findAll();
+       /* var notifications = m_notificationRepository.findAll();
         for (var notification : notifications)
         {
             try
@@ -58,7 +58,7 @@ public class NotificationServiceApplication implements CommandLineRunner
             {
                 System.err.println(ex.getMessage());
             }
-        }
+        }*/
     }
 }
 

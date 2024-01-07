@@ -174,7 +174,7 @@ public class ProjectOwnerServiceTest
         assertNotNull(requestId);
 
         // approve join request
-        var result = m_injection.getProjectOwnerService().approveParticipantRequestCallback(new ParticipantRequestDTO(requestId, true));
+        var result = m_injection.getProjectOwnerService().approveParticipantRequestCallback(new ParticipantRequestDTO(requestId, null, true));
         assertTrue(result.getObject() instanceof ParticipantStatusDTO dto && dto.isAccepted());
 
         // Verify the request is approved
@@ -203,7 +203,7 @@ public class ProjectOwnerServiceTest
         assertNotNull(requestId);
 
         // approve join request
-        var result = m_injection.getProjectOwnerService().approveParticipantRequestCallback(new ParticipantRequestDTO(requestId, false));
+        var result = m_injection.getProjectOwnerService().approveParticipantRequestCallback(new ParticipantRequestDTO(requestId, null, false));
         assertFalse(result.getObject() instanceof ParticipantStatusDTO dto && dto.isAccepted());
 
         // Verify the request is approved
@@ -232,7 +232,7 @@ public class ProjectOwnerServiceTest
         assertNotNull(requestId);
 
         // approve join request
-        var participantRequestDTO = new ParticipantRequestDTO(randomUUID(), true);
+        var participantRequestDTO = new ParticipantRequestDTO(randomUUID(), null, true);
         var result = assertThrows(DataServiceException.class,
                 () -> m_injection.getProjectOwnerService().approveParticipantRequestCallback(participantRequestDTO));
 

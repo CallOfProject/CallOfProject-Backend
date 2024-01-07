@@ -622,7 +622,7 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::sendParticipantRequestToProject");
     }
 
-    public boolean sendParticipantRequestToProject(UUID projectId, UUID userId)
+    public Optional<ProjectParticipantRequest> sendParticipantRequestToProject(UUID projectId, UUID userId)
     {
         var user = findUserById(userId);
         var project = findProjectById(projectId);
@@ -630,20 +630,25 @@ public class ProjectServiceHelper
         if (user.isEmpty() || project.isEmpty())
             throw new RepositoryException("User or Project is not found!");
 
-        var isExistParticipantRequest = project.get()
+       /* var isExistParticipantRequest = project.get()
                 .getProjectParticipantRequests()
                 .stream()
                 .anyMatch(p -> p.getUser().getUserId().equals(userId) &&
                         p.getProject().getProjectId().equals(projectId));
 
         if (isExistParticipantRequest)
-            return false;
-
+        {
+            return project.get().getProjectParticipantRequests().stream().filter(r -> r.getProject().getProjectId().equals(projectId) &&
+                    r.getUser().getUserId().equals(userId)).findFirst();
+            //return false;
+        }
+*/
         project.get().addProjectParticipantRequest(user.get());
 
-        doForRepository(() -> m_facade.m_projectRepository.save(project.get()), "ProjectServiceHelper::sendParticipantRequestToProject");
+        var updatedProject = doForRepository(() -> m_facade.m_projectRepository.save(project.get()), "ProjectServiceHelper::sendParticipantRequestToProject");
 
-        return true;
+        return updatedProject.getProjectParticipantRequests().stream().filter(r -> r.getProject().getProjectId().equals(projectId) &&
+                r.getUser().getUserId().equals(userId)).findFirst();
     }
 
     public Iterable<Project> findAllProjectParticipantRequestByProjectId(UUID projectId)

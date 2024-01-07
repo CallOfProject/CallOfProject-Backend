@@ -1,6 +1,6 @@
 package callofproject.dev.project.config.kafka;
 
-import callofproject.dev.project.dto.ProjectParticipantRequestDTO;
+import callofproject.dev.project.dto.ProjectParticipantNotificationDTO;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.support.MessageBuilder;
@@ -15,9 +15,9 @@ import static org.springframework.kafka.support.KafkaHeaders.TOPIC;
 public class KafkaProducer
 {
     private final NewTopic m_topic;
-    private final KafkaTemplate<String, ProjectParticipantRequestDTO> m_projectParticipantKafkaTemplate;
+    private final KafkaTemplate<String, ProjectParticipantNotificationDTO> m_projectParticipantKafkaTemplate;
 
-    public KafkaProducer(NewTopic topic, KafkaTemplate<String, ProjectParticipantRequestDTO> kafkaTemplate)
+    public KafkaProducer(NewTopic topic, KafkaTemplate<String, ProjectParticipantNotificationDTO> kafkaTemplate)
     {
         m_topic = topic;
         m_projectParticipantKafkaTemplate = kafkaTemplate;
@@ -28,7 +28,7 @@ public class KafkaProducer
      *
      * @param message The message to send.
      */
-    public void sendProjectParticipantNotification(ProjectParticipantRequestDTO message)
+    public void sendProjectParticipantNotification(ProjectParticipantNotificationDTO message)
     {
         var msg = MessageBuilder
                 .withPayload(message)

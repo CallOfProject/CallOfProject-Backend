@@ -105,11 +105,11 @@ public final class DataProvider
 
     public static ParticipantRequestDTO provideApproveParticipantRequestDTO()
     {
-        return new ParticipantRequestDTO(UUID.randomUUID(), true);
+        return new ParticipantRequestDTO(UUID.randomUUID(), null, true);
     }
 
     public static ParticipantRequestDTO provideRejectParticipantRequestDTO()
     {
-        return new ParticipantRequestDTO(UUID.randomUUID(), false);
+        return new ParticipantRequestDTO(UUID.randomUUID(), null, false);
     }
 }

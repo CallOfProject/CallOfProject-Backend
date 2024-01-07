@@ -3,6 +3,8 @@ package callofproject.dev.nosql.dal;
 import callofproject.dev.nosql.entity.Notification;
 import callofproject.dev.nosql.repository.INotificationRepository;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -89,5 +91,28 @@ public class NotificationServiceHelper
     public Iterable<Notification> findAllNotificationsByNotificationOwnerId(UUID ownerId)
     {
         return doForRepository(() -> m_notificationRepository.findAllByNotificationOwnerId(ownerId), "NotificationServiceHelper::findAllNotificationsByNotificationOwnerId");
+    }
+
+    /**
+     * Find all notifications by notification owner id and sort by created at
+     *
+     * @param ownerId notification owner id
+     * @return Iterable<Notification>
+     */
+    public Page<Notification> findAllNotificationsByNotificationOwnerIdAndSortCreatedAt(UUID ownerId, Pageable pageable)
+    {
+        return doForRepository(() -> m_notificationRepository.findByNotificationOwnerIdOrderByCreatedAt(ownerId, pageable), "NotificationServiceHelper::findAllNotificationsByNotificationOwnerId");
+    }
+
+    /**
+     * Delete notification by id
+     *
+     * @param id notification id
+     * @return boolean value
+     */
+    public boolean deleteNotificationById(String id)
+    {
+        doForRepository(() -> m_notificationRepository.deleteNotificationById(id), "NotificationServiceHelper::deleteNotificationById");
+        return true;
     }
 }

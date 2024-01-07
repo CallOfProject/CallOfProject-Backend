@@ -10,6 +10,7 @@ public enum NotificationType
     INFORMATION("Information"),
     WARNING("Warning"),
     ERROR("Error"),
+    REQUEST("Request"),
     SUCCESS("Success");
 
     private final String m_value;

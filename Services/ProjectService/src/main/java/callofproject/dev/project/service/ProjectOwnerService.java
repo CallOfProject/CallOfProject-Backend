@@ -8,6 +8,7 @@ import callofproject.dev.data.project.entity.ProjectParticipantRequest;
 import callofproject.dev.data.project.entity.User;
 import callofproject.dev.data.project.entity.enums.EProjectStatus;
 import callofproject.dev.library.exception.service.DataServiceException;
+import callofproject.dev.nosql.dal.NotificationServiceHelper;
 import callofproject.dev.nosql.dal.ProjectTagServiceHelper;
 import callofproject.dev.nosql.entity.ProjectTag;
 import callofproject.dev.nosql.enums.NotificationType;
@@ -16,6 +17,7 @@ import callofproject.dev.project.dto.*;
 import callofproject.dev.project.mapper.IProjectMapper;
 import callofproject.dev.project.mapper.IProjectParticipantMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -39,8 +41,11 @@ public class ProjectOwnerService
     private final KafkaProducer m_kafkaProducer;
     private final IProjectMapper m_projectMapper;
     private final IProjectParticipantMapper m_projectParticipantMapper;
+    private final NotificationServiceHelper m_notificationServiceHelper;
+    @Value("${notification.request.approve}")
+    private String m_approvalLink;
 
-    public ProjectOwnerService(ProjectServiceHelper projectServiceHelper, ProjectTagServiceHelper projectTagServiceHelper, ObjectMapper objectMapper, KafkaProducer kafkaProducer, IProjectMapper projectMapper, IProjectParticipantMapper projectParticipantMapper)
+    public ProjectOwnerService(ProjectServiceHelper projectServiceHelper, ProjectTagServiceHelper projectTagServiceHelper, ObjectMapper objectMapper, KafkaProducer kafkaProducer, IProjectMapper projectMapper, IProjectParticipantMapper projectParticipantMapper, NotificationServiceHelper notificationServiceHelper)
     {
         m_projectServiceHelper = projectServiceHelper;
         m_projectTagServiceHelper = projectTagServiceHelper;
@@ -48,6 +53,7 @@ public class ProjectOwnerService
         m_kafkaProducer = kafkaProducer;
         m_projectMapper = projectMapper;
         m_projectParticipantMapper = projectParticipantMapper;
+        m_notificationServiceHelper = notificationServiceHelper;
     }
 
 
@@ -100,7 +106,7 @@ public class ProjectOwnerService
             var message = format("%s denied your request to join %s project!", dto.owner().getFullName(), dto.project().getProjectName());
             sendNotificationToUser(dto.project(), dto.user(), dto.owner(), message);
         }
-
+        m_notificationServiceHelper.deleteNotificationById(requestDTO.notificationId());
         return new ResponseMessage<>(result.getMessage(), result.getStatusCode(), result.getStatusCode() == ACCEPTED);
     }
 
@@ -202,7 +208,22 @@ public class ProjectOwnerService
         var data = new NotificationObject(project.getProjectId(), user.getUserId());
         var dataToJson = doForDataService(() -> m_objectMapper.writeValueAsString(data), "Converter Error!");
 
-        var notificationMessage = new ProjectParticipantRequestDTO.Builder()
+       /* var notificationMessage = new ProjectParticipantRequestDTO.Builder()
+                .setFromUserId(user.getUserId())
+                .setToUserId(project.getProjectOwner().getUserId())
+                .setMessage(message)
+                .setNotificationType(NotificationType.REQUEST)
+                .setNotificationData(dataToJson)
+                .setNotificationLink("none")
+                .setNotificationImage(null)
+                .setNotificationTitle("Project Join Request")
+                .setNotificationDataType(NotificationDataType.PROJECT_JOIN_REQUEST)
+                .setApproveLink(m_approvalLink)
+                .setRejectLink(null)
+                .setRequestId(request.getParticipantRequestId())
+                .build();*/
+
+        var notificationMessage = new ProjectParticipantNotificationDTO.Builder()
                 .setFromUserId(owner.getUserId())
                 .setToUserId(user.getUserId())
                 .setMessage(message)
@@ -327,7 +348,8 @@ public class ProjectOwnerService
 
         }
 
-        if (project.getStartDate().isAfter(LocalDate.now())) {
+        if (project.getStartDate().isAfter(LocalDate.now()))
+        {
             project.getProjectParticipants().forEach(p -> {
                 var message = format("%s removed you from %s project!", project.getProjectOwner().getFullName(), project.getProjectName());
                 sendNotificationToUser(project, p.getUser(), project.getProjectOwner(), message);

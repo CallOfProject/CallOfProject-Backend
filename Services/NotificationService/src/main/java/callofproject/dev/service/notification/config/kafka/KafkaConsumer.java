@@ -32,9 +32,16 @@ public class KafkaConsumer
                 .setNotificationType(message.notificationType())
                 .setNotificationLink(message.notificationLink())
                 .setNotificationData(message.notificationData())
+                .setNotificationImage(message.notificationImage())
+                .setNotificationTitle(message.notificationTitle())
+                .setNotificationDataType(message.notificationDataType())
+                .setNotificationApproveLink(message.notificationApproveLink())
+                .setNotificationRejectLink(message.notificationRejectLink())
+                .setRequestId(message.requestId())
                 .build();
-        System.out.println("Notification" + message.toUserId());
+
         m_notificationService.saveNotification(notification);
+
         messagingTemplate.convertAndSend("/topic/user-" + message.toUserId(), message);
     }
 }

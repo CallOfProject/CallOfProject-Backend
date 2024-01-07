@@ -11,7 +11,6 @@ public class NotificationObject
     {
     }
 
-    // write toString method here
     @Override
     public String toString()
     {
@@ -20,7 +19,6 @@ public class NotificationObject
                 ", userId=" + userId +
                 '}';
     }
-
 
 
     public NotificationObject(UUID projectId, UUID userId)

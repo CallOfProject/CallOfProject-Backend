@@ -2,6 +2,9 @@ package callofproject.dev.nosql.repository;
 
 import callofproject.dev.nosql.entity.Notification;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,4 +19,8 @@ public interface INotificationRepository extends MongoRepository<Notification, U
     Iterable<Notification> findAllByNotificationOwnerId(UUID ownerId);
 
     void removeAllByNotificationOwnerIdAndId(UUID ownerId, String id);
+
+    Page<Notification> findByNotificationOwnerIdOrderByCreatedAt(UUID ownerId, Pageable pageable);
+
+    void deleteNotificationById(String id);
 }

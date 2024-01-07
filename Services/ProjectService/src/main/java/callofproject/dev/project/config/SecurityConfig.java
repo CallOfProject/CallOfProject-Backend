@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -40,8 +41,8 @@ public class SecurityConfig
                 .requestMatchers(antMatcher("/api-docs/**")).permitAll()
                 .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
                 .requestMatchers(antMatcher("/api/admin/project/**")).hasAnyRole("ADMIN", "ROOT")
+                .requestMatchers(antMatcher("/api/project-owner/**")).hasAnyRole("ADMIN", "USER", "ROOT")
                 .requestMatchers(antMatcher("/api/project/**")).hasAnyRole("ROOT", "USER", "ADMIN")
-                .requestMatchers(antMatcher("/api/project-owner/project/**")).hasAnyRole("ADMIN", "USER", "ROOT")
                 .requestMatchers(antMatcher("/api/storage/**")).hasAnyRole("ADMIN", "USER", "ROOT");
     }
 
@@ -57,6 +58,7 @@ public class SecurityConfig
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers(h -> h.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 //.cors(corsCustomizer -> corsCustomizer.configurationSource(this::setCorsConfig))
                 .csrf(AbstractHttpConfigurer::disable);
 
@@ -84,7 +86,7 @@ public class SecurityConfig
     {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:4200"));
+        config.setAllowedOrigins(List.of("*"));
         config.setAllowedMethods(Collections.singletonList("*"));
         config.setAllowCredentials(true);
         config.setAllowedHeaders(Collections.singletonList("*"));

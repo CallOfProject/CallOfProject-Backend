@@ -5,6 +5,7 @@ import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.data.project.entity.ProjectParticipant;
+import callofproject.dev.data.project.entity.ProjectParticipantRequest;
 import callofproject.dev.data.project.entity.User;
 import callofproject.dev.data.project.entity.enums.AdminOperationStatus;
 import callofproject.dev.data.project.entity.enums.EProjectStatus;
@@ -13,6 +14,7 @@ import callofproject.dev.nosql.dal.ProjectTagServiceHelper;
 import callofproject.dev.nosql.dal.TagServiceHelper;
 import callofproject.dev.nosql.entity.ProjectTag;
 import callofproject.dev.nosql.entity.Tag;
+import callofproject.dev.nosql.enums.NotificationDataType;
 import callofproject.dev.nosql.enums.NotificationType;
 import callofproject.dev.project.config.kafka.KafkaProducer;
 import callofproject.dev.project.dto.*;
@@ -21,11 +23,11 @@ import callofproject.dev.project.mapper.IProjectParticipantMapper;
 import callofproject.dev.project.util.Policy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static callofproject.dev.data.common.status.Status.*;
@@ -37,8 +39,6 @@ import static callofproject.dev.nosql.NoSqlBeanName.TAG_SERVICE_HELPER_BEAN_NAME
 import static callofproject.dev.project.util.Constants.PROJECT_SERVICE;
 import static callofproject.dev.util.stream.StreamUtil.*;
 import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 
 @Service(PROJECT_SERVICE)
 @Lazy
@@ -52,6 +52,9 @@ public class ProjectService
     private final IProjectMapper m_projectMapper;
     private final S3Service m_s3Service;
     private final IProjectParticipantMapper m_projectParticipantMapper;
+
+    @Value("${notification.request.approve}")
+    private String m_approvalLink;
 
     public ProjectService(@Qualifier(PROJECT_SERVICE_HELPER_BEAN) ProjectServiceHelper serviceHelper,
                           @Qualifier(PROJECT_TAG_SERVICE_HELPER_BEAN_NAME) ProjectTagServiceHelper projectTagServiceHelper,
@@ -175,9 +178,12 @@ public class ProjectService
     {
         var result = doForDataService(() -> addProjectJoinRequestCallback(projectId, userId), "ProjectService::addProjectJoinRequest");
 
-        if ((Boolean) result.getObject())
-            sendNotificationToProjectOwner(userId, projectId);
+        var request = (ProjectParticipantRequestDTO) result.getObject();
 
+        if (result.getStatusCode() == OK)
+        {
+            sendNotificationToProjectOwner(request);
+        }
         return result;
     }
 
@@ -207,46 +213,47 @@ public class ProjectService
         var projectChecked = checkProjectPolicies(user.get(), project.get());
 
         // If project checked is present then return error message.
-        if (projectChecked.isPresent())
-            return projectChecked.get();
+        if (projectChecked.getStatusCode() != OK)
+            return projectChecked;
 
-        var result = doForDataService(() -> m_serviceHelper.sendParticipantRequestToProject(projectId, userId),
+        var result = doForDataService(() -> m_serviceHelper.sendParticipantRequestToProject(new ProjectParticipantRequest(project.get(), user.get())),
                 "ProjectService::addProjectJoinRequest");
 
-        return new ResponseMessage<>("Participant request is sent!", OK, result);
+        var dto = new ProjectParticipantRequestDTO(userId, projectId, result.getParticipantRequestId());
+        return new ResponseMessage<>("Participant request is sent!", OK, dto);
     }
 
-    private Optional<ResponseMessage<Object>> checkProjectPolicies(User user, Project project)
+    private ResponseMessage<Object> checkProjectPolicies(User user, Project project)
     {
         // If user is owner of project then return error message.
         if (user.getProjects().stream().map(Project::getProjectId).anyMatch(project.getProjectId()::equals))
-            return of(new ResponseMessage<>("You are owner of project!", NOT_ACCEPTED, false));
+            return new ResponseMessage<>("You are owner of project!", NOT_ACCEPTED, null);
 
         // If user is already joined to project then return error message.
         if (user.getProjectParticipants().stream().map(ProjectParticipant::getProjectId).anyMatch(project.getProjectId()::equals))
-            return of(new ResponseMessage<>("you are participant of project already!", NOT_ACCEPTED, false));
+            return new ResponseMessage<>("you are participant of project already!", NOT_ACCEPTED, null);
 
         // If user sent request already then return error message.
         if (user.getProjectParticipantRequests().stream().map(p -> p.getProject().getProjectId()).anyMatch(project.getProjectId()::equals))
-            return of(new ResponseMessage<>("you sent request already!", NOT_ACCEPTED, false));
+            return new ResponseMessage<>("you sent request already!", NOT_ACCEPTED, null);
 
         // If user participant project count is greater than or equals to max participant project count then return error message.
         if (user.getParticipantProjectCount() >= Policy.MAX_PARTICIPANT_PROJECT_COUNT)
-            return of(new ResponseMessage<>(format("You are participant %d projects already!", Policy.MAX_PARTICIPANT_PROJECT_COUNT),
-                    NOT_ACCEPTED, false));
+            return new ResponseMessage<>(format("You are participant %d projects already!", Policy.MAX_PARTICIPANT_PROJECT_COUNT),
+                    NOT_ACCEPTED, null);
 
         // If user total project count is greater than or equals to max project count then return error message.
         if (user.getTotalProjectCount() >= Policy.MAX_PROJECT_COUNT)
-            return of(new ResponseMessage<>(format("You cannot create or join to project! Max project count is: %d", Policy.MAX_PROJECT_COUNT),
-                    NOT_ACCEPTED, false));
+            return new ResponseMessage<>(format("You cannot create or join to project! Max project count is: %d", Policy.MAX_PROJECT_COUNT),
+                    NOT_ACCEPTED, null);
 
-        return empty();
+        return new ResponseMessage<>("", OK, null);
     }
 
-    private void sendNotificationToProjectOwner(UUID userId, UUID projectId)
+    private void sendNotificationToProjectOwner(ProjectParticipantRequestDTO request)
     {
-        var user = findUserIfExists(userId);
-        var project = findProjectIfExistsByProjectId(projectId);
+        var user = findUserIfExists(request.userId());
+        var project = findProjectIfExistsByProjectId(request.projectId());
 
         var msg = format("%s wants to join your %s project!", user.getUsername(), project.getProjectName());
 
@@ -257,13 +264,19 @@ public class ProjectService
         var dataToJson = doForDataService(() -> m_objectMapper.writeValueAsString(data), "Converter Error!");
 
         // Project owner to user message
-        var notificationMessage = new ProjectParticipantRequestDTO.Builder()
+        var notificationMessage = new ProjectParticipantNotificationDTO.Builder()
                 .setFromUserId(user.getUserId())
                 .setToUserId(project.getProjectOwner().getUserId())
                 .setMessage(msg)
-                .setNotificationType(NotificationType.INFORMATION)
+                .setNotificationType(NotificationType.REQUEST)
                 .setNotificationData(dataToJson)
                 .setNotificationLink("none")
+                .setNotificationImage(null)
+                .setNotificationTitle("Project Join Request")
+                .setNotificationDataType(NotificationDataType.PROJECT_JOIN_REQUEST)
+                .setApproveLink(m_approvalLink)
+                .setRejectLink(null)
+                .setRequestId(request.requestId())
                 .build();
 
         // Send notification to project owner
