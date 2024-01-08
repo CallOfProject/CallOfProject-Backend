@@ -2,6 +2,7 @@ package callofproject.dev.service.notification.config.kafka;
 
 import callofproject.dev.nosql.entity.Notification;
 import callofproject.dev.service.notification.config.service.NotificationService;
+import callofproject.dev.service.notification.dto.NotificationDTO;
 import callofproject.dev.service.notification.dto.NotificationUserResponseDTO;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -23,8 +24,6 @@ public class KafkaConsumer
     @KafkaListener(topics = "${spring.kafka.consumer.topic-name}", groupId = "${spring.kafka.consumer.group-id}")
     public void projectServiceListener(NotificationUserResponseDTO message)
     {
-        System.out.println("Received Message" + message);
-
         var notification = new Notification.Builder()
                 .setMessage(message.message())
                 .setFromUserId(message.fromUserId())
@@ -40,8 +39,30 @@ public class KafkaConsumer
                 .setRequestId(message.requestId())
                 .build();
 
-        m_notificationService.saveNotification(notification);
+        var savedNotification = m_notificationService.saveNotification(notification);
 
-        messagingTemplate.convertAndSend("/topic/user-" + message.toUserId(), message);
+        sendNotificationToUser(savedNotification);
+    }
+
+    private void sendNotificationToUser(Notification savedNotification)
+    {
+        var dto = new NotificationDTO.Builder()
+                .setNotificationData(savedNotification.getNotificationData())
+                .setNotificationLink(savedNotification.getNotificationLink())
+                .setNotificationType(savedNotification.getNotificationType())
+                .setMessage(savedNotification.getMessage())
+                .setFromUserId(savedNotification.getFromUserId())
+                .setToUserId(savedNotification.getNotificationOwnerId())
+                .setCreatedAt(savedNotification.getCreatedAt())
+                .setNotificationImage(savedNotification.getNotificationImage())
+                .setNotificationTitle(savedNotification.getNotificationTitle())
+                .setRequestId(savedNotification.getRequestId())
+                .setNotificationDataType(savedNotification.getNotificationDataType())
+                .setNotificationApproveLink(savedNotification.getNotificationApproveLink())
+                .setNotificationRejectLink(savedNotification.getNotificationRejectLink())
+                .setNotificationId(savedNotification.getId())
+                .build();
+
+        messagingTemplate.convertAndSend("/topic/user-" + dto.getToUserId(), dto);
     }
 }

@@ -15,10 +15,10 @@ public class CorsGlobalConfiguration
     {
         CorsConfiguration corsConfig = new CorsConfiguration();
         corsConfig.setAllowCredentials(true);
-        corsConfig.addAllowedOriginPattern("*"); // Tüm kökenleri kabul eden bir desen
+        corsConfig.addAllowedOriginPattern("*");
         corsConfig.addAllowedHeader("*");
         corsConfig.addAllowedMethod("*");
-        corsConfig.addExposedHeader("Authorization");
+        //corsConfig.addExposedHeader("Authorization");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);

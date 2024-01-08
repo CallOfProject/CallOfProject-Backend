@@ -30,6 +30,7 @@ public class ForgotPasswordController
     @PostMapping("/password-reset-request")
     public ResponseEntity<Object> SendPasswordResetEmail(@RequestParam("email") String email)
     {
+        System.out.println("hwerwerewr");
         return subscribe(() -> ok(m_forgotPasswordService.sendResetPasswordLink(email)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }

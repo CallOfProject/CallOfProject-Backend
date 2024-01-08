@@ -77,31 +77,8 @@ public class NotificationService
      * @param userId represent the user id.
      * @return Notifications.
      */
-    public List<NotificationDTO> findAllNotificationsByNotificationOwnerId(UUID userId)
-    {
-        var list = toStream(m_notificationServiceHelper.findAllNotificationsByNotificationOwnerId(userId))
-                .map(notification -> new NotificationDTO.Builder()
-                        .setNotificationData(notification.getNotificationData())
-                        .setNotificationLink(notification.getNotificationLink())
-                        .setNotificationType(notification.getNotificationType())
-                        .setMessage(notification.getMessage())
-                        .setFromUserId(notification.getFromUserId())
-                        .setToUserId(notification.getNotificationOwnerId())
-                        .build())
-                .toList();
-
-        return doForDataService(() -> list, "NotificationService::findAllNotificationsByNotificationOwnerId");
-    }
-
-    /**
-     * Find all notifications by notification owner id.
-     *
-     * @param userId represent the user id.
-     * @return Notifications.
-     */
     public MultipleResponseMessagePageable<Object> findAllNotificationsByNotificationOwnerIdAndSortCreatedAt(UUID userId, int page)
     {
-
         var sort = by(ASC, "createdAt");
         var pageable = PageRequest.of(page - 1, 15, sort);
         ISupplier<Page<Notification>> supplier = () -> m_notificationServiceHelper.findAllNotificationsByNotificationOwnerIdAndSortCreatedAt(userId, pageable);
@@ -132,5 +109,4 @@ public class NotificationService
         return new MultipleResponseMessagePageable<>(notificationPageable.getTotalPages(), page, notificationPageable.getNumberOfElements(),
                 "Notifications found!", list);
     }
-
 }

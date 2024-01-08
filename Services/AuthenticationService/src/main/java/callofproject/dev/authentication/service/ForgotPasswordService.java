@@ -73,6 +73,7 @@ public class ForgotPasswordService
      */
     private ResponseMessage<Object> sendResetPasswordLinkCallback(String email)
     {
+        System.out.println("here");
         var user = m_userServiceHelper.findByEmail(email);
 
         if (user.isEmpty())
@@ -83,6 +84,7 @@ public class ForgotPasswordService
         var passwordResetToken = generateToken(claims, user.get().getUsername());
 
         var url = format(m_forgotPasswordUrl, passwordResetToken);
+        System.out.println("DASDASDSDSADSAFAS");
         var message = format("Hello %s, \n\nYou can reset your password by clicking the link below: \n%s", user.get().getUsername(), url);
         var emailTopic = new EmailTopic(EmailType.PASSWORD_RESET, user.get().getEmail(), "Reset Password", message, null);
         m_kafkaProducer.sendEmail(emailTopic);

@@ -12,6 +12,12 @@ public class KafkaTopic
     @Value("${spring.kafka.producer.topic-name}")
     private String m_topicName;
 
+    /**
+     * Default constructor.
+     */
+    public KafkaTopic()
+    {
+    }
 
     /**
      * Create a new topic.

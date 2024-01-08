@@ -18,6 +18,12 @@ public class KafkaProducer
     private final NewTopic m_topic;
     private final KafkaTemplate<String, NotificationUserResponseDTO> m_kafkaTemplate;
 
+    /**
+     * Constructor.
+     *
+     * @param topic         The topic.
+     * @param kafkaTemplate The kafka template.
+     */
     public KafkaProducer(NewTopic topic, KafkaTemplate<String, NotificationUserResponseDTO> kafkaTemplate)
     {
         m_topic = topic;

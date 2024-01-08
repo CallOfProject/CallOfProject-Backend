@@ -13,31 +13,30 @@ import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
+
 @RestController
 @RequestMapping("api/notification")
 public class NotificationController
 {
     private final NotificationService m_notificationService;
 
+    /**
+     * Constructor.
+     *
+     * @param notificationService represent the notification service.
+     */
     public NotificationController(NotificationService notificationService)
     {
         m_notificationService = notificationService;
     }
 
     /**
-     * Find all notifications by notification owner id.
+     * Find all notifications by notification owner id and sort created at.
      *
-     * @param userId is notification owner id
-     * @return list of notification
+     * @param userId represent the user id.
+     * @param page   represent the page.
+     * @return ResponseEntity.
      */
-    @GetMapping("find/all")
-    public ResponseEntity<Object> findAllNotificationsByNotificationOwnerId(@RequestParam("uid") UUID userId)
-    {
-        return subscribe(() -> ok(m_notificationService.findAllNotificationsByNotificationOwnerId(userId)),
-                msg -> internalServerError().body(msg.getMessage()));
-    }
-
-
     @GetMapping("find/all/sort/created-at")
     public ResponseEntity<Object> findAllNotificationsByNotificationOwnerIdAndSortCreatedAt(@RequestParam("uid") UUID userId, @RequestParam("p") int page)
     {
