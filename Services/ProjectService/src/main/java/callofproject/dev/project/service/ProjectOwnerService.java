@@ -287,7 +287,9 @@ public class ProjectOwnerService
 
         project.finishProject();
         var savedProject = m_projectServiceHelper.saveProject(project);
-
+        user.setOwnerProjectCount(user.getOwnerProjectCount() - 1);
+        user.setTotalProjectCount(user.getTotalProjectCount() - 1);
+        m_projectServiceHelper.addUser(user);
         var detailDTO = m_projectMapper.toProjectDetailDTO(savedProject, findTagList(savedProject), findProjectParticipantsByProjectId(savedProject));
 
         return new ResponseMessage<>("Project is finished!", OK, detailDTO);

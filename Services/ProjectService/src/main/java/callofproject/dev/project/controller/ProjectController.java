@@ -1,12 +1,15 @@
 package callofproject.dev.project.controller;
 
+import callofproject.dev.library.exception.util.CopDataUtil;
 import callofproject.dev.project.dto.ProjectSaveDTO;
 import callofproject.dev.project.dto.ProjectUpdateDTO;
 import callofproject.dev.project.service.ProjectService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -20,10 +23,12 @@ import static org.springframework.http.ResponseEntity.ok;
 public class ProjectController
 {
     private final ProjectService m_projectService;
+    private final ObjectMapper m_objectMapper;
 
-    public ProjectController(ProjectService projectService)
+    public ProjectController(ProjectService projectService, ObjectMapper objectMapper)
     {
         m_projectService = projectService;
+        m_objectMapper = objectMapper;
     }
 
     /**
@@ -37,6 +42,13 @@ public class ProjectController
     public ResponseEntity<Object> save(@RequestBody @Valid ProjectSaveDTO saveDTO)
     {
         return subscribe(() -> ok(m_projectService.saveProject(saveDTO)), msg -> internalServerError().body(msg.getMessage()));
+    }
+
+    @PostMapping("/create/v2")
+    public ResponseEntity<Object> saveV2(@RequestParam("projectSaveDTO") String projectSaveDTOJson, @RequestParam(value = "file") MultipartFile file)
+    {
+        var dto = CopDataUtil.doForDataService(() -> m_objectMapper.readValue(projectSaveDTOJson, ProjectSaveDTO.class), "ProjectSaveDTO");
+        return subscribe(() -> ok(m_projectService.saveProjectV2(dto, file)), msg -> internalServerError().body(msg.getMessage()));
     }
 
     /**
@@ -158,6 +170,13 @@ public class ProjectController
     public ResponseEntity<Object> findProjectDetail(@RequestParam("pid") UUID projectId)
     {
         return subscribe(() -> ok(m_projectService.findProjectDetail(projectId)),
+                msg -> internalServerError().body(msg.getMessage()));
+    }
+
+    @GetMapping("/find/project-detail")
+    public ResponseEntity<Object> findProjectDetailIfHasPermission(@RequestParam("pid") UUID projectId, @RequestParam("uid") UUID userId)
+    {
+        return subscribe(() -> ok(m_projectService.findProjectDetailIfHasPermission(projectId, userId)),
                 msg -> internalServerError().body(msg.getMessage()));
     }
 }

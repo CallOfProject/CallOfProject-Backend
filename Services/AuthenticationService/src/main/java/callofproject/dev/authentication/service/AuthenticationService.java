@@ -160,10 +160,13 @@ public class AuthenticationService
         var user = m_serviceHelper.findByUsername(username);
 
         if (user.isEmpty())
-            throw new DataServiceException("User not found!");
+            return new ResponseMessage<>("User not found!", Status.NOT_FOUND, false);
+
+        if (!user.get().getIsAccountBlocked())
+            return new ResponseMessage<>("user already verified!", Status.NOT_ACCEPTED, false);
 
         if (endTime.isBefore(LocalDateTime.now()))
-            throw new DataServiceException("Token expired!");
+            return new ResponseMessage<>("Token expired!", Status.BAD_REQUEST, false);
 
         user.get().setAccountBlocked(false);
         m_serviceHelper.saveUser(user.get());

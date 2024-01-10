@@ -4,6 +4,10 @@ import callofproject.dev.service.jwt.filter.JWTTokenGeneratorFilter;
 import callofproject.dev.service.jwt.filter.JWTTokenValidatorFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.catalina.connector.Connector;
+import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -94,4 +98,16 @@ public class SecurityConfig
         config.setMaxAge(3600L);
         return config;
     }
+
+    /*@Bean
+    public ConfigurableServletWebServerFactory webServerFactory() {
+        TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
+        factory.addConnectorCustomizers(new TomcatConnectorCustomizer() {
+            @Override
+            public void customize(Connector connector) {
+                connector.setProperty("relaxedQueryChars", "|{}[]");
+            }
+        });
+        return factory;
+    }*/
 }

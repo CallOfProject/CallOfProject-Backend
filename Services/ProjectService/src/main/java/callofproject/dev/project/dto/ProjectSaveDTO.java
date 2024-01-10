@@ -51,12 +51,8 @@ public record ProjectSaveDTO(
         @Max(value = 20, message = "max participant count cannot be more than 100")
         int maxParticipantCount,
         @JsonProperty("technical_requirements")
-        @NotBlank(message = "technical requirements cannot be empty")
-        @NotEmpty(message = "technical requirements cannot be empty")
         String technicalRequirements,
         @JsonProperty("special_requirements")
-        @NotBlank(message = "special requirements cannot be empty")
-        @NotEmpty(message = "special requirements cannot be empty")
         String specialRequirements,
         @JsonProperty("project_access_type")
         @NotNull(message = "project access type cannot be empty")

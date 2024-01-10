@@ -53,6 +53,12 @@ public interface IProjectMapper
     })
     ProjectDiscoveryDTO toProjectDiscoveryDTO(Project project, String image);
 
+    @Mappings({
+            @Mapping(source = "project.projectOwner.username", target = "projectOwnerName"),
+            @Mapping(source = "project.projectName", target = "projectTitle"),
+    })
+    ProjectDiscoveryDTO toProjectDiscoveryDTO(Project project);
+
     default ProjectsDiscoveryDTO toProjectsDiscoveryDTO(List<ProjectDiscoveryDTO> projectDiscoveryDTOs)
     {
         return new ProjectsDiscoveryDTO(projectDiscoveryDTOs);

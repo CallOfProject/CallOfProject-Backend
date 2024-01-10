@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -83,6 +84,10 @@ public class ProjectService
         return doForDataService(() -> saveProjectCallback(projectDTO), "ProjectService::saveProject");
     }
 
+    public ResponseMessage<Object> saveProjectV2(ProjectSaveDTO saveDTO, MultipartFile file)
+    {
+        return doForDataService(() -> saveProjectCallbackV2(saveDTO, file), "ProjectService::saveProject");
+    }
 
     /**
      * Find all project by user id who is participant in project.
@@ -192,8 +197,27 @@ public class ProjectService
         var project = findProjectIfExistsByProjectId(projectId);
         var tags = findTagList(project);
 
-        var img = m_s3Service.getImage(project.getProjectImagePath());
-        project.setProjectImagePath(img);
+      /*  var img = m_s3Service.getImage(project.getProjectImagePath());
+        project.setProjectImagePath(img);*/
+        var projectDetailDTO = m_projectMapper.toProjectDetailDTO(project, tags, findProjectParticipantsByProjectId(project));
+
+        return new ResponseMessage<>("Project is found!", OK, projectDetailDTO);
+    }
+
+    public ResponseMessage<Object> findProjectDetailIfHasPermission(UUID projectId, UUID userId)
+    {
+        var project = findProjectIfExistsByProjectId(projectId);
+        var user = findUserIfExists(userId);
+
+        var isOwner = project.getProjectOwner().getUserId().equals(userId);
+        var isParticipant = project.getProjectParticipants().stream().map(ProjectParticipant::getUser)
+                .map(User::getUserId).anyMatch(user.getUserId()::equals);
+
+        if (!isOwner && !isParticipant)
+            return new ResponseMessage<>("User has not view permission", BAD_REQUEST, false);
+
+        var tags = findTagList(project);
+
         var projectDetailDTO = m_projectMapper.toProjectDetailDTO(project, tags, findProjectParticipantsByProjectId(project));
 
         return new ResponseMessage<>("Project is found!", OK, projectDetailDTO);
@@ -289,8 +313,8 @@ public class ProjectService
         var project = findProjectIfExistsByProjectId(projectId);
         var tags = findTagList(project);
 
-        var img = m_s3Service.getImage(project.getProjectImagePath());
-        project.setProjectImagePath(img);
+        /*var img = m_s3Service.getImage(project.getProjectImagePath());
+        project.setProjectImagePath(img);*/
         var projectOverviewDTO = m_projectMapper.toProjectOverviewDTO(project, tags);
 
         return new ResponseMessage<>("Project is found!", OK, projectOverviewDTO);
@@ -300,8 +324,7 @@ public class ProjectService
     {
         var projectPageable = m_serviceHelper.findAllValidProjects(page);
 
-        var resultDTO = m_projectMapper.toProjectsDiscoveryDTO(toListConcurrent(projectPageable.getContent(), p ->
-                m_projectMapper.toProjectDiscoveryDTO(p, m_s3Service.getImage(p.getProjectImagePath()))));
+        var resultDTO = m_projectMapper.toProjectsDiscoveryDTO(toListConcurrent(projectPageable.getContent(), m_projectMapper::toProjectDiscoveryDTO));
 
         return new MultipleResponseMessagePageable<>(projectPageable.getTotalPages(), page, projectPageable.getNumberOfElements(),
                 "Projects found!", resultDTO);
@@ -347,6 +370,68 @@ public class ProjectService
                 .setExpectedCompletionDate(projectDTO.expectedCompletionDate())
                 .setApplicationDeadline(projectDTO.applicationDeadline())
                 .setProjectImagePath(projectDTO.projectImage())
+                .setProjectName(projectDTO.projectName())
+                .setProjectSummary(projectDTO.projectSummary())
+                .setSpecialRequirements(projectDTO.specialRequirements())
+                .setTechnicalRequirements(projectDTO.technicalRequirements())
+                .setMaxParticipant(projectDTO.maxParticipantCount())
+                .build();
+
+        var savedProject = m_serviceHelper.saveProject(project);
+
+        saveTagsIfNotExists(projectDTO.tags(), savedProject);
+
+        var tagList = toStream(m_projectTagServiceHelper
+                .getAllProjectTagByProjectId(savedProject.getProjectId()))
+                .toList();
+
+        user.setOwnerProjectCount(user.getOwnerProjectCount() + 1);
+        user.setTotalProjectCount(user.getTotalProjectCount() + 1);
+        m_serviceHelper.addUser(user);
+
+        return new ResponseMessage<>("Project Created Successfully!", CREATED, m_projectMapper.toProjectOverviewDTO(savedProject, tagList));
+    }
+
+    public String getFileExtension(MultipartFile file)
+    {
+        String fileName = file.getOriginalFilename();
+        if (fileName != null && fileName.contains("."))
+        {
+            return fileName.substring(fileName.lastIndexOf("."));
+        }
+        return "";
+    }
+
+    private ResponseMessage<Object> saveProjectCallbackV2(ProjectSaveDTO projectDTO, MultipartFile file)
+    {
+        var user = findUserIfExists(projectDTO.userId());
+
+        if (user.getOwnerProjectCount() >= Policy.OWNER_MAX_PROJECT_COUNT)
+            return new ResponseMessage<>(format("You are owner of %d projects already!", Policy.OWNER_MAX_PROJECT_COUNT),
+                    NOT_ACCEPTED, false);
+
+        if (user.getTotalProjectCount() >= Policy.MAX_PROJECT_COUNT)
+            return new ResponseMessage<>(format("You cannot create or join to project! Max project count is: %d", Policy.MAX_PROJECT_COUNT),
+                    NOT_ACCEPTED, false);
+
+        var imageLink = m_s3Service.uploadToS3AndGetUrl(file, UUID.randomUUID() + getFileExtension(file));
+        System.out.println("here");
+
+        var project = new Project.Builder()
+                .setStartDate(projectDTO.startDate())
+                .setFeedbackTimeRange(projectDTO.feedbackTimeRange())
+                .setProjectAccessType(projectDTO.projectAccessType())
+                .setProjectOwner(user)
+                .setProjectLevel(projectDTO.projectLevel())
+                .setProfessionLevel(projectDTO.professionLevel())
+                .setSector(projectDTO.sector())
+                .setDegree(projectDTO.degree())
+                .setInterviewType(projectDTO.interviewType())
+                .setProjectAim(projectDTO.projectAim())
+                .setDescription(projectDTO.projectDescription())
+                .setExpectedCompletionDate(projectDTO.expectedCompletionDate())
+                .setApplicationDeadline(projectDTO.applicationDeadline())
+                .setProjectImagePath(imageLink)
                 .setProjectName(projectDTO.projectName())
                 .setProjectSummary(projectDTO.projectSummary())
                 .setSpecialRequirements(projectDTO.specialRequirements())

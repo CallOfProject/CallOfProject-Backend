@@ -28,6 +28,15 @@ public class S3Service
         m_s3Client = s3Client;
     }
 
+    public String uploadToS3AndGetUrl(MultipartFile multipartFile, String fileName)
+    {
+        var fileObject = doForDataService(() -> toFile(multipartFile), "Failed to convert multipart file to file");
+
+        m_s3Client.putObject(new PutObjectRequest(m_bucketName, fileName, fileObject).withCannedAcl(CannedAccessControlList.PublicRead));
+        fileObject.delete();
+
+        return "https://" + m_bucketName + ".s3.amazonaws.com/" + fileName;
+    }
 
     public String uploadToS3WithMultiPartFile(MultipartFile multipartFile, String fileName)
     {

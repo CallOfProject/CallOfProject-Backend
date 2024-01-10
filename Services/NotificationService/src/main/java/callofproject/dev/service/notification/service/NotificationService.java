@@ -1,4 +1,4 @@
-package callofproject.dev.service.notification.config.service;
+package callofproject.dev.service.notification.service;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.library.exception.ISupplier;

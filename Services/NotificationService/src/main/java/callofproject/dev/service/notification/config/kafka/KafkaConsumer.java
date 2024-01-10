@@ -1,7 +1,7 @@
 package callofproject.dev.service.notification.config.kafka;
 
 import callofproject.dev.nosql.entity.Notification;
-import callofproject.dev.service.notification.config.service.NotificationService;
+import callofproject.dev.service.notification.service.NotificationService;
 import callofproject.dev.service.notification.dto.NotificationDTO;
 import callofproject.dev.service.notification.dto.NotificationUserResponseDTO;
 import org.springframework.kafka.annotation.KafkaListener;

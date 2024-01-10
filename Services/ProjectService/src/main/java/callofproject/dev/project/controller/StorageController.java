@@ -27,6 +27,11 @@ public class StorageController
     {
         return new ResponseEntity<>(m_storageService.uploadToS3WithMultiPartFile(file, fileName), HttpStatus.OK);
     }
+    @PostMapping("/upload/multipart/url")
+    public ResponseEntity<String> uploadFileAndGetUrl(@RequestParam(value = "file") MultipartFile file, @RequestParam("name") String fileName)
+    {
+        return new ResponseEntity<>(m_storageService.uploadToS3AndGetUrl(file, fileName), HttpStatus.OK);
+    }
 
     @PostMapping("/upload/file")
     public ResponseEntity<String> uploadFile(@RequestParam(value = "file") File file, @RequestParam("name") String fileName)

@@ -1,6 +1,6 @@
 package callofproject.dev.service.notification.controller;
 
-import callofproject.dev.service.notification.config.service.NotificationService;
+import callofproject.dev.service.notification.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
