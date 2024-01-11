@@ -24,7 +24,7 @@ import static org.springframework.http.ResponseEntity.ok;
  * All Rights free.
  */
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping("api/auth/authenticate")
 @SecurityRequirement(name = "Authorization")
 public class AuthenticationController
 {

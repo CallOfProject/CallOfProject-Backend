@@ -14,7 +14,7 @@ import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
-@RequestMapping("api/users")
+@RequestMapping("api/auth/users")
 @RestController
 @SecurityRequirement(name = "Authorization")
 public class UserManagementController

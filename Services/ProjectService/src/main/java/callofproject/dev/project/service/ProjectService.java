@@ -240,8 +240,7 @@ public class ProjectService
         if (projectChecked.getStatusCode() != OK)
             return projectChecked;
 
-        var result = doForDataService(() -> m_serviceHelper.sendParticipantRequestToProject(new ProjectParticipantRequest(project.get(), user.get())),
-                "ProjectService::addProjectJoinRequest");
+        var result = doForDataService(() -> m_serviceHelper.sendParticipantRequestToProject(new ProjectParticipantRequest(project.get(), user.get())), "ProjectService::addProjectJoinRequest");
 
         var dto = new ProjectParticipantRequestDTO(userId, projectId, result.getParticipantRequestId());
         return new ResponseMessage<>("Participant request is sent!", OK, dto);
@@ -415,7 +414,6 @@ public class ProjectService
                     NOT_ACCEPTED, false);
 
         var imageLink = m_s3Service.uploadToS3AndGetUrl(file, UUID.randomUUID() + getFileExtension(file));
-        System.out.println("here");
 
         var project = new Project.Builder()
                 .setStartDate(projectDTO.startDate())

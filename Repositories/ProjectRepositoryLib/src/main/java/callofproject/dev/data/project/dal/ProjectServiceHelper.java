@@ -5,7 +5,10 @@
 
 package callofproject.dev.data.project.dal;
 
-import callofproject.dev.data.project.entity.*;
+import callofproject.dev.data.project.entity.Project;
+import callofproject.dev.data.project.entity.ProjectParticipant;
+import callofproject.dev.data.project.entity.ProjectParticipantRequest;
+import callofproject.dev.data.project.entity.User;
 import callofproject.dev.data.project.entity.enums.*;
 import callofproject.dev.library.exception.repository.RepositoryException;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -543,7 +546,6 @@ public class ProjectServiceHelper
     }
 
 
-
     public Optional<Project> findProjectById(UUID projectId)
     {
         return doForRepository(() -> m_facade.m_projectRepository.findById(projectId),
@@ -618,6 +620,7 @@ public class ProjectServiceHelper
 
     public ProjectParticipantRequest sendParticipantRequestToProject(ProjectParticipantRequest participantRequest)
     {
+
         return doForRepository(() -> m_facade.m_projectParticipantRequestRepository.save(participantRequest),
                 "ProjectServiceHelper::sendParticipantRequestToProject");
     }
@@ -630,19 +633,6 @@ public class ProjectServiceHelper
         if (user.isEmpty() || project.isEmpty())
             throw new RepositoryException("User or Project is not found!");
 
-       /* var isExistParticipantRequest = project.get()
-                .getProjectParticipantRequests()
-                .stream()
-                .anyMatch(p -> p.getUser().getUserId().equals(userId) &&
-                        p.getProject().getProjectId().equals(projectId));
-
-        if (isExistParticipantRequest)
-        {
-            return project.get().getProjectParticipantRequests().stream().filter(r -> r.getProject().getProjectId().equals(projectId) &&
-                    r.getUser().getUserId().equals(userId)).findFirst();
-            //return false;
-        }
-*/
         project.get().addProjectParticipantRequest(user.get());
 
         var updatedProject = doForRepository(() -> m_facade.m_projectRepository.save(project.get()), "ProjectServiceHelper::sendParticipantRequestToProject");

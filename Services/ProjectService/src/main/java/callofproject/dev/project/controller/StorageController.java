@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 
 @RestController
-@RequestMapping("api/storage")
+@RequestMapping("api/project/storage")
 @SecurityRequirement(name = "Authorization")
 public class StorageController
 {

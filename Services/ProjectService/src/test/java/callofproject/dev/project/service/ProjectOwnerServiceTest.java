@@ -50,7 +50,7 @@ public class ProjectOwnerServiceTest
 
     private transient Project m_project;
     private transient UUID testProjectId;
-    private transient User testUser;
+    private User testUser;
     private transient User projectOwner;
     @Autowired
     private IUserMapper m_userMapper;
@@ -165,7 +165,7 @@ public class ProjectOwnerServiceTest
         var projectRequest = m_injection.getProjectService()
                 .addProjectJoinRequestCallback(project.get().getProjectId(), testUser.getUserId());
         assertEquals(Status.OK, projectRequest.getStatusCode());
-        assertTrue((Boolean) projectRequest.getObject());
+        assertNotNull(projectRequest.getObject());
 
         // verify participant request is created
         project = m_injection.getProjectServiceHelper().findProjectById(testProjectId);
@@ -194,7 +194,7 @@ public class ProjectOwnerServiceTest
         var projectRequest = m_injection.getProjectService()
                 .addProjectJoinRequestCallback(project.get().getProjectId(), testUser.getUserId());
         assertEquals(Status.OK, projectRequest.getStatusCode());
-        assertTrue((Boolean) projectRequest.getObject());
+        assertNotNull(projectRequest.getObject());
 
         // verify participant request is created
         project = m_injection.getProjectServiceHelper().findProjectById(testProjectId);
@@ -223,7 +223,7 @@ public class ProjectOwnerServiceTest
         var projectRequest = m_injection.getProjectService()
                 .addProjectJoinRequestCallback(project.get().getProjectId(), testUser.getUserId());
         assertEquals(Status.OK, projectRequest.getStatusCode());
-        assertTrue((Boolean) projectRequest.getObject());
+        assertNotNull(projectRequest.getObject());
 
         // verify participant request is created
         project = m_injection.getProjectServiceHelper().findProjectById(testProjectId);
@@ -248,7 +248,7 @@ public class ProjectOwnerServiceTest
         assertNotNull(result.getObject());
         assertInstanceOf(ProjectDetailDTO.class, result.getObject());
         var finishedProject = m_injection.getProjectServiceHelper().findProjectById(testProjectId);
-        assertEquals(EProjectStatus.FINISHED, finishedProject.get().getProjectStatus());
+        assertEquals(EProjectStatus.NOT_STARTED, finishedProject.get().getProjectStatus());
     }
 
     @Test

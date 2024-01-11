@@ -13,7 +13,7 @@ import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-@RequestMapping("api/root")
+@RequestMapping("api/auth/root")
 @SecurityRequirement(name = "Authorization")
 public class RootController
 {

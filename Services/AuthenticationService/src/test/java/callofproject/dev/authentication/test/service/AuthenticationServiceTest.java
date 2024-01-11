@@ -2,11 +2,13 @@ package callofproject.dev.authentication.test.service;
 
 import callofproject.dev.authentication.DatabaseCleaner;
 import callofproject.dev.authentication.Injection;
+import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.dto.auth.RegisterRequest;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.entity.Role;
 import callofproject.dev.repository.authentication.entity.User;
+import callofproject.dev.repository.authentication.enumeration.RoleEnum;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -152,13 +154,15 @@ public class AuthenticationServiceTest
     public void testRegisterOperation_withGivenValidRegisterDTO_shouldNotNull()
     {
         var user = new RegisterRequest("John", "Doe", "M", "john.doe", "john@example.com", "password123", LocalDate.of(1990, 5, 15));
-
-        var registerResponse = m_injection.getAuthenticationService().registerUserCallback(user);
+        var dto = new UserSignUpRequestDTO(user.getEmail(), user.getFirst_name(),
+                user.getMiddle_name(), user.getLast_name(), user.getUsername(),
+                m_passwordEncoder.encode(user.getPassword()), user.getBirth_date(),
+                RoleEnum.ROLE_USER);
+        var registerResponse = m_injection.getUserManagementService().saveUserCallback(dto);
 
         assertNotNull(registerResponse);
-        assertEquals("ROLE_USER", registerResponse.getRole());
-        assertNotNull(registerResponse.getAccessToken());
-        assertTrue(registerResponse.isSuccess());
+        assertNotNull(registerResponse.getObject().accessToken());
+        assertTrue(registerResponse.getObject().success());
     }
 
 

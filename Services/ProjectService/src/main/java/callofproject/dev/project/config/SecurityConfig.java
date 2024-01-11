@@ -41,13 +41,12 @@ public class SecurityConfig
     private static void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests)
     {
         requests
-                .requestMatchers(antMatcher("/api/auth/register-all")).permitAll()
                 .requestMatchers(antMatcher("/api-docs/**")).permitAll()
                 .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
-                .requestMatchers(antMatcher("/api/admin/project/**")).hasAnyRole("ADMIN", "ROOT")
-                .requestMatchers(antMatcher("/api/project-owner/**")).hasAnyRole("ADMIN", "USER", "ROOT")
-                .requestMatchers(antMatcher("/api/project/**")).hasAnyRole("ROOT", "USER", "ADMIN")
-                .requestMatchers(antMatcher("/api/storage/**")).hasAnyRole("ADMIN", "USER", "ROOT");
+                .requestMatchers(antMatcher("/api/project/admin/**")).hasAnyRole("ADMIN", "ROOT")
+                .requestMatchers(antMatcher("/api/project/project-owner/**")).hasAnyRole("ADMIN", "USER", "ROOT")
+                .requestMatchers(antMatcher("/api/project/project/**")).hasAnyRole("ROOT", "USER", "ADMIN")
+                .requestMatchers(antMatcher("/api/project/storage/**")).hasAnyRole("ADMIN", "USER", "ROOT");
     }
 
 

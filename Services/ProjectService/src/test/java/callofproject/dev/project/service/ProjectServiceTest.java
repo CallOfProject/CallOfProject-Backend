@@ -466,8 +466,10 @@ public class ProjectServiceTest
         var project = m_injection.getProjectServiceHelper().findProjectById(project_4.getProjectId());
         System.out.println(user.get().getUserId());
         System.out.println(project.get().getProjectId());
+
         var projectJoinRequest = m_injection.getProjectService()
                 .addProjectJoinRequestCallback(project.get().getProjectId(), user.get().getUserId());
+        System.out.println(projectJoinRequest);
         assertNotNull(projectJoinRequest.getObject());
     }
 

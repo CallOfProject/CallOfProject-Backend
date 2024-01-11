@@ -8,8 +8,10 @@ import callofproject.dev.authentication.dto.environments.EducationUpsertDTO;
 import callofproject.dev.authentication.dto.environments.ExperienceUpsertDTO;
 import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
 import callofproject.dev.library.exception.service.DataServiceException;
-import callofproject.dev.repository.authentication.entity.*;
-import callofproject.dev.repository.authentication.enumeration.RoleEnum;
+import callofproject.dev.repository.authentication.entity.Course;
+import callofproject.dev.repository.authentication.entity.Education;
+import callofproject.dev.repository.authentication.entity.Experience;
+import callofproject.dev.repository.authentication.entity.Link;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +60,7 @@ public class UserInformationTest
     @BeforeEach
     public void setUpAndCheckUsers()
     {
-        var rootUser = new User("cop_root", "root", "root", "root", "nuricanozturk0@gmail.com",
+      /*  var rootUser = new User("cop_root", "root", "root", "root", "nuricanozturk0@gmail.com",
                 m_passwordEncoder.encode("cop123"), LocalDate.now(), new Role(RoleEnum.ROLE_ROOT.getRole()));
 
         rootUser.addRoleToUser(new Role(RoleEnum.ROLE_USER.getRole()));
@@ -67,17 +69,17 @@ public class UserInformationTest
         profile1.setUser(rootUser);
         rootUser.setUserProfile(profile1);
 
-        m_injection.getUserRepository().save(rootUser);
+        m_injection.getUserRepository().save(rootUser);*/
 
 
-        var adminUser = new User("cop_admin", "admin", "admin", "admin", "nuricanozturk01@gmail.com",
+        /*var adminUser = new User("cop_admin", "admin", "admin", "admin", "nuricanozturk01@gmail.com",
                 m_passwordEncoder.encode("cop_123"), LocalDate.now(), new Role(RoleEnum.ROLE_ADMIN.getRole()));
         adminUser.setUserProfile(new UserProfile());
-        adminUser.addRoleToUser(new Role(RoleEnum.ROLE_USER.getRole()));
-        var profile2 = new UserProfile();
+        adminUser.addRoleToUser(new Role(RoleEnum.ROLE_USER.getRole()));*/
+  /*      var profile2 = new UserProfile();
         profile2.setUser(adminUser);
         adminUser.setUserProfile(profile2);
-        m_injection.getUserRepository().save(adminUser);
+        m_injection.getUserRepository().save(adminUser);*/
 
 
         var user1 = new UserSignUpRequestDTO(
@@ -132,8 +134,8 @@ public class UserInformationTest
 
         user1Id = savedUser1.getObject().userId();
         user2Id = savedUser2.getObject().userId();
-        adminId = adminUser.getUserId();
-        rootId = rootUser.getUserId();
+        //adminId = adminUser.getUserId();
+        //rootId = rootUser.getUserId();
     }
 
     @Test

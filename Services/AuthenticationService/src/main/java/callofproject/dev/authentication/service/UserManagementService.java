@@ -53,7 +53,6 @@ public class UserManagementService
      */
     public ResponseMessage<UserSaveDTO> saveUser(UserSignUpRequestDTO userDTO)
     {
-
         var result = doForDataService(() -> saveUserCallback(userDTO), "User cannot be saved!");
 
         if (result.getStatusCode() == 200)

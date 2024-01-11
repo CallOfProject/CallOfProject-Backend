@@ -10,7 +10,7 @@ import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
-@RequestMapping("api/forgot-password")
+@RequestMapping("api/auth/forgot-password")
 @RestController
 public class ForgotPasswordController
 {

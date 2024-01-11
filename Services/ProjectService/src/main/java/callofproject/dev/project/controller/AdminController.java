@@ -12,7 +12,7 @@ import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.*;
 
 @RestController
-@RequestMapping("api/admin/project")
+@RequestMapping("api/project/admin")
 @SecurityRequirement(name = "Authorization")
 public class AdminController
 {

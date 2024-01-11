@@ -43,7 +43,7 @@ public class User
     @JsonIgnore
     private Set<ProjectParticipant> m_projectParticipants; // projects that he owns
 
-    @OneToMany(mappedBy = "m_user", cascade = {MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "m_user", cascade = {DETACH,MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<ProjectParticipantRequest> m_projectParticipantRequests; // Project Join requests
     @ManyToMany(

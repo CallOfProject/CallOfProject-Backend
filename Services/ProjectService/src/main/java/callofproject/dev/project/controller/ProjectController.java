@@ -18,7 +18,7 @@ import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-@RequestMapping("api/project")
+@RequestMapping("api/project/project")
 @SecurityRequirement(name = "Authorization")
 public class ProjectController
 {
@@ -173,6 +173,13 @@ public class ProjectController
                 msg -> internalServerError().body(msg.getMessage()));
     }
 
+    /**
+     * Find project detail if user has permission
+     *
+     * @param projectId is project id
+     * @param userId    is user id
+     * @return if success ProjectDetailDTO else return Error Message
+     */
     @GetMapping("/find/project-detail")
     public ResponseEntity<Object> findProjectDetailIfHasPermission(@RequestParam("pid") UUID projectId, @RequestParam("uid") UUID userId)
     {

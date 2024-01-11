@@ -17,11 +17,11 @@ public class ProjectParticipantRequest
     @Column(name = "project_participant_request_id")
     private UUID m_participantRequestId;
 
-    @ManyToOne(cascade = {DETACH, MERGE, PERSIST, REFRESH})
+    @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
     private Project m_project;
 
-    @ManyToOne(cascade = {PERSIST, REFRESH})
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User m_user;
     @Column(name = "is_accepted", nullable = false)

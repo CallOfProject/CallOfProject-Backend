@@ -15,7 +15,7 @@ import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-@RequestMapping("api/project-owner")
+@RequestMapping("api/project/project-owner")
 @SecurityRequirement(name = "Authorization")
 public class ProjectOwnerController
 {

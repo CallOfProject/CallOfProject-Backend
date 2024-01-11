@@ -14,7 +14,7 @@ import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-@RequestMapping("api/admin")
+@RequestMapping("api/auth/admin")
 @SecurityRequirement(name = "Authorization")
 public class AdminController
 {

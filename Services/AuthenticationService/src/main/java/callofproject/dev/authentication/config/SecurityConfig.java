@@ -29,18 +29,18 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 public class SecurityConfig
 {
     private static final String[] AUTH_WHITELIST = {
-            "/api/forgot-password/**",
-            "/api/auth/register",
-            "/api/auth/register/verify",
+            "/api/auth/forgot-password/**",
+            "/api/auth/authenticate/register",
+            "/api/auth/authenticate/register/verify",
             "/swagger-ui/**",
-            "/api/auth/login",
-            "/api/admin/login"
+            "/api/auth/authenticate/login",
+            "/api/auth/admin/login"
     };
 
     private static final String[] ROOT_AND_ADMIN_WHITE_LIST = {
-            "/api/auth/refresh-token",
-            "/api/auth/validate",
-            "/api/admin/**"
+            "/api/auth/authenticate/refresh-token",
+            "/api/auth/authenticate/validate",
+            "/api/auth/admin/**"
     };
     private final AuthenticationProvider authenticationProvider;
     //private final LogoutSuccessHandler logoutHandler;
@@ -58,14 +58,14 @@ public class SecurityConfig
      */
     private static void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests)
     {
-        requests.requestMatchers("/api/auth/register-all").permitAll()
+        requests//.requestMatchers("/api/auth/register-all").permitAll()
                 .requestMatchers(antMatcher("/api-docs/**")).permitAll()
                 .requestMatchers(AUTH_WHITELIST).permitAll()
                 .requestMatchers(ROOT_AND_ADMIN_WHITE_LIST).hasAnyRole("ROOT", "ADMIN")
-                .requestMatchers("/api/auth/logout").authenticated()
-                .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN", "ROOT")
-                .requestMatchers("/api/user-info/**").hasAnyRole("USER", "ADMIN", "ROOT")
-                .requestMatchers("/api/root/**").hasAnyRole("ROOT");
+                .requestMatchers("/api/auth/authenticate/logout").authenticated()
+                .requestMatchers("/api/auth/users/**").hasAnyRole("USER", "ADMIN", "ROOT")
+                .requestMatchers("/api/auth/user-info/**").hasAnyRole("USER", "ADMIN", "ROOT")
+                .requestMatchers("/api/auth/root/**").hasAnyRole("ROOT");
     }
 
     /**

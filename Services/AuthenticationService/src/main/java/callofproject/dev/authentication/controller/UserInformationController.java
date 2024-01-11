@@ -17,7 +17,7 @@ import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-@RequestMapping("api/user-info")
+@RequestMapping("api/auth/user-info")
 @SecurityRequirement(name = "Authorization")
 public class UserInformationController
 {
