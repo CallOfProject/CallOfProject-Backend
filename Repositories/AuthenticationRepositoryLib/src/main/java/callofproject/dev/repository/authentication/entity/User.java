@@ -5,6 +5,7 @@ import callofproject.dev.repository.authentication.enumeration.RoleEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -48,6 +49,9 @@ public class User
     @Column(name = "is_account_blocked")
     private boolean isAccountBlocked;
 
+    @Column(name = "delete_at")
+    private LocalDateTime deleteAt;
+
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles",
@@ -62,6 +66,7 @@ public class User
         if (roles == null)
             roles = new HashSet<>();
         isAccountBlocked = false;
+        deleteAt = null;
         roles.add(new Role("ROLE_USER"));
     }
 
@@ -98,6 +103,7 @@ public class User
         this.password = password;
         this.birthDate = birthDate;
         isAccountBlocked = false;
+        deleteAt = null;
         if (roles == null)
             roles = new HashSet<>();
 
@@ -115,6 +121,7 @@ public class User
         this.password = password;
         this.birthDate = birthDate;
         isAccountBlocked = false;
+        deleteAt = null;
         if (roles == null)
             roles = new HashSet<>();
 
@@ -131,10 +138,21 @@ public class User
         this.birthDate = birthDate;
         middleName = "";
         isAccountBlocked = false;
+        deleteAt = null;
         if (roles == null)
             roles = new HashSet<>();
 
         roles.add(new Role("ROLE_USER"));
+    }
+
+    public LocalDateTime getDeleteAt()
+    {
+        return deleteAt;
+    }
+
+    public void setDeleteAt(LocalDateTime deleteAt)
+    {
+        this.deleteAt = deleteAt;
     }
 
     public boolean getIsAccountBlocked()

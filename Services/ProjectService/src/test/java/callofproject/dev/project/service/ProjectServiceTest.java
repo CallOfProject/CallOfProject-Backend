@@ -69,11 +69,11 @@ public class ProjectServiceTest
         project3Id = randomUUID();
 
         var userDTO = new UserDTO(randomUUID(), "nuricanozturk", "can@mail.com", "Nuri", "Can", "Ozturk", EOperation.CREATE,
-                "123", Set.of(new Role("ROLE_USER")), 0, 0, 0);
+                "123", Set.of(new Role("ROLE_USER")), null, 0, 0, 0);
         var testUserDTO = new UserDTO(testUserId, "halilcanozturk", "halilcan@mail.com", "Halil", "Can", "Ozturk", EOperation.CREATE,
-                "123", Set.of(new Role("ROLE_USER")), 0, 0, 0);
+                "123", Set.of(new Role("ROLE_USER")), null, 0, 0, 0);
         var testUser2DTO = new UserDTO(randomUUID(), "emirkafadar", "emir@mail.com", "Emir", "", "Kafadar", EOperation.CREATE,
-                "123", Set.of(new Role("ROLE_USER")), 0, 0, 0);
+                "123", Set.of(new Role("ROLE_USER")), null, 0, 0, 0);
 
         projectOwner = m_injection.getProjectServiceHelper().addUser(m_userMapper.toUser(userDTO));
         testUser = m_injection.getProjectServiceHelper().addUser(m_userMapper.toUser(testUserDTO));

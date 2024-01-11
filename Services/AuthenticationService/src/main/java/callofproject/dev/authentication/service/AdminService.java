@@ -23,6 +23,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
@@ -247,7 +248,9 @@ public class AdminService
         if (user.get().isAdminOrRoot())
             throw new DataServiceException("You cannot remove this user!");
 
-        m_managementServiceHelper.getUserServiceHelper().removeUser(user.get());
+        user.get().setDeleteAt(LocalDateTime.now());
+        m_managementServiceHelper.getUserServiceHelper().saveUser(user.get());
+        //m_managementServiceHelper.getUserServiceHelper().removeUser(user.get());
 
         return new ResponseMessage<>("User removed Successfully!", HttpStatus.SC_OK, true);
     }
@@ -347,7 +350,8 @@ public class AdminService
         if (user.isEmpty())
             return new AuthenticationResponse(null, null, false, null, true, null);
 
-        if (user.get().getIsAccountBlocked())
+
+        if (user.get().getIsAccountBlocked() || user.get().getDeleteAt() != null)
             return new AuthenticationResponse(false, true);
 
         if (!user.get().isAdmin())
@@ -372,7 +376,7 @@ public class AdminService
             var toProjectServiceDTO = new UserKafkaDTO(savedUser.get().getUserId(), savedUser.get().getUsername(), savedUser.get().getEmail(),
                     savedUser.get().getFirstName(), savedUser.get().getMiddleName(), savedUser.get().getLastName(), operation,
                     savedUser.get().getPassword(), savedUser.get().getRoles(),
-                    0, 0, 0);
+                    savedUser.get().getDeleteAt(), 0, 0, 0);
 
             m_kafkaProducer.sendMessage(toProjectServiceDTO);
         }
@@ -388,7 +392,7 @@ public class AdminService
             var toProjectServiceDTO = new UserKafkaDTO(savedUser.get().getUserId(), savedUser.get().getUsername(), savedUser.get().getEmail(),
                     savedUser.get().getFirstName(), savedUser.get().getMiddleName(), savedUser.get().getLastName(), operation,
                     savedUser.get().getPassword(), savedUser.get().getRoles(),
-                    0, 0, 0);
+                    savedUser.get().getDeleteAt(), 0, 0, 0);
 
             m_kafkaProducer.sendMessage(toProjectServiceDTO);
         }

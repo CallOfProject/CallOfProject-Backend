@@ -3,6 +3,7 @@ package callofproject.dev.data.project.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -34,6 +35,8 @@ public class User
     private int m_participantProjectCount;
     @Column(name = "total_project_count", nullable = false)
     private int m_totalProjectCount;
+    @Column(name = "deleted_at")
+    private LocalDateTime m_deletedAt;
 
     @OneToMany(mappedBy = "m_projectOwner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnore
@@ -43,7 +46,7 @@ public class User
     @JsonIgnore
     private Set<ProjectParticipant> m_projectParticipants; // projects that he owns
 
-    @OneToMany(mappedBy = "m_user", cascade = {DETACH,MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "m_user", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<ProjectParticipantRequest> m_projectParticipantRequests; // Project Join requests
     @ManyToMany(
@@ -65,6 +68,7 @@ public class User
 
     public User()
     {
+        m_deletedAt = null;
     }
 
     public User(UUID userId, String username, String email, String firstName, String middleName, String lastName, Set<Role> roles)
@@ -79,6 +83,7 @@ public class User
         m_totalProjectCount = 0;
         m_ownerProjectCount = 0;
         m_participantProjectCount = 0;
+        m_deletedAt = null;
     }
 
     public Set<Role> getRoles()
@@ -101,6 +106,15 @@ public class User
         this.password = password;
     }
 
+    public LocalDateTime getDeletedAt()
+    {
+        return m_deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt)
+    {
+        m_deletedAt = deletedAt;
+    }
 
     public void addOwnProject(Project project)
     {

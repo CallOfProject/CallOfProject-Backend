@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,6 +26,9 @@ public record UserShowingAdminDTO(String username,
                                   @JsonProperty("creation_date")
                                   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
                                   LocalDate creationDate,
+                                  @JsonProperty("deleted_at")
+                                  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy kk:mm:ss")
+                                  LocalDateTime deletedAt,
                                   @JsonProperty("birth_date")
                                   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
                                   LocalDate birthDate)

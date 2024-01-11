@@ -67,7 +67,7 @@ public class UserManagementService
 
         var kafkaMessage = new UserKafkaDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(),
                 user.getMiddleName(), user.getLastName(), EOperation.CREATE, user.getPassword(), user.getRoles(),
-                0, 0, 0);
+                user.getDeleteAt(), 0, 0, 0);
 
         m_userProducer.sendMessage(kafkaMessage);
     }

@@ -1,9 +1,10 @@
 package callofproject.dev.project.dto;
 
 import callofproject.dev.data.common.enums.EOperation;
+import callofproject.dev.data.project.entity.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import callofproject.dev.data.project.entity.Role;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ public record UserDTO(
         EOperation operation,
         String password,
         Set<Role> roles,
+        LocalDateTime deletedAt,
         int ownerProjectCount,
         int participantProjectCount,
         int totalProjectCount

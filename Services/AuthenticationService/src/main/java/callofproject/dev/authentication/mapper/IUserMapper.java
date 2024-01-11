@@ -7,6 +7,7 @@ import callofproject.dev.authentication.dto.admin.UserShowingAdminDTO;
 import callofproject.dev.authentication.dto.admin.UsersShowingAdminDTO;
 import callofproject.dev.repository.authentication.entity.User;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ public interface IUserMapper
 {
     User toUser(UserSignUpRequestDTO dto);
 
+    @Mapping(target="deletedAt", source = "deleteAt")
     UserShowingAdminDTO toUserShowingAdminDTO(User user);
 
     UserDTO toUserDTO(User user);

@@ -1,17 +1,20 @@
 package callofproject.dev.authentication.service;
 
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
+import callofproject.dev.authentication.dto.UserKafkaDTO;
 import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.dto.auth.AuthenticationResponse;
 import callofproject.dev.authentication.dto.auth.RegisterRequest;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.dto.EmailTopic;
+import callofproject.dev.data.common.enums.EOperation;
 import callofproject.dev.data.common.status.Status;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserServiceHelper;
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.enumeration.RoleEnum;
+import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
 import callofproject.dev.service.jwt.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,6 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static callofproject.dev.authentication.util.Util.AUTHENTICATION_SERVICE;
 import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
@@ -52,20 +57,22 @@ public class AuthenticationService
     private final UserServiceHelper m_serviceHelper;
     @Value("${authentication.url.verify-user}")
     private String m_url;
-
+    private final IUserRepository m_userRepository;
     @Value("${account.verification.time.minute.expire-time}")
     private int m_verifyUserTokenExpirationTime;
-
+    private final ExecutorService m_executorService;
 
     public AuthenticationService(@Qualifier(USER_MANAGEMENT_SERVICE) UserManagementService userManagementService,
                                  AuthenticationProvider authenticationProvider,
-                                 PasswordEncoder passwordEncoder, KafkaProducer kafkaProducer, UserServiceHelper serviceHelper)
+                                 PasswordEncoder passwordEncoder, KafkaProducer kafkaProducer, UserServiceHelper serviceHelper, IUserRepository userRepository, ExecutorService executorService)
     {
         m_passwordEncoder = passwordEncoder;
         m_userManagementService = userManagementService;
         m_authenticationProvider = authenticationProvider;
         m_kafkaProducer = kafkaProducer;
         m_serviceHelper = serviceHelper;
+        m_userRepository = userRepository;
+        m_executorService = executorService;
     }
 
     /**
@@ -135,9 +142,41 @@ public class AuthenticationService
         var claims = createClaimsForRegister();
         var token = JwtUtil.generateToken(claims, dto.getUsername());
         var message = String.format(m_url, token);
-        var emailTopic = new EmailTopic(EMAIL_VERIFICATION, dto.getEmail(), "Verification Link", message, null);
-
+        var emailTopic = new EmailTopic(EMAIL_VERIFICATION, dto.getEmail(), "Call-Of-Project Verification Link", message, null);
         m_kafkaProducer.sendEmail(emailTopic);
+        m_executorService.execute(() -> startTimerForUserVerification(dto.getUsername()));
+    }
+
+
+    private void startTimerForUserVerification(String username)
+    {
+        var user = m_serviceHelper.findByUsername(username);
+
+        if (user.isEmpty())
+            throw new DataServiceException("User not found!");
+
+        new CountDownScheduler(5, 1, TimeUnit.MINUTES)
+        {
+            @Override
+            protected void onTick(long millisUntilFinished) throws Exception
+            {
+                System.out.println("onTick");
+            }
+
+            @Override
+            protected void onFinish() throws Exception
+            {
+                var user = m_serviceHelper.findByUsername(username);
+                if (user.get().getIsAccountBlocked())
+                {
+                    m_userRepository.deleteById(user.get().getUserId());
+                    m_kafkaProducer.sendMessage(new UserKafkaDTO(user.get().getUserId(), null, null, null, null, null,
+                            EOperation.REGISTER_NOT_VERIFY, null, null, null, -1, -1, -1));
+                }
+                System.out.println("finish timer");
+            }
+        }.start();
+
     }
 
     private HashMap<String, Object> createClaimsForRegister()
@@ -159,14 +198,15 @@ public class AuthenticationService
 
         var user = m_serviceHelper.findByUsername(username);
 
+        if (endTime.isBefore(LocalDateTime.now()))
+            return new ResponseMessage<>("Token expired!", Status.BAD_REQUEST, false);
+
         if (user.isEmpty())
             return new ResponseMessage<>("User not found!", Status.NOT_FOUND, false);
 
         if (!user.get().getIsAccountBlocked())
             return new ResponseMessage<>("user already verified!", Status.NOT_ACCEPTED, false);
 
-        if (endTime.isBefore(LocalDateTime.now()))
-            return new ResponseMessage<>("Token expired!", Status.BAD_REQUEST, false);
 
         user.get().setAccountBlocked(false);
         m_serviceHelper.saveUser(user.get());
@@ -217,7 +257,7 @@ public class AuthenticationService
             return new AuthenticationResponse(null, null, false, null, false,
                     null);
 
-        if (user.getObject().getIsAccountBlocked())
+        if (user.getObject().getIsAccountBlocked() || user.getObject().getDeleteAt() != null)
             return new AuthenticationResponse(false, true);
 
         var topRole = findTopRole(user.getObject());

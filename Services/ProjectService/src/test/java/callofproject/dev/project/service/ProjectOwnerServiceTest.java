@@ -59,9 +59,9 @@ public class ProjectOwnerServiceTest
     public void setUp()
     {
         var userDTO = new UserDTO(randomUUID(), "nuricanozturk", "can@mail.com", "Nuri", "Can", "Ozturk", EOperation.CREATE,
-                "123", Set.of(new Role("ROLE_USER")), 0, 0, 0);
+                "123", Set.of(new Role("ROLE_USER")), null, 0, 0, 0);
         var testUserDTO = new UserDTO(randomUUID(), "halilcanozturk", "halilcan@mail.com", "Halil", "Can", "Ozturk", EOperation.CREATE,
-                "123", Set.of(new Role("ROLE_USER")), 0, 0, 0);
+                "123", Set.of(new Role("ROLE_USER")), null, 0, 0, 0);
 
         projectOwner = m_injection.getProjectServiceHelper().addUser(m_userMapper.toUser(userDTO));
         testUser = m_injection.getProjectServiceHelper().addUser(m_userMapper.toUser(testUserDTO));

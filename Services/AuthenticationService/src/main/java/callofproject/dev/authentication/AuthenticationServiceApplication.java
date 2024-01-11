@@ -98,10 +98,10 @@ public class AuthenticationServiceApplication implements ApplicationRunner
             m_userRepository.save(adminUser);
 
             m_kafkaProducer.sendMessage(new UserKafkaDTO(rootUser.getUserId(), rootUser.getUsername(), rootUser.getEmail(),
-                    rootUser.getFirstName(), rootUser.getMiddleName(), rootUser.getLastName(), EOperation.CREATE, rootUser.getPassword(), rootUser.getRoles(), 0, 0, 0));
+                    rootUser.getFirstName(), rootUser.getMiddleName(), rootUser.getLastName(), EOperation.CREATE, rootUser.getPassword(), rootUser.getRoles(), null, 0, 0, 0));
 
             m_kafkaProducer.sendMessage(new UserKafkaDTO(adminUser.getUserId(), adminUser.getUsername(), adminUser.getEmail(),
-                    adminUser.getFirstName(), adminUser.getMiddleName(), adminUser.getLastName(), EOperation.CREATE, adminUser.getPassword(), adminUser.getRoles(), 0, 0, 0));
+                    adminUser.getFirstName(), adminUser.getMiddleName(), adminUser.getLastName(), EOperation.CREATE, adminUser.getPassword(), adminUser.getRoles(), null, 0, 0, 0));
         }
     }
 }
