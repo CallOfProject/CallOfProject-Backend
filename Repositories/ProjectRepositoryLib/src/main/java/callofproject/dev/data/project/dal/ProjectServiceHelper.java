@@ -654,7 +654,17 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::findAllProjectParticipantRequestByUserId");
     }
 
+    public Optional<ProjectParticipant> findProjectParticipantByUserIdAndProjectId(UUID userId, UUID projectId)
+    {
+        return doForRepository(() -> m_facade.m_projectParticipantRepository.findProjectParticipantByUserIdAndProjectId(userId, projectId),
+                "ProjectServiceHelper::findProjectParticipantByUserIdAndProjectId");
+    }
 
+    public void  deleteProjectParticipant(ProjectParticipant participant)
+    {
+        doForRepository(() -> m_facade.m_projectParticipantRepository.delete(participant),
+                "ProjectServiceHelper::deleteProjectParticipant");
+    }
     public void changeAllProjectOwnerToRootWhenUserRemoved(UUID removedUserId, UUID rootUserId)
     {
         var rootUser = m_facade.m_userRepository.findById(rootUserId);
@@ -721,12 +731,6 @@ public class ProjectServiceHelper
     {
         return doForRepository(() -> m_facade.m_projectParticipantRequestRepository.findById(projectParticipantRequestId),
                 "ProjectServiceHelper::findProjectParticipantRequestByParticipantRequestId");
-    }
-
-    public void removeParticipant(UUID participantId)
-    {
-        doForRepository(() -> m_facade.m_projectParticipantRepository.deleteById(participantId),
-                "ProjectServiceHelper::removeParticipant");
     }
 
     public void removeParticipantRequestByRequestId(UUID participantRequestId)

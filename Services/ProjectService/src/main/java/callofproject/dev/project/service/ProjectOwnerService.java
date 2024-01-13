@@ -161,24 +161,21 @@ public class ProjectOwnerService
         return approveParticipant(user, project, projectOwner);
     }
 
+
     public ResponseMessage<Object> removeParticipantCallback(UUID projectId, UUID userId)
     {
         var project = findProjectIfExistsByProjectId(projectId);
         var user = findUserIfExists(userId);
-
-        var participant = project
-                .getProjectParticipants()
-                .stream()
-                .filter(p -> p.getUser().getUserId().equals(user.getUserId()))
-                .findFirst();
+        var participant = m_projectServiceHelper.findProjectParticipantByUserIdAndProjectId(userId, projectId);
 
         if (participant.isEmpty())
-            return new ResponseMessage<>("User is not participant of this project", OK, false);
+            throw new DataServiceException("Participant is not found!");
 
         project.getProjectParticipants().remove(participant.get());
-        m_projectServiceHelper.removeParticipant(participant.get().getProjectId());
+        user.getProjectParticipants().remove(participant.get());
         m_projectServiceHelper.saveProject(project);
         m_projectServiceHelper.addUser(user);
+        m_projectServiceHelper.deleteProjectParticipant(participant.get());
 
         var message = format("%s removed you from %s project!", project.getProjectOwner().getFullName(), project.getProjectName());
 
@@ -291,7 +288,11 @@ public class ProjectOwnerService
         user.setTotalProjectCount(user.getTotalProjectCount() - 1);
         m_projectServiceHelper.addUser(user);
         var detailDTO = m_projectMapper.toProjectDetailDTO(savedProject, findTagList(savedProject), findProjectParticipantsByProjectId(savedProject));
-
+        // Send notifications to participants
+        project.getProjectParticipants().forEach(p -> {
+            var message = format("Project Owner: %s finished %s project!", project.getProjectOwner().getFullName(), project.getProjectName());
+            sendNotificationToUser(project, p.getUser(), project.getProjectOwner(), message);
+        });
         return new ResponseMessage<>("Project is finished!", OK, detailDTO);
     }
 

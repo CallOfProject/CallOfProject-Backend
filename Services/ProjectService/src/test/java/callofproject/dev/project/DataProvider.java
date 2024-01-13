@@ -58,17 +58,17 @@ public final class DataProvider
                 "The aim of this project is to...",
                 LocalDate.of(2023, 12, 31),
                 LocalDate.of(2024, 12, 31),
+                LocalDate.of(2023, 1, 1),
                 10,
                 "Technical requirements go here.",
                 "Special requirements go here.",
                 EProjectAccessType.PUBLIC,
                 EProjectProfessionLevel.Expert,
-                ESector.Finance,
-                EDegree.MASTER,
+                ESector.IT,
+                EDegree.BACHELOR,
                 EProjectLevel.INTERMEDIATE,
                 EInterviewType.TEST,
-                EFeedbackTimeRange.ONE_WEEK,
-                LocalDate.of(2023, 1, 1),
+                EFeedbackTimeRange.ONE_MONTH,
                 List.of("tag1", "tag2")
         );
     }

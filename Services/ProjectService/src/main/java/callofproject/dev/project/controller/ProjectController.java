@@ -59,11 +59,18 @@ public class ProjectController
      * @return if success ProjectDTO else return Error Message
      */
     @PutMapping("/update")
-    public ResponseEntity<Object> updateProject(@RequestBody ProjectUpdateDTO dto)
+    public ResponseEntity<Object> updateProject(@RequestBody @Valid ProjectUpdateDTO dto)
     {
         return subscribe(() -> ok(m_projectService.updateProject(dto)), msg -> internalServerError().body(msg.getMessage()));
     }
 
+    @PostMapping("/update/v2")
+    public ResponseEntity<Object> updateProjectV2(@RequestParam("projectUpdateDTO") String projectUpdateDTO, @RequestParam(value = "file", required = false) MultipartFile file)
+    {
+        var dto = CopDataUtil.doForDataService(() -> m_objectMapper.readValue(projectUpdateDTO, ProjectUpdateDTO.class), "projectUpdateDTO");
+
+        return subscribe(() -> ok(m_projectService.updateProjectV2(dto, file)), msg -> internalServerError().body(msg.getMessage()));
+    }
 
     /**
      * Find all project by user id who is participant in project.

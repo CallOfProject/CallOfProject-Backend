@@ -16,6 +16,7 @@ import callofproject.dev.nosql.entity.ProjectTag;
 import callofproject.dev.nosql.entity.Tag;
 import callofproject.dev.nosql.enums.NotificationDataType;
 import callofproject.dev.nosql.enums.NotificationType;
+import callofproject.dev.nosql.repository.IProjectTagRepository;
 import callofproject.dev.project.config.kafka.KafkaProducer;
 import callofproject.dev.project.dto.*;
 import callofproject.dev.project.mapper.IProjectMapper;
@@ -53,6 +54,7 @@ public class ProjectService
     private final IProjectMapper m_projectMapper;
     private final S3Service m_s3Service;
     private final IProjectParticipantMapper m_projectParticipantMapper;
+    private final IProjectTagRepository m_projectTagRepository;
 
     @Value("${notification.request.approve}")
     private String m_approvalLink;
@@ -60,7 +62,7 @@ public class ProjectService
     public ProjectService(@Qualifier(PROJECT_SERVICE_HELPER_BEAN) ProjectServiceHelper serviceHelper,
                           @Qualifier(PROJECT_TAG_SERVICE_HELPER_BEAN_NAME) ProjectTagServiceHelper projectTagServiceHelper,
                           @Qualifier(TAG_SERVICE_HELPER_BEAN_NAME) TagServiceHelper tagServiceHelper, KafkaProducer kafkaProducer, ObjectMapper objectMapper,
-                          IProjectMapper projectMapper, S3Service s3Service, IProjectParticipantMapper projectParticipantMapper)
+                          IProjectMapper projectMapper, S3Service s3Service, IProjectParticipantMapper projectParticipantMapper, IProjectTagRepository projectTagRepository)
     {
         m_serviceHelper = serviceHelper;
         m_projectTagServiceHelper = projectTagServiceHelper;
@@ -70,6 +72,7 @@ public class ProjectService
         m_projectMapper = projectMapper;
         m_s3Service = s3Service;
         m_projectParticipantMapper = projectParticipantMapper;
+        m_projectTagRepository = projectTagRepository;
     }
 
 
@@ -111,6 +114,18 @@ public class ProjectService
     public ResponseMessage<Object> updateProject(ProjectUpdateDTO projectDTO)
     {
         return doForDataService(() -> updateProjectCallback(projectDTO), "ProjectService::updateProject");
+    }
+
+
+    /**
+     * Update project with given dto class.
+     *
+     * @param projectDTO represent the dto class
+     * @return ResponseMessage.
+     */
+    public ResponseMessage<Object> updateProjectV2(ProjectUpdateDTO projectDTO, MultipartFile file)
+    {
+        return doForDataService(() -> updateProjectCallbackV2(projectDTO, file), "ProjectService::updateProject");
     }
 
 
@@ -572,6 +587,50 @@ public class ProjectService
         return new ResponseMessage<>("Project is updated!", OK, overviewDTO);
     }
 
+
+    private ResponseMessage<Object> updateProjectCallbackV2(ProjectUpdateDTO projectDTO, MultipartFile file)
+    {
+        var project = findProjectIfExistsByProjectId(projectDTO.projectId());
+        var imageLink = project.getProjectImagePath();
+        System.out.println(imageLink);
+        if (file != null)
+            imageLink = m_s3Service.uploadToS3AndGetUrl(file, UUID.randomUUID() + getFileExtension(file));
+
+        checkProjectPermission(project, projectDTO.userId());
+
+        project.setStartDate(projectDTO.startDate());
+        project.setFeedbackTimeRange(projectDTO.feedbackTimeRange());
+        project.setProjectAccessType(projectDTO.projectAccessType());
+        project.setProjectLevel(projectDTO.projectLevel());
+        project.setProfessionLevel(projectDTO.professionLevel());
+        project.setSector(projectDTO.sector());
+        project.setDegree(projectDTO.degree());
+        project.setInterviewType(projectDTO.interviewType());
+        project.setProjectAim(projectDTO.projectAim());
+        project.setDescription(projectDTO.projectDescription());
+        project.setExpectedCompletionDate(projectDTO.expectedCompletionDate());
+        project.setApplicationDeadline(projectDTO.applicationDeadline());
+        project.setProjectImagePath(imageLink);
+        project.setProjectName(projectDTO.projectName());
+        project.setProjectSummary(projectDTO.projectSummary());
+        project.setSpecialRequirements(projectDTO.specialRequirements());
+        project.setTechnicalRequirements(projectDTO.technicalRequirements());
+        project.setMaxParticipant(projectDTO.maxParticipantCount());
+
+
+        var savedProject = m_serviceHelper.saveProject(project);
+
+        saveTagsIfNotExists(projectDTO.tags(), savedProject);
+
+        var tagList = toStream(m_projectTagServiceHelper
+                .getAllProjectTagByProjectId(savedProject.getProjectId()))
+                .toList();
+
+        var overviewDTO = m_projectMapper.toProjectDetailDTO(project, tagList, findProjectParticipantsByProjectId(project));
+
+        return new ResponseMessage<>("Project is updated!", OK, overviewDTO);
+    }
+
     private List<ProjectTag> findTagList(Project obj)
     {
         return toStream(m_projectTagServiceHelper.getAllProjectTagByProjectId(obj.getProjectId())).toList();
@@ -585,23 +644,24 @@ public class ProjectService
 
     private void saveTagsIfNotExists(List<String> tags, Project savedProject)
     {
+        var projectTags = toStreamConcurrent(m_projectTagServiceHelper.getAllProjectTagByProjectId(savedProject.getProjectId()));
+        projectTags.map(ProjectTag::getId).forEach(m_projectTagRepository::deleteById);
         for (var tag : tags)
         {
             var tagName = convert(tag);
             if (m_tagServiceHelper.existsByTagNameContainsIgnoreCase(tagName)) // If tag already exists then save project tag
+            {
                 m_projectTagServiceHelper.saveProjectTag(new ProjectTag(tagName, savedProject.getProjectId()));
-
+            }
             else // If tag not exists then save tag and project tag
             {
+                System.out.println("here-3");
                 m_tagServiceHelper.saveTag(new Tag(tagName));
                 m_projectTagServiceHelper.saveProjectTag(new ProjectTag(tagName, savedProject.getProjectId()));
             }
+
         }
 
-        // If project tags not contains string tags, then remove project tag.
-        //var projectTags = toStreamConcurrent(m_projectTagServiceHelper.getAllProjectTagByProjectId(savedProject.getProjectId())).toList();
-
-        //projectTags.stream().filter(projectTag -> !tags.contains(projectTag.getTagName())).forEach(m_projectTagServiceHelper::removeProjectTag);
     }
 
 

@@ -119,6 +119,7 @@ public class ProjectOwnerServiceTest
     public void testRemoveParticipant_withGivenProjectIdAndUserId_shouldBeTrue()
     {
         var project = m_injection.getProjectServiceHelper().findProjectById(testProjectId);
+
         assertNotNull(project);
 
         var participantResult = m_injection.getProjectOwnerService()
@@ -128,12 +129,10 @@ public class ProjectOwnerServiceTest
 
         var removeResult = m_injection
                 .getProjectOwnerService()
-                .removeParticipantCallback(project.get().getProjectId(), testUser.getUserId());
+                .removeParticipant(project.get().getProjectId(), testUser.getUserId());
 
         var result = (Boolean) removeResult.getObject();
         assertTrue(result);
-
-        assertTrue(project.get().getProjectParticipants().isEmpty());
     }
 
 

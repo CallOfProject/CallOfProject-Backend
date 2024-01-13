@@ -155,12 +155,13 @@ public class AuthenticationService
         if (user.isEmpty())
             throw new DataServiceException("User not found!");
 
+
         new CountDownScheduler(5, 1, TimeUnit.MINUTES)
         {
             @Override
             protected void onTick(long millisUntilFinished) throws Exception
             {
-                System.out.println("onTick");
+                // Doing nothing
             }
 
             @Override
@@ -173,7 +174,6 @@ public class AuthenticationService
                     m_kafkaProducer.sendMessage(new UserKafkaDTO(user.get().getUserId(), null, null, null, null, null,
                             EOperation.REGISTER_NOT_VERIFY, null, null, null, -1, -1, -1));
                 }
-                System.out.println("finish timer");
             }
         }.start();
 

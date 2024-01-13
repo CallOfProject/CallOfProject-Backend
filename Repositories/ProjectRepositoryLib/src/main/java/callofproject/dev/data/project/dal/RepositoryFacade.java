@@ -17,7 +17,6 @@ public class RepositoryFacade
     public final IProjectRepository m_projectRepository;
     public final IUserRepository m_userRepository;
     public final IProjectParticipantRepository m_projectParticipantRepository;
-
     public final IProjectParticipantRequestRepository m_projectParticipantRequestRepository;
 
     public RepositoryFacade(

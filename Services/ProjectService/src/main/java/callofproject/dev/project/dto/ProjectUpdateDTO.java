@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.UUID;
 
 public record ProjectUpdateDTO(
-        @JsonProperty("user_id")
-        @NotNull(message = "user id cannot be empty")
-        UUID userId,
         @JsonProperty("project_id")
         @NotNull(message = "project id cannot be empty")
         UUID projectId,
+        @JsonProperty("user_id")
+        @NotNull(message = "user id cannot be empty")
+        UUID userId,
         @JsonProperty("project_image")
         String projectImage,
         @JsonProperty("project_name")
@@ -43,18 +43,18 @@ public record ProjectUpdateDTO(
         @NotNull(message = "expected completion date cannot be empty")
         LocalDate expectedCompletionDate,
 
+        @JsonProperty("start_date")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+        @NotNull(message = "start date cannot be empty")
+        LocalDate startDate,
         @JsonProperty("max_participant_count")
         @NotNull
         @Min(value = 2, message = "max participant count cannot be less than 2")
         @Max(value = 20, message = "max participant count cannot be more than 100")
         int maxParticipantCount,
         @JsonProperty("technical_requirements")
-        @NotBlank(message = "technical requirements cannot be empty")
-        @NotEmpty(message = "technical requirements cannot be empty")
         String technicalRequirements,
         @JsonProperty("special_requirements")
-        @NotBlank(message = "special requirements cannot be empty")
-        @NotEmpty(message = "special requirements cannot be empty")
         String specialRequirements,
         @JsonProperty("project_access_type")
         @NotNull(message = "project access type cannot be empty")
@@ -74,15 +74,9 @@ public record ProjectUpdateDTO(
         @JsonProperty("project_interview_type")
         @NotNull(message = "project interview type cannot be empty")
         EInterviewType interviewType,
-
         @JsonProperty("feedback_time_range")
         @NotNull(message = "feedback time range cannot be empty")
         EFeedbackTimeRange feedbackTimeRange,
-
-        @JsonProperty("start_date")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-        @NotNull(message = "start date cannot be empty")
-        LocalDate startDate,
         @JsonProperty("tags")
         List<String> tags)
 {

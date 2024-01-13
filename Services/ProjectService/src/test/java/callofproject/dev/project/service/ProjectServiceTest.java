@@ -269,6 +269,7 @@ public class ProjectServiceTest
                 "The aim of this project is to...",
                 LocalDate.of(2023, 12, 31),
                 LocalDate.of(2024, 12, 31),
+                LocalDate.of(2024, 12, 31),
                 10,
                 "Technical requirements go here.",
                 "Special requirements go here.",
@@ -279,7 +280,6 @@ public class ProjectServiceTest
                 EProjectLevel.INTERMEDIATE,
                 EInterviewType.TEST,
                 EFeedbackTimeRange.ONE_WEEK,
-                LocalDate.of(2023, 1, 1),
                 List.of("tag1", "tag2")
         );
 
@@ -304,6 +304,7 @@ public class ProjectServiceTest
                 "The aim of this project is to...",
                 LocalDate.of(2023, 12, 31),
                 LocalDate.of(2024, 12, 31),
+                LocalDate.of(2024, 12, 31),
                 10,
                 "Technical requirements go here.",
                 "Special requirements go here.",
@@ -314,7 +315,6 @@ public class ProjectServiceTest
                 EProjectLevel.INTERMEDIATE,
                 EInterviewType.TEST,
                 EFeedbackTimeRange.ONE_WEEK,
-                LocalDate.of(2023, 1, 1),
                 List.of("tag1", "tag2")
         );
 
