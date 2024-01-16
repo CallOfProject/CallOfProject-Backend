@@ -260,8 +260,8 @@ public class ProjectServiceTest
     void testUpdateProject_withGivenProjectUpdateDTO_shouldNotNull()
     {
         var projectUpdateDto = new ProjectUpdateDTO(
-                projectOwner.getUserId(),
                 project_1.getProjectId(),
+                projectOwner.getUserId(),
                 "path/to/image.jpg",
                 "Sample Project",
                 "This is a sample project summary.",
@@ -295,8 +295,8 @@ public class ProjectServiceTest
     void testUpdateProject_withGivenProjectUpdateDTO_shouldThrowDataServiceException()
     {
         var projectUpdateDto = new ProjectUpdateDTO(
-                testUser2_OwnerProject_2.getUserId(),
                 project_1.getProjectId(),
+                testUser2_OwnerProject_2.getUserId(),
                 "path/to/image.jpg",
                 "Sample Project",
                 "This is a sample project summary.",

@@ -44,7 +44,7 @@ import static java.lang.String.format;
 
 @Service(PROJECT_SERVICE)
 @Lazy
-public class ProjectService
+public class ProjectService implements IProjectService
 {
     private final ProjectServiceHelper m_serviceHelper;
     private final ProjectTagServiceHelper m_projectTagServiceHelper;
@@ -82,11 +82,12 @@ public class ProjectService
      * @param projectDTO represent the dto class
      * @return ResponseMessage.
      */
+    @Override
     public ResponseMessage<Object> saveProject(ProjectSaveDTO projectDTO)
     {
         return doForDataService(() -> saveProjectCallback(projectDTO), "ProjectService::saveProject");
     }
-
+    @Override
     public ResponseMessage<Object> saveProjectV2(ProjectSaveDTO saveDTO, MultipartFile file)
     {
         return doForDataService(() -> saveProjectCallbackV2(saveDTO, file), "ProjectService::saveProject");
@@ -99,6 +100,7 @@ public class ProjectService
      * @param page   represent the page
      * @return ProjectOverviewsDTO class.
      */
+    @Override
     public MultipleResponseMessagePageable<Object> findAllParticipantProjectByUserId(UUID userId, int page)
     {
         return doForDataService(() -> findAllParticipantProjectByUserIdCallback(userId, page), "ProjectService::findAllParticipantProjectByUserId");
@@ -111,6 +113,7 @@ public class ProjectService
      * @param projectDTO represent the dto class
      * @return ResponseMessage.
      */
+    @Override
     public ResponseMessage<Object> updateProject(ProjectUpdateDTO projectDTO)
     {
         return doForDataService(() -> updateProjectCallback(projectDTO), "ProjectService::updateProject");
@@ -123,6 +126,7 @@ public class ProjectService
      * @param projectDTO represent the dto class
      * @return ResponseMessage.
      */
+    @Override
     public ResponseMessage<Object> updateProjectV2(ProjectUpdateDTO projectDTO, MultipartFile file)
     {
         return doForDataService(() -> updateProjectCallbackV2(projectDTO, file), "ProjectService::updateProject");
@@ -136,6 +140,7 @@ public class ProjectService
      * @param page   represent the page
      * @return ProjectOverviewsDTO class.
      */
+    @Override
     public MultipleResponseMessagePageable<Object> findAllOwnerProjectsByUserId(UUID userId, int page)
     {
         return doForDataService(() -> findAllOwnerProjectsByUserIdCallback(userId, page), "ProjectService::findAllOwnerProjectsByUserId");
@@ -148,6 +153,7 @@ public class ProjectService
      * @param page     represent the page
      * @return ProjectOverviewsDTO class.
      */
+    @Override
     public MultipleResponseMessagePageable<Object> findAllOwnerProjectsByUsername(String username, int page)
     {
         return doForDataService(() -> findAllOwnerProjectsByUsernameCallback(username, page), "ProjectService::findAllOwnerProjectsByUsername");
@@ -160,6 +166,7 @@ public class ProjectService
      * @param projectId represent the project id
      * @return ResponseMessage.
      */
+    @Override
     public ResponseMessage<Object> findProjectOwnerView(UUID userId, UUID projectId)
     {
         return doForDataService(() -> findProjectOwnerViewCallback(userId, projectId), "ProjectService::findProjectOwnerView");
@@ -171,6 +178,7 @@ public class ProjectService
      * @param page represent the page
      * @return ProjectOverviewsDTO class.
      */
+    @Override
     public MultipleResponseMessagePageable<Object> findAllProjectDiscoveryView(int page)
     {
         return doForDataService(() -> findAllProjectDiscoveryViewCallback(page), "ProjectService::findAllProjectDiscoveryView");
@@ -182,6 +190,7 @@ public class ProjectService
      * @param projectId represent the project id
      * @return ResponseMessage.
      */
+    @Override
     public ResponseMessage<Object> findProjectOverview(UUID projectId)
     {
         return doForDataService(() -> findProjectOverviewCallback(projectId), "ProjectService::findProjectOverview");
@@ -194,6 +203,7 @@ public class ProjectService
      * @param userId    represent the user id
      * @return ResponseMessage.
      */
+    @Override
     public ResponseMessage<Object> addProjectJoinRequest(UUID projectId, UUID userId)
     {
         var result = doForDataService(() -> addProjectJoinRequestCallback(projectId, userId), "ProjectService::addProjectJoinRequest");
@@ -206,7 +216,7 @@ public class ProjectService
         }
         return result;
     }
-
+    @Override
     public ResponseMessage<Object> findProjectDetail(UUID projectId)
     {
         var project = findProjectIfExistsByProjectId(projectId);
@@ -218,7 +228,7 @@ public class ProjectService
 
         return new ResponseMessage<>("Project is found!", OK, projectDetailDTO);
     }
-
+    @Override
     public ResponseMessage<Object> findProjectDetailIfHasPermission(UUID projectId, UUID userId)
     {
         var project = findProjectIfExistsByProjectId(projectId);
@@ -239,7 +249,7 @@ public class ProjectService
     }
 
     //-----------------------------------CALLBACKS---------------------------------------------
-
+    @Override
     public ResponseMessage<Object> addProjectJoinRequestCallback(UUID projectId, UUID userId)
     {
         var user = m_serviceHelper.findUserById(userId);
@@ -406,7 +416,7 @@ public class ProjectService
         return new ResponseMessage<>("Project Created Successfully!", CREATED, m_projectMapper.toProjectOverviewDTO(savedProject, tagList));
     }
 
-    public String getFileExtension(MultipartFile file)
+    private String getFileExtension(MultipartFile file)
     {
         String fileName = file.getOriginalFilename();
         if (fileName != null && fileName.contains("."))
@@ -644,7 +654,8 @@ public class ProjectService
 
     private void saveTagsIfNotExists(List<String> tags, Project savedProject)
     {
-        var projectTags = toStreamConcurrent(m_projectTagServiceHelper.getAllProjectTagByProjectId(savedProject.getProjectId()));
+        var projectTags = toStreamConcurrent(m_projectTagServiceHelper
+                .getAllProjectTagByProjectId(savedProject.getProjectId()));
         projectTags.map(ProjectTag::getId).forEach(m_projectTagRepository::deleteById);
         for (var tag : tags)
         {

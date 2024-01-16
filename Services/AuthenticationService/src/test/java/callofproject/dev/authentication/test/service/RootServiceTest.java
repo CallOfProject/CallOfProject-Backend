@@ -4,10 +4,6 @@ import callofproject.dev.authentication.DatabaseCleaner;
 import callofproject.dev.authentication.Injection;
 import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.library.exception.service.DataServiceException;
-import callofproject.dev.repository.authentication.entity.Role;
-import callofproject.dev.repository.authentication.entity.User;
-import callofproject.dev.repository.authentication.entity.UserProfile;
-import callofproject.dev.repository.authentication.enumeration.RoleEnum;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +43,7 @@ public class RootServiceTest
     @BeforeEach
     public void setUpAndCheckUsers()
     {
-        var rootUser = new User("cop_root", "root", "root", "root", "nuricanozturk02@gmail.com",
+        /*var rootUser = new User("cop_root", "root", "root", "root", "nuricanozturk02@gmail.com",
                 m_passwordEncoder.encode("cop123"), LocalDate.now(), new Role(RoleEnum.ROLE_ROOT.getRole()));
 
         rootUser.addRoleToUser(new Role(RoleEnum.ROLE_USER.getRole()));
@@ -56,9 +52,9 @@ public class RootServiceTest
         profile1.setUser(rootUser);
         rootUser.setUserProfile(profile1);
 
-        m_injection.getUserRepository().save(rootUser);
+        m_injection.getUserRepository().save(rootUser);*/
 
-
+/*
         var adminUser = new User("cop_admin", "admin", "admin", "admin", "nuricanozturk01@gmail.com",
                 m_passwordEncoder.encode("cop_123"), LocalDate.now(), new Role(RoleEnum.ROLE_ADMIN.getRole()));
         adminUser.setUserProfile(new UserProfile());
@@ -66,7 +62,7 @@ public class RootServiceTest
         var profile2 = new UserProfile();
         profile2.setUser(adminUser);
         adminUser.setUserProfile(profile2);
-        m_injection.getUserRepository().save(adminUser);
+        m_injection.getUserRepository().save(adminUser);*/
 
 
         var user1 = new UserSignUpRequestDTO(
@@ -96,8 +92,8 @@ public class RootServiceTest
 
         user1Id = savedUser1.getObject().userId();
         user2Id = savedUser2.getObject().userId();
-        adminId = adminUser.getUserId();
-        rootId = rootUser.getUserId();
+        //adminId = adminUser.getUserId();
+        // rootId = rootUser.getUserId();
     }
 
     @Test

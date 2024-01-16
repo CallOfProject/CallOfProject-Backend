@@ -3,6 +3,7 @@ package callofproject.dev.project.controller;
 import callofproject.dev.library.exception.util.CopDataUtil;
 import callofproject.dev.project.dto.ProjectSaveDTO;
 import callofproject.dev.project.dto.ProjectUpdateDTO;
+import callofproject.dev.project.service.IProjectService;
 import callofproject.dev.project.service.ProjectService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -22,10 +23,10 @@ import static org.springframework.http.ResponseEntity.ok;
 @SecurityRequirement(name = "Authorization")
 public class ProjectController
 {
-    private final ProjectService m_projectService;
+    private final IProjectService m_projectService;
     private final ObjectMapper m_objectMapper;
 
-    public ProjectController(ProjectService projectService, ObjectMapper objectMapper)
+    public ProjectController(IProjectService projectService, ObjectMapper objectMapper)
     {
         m_projectService = projectService;
         m_objectMapper = objectMapper;

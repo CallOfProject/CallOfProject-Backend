@@ -33,7 +33,7 @@ import static java.lang.String.format;
 
 @Service
 @Lazy
-public class ProjectOwnerService
+public class ProjectOwnerService implements IProjectOwnerService
 {
     private final ProjectServiceHelper m_projectServiceHelper;
     private final ProjectTagServiceHelper m_projectTagServiceHelper;
@@ -63,6 +63,7 @@ public class ProjectOwnerService
      * @param dto represent the SaveProjectParticipantDTO class
      * @return ResponseMessage<Object>
      */
+    @Override
     public ResponseMessage<Boolean> addParticipant(SaveProjectParticipantDTO dto)
     {
         var response = doForDataService(() -> m_projectServiceHelper.addProjectParticipant(dto.project_id(), dto.user_id()),
@@ -81,6 +82,7 @@ public class ProjectOwnerService
      * @param userId    represent the user id
      * @return ResponseMessage.
      */
+    @Override
     public ResponseMessage<Object> removeParticipant(UUID projectId, UUID userId)
     {
         return doForDataService(() -> removeParticipantCallback(projectId, userId), "ProjectService::removeParticipant");
@@ -92,6 +94,7 @@ public class ProjectOwnerService
      *
      * @return if success ProjectDTO else return Error Message
      */
+    @Override
     public ResponseMessage<Object> approveParticipantRequest(ParticipantRequestDTO requestDTO)
     {
         var result = doForDataService(() -> approveParticipantRequestCallback(requestDTO), "ProjectService::approveParticipantRequest");
@@ -117,21 +120,25 @@ public class ProjectOwnerService
      * @param projectId represent the project id
      * @return ResponseMessage.
      */
+    @Override
     public ResponseMessage<Object> finishProject(UUID userId, UUID projectId)
     {
         return doForDataService(() -> finishProjectCallback(userId, projectId), "ProjectService::finishProject");
     }
 
+    @Override
     public ResponseMessage<Object> changeProjectStatus(UUID userId, UUID projectId, EProjectStatus projectStatus)
     {
         return doForDataService(() -> changeProjectStatusCallback(userId, projectId, projectStatus), "ProjectService::changeProjectStatus");
     }
 
+    @Override
     public ResponseMessage<Object> removeProject(UUID userId, UUID projectId)
     {
         return doForDataService(() -> removeProjectCallback(userId, projectId), "ProjectService::removeProject");
     }
 
+    @Override
     public ResponseMessage<Object> approveParticipantRequestCallback(ParticipantRequestDTO requestDTO)
     {
         var participantRequest = findProjectParticipantRequestByRequestId(requestDTO.requestId());
@@ -161,7 +168,7 @@ public class ProjectOwnerService
         return approveParticipant(user, project, projectOwner);
     }
 
-
+    @Override
     public ResponseMessage<Object> removeParticipantCallback(UUID projectId, UUID userId)
     {
         var project = findProjectIfExistsByProjectId(projectId);

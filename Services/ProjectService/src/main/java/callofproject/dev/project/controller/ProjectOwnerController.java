@@ -3,6 +3,7 @@ package callofproject.dev.project.controller;
 import callofproject.dev.data.project.entity.enums.EProjectStatus;
 import callofproject.dev.project.dto.ParticipantRequestDTO;
 import callofproject.dev.project.dto.SaveProjectParticipantDTO;
+import callofproject.dev.project.service.IProjectOwnerService;
 import callofproject.dev.project.service.ProjectOwnerService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +20,9 @@ import static org.springframework.http.ResponseEntity.ok;
 @SecurityRequirement(name = "Authorization")
 public class ProjectOwnerController
 {
-    private final ProjectOwnerService m_projectOwnerService;
+    private final IProjectOwnerService m_projectOwnerService;
 
-    public ProjectOwnerController(ProjectOwnerService projectOwnerService)
+    public ProjectOwnerController(IProjectOwnerService projectOwnerService)
     {
         m_projectOwnerService = projectOwnerService;
     }

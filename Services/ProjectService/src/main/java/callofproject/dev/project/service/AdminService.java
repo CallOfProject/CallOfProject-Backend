@@ -23,7 +23,7 @@ import static java.lang.String.format;
 
 @Service
 @Lazy
-public class AdminService
+public class AdminService implements IAdminService
 {
     private final ProjectServiceHelper m_projectServiceHelper;
     private final ProjectTagServiceHelper m_tagServiceHelper;
@@ -47,6 +47,7 @@ public class AdminService
      * @param projectId - project id
      * @return if success ProjectDTO else return Error Message
      */
+    @Override
     public ResponseMessage<Object> cancelProject(UUID projectId)
     {
         return doForDataService(() -> cancelProjectCallback(projectId), "Project is canceled!");
@@ -55,6 +56,7 @@ public class AdminService
     //------------------------------------------------------------------------------------------------------------------
     //####################################################-CALLBACKS-###################################################
     //------------------------------------------------------------------------------------------------------------------
+    @Override
     public ResponseMessage<Object> cancelProjectCallback(UUID projectId)
     {
         var project = findProjectIfExistsByProjectId(projectId);
@@ -71,6 +73,7 @@ public class AdminService
      * @param page represent the page
      * @return ProjectOverviewsDTO class.
      */
+    @Override
     public MultipleResponseMessagePageable<Object> findAll(int page)
     {
         return doForDataService(() -> findAllCallback(page), "ProjectService::findAll");

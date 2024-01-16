@@ -2,6 +2,7 @@ package callofproject.dev.project.controller;
 
 import callofproject.dev.data.common.clas.ErrorMessage;
 import callofproject.dev.project.service.AdminService;
+import callofproject.dev.project.service.IAdminService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,9 @@ import static org.springframework.http.ResponseEntity.*;
 @SecurityRequirement(name = "Authorization")
 public class AdminController
 {
-    private final AdminService m_adminService;
+    private final IAdminService m_adminService;
 
-    public AdminController(AdminService adminService)
+    public AdminController(IAdminService adminService)
     {
         m_adminService = adminService;
     }

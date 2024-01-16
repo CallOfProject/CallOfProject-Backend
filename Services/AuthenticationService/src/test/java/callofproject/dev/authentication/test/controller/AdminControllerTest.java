@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -56,6 +57,7 @@ public class AdminControllerTest
                 "",
                 "KOC",
                 LocalDate.of(1990, 5, 15),
+                LocalDateTime.now(),
                 LocalDate.of(1985, 3, 20)
         );
 
@@ -70,6 +72,7 @@ public class AdminControllerTest
                 "",
                 "KAFADAR",
                 LocalDate.of(1988, 8, 10),
+                LocalDateTime.now(),
                 LocalDate.of(1992, 7, 5)
         );
 
@@ -100,6 +103,7 @@ public class AdminControllerTest
                 admin.getMiddleName(),
                 admin.getLastName(),
                 admin.getCreationDate(),
+                admin.getDeleteAt(),
                 admin.getBirthDate()));
 
     }
@@ -229,6 +233,7 @@ public class AdminControllerTest
                 "Can",
                 "ÖZTÜRK",
                 LocalDate.of(1988, 8, 10),
+                LocalDateTime.now(),
                 LocalDate.of(1992, 7, 5)
         );
 

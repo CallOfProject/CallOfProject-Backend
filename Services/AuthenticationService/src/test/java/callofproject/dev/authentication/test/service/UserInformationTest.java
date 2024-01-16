@@ -60,28 +60,6 @@ public class UserInformationTest
     @BeforeEach
     public void setUpAndCheckUsers()
     {
-      /*  var rootUser = new User("cop_root", "root", "root", "root", "nuricanozturk0@gmail.com",
-                m_passwordEncoder.encode("cop123"), LocalDate.now(), new Role(RoleEnum.ROLE_ROOT.getRole()));
-
-        rootUser.addRoleToUser(new Role(RoleEnum.ROLE_USER.getRole()));
-        rootUser.addRoleToUser(new Role(RoleEnum.ROLE_ADMIN.getRole()));
-        var profile1 = new UserProfile();
-        profile1.setUser(rootUser);
-        rootUser.setUserProfile(profile1);
-
-        m_injection.getUserRepository().save(rootUser);*/
-
-
-        /*var adminUser = new User("cop_admin", "admin", "admin", "admin", "nuricanozturk01@gmail.com",
-                m_passwordEncoder.encode("cop_123"), LocalDate.now(), new Role(RoleEnum.ROLE_ADMIN.getRole()));
-        adminUser.setUserProfile(new UserProfile());
-        adminUser.addRoleToUser(new Role(RoleEnum.ROLE_USER.getRole()));*/
-  /*      var profile2 = new UserProfile();
-        profile2.setUser(adminUser);
-        adminUser.setUserProfile(profile2);
-        m_injection.getUserRepository().save(adminUser);*/
-
-
         var user1 = new UserSignUpRequestDTO(
                 "can@example.com",
                 "Nuri",
@@ -134,8 +112,6 @@ public class UserInformationTest
 
         user1Id = savedUser1.getObject().userId();
         user2Id = savedUser2.getObject().userId();
-        //adminId = adminUser.getUserId();
-        //rootId = rootUser.getUserId();
     }
 
     @Test

@@ -197,7 +197,7 @@ public class AdminService
      * @param userUpdateDTO represent the updating information
      * @return UserShowingAdminDTO class.
      */
-    private ResponseMessage<UserShowingAdminDTO> updateUserCallbackAdmin(UserUpdateDTOAdmin userUpdateDTO)
+    public ResponseMessage<UserShowingAdminDTO> updateUserCallbackAdmin(UserUpdateDTOAdmin userUpdateDTO)
     {
         var authorizedPerson = m_managementServiceHelper.getUserServiceHelper().findById(UUID.fromString(userUpdateDTO.adminId()));
 
