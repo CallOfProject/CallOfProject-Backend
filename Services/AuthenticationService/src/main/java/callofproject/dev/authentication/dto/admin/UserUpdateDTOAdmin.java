@@ -8,6 +8,10 @@ import jakarta.validation.constraints.NotEmpty;
 
 import java.time.LocalDate;
 
+
+/**
+ * Data Transfer Object for a user update request.
+ */
 public record UserUpdateDTOAdmin(
         @JsonProperty("admin_id")
         String adminId,
@@ -44,6 +48,12 @@ public record UserUpdateDTOAdmin(
         LocalDate birthDate
 )
 {
+
+    /**
+     * To string method.
+     *
+     * @return The string.
+     */
     @Override
     public String toString()
     {

@@ -11,6 +11,9 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * Data Transfer Object for a course.
+ */
 public class CourseUpsertDTO
 {
     @JsonProperty("user_id")
@@ -47,6 +50,17 @@ public class CourseUpsertDTO
     @Size(max = 255)
     private String description;
 
+    /**
+     * Constructor.
+     *
+     * @param userId      user ID
+     * @param organizator organizator
+     * @param courseName  course name
+     * @param startDate   start date
+     * @param finishDate  finish date
+     * @param isContinue  is continue
+     * @param description description
+     */
     public CourseUpsertDTO(UUID userId, String organizator, String courseName, LocalDate startDate, LocalDate finishDate, boolean isContinue, String description)
     {
         this.userId = userId;
@@ -58,81 +72,177 @@ public class CourseUpsertDTO
         this.description = description;
     }
 
+
+    /**
+     * Getter for user ID.
+     *
+     * @return user ID
+     */
     public UUID getUserId()
     {
         return userId;
     }
 
+
+    /**
+     * Setter for user ID.
+     *
+     * @param userId user ID
+     */
     public void setUserId(UUID userId)
     {
         this.userId = userId;
     }
 
+
+    /**
+     * Getter for course ID.
+     *
+     * @return course ID
+     */
     public String getCourseId()
     {
         return courseId;
     }
 
+
+    /**
+     * Setter for course ID.
+     *
+     * @param courseId course ID
+     */
     public void setCourseId(String courseId)
     {
         this.courseId = courseId;
     }
 
+
+    /**
+     * Getter for organizator.
+     *
+     * @return organizator
+     */
     public String getOrganizator()
     {
         return organizator;
     }
 
+
+    /**
+     * Setter for organizator.
+     *
+     * @param organizator organizator
+     */
     public void setOrganizator(String organizator)
     {
         this.organizator = organizator;
     }
 
+
+    /**
+     * Getter for course name.
+     *
+     * @return course name
+     */
     public String getCourseName()
     {
         return courseName;
     }
 
+
+    /**
+     * Setter for course name.
+     *
+     * @param courseName course name
+     */
     public void setCourseName(String courseName)
     {
         this.courseName = courseName;
     }
 
+
+    /**
+     * Getter for start date.
+     *
+     * @return start date
+     */
     public LocalDate getStartDate()
     {
         return startDate;
     }
 
+
+    /**
+     * Setter for start date.
+     *
+     * @param startDate start date
+     */
     public void setStartDate(LocalDate startDate)
     {
         this.startDate = startDate;
     }
 
+
+    /**
+     * Getter for finish date.
+     *
+     * @return finish date
+     */
     public LocalDate getFinishDate()
     {
         return finishDate;
     }
 
+
+    /**
+     * Setter for finish date.
+     *
+     * @param finishDate finish date
+     */
     public void setFinishDate(LocalDate finishDate)
     {
         this.finishDate = finishDate;
     }
 
+
+    /**
+     * Getter for is continue.
+     *
+     * @return is continue
+     */
     public boolean isContinue()
     {
         return isContinue;
     }
 
+
+    /**
+     * Setter for is continue.
+     *
+     * @param aContinue is continue
+     */
     public void setContinue(boolean aContinue)
     {
         isContinue = aContinue;
     }
 
+
+    /**
+     * Getter for description.
+     *
+     * @return description
+     */
     public String getDescription()
     {
         return description;
     }
 
+
+    /**
+     * Setter for description.
+     *
+     * @param description description
+     */
     public void setDescription(String description)
     {
         this.description = description;

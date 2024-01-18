@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * Data Transfer Object for an experience.
+ */
 public record ExperienceDTO(
         @JsonProperty("experience_id")
         UUID experienceId,

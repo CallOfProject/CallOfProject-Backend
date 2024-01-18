@@ -31,11 +31,24 @@ public class AuthenticationController
     private final AuthenticationService m_authenticationService;
 
 
+    /**
+     * Constructor for the AuthenticationController class.
+     * It is used to inject dependencies into the controller.
+     *
+     * @param service The AuthenticationService object to be injected.
+     */
     public AuthenticationController(@Qualifier(Util.AUTHENTICATION_SERVICE) AuthenticationService service)
     {
         this.m_authenticationService = service;
     }
 
+
+    /**
+     * Find user by username.
+     *
+     * @param username represent the username.
+     * @return if success returns User else return ErrorMessage.
+     */
     @GetMapping("/find/username")
     public ResponseEntity<Object> findUserByUsername(@RequestParam("username") String username)
     {
@@ -68,19 +81,6 @@ public class AuthenticationController
         return subscribe(() -> ok(m_authenticationService.verifyUserAndRegister(token)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
-
-    /**
-     * Register multiple user to application.
-     *
-     * @param request represent the Register information.
-     * @return if success AuthenticationResponse else return ErrorMessage.
-     *//*
-    @PostMapping("/register-all")
-    public ResponseEntity<Object> register(@RequestBody List<RegisterRequest> request)
-    {
-        return subscribe(() -> ok(m_authenticationService.registerAll(request)),
-                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
-    }*/
 
     /**
      * Login operation for application.

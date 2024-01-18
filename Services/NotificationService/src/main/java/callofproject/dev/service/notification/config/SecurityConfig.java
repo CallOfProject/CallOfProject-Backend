@@ -13,15 +13,31 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * SecurityConfig
+ */
 @Configuration
 @EnableMethodSecurity
 @EnableWebSecurity
 public class SecurityConfig
 {
+
+    /**
+     * Constructs a new SecurityConfig.
+     */
+    public SecurityConfig()
+    {
+    }
+
+    /**
+     * Constructs a new SecurityConfig.
+     *
+     * @param requests represent the requests
+     */
     private static void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests)
     {
         requests
-               // .requestMatchers("/api/notification/**").hasAnyRole("ADMIN", "USER", "ROOT")
+                // .requestMatchers("/api/notification/**").hasAnyRole("ADMIN", "USER", "ROOT")
                 .anyRequest().permitAll();
     }
 

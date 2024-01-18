@@ -7,19 +7,32 @@ import callofproject.dev.project.mapper.IUserMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-
+/**
+ * This class represents a Kafka consumer service responsible for listening to messages from a Kafka topic.
+ */
 @Service
 public class KafkaConsumer
 {
     private final ProjectServiceHelper m_serviceHelper;
     private final IUserMapper m_userMapper;
 
+    /**
+     * Constructs a new KafkaConsumer with the provided dependencies.
+     *
+     * @param serviceHelper The ProjectServiceHelper instance used for handling Kafka messages.
+     * @param userMapper    The IUserMapper instance used for mapping UserDTO messages.
+     */
     public KafkaConsumer(ProjectServiceHelper serviceHelper, IUserMapper userMapper)
     {
         m_serviceHelper = serviceHelper;
         m_userMapper = userMapper;
     }
 
+    /**
+     * Listens to the specified Kafka topic and processes UserDTO messages.
+     *
+     * @param dto The UserDTO message received from Kafka.
+     */
     @KafkaListener(topics = "${spring.kafka.topic-name}", groupId = "${spring.kafka.consumer.group-id}")
     public void listenAuthenticationTopic(UserDTO dto)
     {

@@ -7,9 +7,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
+/**
+ * ExecutorConfig
+ */
 @Configuration
 public class ExecutorConfig
 {
+    /**
+     * Constructs a new ExecutorConfig.
+     */
+    public ExecutorConfig()
+    {
+    }
+
+    /**
+     * Constructs a new ExecutorConfig.
+     */
     @Bean
     public ExecutorService provideExecutorService()
     {

@@ -2,12 +2,7 @@ package callofproject.dev.project.config;
 
 import callofproject.dev.service.jwt.filter.JWTTokenGeneratorFilter;
 import callofproject.dev.service.jwt.filter.JWTTokenValidatorFilter;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.catalina.connector.Connector;
-import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -19,19 +14,23 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-
-import java.util.Collections;
-import java.util.List;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
-
+/**
+ * SecurityConfig
+ */
 @Configuration
 @EnableMethodSecurity
 @EnableWebSecurity
 public class SecurityConfig
 {
+    /**
+     * SecurityConfig
+     */
+    public SecurityConfig()
+    {
+    }
 
     /**
      * Customize security
@@ -77,36 +76,4 @@ public class SecurityConfig
 
         return http.build();
     }
-
-
-    /**
-     * Set cors configuration
-     *
-     * @param httpServletRequest represent the request
-     * @return CorsConfiguration
-     */
-    private CorsConfiguration setCorsConfig(HttpServletRequest httpServletRequest)
-    {
-        CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowedOrigins(List.of("*"));
-        config.setAllowedMethods(Collections.singletonList("*"));
-        config.setAllowCredentials(true);
-        config.setAllowedHeaders(Collections.singletonList("*"));
-        config.setExposedHeaders(List.of("Authorization"));
-        config.setMaxAge(3600L);
-        return config;
-    }
-
-    /*@Bean
-    public ConfigurableServletWebServerFactory webServerFactory() {
-        TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
-        factory.addConnectorCustomizers(new TomcatConnectorCustomizer() {
-            @Override
-            public void customize(Connector connector) {
-                connector.setProperty("relaxedQueryChars", "|{}[]");
-            }
-        });
-        return factory;
-    }*/
 }

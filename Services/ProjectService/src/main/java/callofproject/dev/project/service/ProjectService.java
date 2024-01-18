@@ -42,6 +42,10 @@ import static callofproject.dev.project.util.Constants.PROJECT_SERVICE;
 import static callofproject.dev.util.stream.StreamUtil.*;
 import static java.lang.String.format;
 
+/**
+ * Service class for managing projects.
+ * It implements the IProjectService interface.
+ */
 @Service(PROJECT_SERVICE)
 @Lazy
 public class ProjectService implements IProjectService
@@ -59,6 +63,19 @@ public class ProjectService implements IProjectService
     @Value("${notification.request.approve}")
     private String m_approvalLink;
 
+    /**
+     * Constructor for ProjectService.
+     *
+     * @param serviceHelper            The ProjectServiceHelper to be used for data access.
+     * @param projectTagServiceHelper  The ProjectTagServiceHelper to be used for data access.
+     * @param tagServiceHelper         The TagServiceHelper to be used for data access.
+     * @param kafkaProducer            The KafkaProducer to be used for sending notifications.
+     * @param objectMapper             The ObjectMapper to be used for converting objects to JSON.
+     * @param projectMapper            The IProjectMapper to be used for mapping Project entities to DTOs.
+     * @param s3Service                The S3Service to be used for uploading files to S3.
+     * @param projectParticipantMapper The IProjectParticipantMapper to be used for mapping ProjectParticipant entities to DTOs.
+     * @param projectTagRepository     The IProjectTagRepository to be used for data access.
+     */
     public ProjectService(@Qualifier(PROJECT_SERVICE_HELPER_BEAN) ProjectServiceHelper serviceHelper,
                           @Qualifier(PROJECT_TAG_SERVICE_HELPER_BEAN_NAME) ProjectTagServiceHelper projectTagServiceHelper,
                           @Qualifier(TAG_SERVICE_HELPER_BEAN_NAME) TagServiceHelper tagServiceHelper, KafkaProducer kafkaProducer, ObjectMapper objectMapper,
@@ -77,16 +94,24 @@ public class ProjectService implements IProjectService
 
 
     /**
-     * Save Project with given dto class.
+     * Saves a new project using a ProjectSaveDTO.
      *
-     * @param projectDTO represent the dto class
-     * @return ResponseMessage.
+     * @param projectDTO Data Transfer Object containing project information.
+     * @return A ResponseMessage containing the result of the save operation.
      */
     @Override
     public ResponseMessage<Object> saveProject(ProjectSaveDTO projectDTO)
     {
         return doForDataService(() -> saveProjectCallback(projectDTO), "ProjectService::saveProject");
     }
+
+    /**
+     * Saves a new project with an additional file using ProjectSaveDTO and MultipartFile.
+     *
+     * @param saveDTO Data Transfer Object containing project information.
+     * @param file    The file to be associated with the project.
+     * @return A ResponseMessage containing the result of the save operation.
+     */
     @Override
     public ResponseMessage<Object> saveProjectV2(ProjectSaveDTO saveDTO, MultipartFile file)
     {
@@ -94,11 +119,11 @@ public class ProjectService implements IProjectService
     }
 
     /**
-     * Find all project by user id who is participant in project.
+     * Retrieves all projects a user is participating in, with pagination.
      *
-     * @param userId represent the user id
-     * @param page   represent the page
-     * @return ProjectOverviewsDTO class.
+     * @param userId The UUID of the user.
+     * @param page   The page number for pagination.
+     * @return A MultipleResponseMessagePageable containing a list of projects.
      */
     @Override
     public MultipleResponseMessagePageable<Object> findAllParticipantProjectByUserId(UUID userId, int page)
@@ -108,10 +133,10 @@ public class ProjectService implements IProjectService
 
 
     /**
-     * Update project with given dto class.
+     * Updates a project using ProjectUpdateDTO.
      *
-     * @param projectDTO represent the dto class
-     * @return ResponseMessage.
+     * @param projectDTO Data Transfer Object containing updated project information.
+     * @return A ResponseMessage containing the result of the update operation.
      */
     @Override
     public ResponseMessage<Object> updateProject(ProjectUpdateDTO projectDTO)
@@ -121,10 +146,11 @@ public class ProjectService implements IProjectService
 
 
     /**
-     * Update project with given dto class.
+     * Updates a project with an additional file using ProjectUpdateDTO and MultipartFile.
      *
-     * @param projectDTO represent the dto class
-     * @return ResponseMessage.
+     * @param projectDTO Data Transfer Object containing updated project information.
+     * @param file       The file to be associated with the project update.
+     * @return A ResponseMessage containing the result of the update operation.
      */
     @Override
     public ResponseMessage<Object> updateProjectV2(ProjectUpdateDTO projectDTO, MultipartFile file)
@@ -134,11 +160,11 @@ public class ProjectService implements IProjectService
 
 
     /**
-     * Find all project by user id who is owner in project.
+     * Retrieves all projects owned by a user, with pagination.
      *
-     * @param userId represent the user id
-     * @param page   represent the page
-     * @return ProjectOverviewsDTO class.
+     * @param userId The UUID of the user.
+     * @param page   The page number for pagination.
+     * @return A MultipleResponseMessagePageable containing a list of owned projects.
      */
     @Override
     public MultipleResponseMessagePageable<Object> findAllOwnerProjectsByUserId(UUID userId, int page)
@@ -147,11 +173,11 @@ public class ProjectService implements IProjectService
     }
 
     /**
-     * Find all project by username who is owner in project.
+     * Retrieves all projects owned by a user, identified by username, with pagination.
      *
-     * @param username represent the username
-     * @param page     represent the page
-     * @return ProjectOverviewsDTO class.
+     * @param username The username of the project owner.
+     * @param page     The page number for pagination.
+     * @return A MultipleResponseMessagePageable containing a list of owned projects.
      */
     @Override
     public MultipleResponseMessagePageable<Object> findAllOwnerProjectsByUsername(String username, int page)
@@ -161,10 +187,11 @@ public class ProjectService implements IProjectService
 
 
     /**
-     * Find project by project id.
+     * Retrieves a view of a project from the perspective of its owner.
      *
-     * @param projectId represent the project id
-     * @return ResponseMessage.
+     * @param userId    The UUID of the owner.
+     * @param projectId The UUID of the project.
+     * @return A ResponseMessage containing the ProjectOwnerView.
      */
     @Override
     public ResponseMessage<Object> findProjectOwnerView(UUID userId, UUID projectId)
@@ -173,10 +200,10 @@ public class ProjectService implements IProjectService
     }
 
     /**
-     * Find all project.
+     * Retrieves a paginated list of projects for discovery purposes.
      *
-     * @param page represent the page
-     * @return ProjectOverviewsDTO class.
+     * @param page The page number for pagination.
+     * @return A MultipleResponseMessagePageable containing a list of project discovery views.
      */
     @Override
     public MultipleResponseMessagePageable<Object> findAllProjectDiscoveryView(int page)
@@ -185,10 +212,10 @@ public class ProjectService implements IProjectService
     }
 
     /**
-     * Find project by project id.
+     * Retrieves an overview of a specific project.
      *
-     * @param projectId represent the project id
-     * @return ResponseMessage.
+     * @param projectId The UUID of the project.
+     * @return A ResponseMessage containing the ProjectOverview.
      */
     @Override
     public ResponseMessage<Object> findProjectOverview(UUID projectId)
@@ -197,25 +224,32 @@ public class ProjectService implements IProjectService
     }
 
     /**
-     * Add project join request with given project id and user id.
+     * Adds a request to join a project.
      *
-     * @param projectId represent the project id
-     * @param userId    represent the user id
-     * @return ResponseMessage.
+     * @param projectId The UUID of the project to join.
+     * @param userId    The UUID of the user requesting to join.
+     * @return A ResponseMessage containing the result of the join request.
      */
     @Override
     public ResponseMessage<Object> addProjectJoinRequest(UUID projectId, UUID userId)
     {
-        var result = doForDataService(() -> addProjectJoinRequestCallback(projectId, userId), "ProjectService::addProjectJoinRequest");
+        var result = doForDataService(() -> addProjectJoinRequestCallback(projectId, userId),
+                "ProjectService::addProjectJoinRequest");
 
         var request = (ProjectParticipantRequestDTO) result.getObject();
 
         if (result.getStatusCode() == OK)
-        {
             sendNotificationToProjectOwner(request);
-        }
+
         return result;
     }
+
+    /**
+     * Retrieves detailed information of a specific project.
+     *
+     * @param projectId The UUID of the project.
+     * @return A ResponseMessage containing the ProjectDetail.
+     */
     @Override
     public ResponseMessage<Object> findProjectDetail(UUID projectId)
     {
@@ -228,6 +262,14 @@ public class ProjectService implements IProjectService
 
         return new ResponseMessage<>("Project is found!", OK, projectDetailDTO);
     }
+
+    /**
+     * Retrieves detailed information of a specific project if the user has permission.
+     *
+     * @param projectId The UUID of the project.
+     * @param userId    The UUID of the user.
+     * @return A ResponseMessage containing the ProjectDetail.
+     */
     @Override
     public ResponseMessage<Object> findProjectDetailIfHasPermission(UUID projectId, UUID userId)
     {
@@ -249,6 +291,14 @@ public class ProjectService implements IProjectService
     }
 
     //-----------------------------------CALLBACKS---------------------------------------------
+
+    /**
+     * Callback for adding a request to join a project.
+     *
+     * @param projectId The UUID of the project to join.
+     * @param userId    The UUID of the user requesting to join.
+     * @return A ResponseMessage containing the result of the join request callback.
+     */
     @Override
     public ResponseMessage<Object> addProjectJoinRequestCallback(UUID projectId, UUID userId)
     {
@@ -271,6 +321,14 @@ public class ProjectService implements IProjectService
         return new ResponseMessage<>("Participant request is sent!", OK, dto);
     }
 
+    /**
+     * Checks various project participation policies against a specific user and project.
+     * Validates if the user is eligible to join or interact with the project based on predefined rules.
+     *
+     * @param user    The user for whom policy validation is being performed.
+     * @param project The project to be checked against the user.
+     * @return A ResponseMessage object indicating the result of the policy check.
+     */
     private ResponseMessage<Object> checkProjectPolicies(User user, Project project)
     {
         // If user is owner of project then return error message.
@@ -298,6 +356,11 @@ public class ProjectService implements IProjectService
         return new ResponseMessage<>("", OK, null);
     }
 
+    /**
+     * Sends a notification to the owner of a project about a participant request.
+     *
+     * @param request DTO containing details of the project participant request.
+     */
     private void sendNotificationToProjectOwner(ProjectParticipantRequestDTO request)
     {
         var user = findUserIfExists(request.userId());
@@ -332,6 +395,12 @@ public class ProjectService implements IProjectService
                 "ProjectService::sendNotificationToProjectOwner");
     }
 
+    /**
+     * Retrieves an overview of a specific project.
+     *
+     * @param projectId The UUID of the project.
+     * @return A ResponseMessage containing the ProjectOverviewDTO.
+     */
     private ResponseMessage<Object> findProjectOverviewCallback(UUID projectId)
     {
         var project = findProjectIfExistsByProjectId(projectId);
@@ -344,6 +413,12 @@ public class ProjectService implements IProjectService
         return new ResponseMessage<>("Project is found!", OK, projectOverviewDTO);
     }
 
+    /**
+     * Retrieves a paginated list of all projects for discovery purposes.
+     *
+     * @param page The page number for pagination.
+     * @return A MultipleResponseMessagePageable containing a list of project discovery views.
+     */
     private MultipleResponseMessagePageable<Object> findAllProjectDiscoveryViewCallback(int page)
     {
         var projectPageable = m_serviceHelper.findAllValidProjects(page);
@@ -354,6 +429,13 @@ public class ProjectService implements IProjectService
                 "Projects found!", resultDTO);
     }
 
+    /**
+     * Retrieves a view of a project from the perspective of its owner.
+     *
+     * @param userId    The UUID of the owner.
+     * @param projectId The UUID of the project.
+     * @return A ResponseMessage containing the ProjectOwnerViewDTO.
+     */
     private ResponseMessage<Object> findProjectOwnerViewCallback(UUID userId, UUID projectId)
     {
         var user = findUserIfExists(userId);
@@ -367,6 +449,12 @@ public class ProjectService implements IProjectService
         return new ResponseMessage<>("Project is found!", OK, result);
     }
 
+    /**
+     * Handles the saving of a new project based on provided project details.
+     *
+     * @param projectDTO Data Transfer Object containing project information.
+     * @return A ResponseMessage object indicating the success or failure of the project creation.
+     */
     private ResponseMessage<Object> saveProjectCallback(ProjectSaveDTO projectDTO)
     {
         var user = findUserIfExists(projectDTO.userId());
@@ -416,6 +504,12 @@ public class ProjectService implements IProjectService
         return new ResponseMessage<>("Project Created Successfully!", CREATED, m_projectMapper.toProjectOverviewDTO(savedProject, tagList));
     }
 
+    /**
+     * Extracts the file extension from a given MultipartFile.
+     *
+     * @param file The MultipartFile whose extension is to be extracted.
+     * @return A string representing the file extension.
+     */
     private String getFileExtension(MultipartFile file)
     {
         String fileName = file.getOriginalFilename();
@@ -426,6 +520,13 @@ public class ProjectService implements IProjectService
         return "";
     }
 
+    /**
+     * Handles the saving of a new project with an additional file attachment.
+     *
+     * @param projectDTO Data Transfer Object containing project information.
+     * @param file       The MultipartFile to be associated with the project.
+     * @return A ResponseMessage object indicating the success or failure of the project creation.
+     */
     private ResponseMessage<Object> saveProjectCallbackV2(ProjectSaveDTO projectDTO, MultipartFile file)
     {
         var user = findUserIfExists(projectDTO.userId());
@@ -477,7 +578,13 @@ public class ProjectService implements IProjectService
         return new ResponseMessage<>("Project Created Successfully!", CREATED, m_projectMapper.toProjectOverviewDTO(savedProject, tagList));
     }
 
-
+    /**
+     * Retrieves all projects a specific user is participating in, with pagination.
+     *
+     * @param userId The UUID of the user.
+     * @param page   The page number for pagination.
+     * @return A MultipleResponseMessagePageable containing a list of participant projects.
+     */
     private MultipleResponseMessagePageable<Object> findAllParticipantProjectByUserIdCallback(UUID userId, int page)
     {
         findUserIfExists(userId);
@@ -491,6 +598,13 @@ public class ProjectService implements IProjectService
         return new MultipleResponseMessagePageable<>(totalPage, page, projectPageable.getNumberOfElements(), "Projects found!", projectOverviewsDTO);
     }
 
+    /**
+     * Retrieves all projects owned by a specific user, with pagination.
+     *
+     * @param userId The UUID of the user who owns the projects.
+     * @param page   The page number for pagination.
+     * @return A MultipleResponseMessagePageable containing a list of owner projects.
+     */
     private MultipleResponseMessagePageable<Object> findAllOwnerProjectsByUserIdCallback(UUID userId, int page)
     {
         findUserIfExists(userId);
@@ -502,6 +616,13 @@ public class ProjectService implements IProjectService
         return new MultipleResponseMessagePageable<>(projects.getTotalPages(), page, projects.stream().toList().size(), "Projects found!", projectsDetailDTO);
     }
 
+    /**
+     * Retrieves all projects owned by a specific user, identified by username, with pagination.
+     *
+     * @param username The username of the project owner.
+     * @param page     The page number for pagination.
+     * @return A MultipleResponseMessagePageable containing a list of owner projects.
+     */
     private MultipleResponseMessagePageable<Object> findAllOwnerProjectsByUsernameCallback(String username, int page)
     {
         var user = findUserIfExists(username);
@@ -518,6 +639,13 @@ public class ProjectService implements IProjectService
 
     // -----------------------------------HELPER METHODS---------------------------------------------
 
+    /**
+     * Retrieves a project by its ID if it exists.
+     *
+     * @param projectId The unique identifier of the project.
+     * @return The found Project entity.
+     * @throws DataServiceException if the project is not found.
+     */
     private Project findProjectIfExistsByProjectId(UUID projectId)
     {
         var project = m_serviceHelper.findProjectById(projectId);
@@ -528,6 +656,13 @@ public class ProjectService implements IProjectService
         return project.get();
     }
 
+    /**
+     * Retrieves a user by their UUID if they exist.
+     *
+     * @param userId The unique identifier of the user.
+     * @return The found User entity.
+     * @throws DataServiceException if the user is not found.
+     */
     private User findUserIfExists(UUID userId)
     {
         var user = m_serviceHelper.findUserById(userId);
@@ -538,6 +673,13 @@ public class ProjectService implements IProjectService
         return user.get();
     }
 
+    /**
+     * Retrieves a user by their username if they exist.
+     *
+     * @param username The username of the user.
+     * @return The found User entity.
+     * @throws DataServiceException if the user is not found.
+     */
     private User findUserIfExists(String username)
     {
         var user = m_serviceHelper.findUserByUsername(username);
@@ -548,6 +690,13 @@ public class ProjectService implements IProjectService
         return user.get();
     }
 
+    /**
+     * Checks if the user has permission to perform actions on the project.
+     *
+     * @param project The project to check permissions against.
+     * @param userId  The UUID of the user.
+     * @throws DataServiceException if the user does not have permission.
+     */
     private void checkProjectPermission(Project project, UUID userId)
     {
         if (project.getAdminOperationStatus() == AdminOperationStatus.BLOCKED)
@@ -560,6 +709,12 @@ public class ProjectService implements IProjectService
             throw new DataServiceException("You are not owner of this project!");
     }
 
+    /**
+     * Updates a project with new details provided in ProjectUpdateDTO.
+     *
+     * @param projectDTO The DTO containing updated project information.
+     * @return A ResponseMessage indicating the outcome of the update operation.
+     */
     private ResponseMessage<Object> updateProjectCallback(ProjectUpdateDTO projectDTO)
     {
         var project = findProjectIfExistsByProjectId(projectDTO.projectId());
@@ -597,7 +752,13 @@ public class ProjectService implements IProjectService
         return new ResponseMessage<>("Project is updated!", OK, overviewDTO);
     }
 
-
+    /**
+     * Updates a project with new details and an image file.
+     *
+     * @param projectDTO The DTO containing updated project information.
+     * @param file       The MultipartFile containing the project's new image.
+     * @return A ResponseMessage indicating the outcome of the update operation.
+     */
     private ResponseMessage<Object> updateProjectCallbackV2(ProjectUpdateDTO projectDTO, MultipartFile file)
     {
         var project = findProjectIfExistsByProjectId(projectDTO.projectId());
@@ -641,17 +802,35 @@ public class ProjectService implements IProjectService
         return new ResponseMessage<>("Project is updated!", OK, overviewDTO);
     }
 
+    /**
+     * Finds and retrieves a list of tags associated with a given project.
+     *
+     * @param obj The project for which tags are to be retrieved.
+     * @return A list of ProjectTag objects associated with the project.
+     */
     private List<ProjectTag> findTagList(Project obj)
     {
         return toStream(m_projectTagServiceHelper.getAllProjectTagByProjectId(obj.getProjectId())).toList();
     }
 
+    /**
+     * Retrieves all participants of a specific project.
+     *
+     * @param obj The project for which participants are to be retrieved.
+     * @return A ProjectsParticipantDTO containing the list of participants.
+     */
     private ProjectsParticipantDTO findProjectParticipantsByProjectId(Project obj)
     {
         var participants = m_serviceHelper.findAllProjectParticipantByProjectId(obj.getProjectId());
         return m_projectParticipantMapper.toProjectsParticipantDTO(toList(participants, m_projectParticipantMapper::toProjectParticipantDTO));
     }
 
+    /**
+     * Saves new tags for a project if they do not already exist.
+     *
+     * @param tags         The list of tags to be associated with the project.
+     * @param savedProject The project to which tags are to be saved.
+     */
     private void saveTagsIfNotExists(List<String> tags, Project savedProject)
     {
         var projectTags = toStreamConcurrent(m_projectTagServiceHelper
@@ -663,10 +842,9 @@ public class ProjectService implements IProjectService
             if (m_tagServiceHelper.existsByTagNameContainsIgnoreCase(tagName)) // If tag already exists then save project tag
             {
                 m_projectTagServiceHelper.saveProjectTag(new ProjectTag(tagName, savedProject.getProjectId()));
-            }
-            else // If tag not exists then save tag and project tag
+            } else // If tag not exists then save tag and project tag
             {
-                System.out.println("here-3");
+                //System.out.println("here-3");
                 m_tagServiceHelper.saveTag(new Tag(tagName));
                 m_projectTagServiceHelper.saveProjectTag(new ProjectTag(tagName, savedProject.getProjectId()));
             }

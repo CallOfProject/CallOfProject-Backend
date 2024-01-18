@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class provides configuration for creating Kafka topics.
+ */
 @Component
 public class KafkaTopicProvider
 {
@@ -13,9 +16,16 @@ public class KafkaTopicProvider
     private String m_notificationTopicName;
 
     /**
-     * Create a new topic.
+     * Constructs a new KafkaTopicProvider.
+     */
+    public KafkaTopicProvider()
+    {
+    }
+
+    /**
+     * Create a new Kafka topic.
      *
-     * @return The topic.
+     * @return The newly created Kafka topic.
      */
     @Bean
     public NewTopic provideNotificationTopic()

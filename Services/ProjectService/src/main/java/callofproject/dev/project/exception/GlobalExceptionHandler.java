@@ -8,13 +8,29 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+/**
+ * Global exception handler for the application.
+ * This class handles various types of exceptions and returns the appropriate ResponseEntity.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler
 {
 
+    /**
+     * Default constructor.
+     */
+    public GlobalExceptionHandler()
+    {
+    }
+
+    /**
+     * Handles exceptions for invalid method arguments.
+     *
+     * @param ex MethodArgumentNotValidException exception
+     * @return ResponseEntity containing the error message and BAD_REQUEST status
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex)
@@ -23,6 +39,12 @@ public class GlobalExceptionHandler
         return ResponseEntity.badRequest().body(errorMessage);
     }
 
+    /**
+     * Handles exceptions when the HTTP message is not readable.
+     *
+     * @param ex HttpMessageNotReadableException exception
+     * @return ResponseEntity containing the error message and BAD_REQUEST status
+     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> handleMessageNotReadableException(HttpMessageNotReadableException ex)
     {
@@ -30,6 +52,13 @@ public class GlobalExceptionHandler
         return ResponseEntity.badRequest().body(errorMessage);
     }
 
+    /**
+     * Handles access denied exceptions in the application.
+     *
+     * @param ex      AccessDeniedException exception
+     * @param request WebRequest instance
+     * @return ResponseEntity with FORBIDDEN status and the error message
+     */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex, WebRequest request)
     {

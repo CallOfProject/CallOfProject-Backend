@@ -11,10 +11,21 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+/**
+ * Service class for handling logout operations.
+ */
 @Service("ad")
 @Lazy
 public class LogoutService extends SimpleUrlLogoutSuccessHandler implements LogoutSuccessHandler
 {
+
+    /**
+     * Constructor for LogoutService.
+     */
+    public LogoutService()
+    {
+    }
+
 
  /*   @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
@@ -29,6 +40,15 @@ public class LogoutService extends SimpleUrlLogoutSuccessHandler implements Logo
         SecurityContextHolder.getContext().getAuthentication();
     }*/
 
+    /**
+     * Handles logout success.
+     *
+     * @param request        The HttpServletRequest.
+     * @param response       The HttpServletResponse.
+     * @param authentication The Authentication object representing the user.
+     * @throws IOException      If an input or output exception occurs during the operation.
+     * @throws ServletException If a servlet exception occurs during the operation.
+     */
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException
     {

@@ -16,12 +16,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * This class is a Spring Component class that provides authentication for the application.
+ */
 @Component
 public class CopAuthenticationProvider implements AuthenticationProvider
 {
     private final UserManagementServiceHelper m_userManagementServiceHelper;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Constructs a new CopAuthenticationProvider.
+     *
+     * @param userManagementServiceHelper The UserManagementServiceHelper object to be injected.
+     */
     public CopAuthenticationProvider(UserManagementServiceHelper userManagementServiceHelper, PasswordEncoder passwordEncoder)
     {
         m_userManagementServiceHelper = userManagementServiceHelper;
@@ -29,6 +37,8 @@ public class CopAuthenticationProvider implements AuthenticationProvider
     }
 
     /**
+     * Performs authentication with the same contract as AuthenticationManager.authenticate(Authentication).
+     *
      * @param authentication the authentication request object.
      * @return Authentication
      * @throws AuthenticationException if the authentication fails
@@ -51,6 +61,8 @@ public class CopAuthenticationProvider implements AuthenticationProvider
     }
 
     /**
+     * Returns a list of authorities granted to the user.
+     *
      * @param authorities the authorities granted to the user.
      * @return List<GrantedAuthority>
      */
@@ -64,6 +76,8 @@ public class CopAuthenticationProvider implements AuthenticationProvider
     }
 
     /**
+     * Returns true if this AuthenticationProvider supports the indicated Authentication object.
+     *
      * @param authentication the authentication request object.
      * @return boolean
      */

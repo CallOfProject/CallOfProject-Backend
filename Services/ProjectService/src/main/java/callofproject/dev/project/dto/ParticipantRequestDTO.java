@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.UUID;
 
+/**
+ * ParticipantRequestDTO
+ */
 public record ParticipantRequestDTO(
         @JsonProperty("request_id")
         UUID requestId,

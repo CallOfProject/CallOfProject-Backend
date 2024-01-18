@@ -1,13 +1,17 @@
 package callofproject.dev.service.notification.config.kafka;
 
 import callofproject.dev.nosql.entity.Notification;
-import callofproject.dev.service.notification.service.NotificationService;
 import callofproject.dev.service.notification.dto.NotificationDTO;
 import callofproject.dev.service.notification.dto.NotificationUserResponseDTO;
+import callofproject.dev.service.notification.service.NotificationService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
+
+/**
+ * Kafka consumer.
+ */
 @Component
 public class KafkaConsumer
 {
@@ -15,12 +19,24 @@ public class KafkaConsumer
     private final SimpMessagingTemplate messagingTemplate;
 
 
+    /**
+     * Constructor.
+     *
+     * @param notificationService The notification service.
+     * @param messagingTemplate   The messaging template.
+     */
     public KafkaConsumer(NotificationService notificationService, SimpMessagingTemplate messagingTemplate)
     {
         m_notificationService = notificationService;
         this.messagingTemplate = messagingTemplate;
     }
 
+
+    /**
+     * Listen to the Kafka topic.
+     *
+     * @param message The message.
+     */
     @KafkaListener(topics = "${spring.kafka.consumer.topic-name}", groupId = "${spring.kafka.consumer.group-id}")
     public void projectServiceListener(NotificationUserResponseDTO message)
     {
@@ -44,6 +60,12 @@ public class KafkaConsumer
         sendNotificationToUser(savedNotification);
     }
 
+
+    /**
+     * Send notification to user.
+     *
+     * @param savedNotification The saved notification.
+     */
     private void sendNotificationToUser(Notification savedNotification)
     {
         var dto = new NotificationDTO.Builder()

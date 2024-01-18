@@ -5,6 +5,9 @@ import callofproject.dev.nosql.enums.NotificationType;
 
 import java.util.UUID;
 
+/**
+ * DTO class for notification user response.
+ */
 public record NotificationUserResponseDTO(
         UUID toUserId,
         UUID fromUserId,

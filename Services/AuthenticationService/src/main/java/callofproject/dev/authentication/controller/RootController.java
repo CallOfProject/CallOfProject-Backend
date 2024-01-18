@@ -12,6 +12,12 @@ import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
+
+/**
+ * Authentication Controller
+ * Copyleft (C), 2023, Cal-of-Project-Teams Developers.
+ * All Rights free.
+ */
 @RestController
 @RequestMapping("api/auth/root")
 @SecurityRequirement(name = "Authorization")
@@ -19,11 +25,27 @@ public class RootController
 {
     private final RootService m_rootService;
 
+
+    /**
+     * Constructor for the RootController class.
+     * It is used to inject dependencies into the controller.
+     *
+     * @param rootService The RootService object to be injected.
+     */
     public RootController(RootService rootService)
     {
         m_rootService = rootService;
     }
 
+
+    /**
+     * Create error message.
+     *
+     * @param msg        represent the message
+     * @param status     represent the status
+     * @param statusCode represent the status code
+     * @return ErrorMessage
+     */
     private ResponseEntity<Object> createErrorMessage(String msg, boolean status, int statusCode)
     {
         return internalServerError().body(new ErrorMessage(msg, status, statusCode));

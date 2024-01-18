@@ -13,9 +13,20 @@ import org.springframework.data.mongodb.core.MongoClientFactoryBean;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
+/**
+ * MongoRepoConfig
+ */
 @Configuration
 public class MongoRepoConfig
 {
+
+    /**
+     * Constructs a new MongoRepoConfig.
+     */
+    public MongoRepoConfig()
+    {
+    }
+
     /**
      * @param uri The MongoDB connection string.
      * @return The MongoClientFactoryBean.

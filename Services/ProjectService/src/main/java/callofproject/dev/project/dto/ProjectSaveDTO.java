@@ -10,6 +10,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * ProjectSaveDTO
+ */
 public record ProjectSaveDTO(
         @JsonProperty("user_id")
         @NotNull(message = "user id cannot be empty")

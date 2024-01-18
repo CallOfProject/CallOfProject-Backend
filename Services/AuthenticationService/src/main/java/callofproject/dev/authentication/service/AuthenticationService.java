@@ -8,7 +8,6 @@ import callofproject.dev.authentication.dto.auth.AuthenticationResponse;
 import callofproject.dev.authentication.dto.auth.RegisterRequest;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.dto.EmailTopic;
-import callofproject.dev.data.common.enums.EOperation;
 import callofproject.dev.data.common.status.Status;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserServiceHelper;
@@ -39,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 
 import static callofproject.dev.authentication.util.Util.AUTHENTICATION_SERVICE;
 import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
+import static callofproject.dev.data.common.enums.EOperation.REGISTER_NOT_VERIFY;
 import static callofproject.dev.data.common.enums.EmailType.EMAIL_VERIFICATION;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static callofproject.dev.service.jwt.JwtUtil.extractClaim;
@@ -46,6 +46,10 @@ import static callofproject.dev.service.jwt.JwtUtil.extractUsername;
 import static java.time.LocalDateTime.parse;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 
+/**
+ * Service class for authentication-related operations.
+ * It implements the IAuthenticationService interface.
+ */
 @Service(AUTHENTICATION_SERVICE)
 @Lazy
 public class AuthenticationService
@@ -62,6 +66,18 @@ public class AuthenticationService
     private int m_verifyUserTokenExpirationTime;
     private final ExecutorService m_executorService;
 
+    /**
+     * Constructor for the AuthenticationService class.
+     * It is used to inject dependencies into the service.
+     *
+     * @param userManagementService  The UserManagementService object to be injected.
+     * @param authenticationProvider The AuthenticationProvider object to be injected.
+     * @param passwordEncoder        The PasswordEncoder object to be injected.
+     * @param kafkaProducer          The KafkaProducer object to be injected.
+     * @param serviceHelper          The UserServiceHelper object to be injected.
+     * @param userRepository         The IUserRepository object to be injected.
+     * @param executorService        The ExecutorService object to be injected.
+     */
     public AuthenticationService(@Qualifier(USER_MANAGEMENT_SERVICE) UserManagementService userManagementService,
                                  AuthenticationProvider authenticationProvider,
                                  PasswordEncoder passwordEncoder, KafkaProducer kafkaProducer, UserServiceHelper serviceHelper, IUserRepository userRepository, ExecutorService executorService)
@@ -137,6 +153,11 @@ public class AuthenticationService
         return new AuthenticationResponse(user.getObject().accessToken(), user.getObject().refreshToken(), true, RoleEnum.ROLE_USER.getRole(), user.getObject().userId());
     }
 
+    /**
+     * Send authentication email.
+     *
+     * @param dto represent the UserSignUpRequestDTO.
+     */
     public void sendAuthenticationEmail(UserSignUpRequestDTO dto)
     {
         var claims = createClaimsForRegister();
@@ -148,6 +169,11 @@ public class AuthenticationService
     }
 
 
+    /**
+     * Start timer for user verification.
+     *
+     * @param username represent the username.
+     */
     private void startTimerForUserVerification(String username)
     {
         var user = m_serviceHelper.findByUsername(username);
@@ -172,13 +198,18 @@ public class AuthenticationService
                 {
                     m_userRepository.deleteById(user.get().getUserId());
                     m_kafkaProducer.sendMessage(new UserKafkaDTO(user.get().getUserId(), null, null, null, null, null,
-                            EOperation.REGISTER_NOT_VERIFY, null, null, null, -1, -1, -1));
+                            REGISTER_NOT_VERIFY, null, null, null, -1, -1, -1));
                 }
             }
         }.start();
 
     }
 
+    /**
+     * Create claims for register.
+     *
+     * @return HashMap<String, Object>
+     */
     private HashMap<String, Object> createClaimsForRegister()
     {
         var claims = new HashMap<String, Object>();
@@ -191,6 +222,12 @@ public class AuthenticationService
         return claims;
     }
 
+    /**
+     * Verify user and register.
+     *
+     * @param token represent the token.
+     * @return ResponseMessage
+     */
     public ResponseMessage<Object> verifyUserAndRegister(String token)
     {
         var username = extractUsername(token);
@@ -218,7 +255,7 @@ public class AuthenticationService
      * Register all users with given RegisterRequest list parameter.
      *
      * @param requests represent the RegisterRequest list.
-     * @return Iterable<User>
+     * @return Users.
      */
     public Iterable<User> registerAll(List<RegisterRequest> requests)
     {
@@ -351,6 +388,13 @@ public class AuthenticationService
         return JwtUtil.isTokenValid(token, user.getObject().username());
     }
 
+
+    /**
+     * Find user by username.
+     *
+     * @param username represent the username.
+     * @return User.
+     */
     public Optional<User> findUserByUsername(String username)
     {
         return m_serviceHelper.findByUsername(username);

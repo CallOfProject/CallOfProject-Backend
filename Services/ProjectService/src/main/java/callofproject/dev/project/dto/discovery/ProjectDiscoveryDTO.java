@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * ProjectOverviewDTO
+ */
 public record ProjectDiscoveryDTO(
         @JsonProperty("project_id")
         UUID projectId,

@@ -8,6 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * ProjectOverviewDTO
+ */
 public record ProjectOverviewDTO(
         @JsonProperty("project_id")
         String projectId,

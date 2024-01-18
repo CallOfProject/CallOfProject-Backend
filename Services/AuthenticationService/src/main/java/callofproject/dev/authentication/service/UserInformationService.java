@@ -23,6 +23,9 @@ import static callofproject.dev.data.common.util.UtilityMethod.convert;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static java.util.Optional.of;
 
+/**
+ * Service class for managing user information, including education, experience, courses, links, and more.
+ */
 @Service
 @Lazy
 public class UserInformationService
@@ -32,6 +35,14 @@ public class UserInformationService
     private final IEnvironmentClientService m_environmentClient;
     private final MapperConfiguration m_mapperConfig;
 
+    /**
+     * Constructs a new UserInformationService with the given dependencies.
+     *
+     * @param serviceHelper      The UserManagementServiceHelper to be used by this service.
+     * @param matchServiceHelper The MatchServiceHelper to be used by this service.
+     * @param environmentClient  The IEnvironmentClientService to interact with the environment.
+     * @param mapperConfig       The MapperConfiguration for mapping DTOs to entities.
+     */
     public UserInformationService(UserManagementServiceHelper serviceHelper, MatchServiceHelper matchServiceHelper,
                                   IEnvironmentClientService environmentClient, MapperConfiguration mapperConfig)
     {
@@ -148,6 +159,14 @@ public class UserInformationService
     //------------------------------------------------------------------------------------------------------------------
     //####################################################-CALLBACKS-###################################################
     //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Retrieves the user profile for the given user ID.
+     *
+     * @param userId The UUID of the user whose profile is being retrieved.
+     * @return The UserProfile associated with the given user ID.
+     * @throws DataServiceException if the user profile does not exist.
+     */
     private UserProfile getUserProfile(UUID userId)
     {
         var userProfile = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(userId);
@@ -158,6 +177,13 @@ public class UserInformationService
         return userProfile.get();
     }
 
+    /**
+     * Adds or updates educational information for a user based on the provided EducationUpsertDTO.
+     *
+     * @param dto The DTO containing education information to be upserted.
+     * @return A ResponseMessage indicating the success of the education upsert operation.
+     * @throws DataServiceException if the user or education information does not exist.
+     */
     private ResponseMessage<Object> upsertEducationCallback(EducationUpsertDTO dto)
     {
         // save to environment client if not exists
@@ -191,6 +217,13 @@ public class UserInformationService
         return new ResponseMessage<>("Education upserted successfully!", 200, savedEducation);
     }
 
+    /**
+     * Adds or updates professional experience for a user based on the provided ExperienceUpsertDTO.
+     *
+     * @param dto The DTO containing experience information to be upserted.
+     * @return A ResponseMessage indicating the success of the experience upsert operation.
+     * @throws DataServiceException if the user or experience information does not exist.
+     */
     private ResponseMessage<Object> upsertExperienceCallback(ExperienceUpsertDTO dto)
     {
         // save to environment client if not exists
@@ -223,6 +256,13 @@ public class UserInformationService
         return new ResponseMessage<>("Experience upserted successfully!", 200, savedExperience);
     }
 
+    /**
+     * Adds or updates course information for a user based on the provided CourseUpsertDTO.
+     *
+     * @param dto The DTO containing course information to be upserted.
+     * @return A ResponseMessage indicating the success of the course upsert operation.
+     * @throws DataServiceException if the user or course information does not exist.
+     */
     private ResponseMessage<Object> upsertCourseCallback(CourseUpsertDTO dto)
     {
         // save to environment client if not exists
@@ -267,6 +307,12 @@ public class UserInformationService
         return new ResponseMessage<>("Course upserted successfully!", 200, savedCourse);
     }
 
+    /**
+     * Adds or updates a link for a user based on the provided LinkUpsertDTO.
+     *
+     * @param dto The DTO containing link information to be upserted.
+     * @return A ResponseMessage indicating the success of the link upsert operation.
+     */
     private ResponseMessage<Object> upsertLinkCallback(LinkUpsertDTO dto)
     {
         var user = getUserProfile(dto.userId());
@@ -280,6 +326,14 @@ public class UserInformationService
         return new ResponseMessage<>("Link upserted successfully!", 200, upsertedLink);
     }
 
+    /**
+     * Removes an education entry for a user based on provided identifiers.
+     *
+     * @param userId The UUID of the user.
+     * @param id     The UUID of the education entry to be removed.
+     * @return A ResponseMessage indicating the success of the education removal operation.
+     * @throws DataServiceException if the education entry does not exist.
+     */
     private ResponseMessage<Object> removeEducationCallback(UUID userId, UUID id)
     {
         var userProfile = getUserProfile(userId);
@@ -300,6 +354,14 @@ public class UserInformationService
         return new ResponseMessage<>("Education removed successfully!", 200, true);
     }
 
+    /**
+     * Removes a course entry for a user based on provided identifiers.
+     *
+     * @param userId The UUID of the user.
+     * @param id     The UUID of the course entry to be removed.
+     * @return A ResponseMessage indicating the success of the course removal operation.
+     * @throws DataServiceException if the course entry does not exist.
+     */
     private ResponseMessage<Object> removeCourseCallback(UUID userId, UUID id)
     {
         var userProfile = getUserProfile(userId);
@@ -320,6 +382,14 @@ public class UserInformationService
         return new ResponseMessage<>("Course removed successfully!", 200, true);
     }
 
+    /**
+     * Removes an experience entry for a user based on provided identifiers.
+     *
+     * @param userId The UUID of the user.
+     * @param id     The UUID of the experience entry to be removed.
+     * @return A ResponseMessage indicating the success of the experience removal operation.
+     * @throws DataServiceException if the experience entry does not exist.
+     */
     private ResponseMessage<Object> removeExperienceCallback(UUID userId, UUID id)
     {
         var userProfile = getUserProfile(userId);
@@ -340,6 +410,14 @@ public class UserInformationService
         return new ResponseMessage<>("Experience removed successfully!", 200, true);
     }
 
+    /**
+     * Removes a link for a user based on provided identifiers.
+     *
+     * @param userId The UUID of the user.
+     * @param id     The unique ID of the link to be removed.
+     * @return A ResponseMessage indicating the success of the link removal operation.
+     * @throws DataServiceException if the link does not exist.
+     */
     private ResponseMessage<Object> removeLinkCallback(UUID userId, long id)
     {
         var userProfile = getUserProfile(userId);
@@ -360,6 +438,14 @@ public class UserInformationService
         return new ResponseMessage<>("Link removed successfully!", 200, true);
     }
 
+    /**
+     * Removes a course organization entry for a user based on provided identifiers.
+     *
+     * @param userId The UUID of the user.
+     * @param id     The UUID of the course organization entry to be removed.
+     * @return A ResponseMessage indicating the success of the course organization removal operation.
+     * @throws DataServiceException if the course organization entry does not exist.
+     */
     private ResponseMessage<Object> removeCourseOrganizationCallback(UUID userId, UUID id)
     {
         var userProfile = getUserProfile(userId);

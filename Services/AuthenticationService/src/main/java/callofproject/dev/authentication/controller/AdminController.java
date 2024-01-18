@@ -13,6 +13,12 @@ import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
+
+/**
+ * Authentication Controller
+ * Copyleft (C), 2023, Cal-of-Project-Teams Developers.
+ * All Rights free.
+ */
 @RestController
 @RequestMapping("api/auth/admin")
 @SecurityRequirement(name = "Authorization")
@@ -20,6 +26,13 @@ public class AdminController
 {
     private final AdminService m_adminService;
 
+
+    /**
+     * Constructor for the AdminController class.
+     * It is used to inject dependencies into the controller.
+     *
+     * @param adminService The AdminService object to be injected.
+     */
     public AdminController(AdminService adminService)
     {
         m_adminService = adminService;

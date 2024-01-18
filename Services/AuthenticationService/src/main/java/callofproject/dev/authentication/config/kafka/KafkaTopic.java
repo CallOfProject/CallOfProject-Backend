@@ -7,6 +7,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.stereotype.Component;
 
+/**
+ * KafkaTopic
+ */
 @Component
 public class KafkaTopic
 {
@@ -15,6 +18,13 @@ public class KafkaTopic
 
     @Value("${spring.kafka.email-topic-name}")
     private String m_emailTopicName;
+
+    /**
+     * Constructs a new KafkaTopic.
+     */
+    public KafkaTopic()
+    {
+    }
 
     /**
      * Create a new topic.
@@ -28,6 +38,12 @@ public class KafkaTopic
         return TopicBuilder.name(m_authenticationTopic).build();
     }
 
+
+    /**
+     * Create a new topic.
+     *
+     * @return The topic.
+     */
     @Bean("emailTopic")
     public NewTopic provideEmailTopic()
     {

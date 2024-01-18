@@ -28,6 +28,10 @@ import static callofproject.dev.repository.authentication.BeanName.USER_MANAGEME
 import static callofproject.dev.util.stream.StreamUtil.toListConcurrent;
 import static java.lang.String.format;
 
+/**
+ * Service class for managing users.
+ * It implements the IUserManagementService interface.
+ */
 @Service(USER_MANAGEMENT_SERVICE)
 @Lazy
 public class UserManagementService
@@ -36,6 +40,14 @@ public class UserManagementService
     private final UserManagementServiceHelper m_serviceHelper;
     private final MapperConfiguration m_mapperConfig;
 
+    /**
+     * Constructor for the UserManagementService class.
+     * It is used to inject dependencies into the service.
+     *
+     * @param serviceHelper The UserManagementServiceHelper object to be injected.
+     * @param mapperConfig  The MapperConfiguration object to be injected.
+     * @param userProducer  The KafkaProducer object to be injected.
+     */
     public UserManagementService(@Qualifier(USER_MANAGEMENT_DAL_BEAN) UserManagementServiceHelper serviceHelper,
                                  @Qualifier(MAPPER_CONFIG_BEAN) MapperConfiguration mapperConfig,
                                  KafkaProducer userProducer)
@@ -61,6 +73,12 @@ public class UserManagementService
         return result;
     }
 
+
+    /**
+     * publish user to kafka
+     *
+     * @param uuid represent the uuid
+     */
     private void PublishUser(UUID uuid)
     {
         var user = getUserIfExists(uuid);
@@ -155,6 +173,14 @@ public class UserManagementService
     //------------------------------------------------------------------------------------------------------------------
     //####################################################-CALLBACKS-###################################################
     //------------------------------------------------------------------------------------------------------------------
+
+
+    /**
+     * Save User with given dto class.
+     *
+     * @param userDTO represent the dto class
+     * @return UserSaveDTO.
+     */
     public ResponseMessage<UserSaveDTO> saveUserCallback(UserSignUpRequestDTO userDTO)
     {
         var user = m_mapperConfig.userMapper.toUser(userDTO);
@@ -180,6 +206,13 @@ public class UserManagementService
         return new ResponseMessage<>("User saved successfully!", 200, new UserSaveDTO(token, refreshToken, true, savedUser.getUserId()));
     }
 
+
+    /**
+     * Find user with given username
+     *
+     * @param username represent the username.
+     * @return UserDTO class.
+     */
     public ResponseMessage<UserDTO> findUserByUsernameCallback(String username)
     {
         var user = doForDataService(() -> m_serviceHelper.getUserServiceHelper().findByUsername(username),
@@ -190,6 +223,13 @@ public class UserManagementService
 
     }
 
+
+    /**
+     * Find User with given username but returns the user entity.
+     *
+     * @param username represent the username.
+     * @return User class.
+     */
     public UserResponseDTO<User> findUserByUsernameForAuthenticationServiceCallback(String username)
     {
         var user = m_serviceHelper.getUserServiceHelper().findByUsername(username);
@@ -200,6 +240,14 @@ public class UserManagementService
         return new UserResponseDTO<User>(true, user.get());
     }
 
+
+    /**
+     * Find all users with given word and page.
+     *
+     * @param page represent the page.
+     * @param word represent the containing word.
+     * @return UsersDTO class.
+     */
     public MultipleResponseMessagePageable<Object> findAllUsersPageableByContainsWordCallback(int page, String word)
     {
         var userListPageable = m_serviceHelper.getUserServiceHelper().findUsersByUsernameContainsIgnoreCase(word, page);
@@ -211,6 +259,13 @@ public class UserManagementService
         return new MultipleResponseMessagePageable<>(userListPageable.getTotalPages(), page, dtoList.users().size(), msg, dtoList);
     }
 
+
+    /**
+     * Update user profile with given dto class.
+     *
+     * @param user represent the entity class
+     * @return MessageResponseDTO.
+     */
     private String findTopRole(User user)
     {
         var role = RoleEnum.ROLE_USER.getRole();
@@ -228,6 +283,13 @@ public class UserManagementService
         return role;
     }
 
+
+    /**
+     * Update user profile with given dto class.
+     *
+     * @param dto represent the dto class
+     * @return MessageResponseDTO.
+     */
     private ResponseMessage<Object> upsertUserProfileCallback(UserProfileUpdateDTO dto)
     {
         var user = getUserIfExists(dto.userId());
@@ -246,6 +308,13 @@ public class UserManagementService
         return new ResponseMessage<>("User profile updated successfully!", 200, getUserProfile(user));
     }
 
+
+    /**
+     * Find user profile with given user id.
+     *
+     * @param userId represent the user id.
+     * @return UserProfileDTO class.
+     */
     private ResponseMessage<Object> findUserProfileByUserIdCallback(UUID userId)
     {
         var profileMap = getUserProfile(getUserIfExists(userId));
@@ -253,6 +322,13 @@ public class UserManagementService
         return new ResponseMessage<>("User profile found!", 200, profileMap);
     }
 
+
+    /**
+     * Find user profile with given username.
+     *
+     * @param username represent the username.
+     * @return UserProfileDTO class.
+     */
     private ResponseMessage<Object> findUserProfileByUserUsernameCallback(String username)
     {
         var user = m_serviceHelper.getUserServiceHelper().findByUsername(username);
@@ -265,6 +341,13 @@ public class UserManagementService
         return new ResponseMessage<>("User profile found!", 200, profileMap);
     }
 
+
+    /**
+     * Find user and his/her profile with given id.
+     *
+     * @param uuid represent the user id.
+     * @return UserWithProfileDTO class.
+     */
     private ResponseMessage<Object> findUserWithProfileCallback(UUID uuid)
     {
         var user = getUserIfExists(uuid);
@@ -277,6 +360,13 @@ public class UserManagementService
     //------------------------------------------------------------------------------------------------------------------
     //##################################################-HELPER METHODS-################################################
     //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Get user profile with given user.
+     *
+     * @param user represent the user.
+     * @return UserProfileDTO class.
+     */
     private UserProfileDTO getUserProfile(User user)
     {
         var userProfile = user.getUserProfile();
@@ -294,6 +384,13 @@ public class UserManagementService
         return m_mapperConfig.userProfileMapper.toUserProfileDTO(userProfile, educations, experiences, courses, links, userRate);
     }
 
+
+    /**
+     * Get user with given user id.
+     *
+     * @param userId represent the user id.
+     * @return User class.
+     */
     public User getUserIfExists(UUID userId)
     {
         var user = m_serviceHelper.getUserServiceHelper().findById(userId);
@@ -304,6 +401,13 @@ public class UserManagementService
         return user.get();
     }
 
+
+    /**
+     * Save Users with given dto class.
+     *
+     * @param userDTOs represent the dto class
+     * @return UserSaveDTO.
+     */
     public Iterable<User> saveUsers(List<UserSignUpRequestDTO> userDTOs) throws DataServiceException
     {
         try

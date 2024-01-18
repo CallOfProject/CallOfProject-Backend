@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * StorageConfig
+ */
 @Configuration
 public class StorageConfig
 {
@@ -17,6 +20,13 @@ public class StorageConfig
     private String m_secretKey;
     @Value("${cloud.aws.region.static}")
     private String m_region;
+
+    /**
+     * Constructs a new StorageConfig.
+     */
+    public StorageConfig()
+    {
+    }
 
     @Bean
     public AmazonS3 provideS3Client()

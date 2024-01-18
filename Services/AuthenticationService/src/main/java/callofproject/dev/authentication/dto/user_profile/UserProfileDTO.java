@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+/**
+ * Data Transfer Object for a user profile.
+ */
 public class UserProfileDTO
 {
     public String cv;
@@ -17,4 +20,11 @@ public class UserProfileDTO
     public List<EducationDTO> educations;
     public List<ExperienceDTO> experiences;
     public List<LinkDTO> links;
+
+    /**
+     * Constructor.
+     */
+    public UserProfileDTO()
+    {
+    }
 }

@@ -16,6 +16,12 @@ import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
+
+/**
+ * Authentication Controller
+ * Copyleft (C), 2023, Cal-of-Project-Teams Developers.
+ * All Rights free.
+ */
 @RestController
 @RequestMapping("api/auth/user-info")
 @SecurityRequirement(name = "Authorization")
@@ -23,6 +29,13 @@ public class UserInformationController
 {
     private final UserInformationService m_service;
 
+
+    /**
+     * Constructor for the UserInformationController class.
+     * It is used to inject dependencies into the controller.
+     *
+     * @param service The UserInformationService object to be injected.
+     */
     public UserInformationController(UserInformationService service)
     {
         m_service = service;

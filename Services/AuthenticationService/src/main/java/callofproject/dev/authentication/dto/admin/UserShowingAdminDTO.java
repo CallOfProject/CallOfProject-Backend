@@ -9,6 +9,10 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
+
+/**
+ * Data Transfer Object for a course.
+ */
 public record UserShowingAdminDTO(String username,
 
                                   @JsonProperty("user_id")

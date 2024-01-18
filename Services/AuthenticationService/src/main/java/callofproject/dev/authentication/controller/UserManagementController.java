@@ -14,6 +14,12 @@ import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
+
+/**
+ * Authentication Controller
+ * Copyleft (C), 2023, Cal-of-Project-Teams Developers.
+ * All Rights free.
+ */
 @RequestMapping("api/auth/users")
 @RestController
 @SecurityRequirement(name = "Authorization")
@@ -21,6 +27,13 @@ public class UserManagementController
 {
     private final UserManagementService m_service;
 
+
+    /**
+     * Constructor for the UserManagementController class.
+     * It is used to inject dependencies into the controller.
+     *
+     * @param service The UserManagementService object to be injected.
+     */
     public UserManagementController(UserManagementService service)
     {
         m_service = service;

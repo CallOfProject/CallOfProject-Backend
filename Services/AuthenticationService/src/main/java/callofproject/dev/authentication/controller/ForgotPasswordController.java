@@ -10,12 +10,25 @@ import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
+
+/**
+ * Authentication Controller
+ * Copyleft (C), 2023, Cal-of-Project-Teams Developers.
+ * All Rights free.
+ */
 @RequestMapping("api/auth/forgot-password")
 @RestController
 public class ForgotPasswordController
 {
     private final ForgotPasswordService m_forgotPasswordService;
 
+
+    /**
+     * Constructor for the AuthenticationController class.
+     * It is used to inject dependencies into the controller.
+     *
+     * @param forgotPasswordService The AuthenticationService object to be injected.
+     */
     public ForgotPasswordController(ForgotPasswordService forgotPasswordService)
     {
         m_forgotPasswordService = forgotPasswordService;

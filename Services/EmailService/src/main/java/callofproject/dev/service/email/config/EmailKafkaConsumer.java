@@ -16,8 +16,9 @@ public class EmailKafkaConsumer
 
 
     /**
+     * Constructor.
+     *
      * @param emailService represents the email service
-     * @implNote This constructor is used for dependency injection
      */
     public EmailKafkaConsumer(EmailService emailService)
     {
@@ -25,8 +26,9 @@ public class EmailKafkaConsumer
     }
 
     /**
+     * Listen to the email topic.
+     *
      * @param emailTopic represents the email topic
-     * @implNote This method is used for listening to the email topic
      */
     @KafkaListener(topics = "${spring.kafka.email-topic-name}", groupId = "${spring.kafka.consumer.group-id}")
     public void listenEmailTopic(EmailTopic emailTopic)

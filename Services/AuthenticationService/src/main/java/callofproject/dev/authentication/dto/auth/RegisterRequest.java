@@ -10,6 +10,10 @@ import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
 
+
+/**
+ * Data Transfer Object for a register request.
+ */
 public class RegisterRequest
 {
     @JsonProperty("first_name")
@@ -39,10 +43,25 @@ public class RegisterRequest
     private LocalDate birth_date;
 
 
+    /**
+     * Constructor.
+     */
     public RegisterRequest()
     {
     }
 
+
+    /**
+     * Constructor.
+     *
+     * @param firstName  The first name.
+     * @param lastName   The last name.
+     * @param middleName The middle name.
+     * @param username   The username.
+     * @param email      The email.
+     * @param password   The password.
+     * @param birthDate  The birth date.
+     */
     public RegisterRequest(String firstName, String lastName, String middleName, String username, String email, String password, LocalDate birthDate)
     {
         first_name = firstName;
@@ -54,71 +73,155 @@ public class RegisterRequest
         birth_date = birthDate;
     }
 
+
+    /**
+     * Gets the first name.
+     *
+     * @return The first name.
+     */
     public String getFirst_name()
     {
         return first_name;
     }
 
+
+    /**
+     * Sets the first name.
+     *
+     * @param first_name The first name.
+     */
     public void setFirst_name(String first_name)
     {
         this.first_name = first_name;
     }
 
+
+    /**
+     * Gets the last name.
+     *
+     * @return The last name.
+     */
     public String getLast_name()
     {
         return last_name;
     }
 
+
+    /**
+     * Sets the last name.
+     *
+     * @param last_name The last name.
+     */
     public void setLast_name(String last_name)
     {
         this.last_name = last_name;
     }
 
+
+    /**
+     * Gets the middle name.
+     *
+     * @return The middle name.
+     */
     public String getMiddle_name()
     {
         return middle_name;
     }
 
+
+    /**
+     * Sets the middle name.
+     *
+     * @param middle_name The middle name.
+     */
     public void setMiddle_name(String middle_name)
     {
         this.middle_name = middle_name;
     }
 
+
+    /**
+     * Gets the username.
+     *
+     * @return The username.
+     */
     public String getUsername()
     {
         return username;
     }
 
+
+    /**
+     * Sets the username.
+     *
+     * @param username The username.
+     */
     public void setUsername(String username)
     {
         this.username = username;
     }
 
+
+    /**
+     * Gets the email.
+     *
+     * @return The email.
+     */
     public String getEmail()
     {
         return email;
     }
 
+
+    /**
+     * Sets the email.
+     *
+     * @param email The email.
+     */
     public void setEmail(String email)
     {
         this.email = email;
     }
 
+
+    /**
+     * Gets the password.
+     *
+     * @return The password.
+     */
     public String getPassword()
     {
         return password;
     }
 
+
+    /**
+     * Sets the password.
+     *
+     * @param password The password.
+     */
     public void setPassword(String password)
     {
         this.password = password;
     }
 
+
+    /**
+     * Gets the birth date.
+     *
+     * @return The birth date.
+     */
     public LocalDate getBirth_date()
     {
         return birth_date;
     }
 
+
+    /**
+     * Sets the birth date.
+     *
+     * @param birth_date The birth date.
+     */
     public void setBirth_date(LocalDate birth_date)
     {
         this.birth_date = birth_date;

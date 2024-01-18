@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+/**
+ * ProjectOverviewsDTO
+ */
 public record ProjectOverviewsDTO(
         @JsonProperty("project_overviews")
         List<ProjectOverviewDTO> projectOverviews)

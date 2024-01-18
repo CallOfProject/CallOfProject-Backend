@@ -1,7 +1,13 @@
 package callofproject.dev.project.util;
 
+/**
+ * Utility class for policy constants.
+ */
 public final class Policy
 {
+    /**
+     * Prevents instantiation of this utility class.
+     */
     private Policy()
     {
     }

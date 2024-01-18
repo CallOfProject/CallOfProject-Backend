@@ -4,7 +4,6 @@ import callofproject.dev.library.exception.util.CopDataUtil;
 import callofproject.dev.project.dto.ProjectSaveDTO;
 import callofproject.dev.project.dto.ProjectUpdateDTO;
 import callofproject.dev.project.service.IProjectService;
-import callofproject.dev.project.service.ProjectService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -18,6 +17,10 @@ import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
+/**
+ * This class represents a controller for managing project-related operations.
+ * It handles HTTP requests related to projects and interacts with the ProjectService.
+ */
 @RestController
 @RequestMapping("api/project/project")
 @SecurityRequirement(name = "Authorization")
@@ -26,6 +29,12 @@ public class ProjectController
     private final IProjectService m_projectService;
     private final ObjectMapper m_objectMapper;
 
+    /**
+     * Constructs a new ProjectController with the provided dependencies.
+     *
+     * @param projectService The IProjectService instance used for handling project-related operations.
+     * @param objectMapper   The ObjectMapper instance used for JSON serialization and deserialization.
+     */
     public ProjectController(IProjectService projectService, ObjectMapper objectMapper)
     {
         m_projectService = projectService;
@@ -33,11 +42,10 @@ public class ProjectController
     }
 
     /**
-     * Save project
-     * Projeyi kaydeder.
+     * Handles the HTTP POST request to save a new project.
      *
-     * @param saveDTO is projectSaveDTO
-     * @return if success ProjectDTO else return Error Message
+     * @param saveDTO The ProjectSaveDTO containing project details to be saved.
+     * @return ResponseEntity with the result of the save operation as ProjectDTO, or an error message in case of failure.
      */
     @PostMapping("/create")
     public ResponseEntity<Object> save(@RequestBody @Valid ProjectSaveDTO saveDTO)
@@ -45,6 +53,13 @@ public class ProjectController
         return subscribe(() -> ok(m_projectService.saveProject(saveDTO)), msg -> internalServerError().body(msg.getMessage()));
     }
 
+    /**
+     * Handles the HTTP POST request to save a new project using a different version (V2) with a file attachment.
+     *
+     * @param projectSaveDTOJson The JSON representation of the ProjectSaveDTO containing project details.
+     * @param file               The file attachment, if any.
+     * @return ResponseEntity with the result of the save operation as ProjectDTO, or an error message in case of failure.
+     */
     @PostMapping("/create/v2")
     public ResponseEntity<Object> saveV2(@RequestParam("projectSaveDTO") String projectSaveDTOJson, @RequestParam(value = "file") MultipartFile file)
     {
@@ -53,17 +68,25 @@ public class ProjectController
     }
 
     /**
-     * Update project
-     * Projeyi günceller.
+     * Handles the HTTP PUT request to update an existing project.
      *
-     * @param dto is projectUpdateDTO
-     * @return if success ProjectDTO else return Error Message
+     * @param dto The ProjectUpdateDTO containing project details to be updated.
+     * @return ResponseEntity with the result of the update operation as ProjectDTO, or an error message in case of failure.
      */
     @PutMapping("/update")
     public ResponseEntity<Object> updateProject(@RequestBody @Valid ProjectUpdateDTO dto)
     {
         return subscribe(() -> ok(m_projectService.updateProject(dto)), msg -> internalServerError().body(msg.getMessage()));
     }
+
+
+    /**
+     * Handles the HTTP POST request to update an existing project using a different version (V2) with a file attachment.
+     *
+     * @param projectUpdateDTO The JSON representation of the ProjectUpdateDTO containing updated project details.
+     * @param file             The file attachment, if any.
+     * @return ResponseEntity with the result of the update operation as ProjectDTO, or an error message in case of failure.
+     */
 
     @PostMapping("/update/v2")
     public ResponseEntity<Object> updateProjectV2(@RequestParam("projectUpdateDTO") String projectUpdateDTO, @RequestParam(value = "file", required = false) MultipartFile file)
@@ -74,12 +97,11 @@ public class ProjectController
     }
 
     /**
-     * Find all project by user id who is participant in project.
-     * Kullanıcının katılımcı olduğu projeleri sayfa sayfa getirir.
+     * Handles the HTTP POST request to find all projects in which a user is a participant, paginated by page number.
      *
-     * @param userId is user id
-     * @param page   is page number
-     * @return if success ProjectDTO else return Error Message
+     * @param userId The unique identifier (UUID) of the user.
+     * @param page   The page number for paginated results.
+     * @return ResponseEntity containing ProjectDTO if successful, or an error message in case of failure.
      */
     @PostMapping("/participant/user-id")
     public ResponseEntity<Object> findAllParticipantProjectByUserId(@RequestParam("uid") String userId, @RequestParam("p") int page)
@@ -90,12 +112,11 @@ public class ProjectController
 
 
     /**
-     * Find all owner of project by given user id and page
-     * Kullanıcının sahip olduğu projeleri sayfa sayfa getirir.
+     * Handles the HTTP GET request to find all projects owned by a user, paginated by page number.
      *
-     * @param userId is user id
-     * @param page   is page number
-     * @return if success ProjectDTO else return Error Message
+     * @param userId The unique identifier (UUID) of the user.
+     * @param page   The page number for paginated results.
+     * @return ResponseEntity containing ProjectDTO if successful, or an error message in case of failure.
      */
     @GetMapping("find/all/owner-id")
     public ResponseEntity<Object> findAllOwnerProjectsByUserId(@RequestParam("uid") UUID userId, @RequestParam("p") int page)
@@ -105,12 +126,11 @@ public class ProjectController
     }
 
     /**
-     * Find all participant of project by given username and page
-     * Kullanıcının sahip olduğu projeleri sayfa sayfa getirir.
+     * Handles the HTTP GET request to find all projects owned by a user with the given username, paginated by page number.
      *
-     * @param username is username
-     * @param page     is page number
-     * @return if success ProjectDTO else return Error Message
+     * @param username The username of the user.
+     * @param page     The page number for paginated results.
+     * @return ResponseEntity containing ProjectDTO if successful, or an error message in case of failure.
      */
     @GetMapping("find/all/owner-username")
     public ResponseEntity<Object> findAllOwnerProjectsByUsername(String username, int page)
@@ -120,11 +140,10 @@ public class ProjectController
     }
 
     /**
-     * Find project Overview by project id
-     * Projenin genel bilgilerini getirir.
+     * Handles the HTTP GET request to find an overview of a project by its unique identifier (UUID).
      *
-     * @param projectId is project id
-     * @return if success ProjectDTO else return Error Message
+     * @param projectId The unique identifier (UUID) of the project.
+     * @return ResponseEntity containing ProjectDTO if successful, or an error message in case of failure.
      */
     @GetMapping("find/overview")
     public ResponseEntity<Object> findProjectOverview(@RequestParam("pid") UUID projectId)
@@ -134,12 +153,11 @@ public class ProjectController
     }
 
     /**
-     * Find project by view of owner
-     * Projenin sahibi tarafından görüntülenmesini sağlar.
+     * Handles the HTTP GET request to find a project from the owner's perspective by user and project IDs.
      *
-     * @param userId    is user id
-     * @param projectId is project id
-     * @return if success ProjectDetailDTO else return Error Message
+     * @param userId    The unique identifier (UUID) of the user.
+     * @param projectId The unique identifier (UUID) of the project.
+     * @return ResponseEntity containing ProjectDetailDTO if successful, or an error message in case of failure.
      */
     @GetMapping("find/detail/owner")
     public ResponseEntity<Object> findProjectOwnerView(@RequestParam("uid") UUID userId, @RequestParam("pid") UUID projectId)
@@ -149,10 +167,10 @@ public class ProjectController
     }
 
     /**
-     * Find projects by view of discovery
-     * Projelerin keşif görünümünü getirir.
+     * Handles the HTTP GET request to find all projects in a discovery view, paginated by page number.
      *
-     * @return if success ProjectsDiscoveryDTO else return Error Message
+     * @param page The page number for paginated results.
+     * @return ResponseEntity containing ProjectsDiscoveryDTO if successful, or an error message in case of failure.
      */
     @GetMapping("discovery/all")
     public ResponseEntity<Object> findAllProjectDiscoveryView(@RequestParam("p") int page)
@@ -161,11 +179,11 @@ public class ProjectController
     }
 
     /**
-     * Send Project Participant Request
+     * Handles the HTTP POST request to send a project participant request.
      *
-     * @param projectId is project id
-     * @param userId    is user id
-     * @return if success ProjectDTO else return Error Message
+     * @param projectId The unique identifier (UUID) of the project.
+     * @param userId    The unique identifier (UUID) of the user sending the request.
+     * @return ResponseEntity containing ProjectDTO if successful, or an error message in case of failure.
      */
     @PostMapping("/participant/request")
     public ResponseEntity<Object> addProjectJoinRequest(@RequestParam("pid") UUID projectId, @RequestParam("uid") UUID userId)
@@ -174,6 +192,12 @@ public class ProjectController
                 msg -> internalServerError().body(msg.getMessage()));
     }
 
+    /**
+     * Handles the HTTP GET request to retrieve detailed information about a specific project.
+     *
+     * @param projectId The unique identifier (UUID) of the project for which details are requested.
+     * @return ResponseEntity containing detailed project information if successful, or an error message in case of failure.
+     */
     @GetMapping("/find/detail")
     public ResponseEntity<Object> findProjectDetail(@RequestParam("pid") UUID projectId)
     {
@@ -182,11 +206,11 @@ public class ProjectController
     }
 
     /**
-     * Find project detail if user has permission
+     * Handles the HTTP GET request to find detailed information about a specific project if the user has permission.
      *
-     * @param projectId is project id
-     * @param userId    is user id
-     * @return if success ProjectDetailDTO else return Error Message
+     * @param projectId The unique identifier (UUID) of the project for which details are requested.
+     * @param userId    The unique identifier (UUID) of the user making the request.
+     * @return ResponseEntity containing detailed project information if the user has permission, or an error message in case of failure or lack of permission.
      */
     @GetMapping("/find/project-detail")
     public ResponseEntity<Object> findProjectDetailIfHasPermission(@RequestParam("pid") UUID projectId, @RequestParam("uid") UUID userId)

@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Data Transfer Object for a user.
+ */
 public record UserKafkaDTO(
         @JsonProperty("user_id")
         UUID userId,

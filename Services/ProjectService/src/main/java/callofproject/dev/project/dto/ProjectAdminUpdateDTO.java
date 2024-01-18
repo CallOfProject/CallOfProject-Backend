@@ -9,6 +9,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * ProjectAdminUpdateDTO
+ */
 public record ProjectAdminUpdateDTO(
         @JsonProperty("user_id")
         @NotNull(message = "user id cannot be empty")

@@ -31,6 +31,10 @@ import static callofproject.dev.util.stream.StreamUtil.toList;
 import static callofproject.dev.util.stream.StreamUtil.toStream;
 import static java.lang.String.format;
 
+/**
+ * Service class for project owner-related operations.
+ * It implements the IProjectOwnerService interface.
+ */
 @Service
 @Lazy
 public class ProjectOwnerService implements IProjectOwnerService
@@ -45,6 +49,17 @@ public class ProjectOwnerService implements IProjectOwnerService
     @Value("${notification.request.approve}")
     private String m_approvalLink;
 
+    /**
+     * Constructor for ProjectOwnerService.
+     *
+     * @param projectServiceHelper      The ProjectServiceHelper to be injected.
+     * @param projectTagServiceHelper   The ProjectTagServiceHelper to be injected.
+     * @param objectMapper              The ObjectMapper to be injected.
+     * @param kafkaProducer             The KafkaProducer to be injected.
+     * @param projectMapper             The IProjectMapper to be injected.
+     * @param projectParticipantMapper  The IProjectParticipantMapper to be injected.
+     * @param notificationServiceHelper The NotificationServiceHelper to be injected.
+     */
     public ProjectOwnerService(ProjectServiceHelper projectServiceHelper, ProjectTagServiceHelper projectTagServiceHelper, ObjectMapper objectMapper, KafkaProducer kafkaProducer, IProjectMapper projectMapper, IProjectParticipantMapper projectParticipantMapper, NotificationServiceHelper notificationServiceHelper)
     {
         m_projectServiceHelper = projectServiceHelper;
@@ -58,10 +73,10 @@ public class ProjectOwnerService implements IProjectOwnerService
 
 
     /**
-     * Add participant with given project id and user id.
+     * Adds a participant to a project.
      *
-     * @param dto represent the SaveProjectParticipantDTO class
-     * @return ResponseMessage<Object>
+     * @param dto Data Transfer Object containing details for saving a project participant.
+     * @return A ResponseMessage containing a Boolean result of the operation.
      */
     @Override
     public ResponseMessage<Boolean> addParticipant(SaveProjectParticipantDTO dto)
@@ -76,11 +91,11 @@ public class ProjectOwnerService implements IProjectOwnerService
     }
 
     /**
-     * Remove participant with given project id and user id.
+     * Removes a participant from a project.
      *
-     * @param projectId represent the project id
-     * @param userId    represent the user id
-     * @return ResponseMessage.
+     * @param projectId The UUID of the project.
+     * @param userId    The UUID of the user to be removed.
+     * @return A ResponseMessage containing the result of the operation.
      */
     @Override
     public ResponseMessage<Object> removeParticipant(UUID projectId, UUID userId)
@@ -90,9 +105,10 @@ public class ProjectOwnerService implements IProjectOwnerService
 
 
     /**
-     * Approve or Reject Project Participant Request
+     * Approves a participant's request to join a project.
      *
-     * @return if success ProjectDTO else return Error Message
+     * @param requestDTO Data Transfer Object containing the participant request details.
+     * @return A ResponseMessage containing the result of the approval operation.
      */
     @Override
     public ResponseMessage<Object> approveParticipantRequest(ParticipantRequestDTO requestDTO)
@@ -114,11 +130,11 @@ public class ProjectOwnerService implements IProjectOwnerService
     }
 
     /**
-     * Finish project with given project id.
+     * Marks a project as finished.
      *
-     * @param userId    represent the user id
-     * @param projectId represent the project id
-     * @return ResponseMessage.
+     * @param userId    The UUID of the user who is finishing the project.
+     * @param projectId The UUID of the project to be finished.
+     * @return A ResponseMessage containing the result of the finish operation.
      */
     @Override
     public ResponseMessage<Object> finishProject(UUID userId, UUID projectId)
@@ -126,18 +142,39 @@ public class ProjectOwnerService implements IProjectOwnerService
         return doForDataService(() -> finishProjectCallback(userId, projectId), "ProjectService::finishProject");
     }
 
+    /**
+     * Changes the status of a project.
+     *
+     * @param userId        The UUID of the user changing the project status.
+     * @param projectId     The UUID of the project whose status is being changed.
+     * @param projectStatus The new status of the project.
+     * @return A ResponseMessage containing the result of the status change.
+     */
     @Override
     public ResponseMessage<Object> changeProjectStatus(UUID userId, UUID projectId, EProjectStatus projectStatus)
     {
         return doForDataService(() -> changeProjectStatusCallback(userId, projectId, projectStatus), "ProjectService::changeProjectStatus");
     }
 
+    /**
+     * Removes a project.
+     *
+     * @param userId    The UUID of the user removing the project.
+     * @param projectId The UUID of the project to be removed.
+     * @return A ResponseMessage containing the result of the remove operation.
+     */
     @Override
     public ResponseMessage<Object> removeProject(UUID userId, UUID projectId)
     {
         return doForDataService(() -> removeProjectCallback(userId, projectId), "ProjectService::removeProject");
     }
 
+    /**
+     * Callback for approving a participant's request to join a project.
+     *
+     * @param requestDTO Data Transfer Object containing the participant request details.
+     * @return A ResponseMessage containing the result of the approval operation callback.
+     */
     @Override
     public ResponseMessage<Object> approveParticipantRequestCallback(ParticipantRequestDTO requestDTO)
     {
@@ -168,6 +205,13 @@ public class ProjectOwnerService implements IProjectOwnerService
         return approveParticipant(user, project, projectOwner);
     }
 
+    /**
+     * Callback for removing a participant from a project.
+     *
+     * @param projectId The UUID of the project.
+     * @param userId    The UUID of the user to be removed.
+     * @return A ResponseMessage containing the result of the remove operation callback.
+     */
     @Override
     public ResponseMessage<Object> removeParticipantCallback(UUID projectId, UUID userId)
     {
@@ -189,11 +233,27 @@ public class ProjectOwnerService implements IProjectOwnerService
         return new ResponseMessage<>(message, OK, true);
     }
 
+    /**
+     * Creates a response message indicating the denial of a participant request for a project.
+     *
+     * @param user         The user who requested to join the project.
+     * @param project      The project for which the join request was made.
+     * @param projectOwner The owner of the project.
+     * @return A ResponseMessage object containing the denial status and additional details.
+     */
     private ResponseMessage<Object> deniedParticipantRequest(User user, Project project, User projectOwner)
     {
         return new ResponseMessage<>("Participant request is not accepted!", NOT_ACCEPTED, new ParticipantStatusDTO(project, user, projectOwner, false));
     }
 
+    /**
+     * Approves a participant request for a project and updates the project and user details accordingly.
+     *
+     * @param user    The user who requested to join the project.
+     * @param project The project for which the join request was made.
+     * @param owner   The owner of the project.
+     * @return A ResponseMessage object indicating the successful approval of the participant.
+     */
     private ResponseMessage<Object> approveParticipant(User user, Project project, User owner)
     {
         // Add participant to project
@@ -207,6 +267,14 @@ public class ProjectOwnerService implements IProjectOwnerService
         return new ResponseMessage<>("Participant request is accepted!", ACCEPTED, new ParticipantStatusDTO(project, user, owner, true));
     }
 
+    /**
+     * Sends a notification to a user regarding a project-related action.
+     *
+     * @param project The project associated with the notification.
+     * @param user    The recipient of the notification.
+     * @param owner   The owner of the project, typically the sender of the notification.
+     * @param message The message to be included in the notification.
+     */
     private void sendNotificationToUser(Project project, User user, User owner, String message)
     {
         var data = new NotificationObject(project.getProjectId(), user.getUserId());
@@ -239,28 +307,13 @@ public class ProjectOwnerService implements IProjectOwnerService
         doForDataService(() -> m_kafkaProducer.sendProjectParticipantNotification(notificationMessage), "ProjectService::approveParticipantRequest");
     }
 
-   /* private void sendFailNotificationToUser(Project project, User user, User owner)
-    {
-        var msg = format("%s denied your request to join %s project!", owner.getFullName(), project.getProjectName());
-
-        var data = new NotificationObject(project.getProjectId(), user.getUserId());
-
-        var dataToJson = doForDataService(() -> m_objectMapper.writeValueAsString(data), "Converter Error!");
-
-        // Project owner to user message
-        var notificationMessage = new ProjectParticipantRequestDTO.Builder()
-                .setFromUserId(owner.getUserId())
-                .setToUserId(user.getUserId())
-                .setMessage(msg)
-                .setNotificationType(NotificationType.INFORMATION)
-                .setNotificationData(dataToJson)
-                .setNotificationLink("none")
-                .build();
-
-        // Send notification to user
-        doForDataService(() -> m_kafkaProducer.sendProjectParticipantNotification(notificationMessage), "ProjectService::approveParticipantRequest");
-    }*/
-
+    /**
+     * Retrieves a project participant request by its unique request ID.
+     *
+     * @param requestId The UUID of the participant request.
+     * @return The ProjectParticipantRequest object if found.
+     * @throws DataServiceException if the request is not found or already accepted.
+     */
     private ProjectParticipantRequest findProjectParticipantRequestByRequestId(UUID requestId)
     {
         var request = doForDataService(() -> m_projectServiceHelper.findProjectParticipantRequestByParticipantRequestId(requestId),
@@ -275,12 +328,25 @@ public class ProjectOwnerService implements IProjectOwnerService
         return request.get();
     }
 
-
+    /**
+     * Finds and retrieves a list of tags associated with a given project.
+     *
+     * @param obj The project for which tags are to be retrieved.
+     * @return A list of ProjectTag objects associated with the project.
+     */
     private List<ProjectTag> findTagList(Project obj)
     {
         return toStream(m_projectTagServiceHelper.getAllProjectTagByProjectId(obj.getProjectId())).toList();
     }
 
+    /**
+     * Handles the completion of a project by its owner and sends notifications to project participants.
+     *
+     * @param userId    The UUID of the user (project owner).
+     * @param projectId The UUID of the project to be finished.
+     * @return A ResponseMessage object containing the final project details.
+     * @throws DataServiceException if the user is not the owner of the project.
+     */
     private ResponseMessage<Object> finishProjectCallback(UUID userId, UUID projectId)
     {
         var user = findUserIfExists(userId);
@@ -303,6 +369,15 @@ public class ProjectOwnerService implements IProjectOwnerService
         return new ResponseMessage<>("Project is finished!", OK, detailDTO);
     }
 
+    /**
+     * Changes the status of a project and updates its details.
+     *
+     * @param userId        The UUID of the user (project owner).
+     * @param projectId     The UUID of the project whose status is to be changed.
+     * @param projectStatus The new status to set for the project.
+     * @return A ResponseMessage object containing the updated project details.
+     * @throws DataServiceException if the user is not the owner of the project.
+     */
     private ResponseMessage<Object> changeProjectStatusCallback(UUID userId, UUID projectId, EProjectStatus projectStatus)
     {
         var user = findUserIfExists(userId);
@@ -319,12 +394,25 @@ public class ProjectOwnerService implements IProjectOwnerService
         return new ResponseMessage<>(format("Project status changed to %s!", projectStatus), OK, detailDTO);
     }
 
+    /**
+     * Retrieves all participants of a specific project.
+     *
+     * @param obj The project for which participants are to be retrieved.
+     * @return A ProjectsParticipantDTO containing the list of participants.
+     */
     private ProjectsParticipantDTO findProjectParticipantsByProjectId(Project obj)
     {
         var participants = m_projectServiceHelper.findAllProjectParticipantByProjectId(obj.getProjectId());
         return m_projectParticipantMapper.toProjectsParticipantDTO(toList(participants, m_projectParticipantMapper::toProjectParticipantDTO));
     }
 
+    /**
+     * Retrieves a project by its unique identifier if it exists.
+     *
+     * @param projectId The UUID of the project to be retrieved.
+     * @return The Project entity if found.
+     * @throws DataServiceException if the project with the specified ID is not found.
+     */
     private Project findProjectIfExistsByProjectId(UUID projectId)
     {
         var project = m_projectServiceHelper.findProjectById(projectId);
@@ -335,6 +423,13 @@ public class ProjectOwnerService implements IProjectOwnerService
         return project.get();
     }
 
+    /**
+     * Retrieves a user by their unique identifier if they exist.
+     *
+     * @param userId The UUID of the user to be retrieved.
+     * @return The User entity if found.
+     * @throws DataServiceException if the user with the specified ID is not found.
+     */
     private User findUserIfExists(UUID userId)
     {
         var user = m_projectServiceHelper.findUserById(userId);
@@ -345,6 +440,13 @@ public class ProjectOwnerService implements IProjectOwnerService
         return user.get();
     }
 
+    /**
+     * Removes a project.
+     *
+     * @param userId    The UUID of the user removing the project.
+     * @param projectId The UUID of the project to be removed.
+     * @return A ResponseMessage containing the result of the remove operation.
+     */
     public ResponseMessage<Object> removeProjectCallback(UUID userId, UUID projectId)
     {
         var project = findProjectIfExistsByProjectId(projectId);
@@ -353,10 +455,10 @@ public class ProjectOwnerService implements IProjectOwnerService
         if (!project.getProjectOwner().getUserId().equals(user.getUserId()))
             throw new DataServiceException("You are not owner of this project!");
 
-        if (!project.getProjectParticipants().isEmpty())
+       /* if (!project.getProjectParticipants().isEmpty())
         {
 
-        }
+        }*/
 
         if (project.getStartDate().isAfter(LocalDate.now()))
         {

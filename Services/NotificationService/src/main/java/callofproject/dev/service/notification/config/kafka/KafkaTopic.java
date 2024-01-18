@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.stereotype.Component;
 
+/**
+ * KafkaTopic
+ */
 @Component
 public class KafkaTopic
 {

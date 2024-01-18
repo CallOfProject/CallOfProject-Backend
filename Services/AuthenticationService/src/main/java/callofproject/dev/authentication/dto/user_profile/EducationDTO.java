@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * Data Transfer Object for an education.
+ */
 public record EducationDTO(
         @JsonProperty("education_id")
         UUID educationId,

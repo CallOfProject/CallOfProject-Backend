@@ -19,6 +19,9 @@ import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.by;
 
 
+/**
+ * Service class for handling notification operations.
+ */
 @Service
 @Lazy
 public class NotificationService

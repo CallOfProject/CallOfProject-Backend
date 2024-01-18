@@ -20,6 +20,9 @@ import static callofproject.dev.library.exception.util.CopDataUtil.doForDataServ
 import static callofproject.dev.service.jwt.JwtUtil.generateToken;
 import static java.lang.String.format;
 
+/**
+ * Service class for handling forgot password operations.
+ */
 @Service
 @Lazy
 public class ForgotPasswordService
@@ -29,9 +32,15 @@ public class ForgotPasswordService
 
     @Value("${authentication.url.forgot-password}")
     private String m_forgotPasswordUrl;
-
     private final KafkaProducer m_kafkaProducer;
 
+    /**
+     * Constructor for ForgotPasswordService.
+     *
+     * @param userServiceHelper The UserServiceHelper to interact with user-related operations.
+     * @param passwordEncoder   The PasswordEncoder for encoding passwords.
+     * @param kafkaProducer     The KafkaProducer for sending email notifications.
+     */
     public ForgotPasswordService(UserServiceHelper userServiceHelper, PasswordEncoder passwordEncoder, KafkaProducer kafkaProducer)
     {
         m_userServiceHelper = userServiceHelper;
@@ -40,10 +49,10 @@ public class ForgotPasswordService
     }
 
     /**
-     * Send Reset password link to email.
+     * Sends a reset password link to the user's email.
      *
-     * @param email represent the email.
-     * @return the boolean value.
+     * @param email The user's email address.
+     * @return A ResponseMessage indicating the result of sending the reset password link.
      */
     public ResponseMessage<Object> sendResetPasswordLink(String email)
     {
@@ -51,10 +60,10 @@ public class ForgotPasswordService
     }
 
     /**
-     * Change password.
+     * Resets the user's password based on the provided ForgotPasswordDTO.
      *
-     * @param forgotPasswordDTO represent the necessary information for change password.
-     * @return the boolean value.
+     * @param forgotPasswordDTO The DTO containing the necessary information for password reset.
+     * @return A ResponseMessage indicating the result of the password reset.
      */
     public ResponseMessage<Object> resetPassword(ForgotPasswordDTO forgotPasswordDTO)
     {
@@ -66,14 +75,13 @@ public class ForgotPasswordService
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Send Reset password link to email.
+     * Sends a reset password link to the user's email.
      *
-     * @param email represent the email.
-     * @return the boolean value.
+     * @param email The user's email address.
+     * @return A ResponseMessage indicating the result of sending the reset password link.
      */
     private ResponseMessage<Object> sendResetPasswordLinkCallback(String email)
     {
-        System.out.println("here");
         var user = m_userServiceHelper.findByEmail(email);
 
         if (user.isEmpty())
@@ -84,7 +92,6 @@ public class ForgotPasswordService
         var passwordResetToken = generateToken(claims, user.get().getUsername());
 
         var url = format(m_forgotPasswordUrl, passwordResetToken);
-        System.out.println("DASDASDSDSADSAFAS");
         var message = format("Hello %s, \n\nYou can reset your password by clicking the link below: \n%s", user.get().getUsername(), url);
         var emailTopic = new EmailTopic(EmailType.PASSWORD_RESET, user.get().getEmail(), "Reset Password", message, null);
         m_kafkaProducer.sendEmail(emailTopic);
@@ -92,10 +99,11 @@ public class ForgotPasswordService
     }
 
     /**
-     * Change password.
+     * Resets the password for a user based on the provided ForgotPasswordDTO.
      *
-     * @param forgotPasswordDTO represent the necessary information for change password.
-     * @return the boolean value.
+     * @param forgotPasswordDTO The DTO containing the user's token and new password.
+     * @return A ResponseMessage indicating the result of the password reset.
+     * @throws DataServiceException If an error occurs during the password reset process.
      */
     private ResponseMessage<Object> resetPasswordCallback(ForgotPasswordDTO forgotPasswordDTO)
     {
@@ -118,8 +126,7 @@ public class ForgotPasswordService
 
             return new ResponseMessage<>("Password changed Successfully!", 200, true);
 
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             throw new DataServiceException(ex.getMessage());
         }

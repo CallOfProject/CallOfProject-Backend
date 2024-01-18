@@ -2,7 +2,6 @@ package callofproject.dev.authentication.config;
 
 import callofproject.dev.service.jwt.filter.JWTTokenGeneratorFilter;
 import callofproject.dev.service.jwt.filter.JWTTokenValidatorFilter;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -15,14 +14,13 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-
-import java.util.Collections;
-import java.util.List;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 
+/**
+ * This class is a Spring Configuration class that provides configuration for security.
+ */
 @Configuration
 @EnableMethodSecurity
 @EnableWebSecurity
@@ -45,6 +43,12 @@ public class SecurityConfig
     private final AuthenticationProvider authenticationProvider;
     //private final LogoutSuccessHandler logoutHandler;
 
+
+    /**
+     * Constructs a new SecurityConfig.
+     *
+     * @param authenticationProvider The AuthenticationProvider object to be injected.
+     */
     public SecurityConfig(AuthenticationProvider authenticationProvider)
     {
         this.authenticationProvider = authenticationProvider;
@@ -96,46 +100,4 @@ public class SecurityConfig
 
         return http.build();
     }
-
-
-    /**
-     * Set cors configuration
-     *
-     * @param httpServletRequest represent the request
-     * @return CorsConfiguration
-     */
-    private CorsConfiguration setCorsConfig(HttpServletRequest httpServletRequest)
-    {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:4200"));
-        config.setAllowedMethods(Collections.singletonList("*"));
-        config.setAllowCredentials(true);
-        config.setAllowedHeaders(Collections.singletonList("*"));
-        config.setExposedHeaders(List.of("Authorization"));
-        config.setMaxAge(3600L);
-        return config;
-    }
-
-   /* @Bean
-    public WebMvcConfigurer corsConfigurer()
-    {
-        return new WebMvcConfigurer()
-        {
-            @Override
-            public void addCorsMappings(CorsRegistry registry)
-            {
-                CorsConfiguration config = new CorsConfiguration();
-                config.setAllowCredentials(true);
-                config.addAllowedOrigin("*");
-                config.addAllowedHeader("*");
-                config.addAllowedMethod("*");
-                config.addExposedHeader("Authorization");
-
-                registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedMethods("*")
-                        .allowedHeaders("*");
-            }
-        };
-    }*/
 }

@@ -8,6 +8,9 @@ import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
 
+/**
+ * Data Transfer Object for a link.
+ */
 public record LinkUpsertDTO(
         @JsonProperty("user_id")
         @Tag(name = "user_id", description = "type: UUID")

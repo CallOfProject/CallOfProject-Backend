@@ -11,22 +11,30 @@ import org.springframework.stereotype.Service;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 
+/**
+ * Service class for handling root-level operations.
+ */
 @Service
 @Lazy
 public class RootService
 {
     private final UserManagementServiceHelper m_managementServiceHelper;
 
+    /**
+     * Constructs a new RootService with the given UserManagementServiceHelper.
+     *
+     * @param managementServiceHelper The UserManagementServiceHelper to be used by this service.
+     */
     public RootService(UserManagementServiceHelper managementServiceHelper)
     {
         m_managementServiceHelper = managementServiceHelper;
     }
 
     /**
-     * Give Admin tole to user
+     * Gives the admin role to a user by their username.
      *
-     * @param username represent the user.
-     * @return boolean value.
+     * @param username The username of the user to give the admin role to.
+     * @return A ResponseMessage containing a boolean value indicating the success of the operation.
      */
     public ResponseMessage<Boolean> giveAdminRoleByUsername(String username)
     {
@@ -34,10 +42,10 @@ public class RootService
     }
 
     /**
-     * Remove admin role from user.
+     * Removes the admin role from a user by their username.
      *
-     * @param username represent the user.
-     * @return boolean value.
+     * @param username The username of the user to remove the admin role from.
+     * @return A ResponseMessage containing a boolean value indicating the success of the operation.
      */
     public ResponseMessage<Boolean> removeAdminRoleByUsername(String username)
     {
@@ -49,10 +57,10 @@ public class RootService
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Give admin role to user.
+     * Callback method to give admin role to a user by their username.
      *
-     * @param username represent the user.
-     * @return boolean value.
+     * @param username The username of the user to give the admin role to.
+     * @return A ResponseMessage containing a boolean value indicating the success of the operation.
      */
     private ResponseMessage<Boolean> giveAdminRoleByUsernameCallback(String username)
     {
@@ -72,10 +80,10 @@ public class RootService
     }
 
     /**
-     * Remove admin role from user.
+     * Callback method to remove the admin role from a user by their username.
      *
-     * @param username represent the user.
-     * @return boolean value.
+     * @param username The username of the user to remove the admin role from.
+     * @return A ResponseMessage containing a boolean value indicating the success of the operation.
      */
     private ResponseMessage<Boolean> removeAdminRoleByUsernameCallback(String username)
     {
