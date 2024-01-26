@@ -49,22 +49,28 @@ public class Project
     @Column(name = "special_requirements", length = 200)
     private String m_specialRequirements;
     @Enumerated(EnumType.STRING)
-    @JoinColumn(name = "project_access_type", nullable = false)
+    //@JoinColumn(name = "project_access_type", nullable = false)
+    @Column(name = "project_access_type")
     private EProjectAccessType m_projectAccessType;
     @Enumerated(EnumType.STRING)
-    @JoinColumn(name = "project_profession_level", nullable = false)
+    //@JoinColumn(name = "project_profession_level", nullable = false)
+    @Column(name = "project_profession_level")
     private EProjectProfessionLevel m_professionLevel;
     @Enumerated(EnumType.STRING)
-    @JoinColumn(name = "sector", nullable = false)
+    //@JoinColumn(name = "sector", nullable = false)
+    @Column(name = "sector")
     private ESector m_sector;
     @Enumerated(EnumType.STRING)
-    @JoinColumn(name = "degree", nullable = false)
+    //@JoinColumn(name = "degree", nullable = false)
+    @Column(name = "degree")
     private EDegree m_degree;
     @Enumerated(EnumType.STRING)
-    @JoinColumn(name = "project_level", nullable = false)
+    //@JoinColumn(name = "project_level", nullable = false)
+    @Column(name = "project_level")
     private EProjectLevel m_projectLevel;
     @Enumerated(EnumType.STRING)
-    @JoinColumn(name = "interview_type", nullable = false)
+    //@JoinColumn(name = "interview_type", nullable = false)
+    @Column(name = "interview_type")
     private EInterviewType m_interviewType;
 
     @ManyToOne(cascade = ALL)

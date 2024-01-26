@@ -665,6 +665,12 @@ public class ProjectServiceHelper
         doForRepository(() -> m_facade.m_projectParticipantRepository.delete(participant),
                 "ProjectServiceHelper::deleteProjectParticipant");
     }
+
+    public void  deleteProjectParticipantById(UUID id)
+    {
+        doForRepository(() -> m_facade.m_projectParticipantRepository.deleteById(id),
+                "ProjectServiceHelper::deleteProjectParticipant");
+    }
     public void changeAllProjectOwnerToRootWhenUserRemoved(UUID removedUserId, UUID rootUserId)
     {
         var rootUser = m_facade.m_userRepository.findById(rootUserId);

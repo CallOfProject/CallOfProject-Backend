@@ -2,6 +2,9 @@ package callofproject.dev.environment.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * CompanyDTO
+ */
 public class CompanyDTO
 {
     @JsonProperty("company_name")

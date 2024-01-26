@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import static callofproject.dev.data.project.ProjectRepositoryBeanName.PROJECT_REPOSITORY;
@@ -37,6 +38,9 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>
     Page<Project> findAllByApplicationDeadlineAfter(LocalDate date, Pageable pageable);
 
     Page<Project> findAllByApplicationDeadlineBefore(LocalDate date, Pageable pageable);
+
+    @Query("from Project where m_applicationDeadline < :date")
+    List<Project> findAllByApplicationDeadlineBefore(LocalDate date);
 
     Page<Project> findAllByApplicationDeadlineBetween(LocalDate start, LocalDate end, Pageable pageable);
 
@@ -111,5 +115,4 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>
             and m_projectAccessType = 'PUBLIC'
             """)
     Page<Project> findAllByProjectStatusAndAdminOperationStatusAndProjectAccessType(Pageable pageable);
-
 }

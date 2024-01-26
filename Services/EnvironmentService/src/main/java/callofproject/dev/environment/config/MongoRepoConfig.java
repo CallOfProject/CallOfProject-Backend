@@ -13,6 +13,10 @@ import org.springframework.data.mongodb.core.MongoClientFactoryBean;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
+
+/**
+ * MongoRepoConfig
+ */
 @Configuration
 public class MongoRepoConfig
 {

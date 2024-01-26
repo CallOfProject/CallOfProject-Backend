@@ -39,6 +39,7 @@ public class UserManagementService
     private final KafkaProducer m_userProducer;
     private final UserManagementServiceHelper m_serviceHelper;
     private final MapperConfiguration m_mapperConfig;
+    private final S3Service m_storageService;
 
     /**
      * Constructor for the UserManagementService class.
@@ -50,11 +51,12 @@ public class UserManagementService
      */
     public UserManagementService(@Qualifier(USER_MANAGEMENT_DAL_BEAN) UserManagementServiceHelper serviceHelper,
                                  @Qualifier(MAPPER_CONFIG_BEAN) MapperConfiguration mapperConfig,
-                                 KafkaProducer userProducer)
+                                 KafkaProducer userProducer, S3Service storageService)
     {
         m_userProducer = userProducer;
         m_serviceHelper = serviceHelper;
         m_mapperConfig = mapperConfig;
+        m_storageService = storageService;
     }
 
     /**

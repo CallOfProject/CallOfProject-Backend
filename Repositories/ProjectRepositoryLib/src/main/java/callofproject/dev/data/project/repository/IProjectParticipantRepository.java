@@ -21,7 +21,6 @@ public interface IProjectParticipantRepository extends CrudRepository<ProjectPar
     @Query("from ProjectParticipant where m_user.m_userId = :userId")
     Iterable<ProjectParticipant> findAllByUserUserId(UUID userId);
 
-
     @Query("from ProjectParticipant where m_user.m_userId = :userId and m_project.m_projectId = :projectId")
     Optional<ProjectParticipant> findProjectParticipantByUserIdAndProjectId(UUID userId, UUID projectId);
 }

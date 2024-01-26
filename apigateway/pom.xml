@@ -10,7 +10,6 @@
     </parent>
 
 
-
     <groupId>callofproject.dev</groupId>
     <artifactId>apigateway</artifactId>
     <version>1.0.0</version>
@@ -22,10 +21,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
     </properties>
-
-
-
-
 
 
     <dependencies>
@@ -51,10 +46,6 @@
     </dependencies>
 
 
-
-
-
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -75,7 +66,7 @@
                 <configuration>
                     <mainClass>callofproject.dev.apigateway.ApiGatewayApplication</mainClass>
                     <layout>JAR</layout>
-                    <skip>true</skip>
+                    <!-- <skip>true</skip>-->
                 </configuration>
             </plugin>
         </plugins>

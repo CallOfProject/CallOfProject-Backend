@@ -29,9 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -249,32 +247,6 @@ public class AuthenticationService
         m_serviceHelper.saveUser(user.get());
 
         return new ResponseMessage<>("User verified!", Status.OK, true);
-    }
-
-    /**
-     * Register all users with given RegisterRequest list parameter.
-     *
-     * @param requests represent the RegisterRequest list.
-     * @return Users.
-     */
-    public Iterable<User> registerAll(List<RegisterRequest> requests)
-    {
-        var list = new ArrayList<UserSignUpRequestDTO>();
-        for (var request : requests)
-        {
-            var dto = new UserSignUpRequestDTO(request.getEmail(),
-                    request.getFirst_name(),
-                    request.getMiddle_name(),
-                    request.getLast_name(),
-                    request.getUsername(),
-                    m_passwordEncoder.encode(request.getPassword()),
-                    request.getBirth_date(),
-                    RoleEnum.ROLE_USER);
-
-            list.add(dto);
-        }
-
-        return m_userManagementService.saveUsers(list);
     }
 
     /**

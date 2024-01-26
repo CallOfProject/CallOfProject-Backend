@@ -29,7 +29,6 @@ public class UserInformationController
 {
     private final UserInformationService m_service;
 
-
     /**
      * Constructor for the UserInformationController class.
      * It is used to inject dependencies into the controller.
