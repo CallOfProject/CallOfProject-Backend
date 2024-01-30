@@ -40,7 +40,7 @@ public class Project
     @Column(name = "admin_operation_status")
     private AdminOperationStatus m_adminOperationStatus;
 
-    @OneToMany(mappedBy = "m_project", cascade = ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "m_project", fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<Task> m_tasks;
 

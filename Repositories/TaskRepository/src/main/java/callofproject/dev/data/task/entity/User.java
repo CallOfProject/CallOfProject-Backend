@@ -33,7 +33,7 @@ public class User
     @Column(name = "deleted_at")
     private LocalDateTime m_deletedAt;
 
-    @ManyToMany(mappedBy = "m_assignees", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "m_assignees", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     private Set<Task> m_assignedTasks;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

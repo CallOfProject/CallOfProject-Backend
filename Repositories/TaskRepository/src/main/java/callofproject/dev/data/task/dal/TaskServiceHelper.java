@@ -1,8 +1,6 @@
 package callofproject.dev.data.task.dal;
 
 import callofproject.dev.data.task.entity.*;
-import callofproject.dev.data.task.entity.enums.Priority;
-import callofproject.dev.data.task.entity.enums.TaskStatus;
 import callofproject.dev.data.task.repository.*;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -48,6 +46,11 @@ public class TaskServiceHelper
     public User saveUser(User user)
     {
         return doForRepository(() -> m_userRepository.save(user), "Failed to save user");
+    }
+
+    public Iterable<User> saveAllUser(List<User> user)
+    {
+        return doForRepository(() -> m_userRepository.saveAll(user), "Failed to save user");
     }
 
     public Task saveTask(Task task)

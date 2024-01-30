@@ -27,7 +27,7 @@ public class Task
     @Column(name = "description")
     private String m_description;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {DETACH, MERGE, PERSIST, REFRESH})
     @JoinTable(name = "user_tasks",
             joinColumns = {@JoinColumn(name = "task_id", referencedColumnName = "task_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")})
@@ -48,13 +48,14 @@ public class Task
     @Column(name = "end_date")
     private LocalDate m_endDate;
 
-    @ManyToOne(cascade = {DETACH, MERGE, PERSIST, REFRESH})
+    @ManyToOne(cascade = {ALL})
     @JoinColumn(name = "project_id", nullable = false)
     private Project m_project;
 
 
     public Task()
     {
+        m_assignees = new HashSet<>();
     }
 
     public Task(Project project, String title, String description, Priority priority, LocalDate startDate, LocalDate endDate)
@@ -66,6 +67,7 @@ public class Task
         m_startDate = startDate;
         m_endDate = endDate;
         m_taskStatus = TaskStatus.NOT_STARTED;
+        m_assignees = new HashSet<>();
     }
 
     public void addAssignee(User user)

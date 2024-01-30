@@ -63,11 +63,6 @@ public class TaskService
         return toTaskDTO(task, createTaskCallback);
     }
 
-    public ResponseMessage<?> updateTask(UpdateTaskDTO updateTaskDTO)
-    {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
     public ResponseMessage<?> changeTaskStatus(ChangeTaskStatusDTO taskStatusDTO)
     {
         var changeTaskStatusCallback = changeTaskStatusCallback(taskStatusDTO);
@@ -87,7 +82,60 @@ public class TaskService
 
         return changeTaskPriorityCallback;
     }
+
+    public ResponseMessage<?> updateTask(UpdateTaskDTO updateTaskDTO)
+    {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    public ResponseMessage<?> deleteTask(UUID taskId)
+    {
+        var removedTaskCallback = deleteTaskCallback(taskId);
+        if (removedTaskCallback.getStatusCode() == Status.OK)
+            sendNotification((Task) removedTaskCallback.getObject());
+        removedTaskCallback.setObject("Task deleted successfully");
+        return removedTaskCallback;
+    }
+
+
+    public ResponseMessage<?> deleteTaskByTaskIdAndUserId(UUID userId, UUID taskId)
+    {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    public ResponseMessage<?> findTasksByProjectId(UUID projectId)
+    {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    public ResponseMessage<?> findTasksByProjectIdAndUserId(UUID projectId, UUID userId)
+    {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    public ResponseMessage<?> findTaskById(UUID taskId)
+    {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
     //------------------------------------------------------------------------------------------------------------------
+
+    public ResponseMessage<Object> deleteTaskCallback(UUID taskId)
+    {
+        var task = findTaskByIdIfExist(taskId);
+        var project = task.getProject();
+        var taskAssignees = task.getAssignees();
+
+        if (taskAssignees != null && !taskAssignees.isEmpty())
+            taskAssignees.forEach(user -> user.getAssignedTasks().remove(task));
+
+        doForDataService(() -> m_taskServiceHelper.deleteTask(task), "TaskService::deleteTaskCallback");
+        var message = "You have been removed from the " + task.getTitle() + " task in the " + project.getProjectName() + " project.";
+
+        for (var user : taskAssignees)
+            sendNotificationToUser(project, user, project.getProjectOwner(), message);
+
+        return new ResponseMessage<>("Task deleted successfully", Status.OK, task);
+    }
 
     public ResponseMessage<?> changeTaskPriorityCallback(ChangeTaskPriorityDTO dto)
     {
@@ -192,6 +240,4 @@ public class TaskService
         var task = doForDataService(taskSupplier, "TaskService::findTaskByIdIfExist");
         return task.orElseThrow(() -> new DataServiceException("Task not found"));
     }
-
-
 }

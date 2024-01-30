@@ -79,4 +79,7 @@ public class TaskController
     {
         return subscribe(() -> ok(m_taskService.findTaskById(taskId)), ex -> badRequest().body(ex.getMessage()));
     }
+
+    // projedeki tüm taskleri getir
+    // projedeki taskleri kullanıcıya göre getir
 }
