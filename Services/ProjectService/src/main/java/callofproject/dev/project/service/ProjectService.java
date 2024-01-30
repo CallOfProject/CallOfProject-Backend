@@ -18,9 +18,14 @@ import callofproject.dev.nosql.enums.NotificationDataType;
 import callofproject.dev.nosql.enums.NotificationType;
 import callofproject.dev.nosql.repository.IProjectTagRepository;
 import callofproject.dev.project.config.kafka.KafkaProducer;
+import callofproject.dev.project.config.kafka.dto.ProjectInfoKafkaDTO;
+import callofproject.dev.project.config.kafka.dto.ProjectParticipantKafkaDTO;
+import callofproject.dev.project.config.kafka.dto.UserKafkaDTO;
 import callofproject.dev.project.dto.*;
+import callofproject.dev.project.dto.overview.ProjectOverviewDTO;
 import callofproject.dev.project.mapper.IProjectMapper;
 import callofproject.dev.project.mapper.IProjectParticipantMapper;
+import callofproject.dev.project.mapper.IUserMapper;
 import callofproject.dev.project.util.Policy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static callofproject.dev.data.common.status.Status.*;
@@ -59,6 +65,7 @@ public class ProjectService implements IProjectService
     private final S3Service m_s3Service;
     private final IProjectParticipantMapper m_projectParticipantMapper;
     private final IProjectTagRepository m_projectTagRepository;
+    private final IUserMapper m_userMapper;
 
     @Value("${notification.request.approve}")
     private String m_approvalLink;
@@ -79,7 +86,7 @@ public class ProjectService implements IProjectService
     public ProjectService(@Qualifier(PROJECT_SERVICE_HELPER_BEAN) ProjectServiceHelper serviceHelper,
                           @Qualifier(PROJECT_TAG_SERVICE_HELPER_BEAN_NAME) ProjectTagServiceHelper projectTagServiceHelper,
                           @Qualifier(TAG_SERVICE_HELPER_BEAN_NAME) TagServiceHelper tagServiceHelper, KafkaProducer kafkaProducer, ObjectMapper objectMapper,
-                          IProjectMapper projectMapper, S3Service s3Service, IProjectParticipantMapper projectParticipantMapper, IProjectTagRepository projectTagRepository)
+                          IProjectMapper projectMapper, S3Service s3Service, IProjectParticipantMapper projectParticipantMapper, IProjectTagRepository projectTagRepository, IUserMapper userMapper)
     {
         m_serviceHelper = serviceHelper;
         m_projectTagServiceHelper = projectTagServiceHelper;
@@ -90,6 +97,7 @@ public class ProjectService implements IProjectService
         m_s3Service = s3Service;
         m_projectParticipantMapper = projectParticipantMapper;
         m_projectTagRepository = projectTagRepository;
+        m_userMapper = userMapper;
     }
 
 
@@ -115,7 +123,38 @@ public class ProjectService implements IProjectService
     @Override
     public ResponseMessage<Object> saveProjectV2(ProjectSaveDTO saveDTO, MultipartFile file)
     {
-        return doForDataService(() -> saveProjectCallbackV2(saveDTO, file), "ProjectService::saveProject");
+        var savedProject = doForDataService(() -> saveProjectCallbackV2(saveDTO, file), "ProjectService::saveProject");
+
+        if (savedProject.getStatusCode() == CREATED)
+        {
+            var projectOverviewDTO = (ProjectOverviewDTO) savedProject.getObject();
+            var project = findProjectIfExistsByProjectId(UUID.fromString(projectOverviewDTO.projectId()));
+            List<ProjectParticipantKafkaDTO> participants;
+
+            if (project.getProjectParticipants() != null)
+                participants = project.getProjectParticipants().stream().map(this::toProjectParticipantKafkaDTO).toList();
+            else participants = List.of();
+
+            var userOwner = findUserIfExists(projectOverviewDTO.projectOwnerName());
+            var owner = m_userMapper.toUserKafkaDTO(userOwner);
+            var projectKafkaDTO = new ProjectInfoKafkaDTO(project.getProjectId(), projectOverviewDTO.projectTitle(), owner, participants,
+                    projectOverviewDTO.projectStatus(), project.getAdminOperationStatus());
+
+            m_kafkaProducer.sendProjectInfo(projectKafkaDTO);
+        }
+        return savedProject;
+    }
+
+    private ProjectParticipantKafkaDTO toProjectParticipantKafkaDTO(ProjectParticipant participant)
+    {
+        return new ProjectParticipantKafkaDTO(participant.getProjectId(), participant.getProject().getProjectId(),
+                participant.getUser().getUserId(), participant.getJoinDate());
+    }
+
+
+    private UserKafkaDTO createUserKafkaDTO(User user)
+    {
+        return m_userMapper.toUserKafkaDTO(user);
     }
 
     /**
@@ -258,7 +297,7 @@ public class ProjectService implements IProjectService
 
       /*  var img = m_s3Service.getImage(project.getProjectImagePath());
         project.setProjectImagePath(img);*/
-        var projectDetailDTO = m_projectMapper.toProjectDetailDTO(project, tags, findProjectParticipantsByProjectId(project));
+        var projectDetailDTO = m_projectMapper.toProjectDetailDTO(project, tags, findProjectParticipantsDTOByProjectId(project));
 
         return new ResponseMessage<>("Project is found!", OK, projectDetailDTO);
     }
@@ -285,7 +324,7 @@ public class ProjectService implements IProjectService
 
         var tags = findTagList(project);
 
-        var projectDetailDTO = m_projectMapper.toProjectDetailDTO(project, tags, findProjectParticipantsByProjectId(project));
+        var projectDetailDTO = m_projectMapper.toProjectDetailDTO(project, tags, findProjectParticipantsDTOByProjectId(project));
 
         return new ResponseMessage<>("Project is found!", OK, projectDetailDTO);
     }
@@ -444,7 +483,7 @@ public class ProjectService implements IProjectService
         if (!project.getProjectOwner().getUserId().equals(user.getUserId()))
             throw new DataServiceException("You are not owner of this project!");
 
-        var result = m_projectMapper.toProjectOwnerViewDTO(project, findTagList(project), findProjectParticipantsByProjectId(project));
+        var result = m_projectMapper.toProjectOwnerViewDTO(project, findTagList(project), findProjectParticipantsDTOByProjectId(project));
 
         return new ResponseMessage<>("Project is found!", OK, result);
     }
@@ -611,7 +650,7 @@ public class ProjectService implements IProjectService
         var projects = m_serviceHelper.findAllProjectByProjectOwnerUserId(userId, page);
 
         var projectsDetailDTO = m_projectMapper.toProjectsDetailDTO(toList(projects.getContent(),
-                obj -> m_projectMapper.toProjectDetailDTO(obj, findTagList(obj), findProjectParticipantsByProjectId(obj))));
+                obj -> m_projectMapper.toProjectDetailDTO(obj, findTagList(obj), findProjectParticipantsDTOByProjectId(obj))));
 
         return new MultipleResponseMessagePageable<>(projects.getTotalPages(), page, projects.stream().toList().size(), "Projects found!", projectsDetailDTO);
     }
@@ -631,7 +670,7 @@ public class ProjectService implements IProjectService
 
 
         var dtoList = m_projectMapper.toProjectsDetailDTO(toList(projects.getContent(),
-                obj -> m_projectMapper.toProjectDetailDTO(obj, findTagList(obj), findProjectParticipantsByProjectId(obj))));
+                obj -> m_projectMapper.toProjectDetailDTO(obj, findTagList(obj), findProjectParticipantsDTOByProjectId(obj))));
 
         return new MultipleResponseMessagePageable<>(projects.getTotalPages(), page, projects.stream().toList().size(), "Projects found!", dtoList);
     }
@@ -747,7 +786,7 @@ public class ProjectService implements IProjectService
         // Mevcut projenin tagları
         var tagList = toStream(m_projectTagServiceHelper.getAllProjectTagByProjectId(project.getProjectId())).toList();
 
-        var overviewDTO = m_projectMapper.toProjectDetailDTO(project, tagList, findProjectParticipantsByProjectId(project));
+        var overviewDTO = m_projectMapper.toProjectDetailDTO(project, tagList, findProjectParticipantsDTOByProjectId(project));
 
         return new ResponseMessage<>("Project is updated!", OK, overviewDTO);
     }
@@ -797,7 +836,7 @@ public class ProjectService implements IProjectService
                 .getAllProjectTagByProjectId(savedProject.getProjectId()))
                 .toList();
 
-        var overviewDTO = m_projectMapper.toProjectDetailDTO(project, tagList, findProjectParticipantsByProjectId(project));
+        var overviewDTO = m_projectMapper.toProjectDetailDTO(project, tagList, findProjectParticipantsDTOByProjectId(project));
 
         return new ResponseMessage<>("Project is updated!", OK, overviewDTO);
     }
@@ -819,11 +858,24 @@ public class ProjectService implements IProjectService
      * @param obj The project for which participants are to be retrieved.
      * @return A ProjectsParticipantDTO containing the list of participants.
      */
-    private ProjectsParticipantDTO findProjectParticipantsByProjectId(Project obj)
+    private ProjectsParticipantDTO findProjectParticipantsDTOByProjectId(Project obj)
     {
         var participants = m_serviceHelper.findAllProjectParticipantByProjectId(obj.getProjectId());
         return m_projectParticipantMapper.toProjectsParticipantDTO(toList(participants, m_projectParticipantMapper::toProjectParticipantDTO));
     }
+
+    /**
+     * Retrieves all participants of a specific project.
+     *
+     * @param id The UUID of the project for which participants are to be retrieved.
+     * @return A ProjectsParticipantDTO containing the list of participants.
+     */
+    private Set<ProjectParticipant> findProjectParticipantsByProjectId(UUID id)
+    {
+        var project = findProjectIfExistsByProjectId(id);
+        return project.getProjectParticipants();
+    }
+
 
     /**
      * Saves new tags for a project if they do not already exist.

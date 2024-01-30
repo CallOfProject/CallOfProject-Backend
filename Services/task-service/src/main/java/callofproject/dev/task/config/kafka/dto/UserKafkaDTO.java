@@ -32,4 +32,23 @@ public record UserKafkaDTO(
         int totalProjectCount
 )
 {
+        @Override
+        public String toString()
+        {
+                return "UserKafkaDTO{" +
+                        "userId=" + userId +
+                        ", username='" + username + '\'' +
+                        ", email='" + email + '\'' +
+                        ", firstName='" + firstName + '\'' +
+                        ", middleName='" + middleName + '\'' +
+                        ", lastName='" + lastName + '\'' +
+                        ", operation=" + operation +
+                        ", password='" + password + '\'' +
+                        ", roles=" + roles +
+                        ", deletedAt=" + deletedAt +
+                        ", ownerProjectCount=" + ownerProjectCount +
+                        ", participantProjectCount=" + participantProjectCount +
+                        ", totalProjectCount=" + totalProjectCount +
+                        '}';
+        }
 }

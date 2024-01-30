@@ -13,6 +13,7 @@ import callofproject.dev.nosql.dal.ProjectTagServiceHelper;
 import callofproject.dev.nosql.entity.ProjectTag;
 import callofproject.dev.nosql.enums.NotificationType;
 import callofproject.dev.project.config.kafka.KafkaProducer;
+import callofproject.dev.project.config.kafka.dto.ProjectParticipantKafkaDTO;
 import callofproject.dev.project.dto.*;
 import callofproject.dev.project.mapper.IProjectMapper;
 import callofproject.dev.project.mapper.IProjectParticipantMapper;
@@ -119,6 +120,8 @@ public class ProjectOwnerService implements IProjectOwnerService
         {
             var message = format("%s accepted your request to join %s project!", dto.owner().getFullName(), dto.project().getProjectName());
             sendNotificationToUser(dto.project(), dto.user(), dto.owner(), message);
+            var info = result.getObject() instanceof ParticipantStatusDTO statusDTO ? statusDTO : null;
+            sendParticipantsInfo(info);
         }
         if (result.getStatusCode() == NOT_ACCEPTED && result.getObject() instanceof ParticipantStatusDTO dto && !dto.isAccepted())
         {
@@ -127,6 +130,13 @@ public class ProjectOwnerService implements IProjectOwnerService
         }
         m_notificationServiceHelper.deleteNotificationById(requestDTO.notificationId());
         return new ResponseMessage<>(result.getMessage(), result.getStatusCode(), result.getStatusCode() == ACCEPTED);
+    }
+
+    private void sendParticipantsInfo(ParticipantStatusDTO info)
+    {
+        var participant = m_projectServiceHelper.findProjectParticipantByUserIdAndProjectId(info.user().getUserId(), info.project().getProjectId());
+        m_kafkaProducer.sendProjectParticipant(new ProjectParticipantKafkaDTO(participant.get().getProjectId(), participant.get().getProject().getProjectId(),
+                participant.get().getUser().getUserId(), participant.get().getJoinDate()));
     }
 
     /**

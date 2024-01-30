@@ -14,6 +14,11 @@ public class KafkaTopicProvider
 {
     @Value("${spring.kafka.notification-topic-name}")
     private String m_notificationTopicName;
+    @Value("${spring.kafka.projectInfo-topic-name}")
+    private String m_projectInfoTopicName;
+
+    @Value("${spring.kafka.participant-topic-name}")
+    private String m_participantTopicName;
 
     /**
      * Constructs a new KafkaTopicProvider.
@@ -25,11 +30,33 @@ public class KafkaTopicProvider
     /**
      * Create a new Kafka topic.
      *
-     * @return The newly created Kafka topic.
+     * @return The newly created Kafka notification topic.
      */
-    @Bean
+    @Bean("notificationTopic")
     public NewTopic provideNotificationTopic()
     {
         return TopicBuilder.name(m_notificationTopicName).build();
+    }
+
+    /**
+     * Create a new Kafka topic.
+     *
+     * @return The newly created projectInfo Kafka topic.
+     */
+    @Bean("projectInfoTopic")
+    public NewTopic provideProjectInfoTopic()
+    {
+        return TopicBuilder.name(m_projectInfoTopicName).build();
+    }
+
+    /**
+     * Create a new Kafka topic.
+     *
+     * @return The newly created projectParticipant Kafka topic.
+     */
+    @Bean("projectParticipantTopic")
+    public NewTopic provideProjectParticipantTopic()
+    {
+        return TopicBuilder.name(m_participantTopicName).build();
     }
 }

@@ -1,4 +1,4 @@
-package callofproject.dev.task.config;
+package callofproject.dev.task.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

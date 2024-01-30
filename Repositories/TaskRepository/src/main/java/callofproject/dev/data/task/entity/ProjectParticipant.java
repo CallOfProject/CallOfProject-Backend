@@ -12,7 +12,6 @@ import static jakarta.persistence.CascadeType.*;
 public class ProjectParticipant
 {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "project_participant_id")
     private UUID m_projectId;
 
@@ -37,6 +36,14 @@ public class ProjectParticipant
         m_project = project;
         m_user = user;
         m_joinDate = LocalDateTime.now();
+    }
+
+    public ProjectParticipant(UUID participantId, Project project, User user, LocalDateTime joinDate)
+    {
+        m_projectId = participantId;
+        m_project = project;
+        m_user = user;
+        m_joinDate = joinDate;
     }
 
     public LocalDateTime getJoinDate()

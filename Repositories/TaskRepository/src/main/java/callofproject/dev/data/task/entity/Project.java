@@ -48,6 +48,13 @@ public class Project
     {
     }
 
+    public Project(UUID projectId, String projectName, User projectOwner)
+    {
+        m_projectId = projectId;
+        m_projectName = projectName;
+        m_projectOwner = projectOwner;
+    }
+
     public Project(UUID projectId, String projectName, User projectOwner, Set<ProjectParticipant> projectParticipants,
                    EProjectStatus projectStatus, AdminOperationStatus adminOperationStatus)
     {

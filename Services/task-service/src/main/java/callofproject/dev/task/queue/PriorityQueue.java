@@ -9,7 +9,7 @@ import static java.time.LocalDate.now;
 
 public class PriorityQueue<T extends Task>
 {
-    private LinkedList<T> m_queue;
+    private final LinkedList<T> m_queue;
     private int m_size;
 
     public PriorityQueue()
@@ -45,9 +45,7 @@ public class PriorityQueue<T extends Task>
     public T dequeue()
     {
         if (m_size == 0)
-        {
             return null;
-        }
         m_size--;
         return m_queue.removeFirst();
     }
@@ -55,9 +53,7 @@ public class PriorityQueue<T extends Task>
     public T peek()
     {
         if (m_size == 0)
-        {
             return null;
-        }
         return m_queue.getFirst();
     }
 
@@ -111,5 +107,4 @@ public class PriorityQueue<T extends Task>
 
         queue.print();
     }
-
 }

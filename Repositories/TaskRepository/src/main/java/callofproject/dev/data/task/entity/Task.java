@@ -2,6 +2,7 @@ package callofproject.dev.data.task.entity;
 
 import callofproject.dev.data.task.entity.enums.Priority;
 import callofproject.dev.data.task.entity.enums.TaskStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -30,6 +31,7 @@ public class Task
     @JoinTable(name = "user_tasks",
             joinColumns = {@JoinColumn(name = "task_id", referencedColumnName = "task_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")})
+    @JsonIgnore
     private Set<User> m_assignees;
 
     @Enumerated(EnumType.STRING)
