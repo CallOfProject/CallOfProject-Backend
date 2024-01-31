@@ -4,9 +4,9 @@ import callofproject.dev.data.task.entity.Project;
 import callofproject.dev.data.task.entity.Task;
 import callofproject.dev.data.task.entity.User;
 import callofproject.dev.task.dto.ProjectDTO;
-import callofproject.dev.task.dto.TaskDTO;
 import callofproject.dev.task.dto.UserDTO;
 import callofproject.dev.task.dto.request.CreateTaskDTO;
+import callofproject.dev.task.dto.response.TaskDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

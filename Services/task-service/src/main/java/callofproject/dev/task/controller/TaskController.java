@@ -1,9 +1,6 @@
 package callofproject.dev.task.controller;
 
-import callofproject.dev.task.dto.request.ChangeTaskPriorityDTO;
-import callofproject.dev.task.dto.request.ChangeTaskStatusDTO;
-import callofproject.dev.task.dto.request.CreateTaskDTO;
-import callofproject.dev.task.dto.request.UpdateTaskDTO;
+import callofproject.dev.task.dto.request.*;
 import callofproject.dev.task.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -63,15 +60,16 @@ public class TaskController
     }
 
     @GetMapping("/find/by/project")
-    public ResponseEntity<?> findTaskByProjectId(@RequestParam("pid") UUID projectId)
+    public ResponseEntity<?> findTasksByProjectId(@RequestParam("pid") UUID projectId, @RequestParam(value = "p", defaultValue = "1") int page)
     {
-        return subscribe(() -> ok(m_taskService.findTasksByProjectId(projectId)), ex -> badRequest().body(ex.getMessage()));
+        return subscribe(() -> ok(m_taskService.findTasksByProjectId(projectId, page)), ex -> badRequest().body(ex.getMessage()));
     }
 
     @GetMapping("/find/by/project-and-user")
-    public ResponseEntity<?> findTasksByProjectIdAndUserId(@RequestParam("pid") UUID projectId, @RequestParam("uid") UUID userId)
+    public ResponseEntity<?> findTasksByProjectIdAndUserId(@RequestParam("pid") UUID projectId, @RequestParam("uid") UUID userId,
+                                                           @RequestParam(value = "p", defaultValue = "1") int page)
     {
-        return subscribe(() -> ok(m_taskService.findTasksByProjectIdAndUserId(projectId, userId)), ex -> badRequest().body(ex.getMessage()));
+        return subscribe(() -> ok(m_taskService.findTasksByProjectIdAndUserId(projectId, userId, page)), ex -> badRequest().body(ex.getMessage()));
     }
 
     @GetMapping("/find/by/id")
@@ -80,6 +78,9 @@ public class TaskController
         return subscribe(() -> ok(m_taskService.findTaskById(taskId)), ex -> badRequest().body(ex.getMessage()));
     }
 
-    // projedeki tüm taskleri getir
-    // projedeki taskleri kullanıcıya göre getir
+    @PostMapping("/find/by/filter")
+    public ResponseEntity<?> findTaskByFilter(@RequestBody TaskFilterDTO dto, @RequestParam(value = "p", defaultValue = "1") int page)
+    {
+        return subscribe(() -> ok(m_taskService.findTaskByFilter(dto, page)), ex -> badRequest().body(ex.getMessage()));
+    }
 }

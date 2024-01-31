@@ -1,7 +1,9 @@
-package callofproject.dev.task.dto;
+package callofproject.dev.task.dto.response;
 
 import callofproject.dev.data.task.entity.enums.Priority;
 import callofproject.dev.data.task.entity.enums.TaskStatus;
+import callofproject.dev.task.dto.ProjectDTO;
+import callofproject.dev.task.dto.UserDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

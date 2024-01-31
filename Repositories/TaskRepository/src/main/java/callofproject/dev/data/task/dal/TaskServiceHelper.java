@@ -2,7 +2,13 @@ package callofproject.dev.data.task.dal;
 
 import callofproject.dev.data.task.entity.*;
 import callofproject.dev.data.task.repository.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -13,9 +19,12 @@ import java.util.UUID;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForRepository;
 
 @Component
+@PropertySource("classpath:application-task_repository.properties")
 @Lazy
 public class TaskServiceHelper
 {
+    @Value("${spring-pageable.default-size}")
+    private int m_pageSize;
     private final IProjectRepository m_projectRepository;
     private final IProjectParticipantRepository m_participantRepository;
     private final IUserRepository m_userRepository;
@@ -122,75 +131,96 @@ public class TaskServiceHelper
     }
     // -----------------------------------------------------------------------------------------------------------------
 
-    public Iterable<Task> findAllTasksByProjectId(UUID projectId)
+    public Page<Task> findAllTasksByProjectId(UUID projectId, int page)
     {
-        return doForRepository(() -> m_taskRepository.findAllByProjectId(projectId), "Failed to find all tasks by project id in repository");
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findAllByProjectId(projectId, pageable), "Failed to find all tasks by project id in repository");
     }
 
-    public Iterable<Task> findAllByStartDateAndEndDate(LocalDate startDate, LocalDate endDate)
+    public Page<Task> findAllByStartDateAndEndDate(LocalDate startDate, LocalDate endDate, int page)
     {
-        return doForRepository(() -> m_taskRepository.findAllByStartDateAndEndDate(startDate, endDate), "Failed to find all tasks by start date and end date in repository");
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findAllByStartDateAndEndDate(startDate, endDate, pageable), "Failed to find all tasks by start date and end date in repository");
     }
 
-    public Iterable<Task> findAllByStartDate(LocalDate startDate)
+    public Page<Task> findAllByStartDate(LocalDate startDate, int page)
     {
-        return doForRepository(() -> m_taskRepository.findAllByStartDate(startDate), "Failed to find all tasks by start date in repository");
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findAllByStartDate(startDate, pageable), "Failed to find all tasks by start date in repository");
     }
 
-    public Iterable<Task> findAllByStartDateAfter(LocalDate startDate)
+    public Page<Task> findAllByStartDateAfter(LocalDate startDate, int page)
     {
-        return doForRepository(() -> m_taskRepository.findTasksByStartDateAfter(startDate), "Failed to find all tasks by start date after in repository");
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findTasksByStartDateAfter(startDate, pageable), "Failed to find all tasks by start date after in repository");
     }
 
-    public Iterable<Task> findAllByStartDateBefore(LocalDate startDate)
+    public Page<Task> findAllByStartDateBefore(LocalDate startDate, int page)
     {
-        return doForRepository(() -> m_taskRepository.findTasksByStartDateBefore(startDate), "Failed to find all tasks by start date before in repository");
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findTasksByStartDateBefore(startDate, pageable), "Failed to find all tasks by start date before in repository");
     }
 
-    public Iterable<Task> findAllByEndDate(LocalDate endDate)
+    public Page<Task> findAllByEndDate(LocalDate endDate, int page)
     {
-        return doForRepository(() -> m_taskRepository.findTasksByEndDate(endDate), "Failed to find all tasks by end date in repository");
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findTasksByEndDate(endDate, pageable), "Failed to find all tasks by end date in repository");
     }
 
-    public Iterable<Task> findAllByEndDateAfter(LocalDate endDate)
+    public Page<Task> findAllByEndDateAfter(LocalDate endDate, int page)
     {
-        return doForRepository(() -> m_taskRepository.findTasksByEndDateAfter(endDate), "Failed to find all tasks by end date after in repository");
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findTasksByEndDateAfter(endDate, pageable), "Failed to find all tasks by end date after in repository");
     }
 
-    public Iterable<Task> findAllByEndDateBefore(LocalDate endDate)
+    public Page<Task> findAllByEndDateBefore(LocalDate endDate, int page)
     {
-        return doForRepository(() -> m_taskRepository.findTasksByEndDateBefore(endDate), "Failed to find all tasks by end date before in repository");
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findTasksByEndDateBefore(endDate, pageable), "Failed to find all tasks by end date before in repository");
     }
 
-    public Iterable<Task> findAllByStartDateBetween(LocalDate startDate, LocalDate endDate)
+    public Page<Task> findAllByStartDateBetween(LocalDate startDate, LocalDate endDate, int page)
     {
-        return doForRepository(() -> m_taskRepository.findAllByStartDateBetween(startDate, endDate), "Failed to find all tasks by start date between in repository");
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findAllByStartDateBetween(startDate, endDate, pageable), "Failed to find all tasks by start date between in repository");
     }
 
-    public Iterable<Task> findAllByEndDateBetween(LocalDate startDate, LocalDate endDate)
+    public Page<Task> findAllByEndDateBetween(LocalDate startDate, LocalDate endDate, int page)
     {
-        return doForRepository(() -> m_taskRepository.findAllByEndDateBetween(startDate, endDate), "Failed to find all tasks by end date between in repository");
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findAllByEndDateBetween(startDate, endDate, pageable), "Failed to find all tasks by end date between in repository");
     }
 
-    public Iterable<Task> findAllByPriority(String priority)
+    public Page<Task> findAllByPriority(String priority, int page)
     {
-        return doForRepository(() -> m_taskRepository.findAllByPriority(priority), "Failed to find all tasks by priority in repository");
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findAllByPriority(priority, pageable), "Failed to find all tasks by priority in repository");
     }
 
-    public Iterable<Task> findAllByTaskStatus(String taskStatus)
+    public Page<Task> findAllByTaskStatus(String taskStatus, int page)
     {
-        return doForRepository(() -> m_taskRepository.findAllByTaskStatus(taskStatus), "Failed to find all tasks by task status in repository");
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findAllByTaskStatus(taskStatus, pageable), "Failed to find all tasks by task status in repository");
     }
 
-    public Iterable<Task> findAllByTaskStatusAndProjectProjectId(String taskStatus, UUID projectId)
+    public Page<Task> findAllByTaskStatusAndProjectProjectId(String taskStatus, UUID projectId, int page)
     {
-        return doForRepository(() -> m_taskRepository.findAllByTaskStatusAndProjectProjectId(taskStatus, projectId), "Failed to find all tasks by task status and project id in repository");
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findAllByTaskStatusAndProjectProjectId(taskStatus, projectId, pageable), "Failed to find all tasks by task status and project id in repository");
     }
 
-    public Iterable<Task> findAllByPriorityAndProjectProjectId(String priority, UUID projectId)
+    public Page<Task> findAllByPriorityAndProjectProjectId(String priority, UUID projectId, int page)
     {
-        return doForRepository(() -> m_taskRepository.findAllByPriorityAndProjectProjectId(priority, projectId), "Failed to find all tasks by priority and project id in repository");
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findAllByPriorityAndProjectProjectId(priority, projectId, pageable), "Failed to find all tasks by priority and project id in repository");
     }
+
+    public Page<Task> findAllTasksByFilter(Specification<Task> spec, int page)
+    {
+        var pageable = PageRequest.of(page - 1, m_pageSize);
+        return doForRepository(() -> m_taskRepository.findAll(spec, pageable), "Failed to find all tasks by filter in repository");
+    }
+
 
     public Iterable<User> findUsersByIds(List<UUID> ids)
     {
