@@ -15,6 +15,7 @@ import callofproject.dev.task.config.TaskFilterSpecifications;
 import callofproject.dev.task.config.kafka.KafkaProducer;
 import callofproject.dev.task.dto.NotificationKafkaDTO;
 import callofproject.dev.task.dto.NotificationObject;
+import callofproject.dev.task.dto.UserDTO;
 import callofproject.dev.task.dto.request.*;
 import callofproject.dev.task.dto.response.TaskDTO;
 import callofproject.dev.task.mapper.IProjectMapper;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -71,10 +73,10 @@ public class TaskService
     public ResponseMessage<?> changeTaskStatus(ChangeTaskStatusDTO taskStatusDTO)
     {
         var changeTaskStatusCallback = changeTaskStatusCallback(taskStatusDTO);
-
+        var pair = (Pair<String, Task>) changeTaskStatusCallback.getObject();
         if (changeTaskStatusCallback.getStatusCode() == Status.OK)
-            sendNotification((Task) changeTaskStatusCallback.getObject());
-
+            sendNotification(pair.getSecond());
+        changeTaskStatusCallback.setObject(pair.getFirst());
         return changeTaskStatusCallback;
     }
 
@@ -82,8 +84,12 @@ public class TaskService
     {
         var changeTaskPriorityCallback = changeTaskPriorityCallback(priorityDTO);
 
+        var pair = (Pair<String, Task>) changeTaskPriorityCallback.getObject();
+
         if (changeTaskPriorityCallback.getStatusCode() == Status.OK)
-            sendNotification((Task) changeTaskPriorityCallback.getObject());
+            sendNotification(pair.getSecond());
+
+        changeTaskPriorityCallback.setObject(pair.getFirst());
 
         return changeTaskPriorityCallback;
     }
@@ -99,8 +105,16 @@ public class TaskService
 
     public ResponseMessage<?> updateTask(UpdateTaskDTO updateTaskDTO)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var updateCallback = updateTaskCallback(updateTaskDTO);
+        var pair = (Pair<Task, TaskDTO>) updateCallback.getObject();
+
+        if (updateCallback.getStatusCode() == Status.OK)
+            sendNotification(pair.getFirst());
+
+        updateCallback.setObject(pair.getSecond());
+        return updateCallback;
     }
+
 
     public ResponseMessage<?> deleteTaskByTaskIdAndUserId(UUID userId, UUID taskId)
     {
@@ -149,10 +163,38 @@ public class TaskService
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    private MultipleResponseMessagePageable<?> toMultipleResponseMessagePageable(int totalPage, int currentPage, int itemCount, List<?> list)
+    private MultipleResponseMessagePageable<?> toMultipleResponseMessagePageable(int totalPage, int currentPage, int itemCount, List<TaskDTO> list)
     {
         var msg = "Found " + itemCount + " tasks";
-        return new MultipleResponseMessagePageable<>(totalPage, currentPage, itemCount, msg, list);
+        //var queue = new PriorityQueue<>(list);
+        var k = new java.util.PriorityQueue<TaskDTO>(Comparator.comparing(TaskDTO::priority).reversed());
+        k.addAll(list);
+        return new MultipleResponseMessagePageable<>(totalPage, currentPage, itemCount, msg, k);
+    }
+
+    private ResponseMessage<Object> updateTaskCallback(UpdateTaskDTO updateTaskDTO)
+    {
+        var task = findTaskByIdIfExist(updateTaskDTO.taskId());
+
+        if (updateTaskDTO.startDate().isAfter(updateTaskDTO.endDate()))
+            throw new DataServiceException("Start date cannot be after end date");
+
+        /*if (updateTaskDTO.userIds().isEmpty())
+            deleteTask(task.getTaskId());*/
+
+        task.setPriority(updateTaskDTO.priority());
+        task.setTaskStatus(updateTaskDTO.taskStatus());
+        task.setTitle(updateTaskDTO.title());
+        task.setDescription(updateTaskDTO.description());
+        task.setStartDate(updateTaskDTO.startDate());
+        task.setEndDate(updateTaskDTO.endDate());
+        var users = toStream(m_taskServiceHelper.findUsersByIds(updateTaskDTO.userIds())).collect(toSet());
+        task.setAssignees(users);
+
+
+        var updatedTask = doForDataService(() -> m_taskServiceHelper.saveTask(task), "TaskService::updateTaskCallback");
+
+        return new ResponseMessage<>("Task updated successfully", Status.OK, new Pair<>(task, toTaskDTO(updatedTask)));
     }
 
     public ResponseMessage<?> deleteTaskByTaskIdAndUserIdCallback(UUID taskId, UUID userId)
@@ -189,7 +231,7 @@ public class TaskService
         return new ResponseMessage<>("Task deleted successfully", Status.OK, task);
     }
 
-    public ResponseMessage<?> changeTaskPriorityCallback(ChangeTaskPriorityDTO dto)
+    public ResponseMessage<Object> changeTaskPriorityCallback(ChangeTaskPriorityDTO dto)
     {
         var task = findTaskByIdIfExist(dto.taskId());
 
@@ -200,10 +242,10 @@ public class TaskService
 
         doForDataService(() -> m_taskServiceHelper.saveTask(task), "TaskService::changeTaskPriorityCallback");
 
-        return new ResponseMessage<>("Task priority changed successfully", Status.OK, "Task priority changed successfully");
+        return new ResponseMessage<>("Task priority changed successfully", Status.OK, new Pair<>("Task priority changed successfully", task));
     }
 
-    public ResponseMessage<?> changeTaskStatusCallback(ChangeTaskStatusDTO dto)
+    public ResponseMessage<Object> changeTaskStatusCallback(ChangeTaskStatusDTO dto)
     {
         var task = findTaskByIdIfExist(dto.taskId());
 
@@ -214,7 +256,7 @@ public class TaskService
 
         doForDataService(() -> m_taskServiceHelper.saveTask(task), "TaskService::changeTaskStatusCallback");
 
-        return new ResponseMessage<>("Task status changed successfully", Status.OK, "Task status changed successfully");
+        return new ResponseMessage<>("Task status changed successfully", Status.OK, new Pair<>("Task status changed successfully", task));
     }
 
     public MultipleResponseMessagePageable<?> findTaskByFilter(TaskFilterDTO dto, int page)
@@ -226,11 +268,11 @@ public class TaskService
                 .and(hasProjectId(dto.projectId()))
                 .and(hasProjectOwnerId(dto.projectOwnerId()));
 
-        System.out.println(spec.toString());
         var tasksPage = m_taskServiceHelper.findAllTasksByFilter(spec, page);
 
         var tasks = doForDataService(() -> tasksPage.getContent().stream()
                 .map(this::toTaskDTO)
+                .sorted(TaskDTO::compareTo)
                 .toList(), "TaskService::findTaskByFilter");
 
         return toMultipleResponseMessagePageable(tasksPage.getTotalPages(), page, tasksPage.getNumberOfElements(), tasks);
@@ -310,4 +352,26 @@ public class TaskService
         return task.orElseThrow(() -> new DataServiceException("Task not found"));
     }
 
+    public List<UserDTO> findAllAssigneesByTaskId(UUID userId, UUID taskId)
+    {
+        var task = findTaskByIdIfExist(taskId);
+
+        if (!task.getProject().getProjectOwner().getUserId().equals(userId))
+            throw new DataServiceException("You are not the owner of this project");
+
+        return doForDataService(() -> task.getAssignees().stream()
+                .map(m_userMapper::toUserDTO)
+                .toList(), "TaskService::findAllAssigneesByTaskId");
+    }
+
+    public List<TaskDTO> findAll()
+    {
+        var list = doForDataService(() -> toStream(m_taskServiceHelper.findAllTasks())
+                .map(this::toTaskDTO)
+                .sorted(TaskDTO::compareTo)
+                .toList(), "TaskService::findAll");
+
+
+        return list;
+    }
 }

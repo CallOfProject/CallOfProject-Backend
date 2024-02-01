@@ -226,4 +226,9 @@ public class TaskServiceHelper
     {
         return doForRepository(() -> m_userRepository.findAllById(ids), "Failed to find users by ids in repository");
     }
+
+    public Iterable<Task> findAllTasks()
+    {
+        return doForRepository(() -> m_taskRepository.findAll(), "Failed to find all users in repository");
+    }
 }

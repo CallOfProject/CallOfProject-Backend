@@ -23,6 +23,11 @@ public class TaskController
         m_taskService = taskService;
     }
 
+    @GetMapping("/find/all")
+    public ResponseEntity<?> findAll()
+    {
+        return subscribe(() -> ok(m_taskService.findAll()), ex -> badRequest().body(ex.getMessage()));
+    }
     @PostMapping("/create")
     public ResponseEntity<?> createTask(@RequestBody @Valid CreateTaskDTO createTaskDTO)
     {
@@ -48,13 +53,13 @@ public class TaskController
     }
 
     @PutMapping("/change/status")
-    public ResponseEntity<?> changeTaskStatus(@RequestBody ChangeTaskStatusDTO taskStatusDTO)
+    public ResponseEntity<?> changeTaskStatus(@RequestBody @Valid ChangeTaskStatusDTO taskStatusDTO)
     {
         return subscribe(() -> ok(m_taskService.changeTaskStatus(taskStatusDTO)), ex -> badRequest().body(ex.getMessage()));
     }
 
     @PutMapping("/change/priority")
-    public ResponseEntity<?> changeTaskPriority(@RequestBody ChangeTaskPriorityDTO priorityDTO)
+    public ResponseEntity<?> changeTaskPriority(@RequestBody @Valid ChangeTaskPriorityDTO priorityDTO)
     {
         return subscribe(() -> ok(m_taskService.changeTaskPriority(priorityDTO)), ex -> badRequest().body(ex.getMessage()));
     }
@@ -82,5 +87,11 @@ public class TaskController
     public ResponseEntity<?> findTaskByFilter(@RequestBody TaskFilterDTO dto, @RequestParam(value = "p", defaultValue = "1") int page)
     {
         return subscribe(() -> ok(m_taskService.findTaskByFilter(dto, page)), ex -> badRequest().body(ex.getMessage()));
+    }
+
+    @GetMapping("/find/assignees/by/task")
+    public ResponseEntity<?> findAllAssigneesByTaskId(@RequestParam("tid") UUID taskId, @RequestParam("uid") UUID userId)
+    {
+        return subscribe(() -> ok(m_taskService.findAllAssigneesByTaskId(userId, taskId)), ex -> badRequest().body(ex.getMessage()));
     }
 }
