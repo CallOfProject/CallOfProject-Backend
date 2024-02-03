@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -225,10 +224,5 @@ public class TaskServiceHelper
     public Iterable<User> findUsersByIds(List<UUID> ids)
     {
         return doForRepository(() -> m_userRepository.findAllById(ids), "Failed to find users by ids in repository");
-    }
-
-    public Iterable<Task> findAllTasks()
-    {
-        return doForRepository(() -> m_taskRepository.findAll(), "Failed to find all users in repository");
     }
 }

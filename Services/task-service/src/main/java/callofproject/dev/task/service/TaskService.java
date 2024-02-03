@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,6 +36,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.stream.Collectors.toSet;
 
 @Service
+@SuppressWarnings("all")
 public class TaskService
 {
     private final TaskServiceHelper m_taskServiceHelper;
@@ -58,15 +58,28 @@ public class TaskService
         m_userMapper = userMapper;
     }
 
+    private String getCreatedMessage(Task task)
+    {
+        return "A new task has been assigned to the \"" + task.getProject().getProjectName() +
+                "\" project. The deadline is " + ofPattern("dd/MM/yyyy").format(task.getEndDate()) + ".";
+    }
+
+    private String getRemovedMessage(Task task)
+    {
+        return "You have been removed from the \"" + task.getTitle() +
+                "\" task in the \"" + task.getProject().getProjectName() + "\" project.";
+    }
+
     public ResponseMessage<Object> createTask(CreateTaskDTO createTaskDTO)
     {
-        var createTaskCallback = createTaskCallback(createTaskDTO);
+        var createTaskCallback = doForDataService(() -> createTaskCallback(createTaskDTO), "TaskService::CreateTask");
         var task = (Task) createTaskCallback.getObject();
 
         if (createTaskCallback.getStatusCode() == Status.CREATED)
-            sendNotification(task);
+            sendNotification(task, getCreatedMessage(task));
 
         createTaskCallback.setObject(toTaskDTO(task));
+
         return createTaskCallback;
     }
 
@@ -80,27 +93,32 @@ public class TaskService
         return changeTaskStatusCallback;
     }
 
-    public ResponseMessage<?> changeTaskPriority(ChangeTaskPriorityDTO priorityDTO)
-    {
-        var changeTaskPriorityCallback = changeTaskPriorityCallback(priorityDTO);
-
-        var pair = (Pair<String, Task>) changeTaskPriorityCallback.getObject();
-
-        if (changeTaskPriorityCallback.getStatusCode() == Status.OK)
-            sendNotification(pair.getSecond());
-
-        changeTaskPriorityCallback.setObject(pair.getFirst());
-
-        return changeTaskPriorityCallback;
-    }
-
     public ResponseMessage<?> deleteTask(UUID taskId)
     {
-        var removedTaskCallback = deleteTaskCallback(taskId);
+        var removedTaskCallback = doForDataService(() -> deleteTaskCallback(taskId), "TaskService::deleteTask");
+
+        var task = (Task) removedTaskCallback.getObject();
+
         if (removedTaskCallback.getStatusCode() == Status.OK)
-            sendNotification((Task) removedTaskCallback.getObject());
+            sendNotification(task, getRemovedMessage(task));
+
         removedTaskCallback.setObject("Task deleted successfully");
+
         return removedTaskCallback;
+    }
+
+
+    public ResponseMessage<?> deleteTaskByTaskIdAndUserId(UUID userId, UUID taskId)
+    {
+        var removedTaskCallback = doForDataService(() -> deleteTaskByTaskIdAndUserIdCallback(taskId, userId),
+                "TaskService::deleteTaskByTaskIdAndUserId");
+
+        var task = (Task) removedTaskCallback.getObject();
+
+        if (removedTaskCallback.getStatusCode() == Status.OK)
+            sendNotification(task, getRemovedMessage(task));
+
+        return new ResponseMessage<>("You removed from task successfully!", Status.OK, "You removed from task successfully!");
     }
 
     public ResponseMessage<?> updateTask(UpdateTaskDTO updateTaskDTO)
@@ -116,19 +134,18 @@ public class TaskService
     }
 
 
-    public ResponseMessage<?> deleteTaskByTaskIdAndUserId(UUID userId, UUID taskId)
+    public ResponseMessage<?> changeTaskPriority(ChangeTaskPriorityDTO priorityDTO)
     {
-        var removedTaskCallback = doForDataService(() -> deleteTaskByTaskIdAndUserIdCallback(taskId, userId),
-                "TaskService::deleteTaskByTaskIdAndUserId");
+        var changeTaskPriorityCallback = changeTaskPriorityCallback(priorityDTO);
 
-        var pair = (Pair<User, Task>) removedTaskCallback.getObject();
-        var task = pair.getSecond();
-        var message = "You have been removed from the " + task.getTitle() + " task in the " + task.getProject().getProjectName() + " project.";
+        var pair = (Pair<String, Task>) changeTaskPriorityCallback.getObject();
 
-        if (removedTaskCallback.getStatusCode() == Status.OK)
-            sendNotificationToUser(task.getProject(), pair.getFirst(), task.getProject().getProjectOwner(), message);
+        if (changeTaskPriorityCallback.getStatusCode() == Status.OK)
+            sendNotification(pair.getSecond());
 
-        return new ResponseMessage<>("You removed from task successfully!", Status.OK, "You removed from task successfully!");
+        changeTaskPriorityCallback.setObject(pair.getFirst());
+
+        return changeTaskPriorityCallback;
     }
 
 
@@ -138,6 +155,7 @@ public class TaskService
 
         var tasks = doForDataService(() -> taskPage.getContent().stream()
                 .map(this::toTaskDTO)
+                .sorted(TaskDTO::compareTo)
                 .toList(), "TaskService::findTasksByProjectId");
 
         return toMultipleResponseMessagePageable(taskPage.getTotalPages(), page, taskPage.getNumberOfElements(), tasks);
@@ -150,9 +168,15 @@ public class TaskService
         var tasks = doForDataService(() -> taskPage.getContent().stream()
                 .filter(t -> t.getAssignees().stream().anyMatch(ta -> ta.getUserId().equals(userId)))
                 .map(this::toTaskDTO)
+                .sorted(TaskDTO::compareTo)
                 .toList(), "TaskService::findTasksByProjectIdAndUserId");
 
         return toMultipleResponseMessagePageable(taskPage.getTotalPages(), page, taskPage.getNumberOfElements(), tasks);
+    }
+
+    public MultipleResponseMessagePageable<?> findTaskByFilter(TaskFilterDTO dto, int page)
+    {
+        return doForDataService(() -> findTaskByFilterCallback(dto, page), "TaskService::findTaskByFilter");
     }
 
     public ResponseMessage<?> findTaskById(UUID taskId)
@@ -163,14 +187,6 @@ public class TaskService
     }
     //------------------------------------------------------------------------------------------------------------------
 
-    private MultipleResponseMessagePageable<?> toMultipleResponseMessagePageable(int totalPage, int currentPage, int itemCount, List<TaskDTO> list)
-    {
-        var msg = "Found " + itemCount + " tasks";
-        //var queue = new PriorityQueue<>(list);
-        var k = new java.util.PriorityQueue<TaskDTO>(Comparator.comparing(TaskDTO::priority).reversed());
-        k.addAll(list);
-        return new MultipleResponseMessagePageable<>(totalPage, currentPage, itemCount, msg, k);
-    }
 
     private ResponseMessage<Object> updateTaskCallback(UpdateTaskDTO updateTaskDTO)
     {
@@ -178,9 +194,6 @@ public class TaskService
 
         if (updateTaskDTO.startDate().isAfter(updateTaskDTO.endDate()))
             throw new DataServiceException("Start date cannot be after end date");
-
-        /*if (updateTaskDTO.userIds().isEmpty())
-            deleteTask(task.getTaskId());*/
 
         task.setPriority(updateTaskDTO.priority());
         task.setTaskStatus(updateTaskDTO.taskStatus());
@@ -208,25 +221,24 @@ public class TaskService
 
         task.getAssignees().remove(user.get());
 
-        doForDataService(() -> m_taskServiceHelper.saveTask(task), "TaskService::deleteTaskCallback");
+        var savedTask = m_taskServiceHelper.saveTask(task);
 
-        return new ResponseMessage<>("You removed from task successfully!", Status.OK, new Pair<>(user.get(), task));
+        if (savedTask.getAssignees().isEmpty())
+            m_taskServiceHelper.deleteTask(savedTask);
+
+        return new ResponseMessage<>("You removed from task successfully!", Status.OK, task);
     }
+
 
     public ResponseMessage<Object> deleteTaskCallback(UUID taskId)
     {
         var task = findTaskByIdIfExist(taskId);
-        var project = task.getProject();
         var taskAssignees = task.getAssignees();
 
         if (taskAssignees != null && !taskAssignees.isEmpty())
             taskAssignees.forEach(user -> user.getAssignedTasks().remove(task));
 
-        doForDataService(() -> m_taskServiceHelper.deleteTask(task), "TaskService::deleteTaskCallback");
-        var message = "You have been removed from the " + task.getTitle() + " task in the " + project.getProjectName() + " project.";
-
-        for (var user : taskAssignees)
-            sendNotificationToUser(project, user, project.getProjectOwner(), message);
+        m_taskServiceHelper.deleteTask(task);
 
         return new ResponseMessage<>("Task deleted successfully", Status.OK, task);
     }
@@ -259,7 +271,7 @@ public class TaskService
         return new ResponseMessage<>("Task status changed successfully", Status.OK, new Pair<>("Task status changed successfully", task));
     }
 
-    public MultipleResponseMessagePageable<?> findTaskByFilter(TaskFilterDTO dto, int page)
+    public MultipleResponseMessagePageable<?> findTaskByFilterCallback(TaskFilterDTO dto, int page)
     {
         var spec = Specification.where(TaskFilterSpecifications.hasPriority(dto.priority()))
                 .and(hasTaskStatus(dto.taskStatus()))
@@ -270,10 +282,7 @@ public class TaskService
 
         var tasksPage = m_taskServiceHelper.findAllTasksByFilter(spec, page);
 
-        var tasks = doForDataService(() -> tasksPage.getContent().stream()
-                .map(this::toTaskDTO)
-                .sorted(TaskDTO::compareTo)
-                .toList(), "TaskService::findTaskByFilter");
+        var tasks = tasksPage.getContent().stream().map(this::toTaskDTO).sorted(TaskDTO::compareTo).toList();
 
         return toMultipleResponseMessagePageable(tasksPage.getTotalPages(), page, tasksPage.getNumberOfElements(), tasks);
     }
@@ -284,12 +293,8 @@ public class TaskService
             throw new DataServiceException("Start date cannot be after end date");
 
         var project = findProjectByIdIfExist(createTaskDTO.projectId());
-
         var users = toStream(m_taskServiceHelper.findUsersByIds(createTaskDTO.userIds())).collect(toSet());
-
-        ISupplier<Task> taskSupplier = () -> m_taskServiceHelper.saveTask(m_taskMapper.toTask(createTaskDTO, project, users));
-
-        var savedTask = doForDataService(taskSupplier, "TaskService::createTaskCallback");
+        var savedTask = m_taskServiceHelper.saveTask(m_taskMapper.toTask(createTaskDTO, project, users));
 
         return new ResponseMessage<>("Task created successfully", Status.CREATED, savedTask);
     }
@@ -317,6 +322,12 @@ public class TaskService
         var userDtoList = task.getAssignees().stream().map(m_userMapper::toUserDTO).toList();
         var projectDTO = m_projectMapper.toProjectDTO(task.getProject());
         return m_taskMapper.toTaskDTO(task, projectDTO, userDtoList);
+    }
+
+    private void sendNotification(Task createTaskDTO, String message)
+    {
+        System.out.println(createTaskDTO.getAssignees().size());
+        createTaskDTO.getAssignees().forEach(usr -> sendNotificationToUser(createTaskDTO.getProject(), usr, createTaskDTO.getProject().getProjectOwner(), message));
     }
 
     private void sendNotification(Task createTaskDTO)
@@ -364,14 +375,10 @@ public class TaskService
                 .toList(), "TaskService::findAllAssigneesByTaskId");
     }
 
-    public List<TaskDTO> findAll()
+
+    private MultipleResponseMessagePageable<?> toMultipleResponseMessagePageable(int totalPage, int currentPage, int itemCount, List<TaskDTO> list)
     {
-        var list = doForDataService(() -> toStream(m_taskServiceHelper.findAllTasks())
-                .map(this::toTaskDTO)
-                .sorted(TaskDTO::compareTo)
-                .toList(), "TaskService::findAll");
-
-
-        return list;
+        var msg = "Found " + itemCount + " tasks";
+        return new MultipleResponseMessagePageable<>(totalPage, currentPage, itemCount, msg, list);
     }
 }

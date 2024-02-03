@@ -23,11 +23,6 @@ public class TaskController
         m_taskService = taskService;
     }
 
-    @GetMapping("/find/all")
-    public ResponseEntity<?> findAll()
-    {
-        return subscribe(() -> ok(m_taskService.findAll()), ex -> badRequest().body(ex.getMessage()));
-    }
     @PostMapping("/create")
     public ResponseEntity<?> createTask(@RequestBody @Valid CreateTaskDTO createTaskDTO)
     {
