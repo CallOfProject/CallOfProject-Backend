@@ -2,6 +2,7 @@ package callofproject.dev.community.config.kafka;
 
 import callofproject.dev.community.config.kafka.dto.UserKafkaDTO;
 import callofproject.dev.community.mapper.IUserMapper;
+import callofproject.dev.data.community.repository.IUserRepository;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class KafkaConsumer
 {
 
+    private final IUserRepository m_userRepository;
     private final IUserMapper m_userMapper;
 
     /**
@@ -19,8 +21,9 @@ public class KafkaConsumer
      *
      * @param userMapper The IUserMapper instance used for mapping UserDTO messages.
      */
-    public KafkaConsumer(IUserMapper userMapper)
+    public KafkaConsumer(IUserRepository userRepository, IUserMapper userMapper)
     {
+        m_userRepository = userRepository;
         m_userMapper = userMapper;
     }
 
@@ -36,6 +39,10 @@ public class KafkaConsumer
     )
     public void listenAuthenticationTopic(UserKafkaDTO dto)
     {
+
+        var user = m_userMapper.toUser(dto);
+        m_userRepository.save(user);
+
      /*   if (dto.operation() == EOperation.CREATE || dto.operation() == EOperation.UPDATE)
         {
 

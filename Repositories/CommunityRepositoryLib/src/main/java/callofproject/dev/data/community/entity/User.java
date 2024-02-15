@@ -33,12 +33,28 @@ public class User
     @Column(name = "deleted_at")
     private LocalDateTime m_deletedAt;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private Set<UserConnection> connections = new HashSet<>();
+
+    // Kullanıcı tarafından engellenen kullanıcılar
+    @OneToMany(mappedBy = "blocker", fetch = FetchType.EAGER)
+    private Set<BlockedConnections> blockedUsers;
+
+    // Kullanıcıya gönderilen bağlantı istekleri
+    @OneToMany(mappedBy = "receiver", fetch = FetchType.EAGER)
+    private Set<ConnectionRequests> receivedConnectionRequests;
+
+    // Kullanıcı tarafından gönderilen bağlantı istekleri
+    @OneToMany(mappedBy = "requester", fetch = FetchType.EAGER)
+    private Set<ConnectionRequests> sentConnectionRequests;
+
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")})
     private Set<Role> roles;
+
 
     public User()
     {
@@ -57,25 +73,59 @@ public class User
         m_deletedAt = null;
     }
 
-
-    public Set<Role> getRoles()
+    public void addConnection(UserConnection user)
     {
-        return roles;
+        if (connections == null)
+            connections = new HashSet<>();
+
+        connections.add(user);
     }
 
-    public void setRoles(Set<Role> roles)
+    public void removeConnection(UserConnection user)
     {
-        this.roles = roles;
+        connections.remove(user);
     }
 
-    public LocalDateTime getDeletedAt()
+
+    public void addConnectionRequestReceived(ConnectionRequests connectionRequest)
     {
-        return m_deletedAt;
+        if (receivedConnectionRequests == null)
+            receivedConnectionRequests = new HashSet<>();
+
+        receivedConnectionRequests.add(connectionRequest);
     }
 
-    public void setDeletedAt(LocalDateTime deletedAt)
+    public void removeConnectionRequestReceived(ConnectionRequests connectionRequest)
     {
-        m_deletedAt = deletedAt;
+        receivedConnectionRequests.remove(connectionRequest);
+    }
+
+
+    public void addConnectionRequestSent(ConnectionRequests connectionRequest)
+    {
+        if (sentConnectionRequests == null)
+            sentConnectionRequests = new HashSet<>();
+
+        sentConnectionRequests.add(connectionRequest);
+    }
+
+    public void removeConnectionRequestSent(ConnectionRequests connectionRequest)
+    {
+        sentConnectionRequests.remove(connectionRequest);
+    }
+
+
+    public void addBlockedUser(BlockedConnections user)
+    {
+        if (blockedUsers == null)
+            blockedUsers = new HashSet<>();
+
+        blockedUsers.add(user);
+    }
+
+    public void removeBlockedUser(BlockedConnections user)
+    {
+        blockedUsers.remove(user);
     }
 
     public UUID getUserId()
@@ -136,6 +186,66 @@ public class User
     public void setLastName(String lastName)
     {
         m_lastName = lastName;
+    }
+
+    public LocalDateTime getDeletedAt()
+    {
+        return m_deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt)
+    {
+        m_deletedAt = deletedAt;
+    }
+
+    public Set<UserConnection> getConnections()
+    {
+        return connections;
+    }
+
+    public void setConnections(Set<UserConnection> connections)
+    {
+        this.connections = connections;
+    }
+
+    public Set<BlockedConnections> getBlockedUsers()
+    {
+        return blockedUsers;
+    }
+
+    public void setBlockedUsers(Set<BlockedConnections> blockedUsers)
+    {
+        this.blockedUsers = blockedUsers;
+    }
+
+    public Set<ConnectionRequests> getReceivedConnectionRequests()
+    {
+        return receivedConnectionRequests;
+    }
+
+    public void setReceivedConnectionRequests(Set<ConnectionRequests> receivedConnectionRequests)
+    {
+        this.receivedConnectionRequests = receivedConnectionRequests;
+    }
+
+    public Set<ConnectionRequests> getSentConnectionRequests()
+    {
+        return sentConnectionRequests;
+    }
+
+    public void setSentConnectionRequests(Set<ConnectionRequests> sentConnectionRequests)
+    {
+        this.sentConnectionRequests = sentConnectionRequests;
+    }
+
+    public Set<Role> getRoles()
+    {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles)
+    {
+        this.roles = roles;
     }
 
     public String getFullName()

@@ -125,5 +125,5 @@ public interface IMatchDbRepository extends MongoRepository<UserMatch, UUID>
      * @param matchId      (match id is the id of the user who is matched with the user)
      * @return UserMatch iterable.
      */
-    Iterable<UserMatch> getUserMatchBySchoolIdAndCourseIdAndExperienceIdAndUserIDAndMatchId(long schoolId, UUID courseId, UUID experienceId, UUID userId, UUID matchId);
+    //Iterable<UserMatch> getUserMatchBySchoolIdAndCourseIdAndExperienceIdAndUserIDAndMatchId(long schoolId, UUID courseId, UUID experienceId, UUID userId, UUID matchId);
 }

@@ -267,9 +267,9 @@ public class MatchServiceHelper
      * @param matchId      The id of the user match to be checked.
      * @return UserMatch iterable.
      */
-    public Iterable<UserMatch> getUserMatchBySchoolIdAndCourseIdAndExperienceIdAndUserIdAndMatchId(long schoolId, UUID courseId, UUID experienceId, UUID userId, UUID matchId)
+   /* public Iterable<UserMatch> getUserMatchBySchoolIdAndCourseIdAndExperienceIdAndUserIdAndMatchId(long schoolId, UUID courseId, UUID experienceId, UUID userId, UUID matchId)
     {
         return doForRepository(() -> m_matchDbRepository.getUserMatchBySchoolIdAndCourseIdAndExperienceIdAndUserIDAndMatchId(schoolId, courseId, experienceId, userId, matchId),
                 "MatchServiceHelper::getUserMatchBySchoolIdAndCourseIdAndExperienceIdAndUserIdAndMatchId");
-    }
+    }*/
 }
