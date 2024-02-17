@@ -1,4 +1,4 @@
-package callofproject.dev.data.community.entity;
+package callofproject.dev.data.community.entity.enumeration;
 
 public enum CommunityRequestStatus
 {

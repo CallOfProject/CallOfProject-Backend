@@ -33,20 +33,38 @@ public class User
     @Column(name = "deleted_at")
     private LocalDateTime m_deletedAt;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private Set<UserConnection> connections = new HashSet<>();
+   /* @OneToMany(mappedBy = "mainUser", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<UserConnection> userConnections;
 
-    // Kullanıcı tarafından engellenen kullanıcılar
-    @OneToMany(mappedBy = "blocker", fetch = FetchType.EAGER)
-    private Set<BlockedConnections> blockedUsers;
+    @OneToMany(mappedBy = "mainUser", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<BlockedConnections> blockedConnections;
 
-    // Kullanıcıya gönderilen bağlantı istekleri
-    @OneToMany(mappedBy = "receiver", fetch = FetchType.EAGER)
-    private Set<ConnectionRequests> receivedConnectionRequests;
+    @OneToMany(mappedBy = "mainUser", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<ConnectionRequests> connectionRequests;*/
 
-    // Kullanıcı tarafından gönderilen bağlantı istekleri
-    @OneToMany(mappedBy = "requester", fetch = FetchType.EAGER)
-    private Set<ConnectionRequests> sentConnectionRequests;
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(
+            name = "user_connections",
+            joinColumns = @JoinColumn(name = "main_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "connected_user_id")
+    )
+    private Set<User> connections;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(
+            name = "connection_requests",
+            joinColumns = @JoinColumn(name = "main_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "requester_user_id")
+    )
+    private Set<User> connectionRequests;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(
+            name = "blocked_connections",
+            joinColumns = @JoinColumn(name = "main_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "blocked_user_id")
+    )
+    private Set<User> blockedConnections;
 
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -73,7 +91,7 @@ public class User
         m_deletedAt = null;
     }
 
-    public void addConnection(UserConnection user)
+    public void addConnection(User user)
     {
         if (connections == null)
             connections = new HashSet<>();
@@ -81,52 +99,113 @@ public class User
         connections.add(user);
     }
 
-    public void removeConnection(UserConnection user)
+    public void removeConnection(User user)
     {
+        if (connections == null)
+            return;
+
         connections.remove(user);
     }
 
-
-    public void addConnectionRequestReceived(ConnectionRequests connectionRequest)
+    public void addConnectionRequest(User user)
     {
-        if (receivedConnectionRequests == null)
-            receivedConnectionRequests = new HashSet<>();
+        if (connectionRequests == null)
+            connectionRequests = new HashSet<>();
 
-        receivedConnectionRequests.add(connectionRequest);
+        connectionRequests.add(user);
     }
 
-    public void removeConnectionRequestReceived(ConnectionRequests connectionRequest)
+    public void addBlockedConnection(User user)
     {
-        receivedConnectionRequests.remove(connectionRequest);
+        if (blockedConnections == null)
+            blockedConnections = new HashSet<>();
+
+        blockedConnections.add(user);
     }
 
-
-    public void addConnectionRequestSent(ConnectionRequests connectionRequest)
+    public Set<User> getConnections()
     {
-        if (sentConnectionRequests == null)
-            sentConnectionRequests = new HashSet<>();
-
-        sentConnectionRequests.add(connectionRequest);
+        return connections;
     }
 
-    public void removeConnectionRequestSent(ConnectionRequests connectionRequest)
+    public void setConnections(Set<User> connections)
     {
-        sentConnectionRequests.remove(connectionRequest);
+        this.connections = connections;
     }
 
-
-    public void addBlockedUser(BlockedConnections user)
+    public Set<User> getConnectionRequests()
     {
-        if (blockedUsers == null)
-            blockedUsers = new HashSet<>();
-
-        blockedUsers.add(user);
+        return connectionRequests;
     }
 
-    public void removeBlockedUser(BlockedConnections user)
+    public void setConnectionRequests(Set<User> connectionRequests)
     {
-        blockedUsers.remove(user);
+        this.connectionRequests = connectionRequests;
     }
+
+    public Set<User> getBlockedConnections()
+    {
+        return blockedConnections;
+    }
+
+    public void setBlockedConnections(Set<User> blockedConnections)
+    {
+        this.blockedConnections = blockedConnections;
+    }
+
+    /*public void addConnection(UserConnection connection)
+    {
+        if (userConnections == null)
+            userConnections = new HashSet<>();
+
+        userConnections.add(connection);
+    }
+
+    public void addBlockedConnection(BlockedConnections blockedConnection)
+    {
+        if (blockedConnections == null)
+            blockedConnections = new HashSet<>();
+
+        blockedConnections.add(blockedConnection);
+    }
+
+    public void addConnectionRequest(ConnectionRequests connectionRequest)
+    {
+        if (connectionRequests == null)
+            connectionRequests = new HashSet<>();
+
+        connectionRequests.add(connectionRequest);
+    }
+
+    public Set<UserConnection> getUserConnections()
+    {
+        return userConnections;
+    }
+
+    public void setUserConnections(Set<UserConnection> userConnections)
+    {
+        this.userConnections = userConnections;
+    }
+
+    public Set<BlockedConnections> getBlockedConnections()
+    {
+        return blockedConnections;
+    }
+
+    public void setBlockedConnections(Set<BlockedConnections> blockedConnections)
+    {
+        this.blockedConnections = blockedConnections;
+    }
+
+    public Set<ConnectionRequests> getConnectionRequests()
+    {
+        return connectionRequests;
+    }
+
+    public void setConnectionRequests(Set<ConnectionRequests> connectionRequests)
+    {
+        this.connectionRequests = connectionRequests;
+    }*/
 
     public UUID getUserId()
     {
@@ -198,45 +277,6 @@ public class User
         m_deletedAt = deletedAt;
     }
 
-    public Set<UserConnection> getConnections()
-    {
-        return connections;
-    }
-
-    public void setConnections(Set<UserConnection> connections)
-    {
-        this.connections = connections;
-    }
-
-    public Set<BlockedConnections> getBlockedUsers()
-    {
-        return blockedUsers;
-    }
-
-    public void setBlockedUsers(Set<BlockedConnections> blockedUsers)
-    {
-        this.blockedUsers = blockedUsers;
-    }
-
-    public Set<ConnectionRequests> getReceivedConnectionRequests()
-    {
-        return receivedConnectionRequests;
-    }
-
-    public void setReceivedConnectionRequests(Set<ConnectionRequests> receivedConnectionRequests)
-    {
-        this.receivedConnectionRequests = receivedConnectionRequests;
-    }
-
-    public Set<ConnectionRequests> getSentConnectionRequests()
-    {
-        return sentConnectionRequests;
-    }
-
-    public void setSentConnectionRequests(Set<ConnectionRequests> sentConnectionRequests)
-    {
-        this.sentConnectionRequests = sentConnectionRequests;
-    }
 
     public Set<Role> getRoles()
     {
