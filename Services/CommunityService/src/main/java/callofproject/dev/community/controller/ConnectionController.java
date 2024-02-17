@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/connection")
+@RequestMapping("api/community/personal-connection")
 public class ConnectionController
 {
     private final ConnectionService m_connectionService;

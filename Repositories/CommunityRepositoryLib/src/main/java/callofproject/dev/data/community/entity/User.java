@@ -33,14 +33,9 @@ public class User
     @Column(name = "deleted_at")
     private LocalDateTime m_deletedAt;
 
-   /* @OneToMany(mappedBy = "mainUser", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<UserConnection> userConnections;
+    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
+    private Set<Community> communities;
 
-    @OneToMany(mappedBy = "mainUser", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<BlockedConnections> blockedConnections;
-
-    @OneToMany(mappedBy = "mainUser", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<ConnectionRequests> connectionRequests;*/
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
@@ -91,6 +86,7 @@ public class User
         m_deletedAt = null;
     }
 
+    // TODO:  add community might be a good idea
     public void addConnection(User user)
     {
         if (connections == null)
@@ -153,59 +149,15 @@ public class User
         this.blockedConnections = blockedConnections;
     }
 
-    /*public void addConnection(UserConnection connection)
+    public Set<Community> getCommunities()
     {
-        if (userConnections == null)
-            userConnections = new HashSet<>();
-
-        userConnections.add(connection);
+        return communities;
     }
 
-    public void addBlockedConnection(BlockedConnections blockedConnection)
+    public void setCommunities(Set<Community> communities)
     {
-        if (blockedConnections == null)
-            blockedConnections = new HashSet<>();
-
-        blockedConnections.add(blockedConnection);
+        this.communities = communities;
     }
-
-    public void addConnectionRequest(ConnectionRequests connectionRequest)
-    {
-        if (connectionRequests == null)
-            connectionRequests = new HashSet<>();
-
-        connectionRequests.add(connectionRequest);
-    }
-
-    public Set<UserConnection> getUserConnections()
-    {
-        return userConnections;
-    }
-
-    public void setUserConnections(Set<UserConnection> userConnections)
-    {
-        this.userConnections = userConnections;
-    }
-
-    public Set<BlockedConnections> getBlockedConnections()
-    {
-        return blockedConnections;
-    }
-
-    public void setBlockedConnections(Set<BlockedConnections> blockedConnections)
-    {
-        this.blockedConnections = blockedConnections;
-    }
-
-    public Set<ConnectionRequests> getConnectionRequests()
-    {
-        return connectionRequests;
-    }
-
-    public void setConnectionRequests(Set<ConnectionRequests> connectionRequests)
-    {
-        this.connectionRequests = connectionRequests;
-    }*/
 
     public UUID getUserId()
     {
