@@ -326,7 +326,7 @@ public class TaskService
 
     private void sendNotification(Task createTaskDTO, String message)
     {
-        System.out.println(createTaskDTO.getAssignees().size());
+        //System.out.println(createTaskDTO.getAssignees().size());
         createTaskDTO.getAssignees().forEach(usr -> sendNotificationToUser(createTaskDTO.getProject(), usr, createTaskDTO.getProject().getProjectOwner(), message));
     }
 

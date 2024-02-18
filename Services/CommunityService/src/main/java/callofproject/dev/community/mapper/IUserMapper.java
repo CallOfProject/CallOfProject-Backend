@@ -2,9 +2,13 @@ package callofproject.dev.community.mapper;
 
 
 import callofproject.dev.community.config.kafka.dto.UserKafkaDTO;
+import callofproject.dev.community.dto.UserDTO;
+import callofproject.dev.community.dto.UsersDTO;
 import callofproject.dev.data.community.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import java.util.List;
 
 /**
  * Mapper interface for mapping between UserDTO and User entity.
@@ -21,4 +25,13 @@ public interface IUserMapper
      */
     @Mapping(target = "roles", source = "roles")
     User toUser(UserKafkaDTO userKafkaDTO);
+
+    @Mapping(target = "userId", source = "userId")
+    @Mapping(target = "username", source = "username")
+    UserDTO toUserDTO(User user);
+
+    default UsersDTO toUsersDTO(List<UserDTO> users)
+    {
+        return new UsersDTO(users);
+    }
 }

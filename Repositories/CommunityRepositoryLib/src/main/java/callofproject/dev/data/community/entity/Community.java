@@ -19,15 +19,13 @@ public class Community
     @Column(name = "community_name", nullable = false)
     private String communityName;
 
-    @Column(name = "project_id", nullable = false)
-    private UUID projectId;
-
-    @Column(name = "project_owner_id", nullable = false)
-    private UUID projectOwnerId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "community_status", nullable = false)
     private CommunityStatus communityStatus;
+
+    @OneToOne(mappedBy = "m_community",fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    private Project project;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "community_users",
@@ -40,11 +38,9 @@ public class Community
         communityStatus = CommunityStatus.OPEN;
     }
 
-    public Community(String communityName, UUID projectId, UUID projectOwnerId)
+    public Community(String communityName)
     {
         this.communityName = communityName;
-        this.projectId = projectId;
-        this.projectOwnerId = projectOwnerId;
         communityStatus = CommunityStatus.OPEN;
     }
 
@@ -56,6 +52,16 @@ public class Community
         this.users.add(user);
     }
 
+    public Project getProject()
+    {
+        return project;
+    }
+
+    public void setProject(Project project)
+    {
+        this.project = project;
+    }
+
     public CommunityStatus getCommunityStatus()
     {
         return communityStatus;
@@ -65,6 +71,7 @@ public class Community
     {
         this.communityStatus = communityStatus;
     }
+
 
     public UUID getCommunityId()
     {
@@ -86,25 +93,6 @@ public class Community
         this.communityName = communityName;
     }
 
-    public UUID getProjectId()
-    {
-        return projectId;
-    }
-
-    public void setProjectId(UUID projectId)
-    {
-        this.projectId = projectId;
-    }
-
-    public UUID getProjectOwnerId()
-    {
-        return projectOwnerId;
-    }
-
-    public void setProjectOwnerId(UUID projectOwnerId)
-    {
-        this.projectOwnerId = projectOwnerId;
-    }
 
     public Set<User> getUsers()
     {

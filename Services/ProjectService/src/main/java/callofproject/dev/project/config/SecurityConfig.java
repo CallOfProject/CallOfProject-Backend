@@ -68,11 +68,11 @@ public class SecurityConfig
                 .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(SecurityConfig::customize)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .exceptionHandling(ex -> ex.accessDeniedHandler((request, response, accessDeniedException) -> {
+                .httpBasic(AbstractHttpConfigurer::disable);
+                /*.exceptionHandling(ex -> ex.accessDeniedHandler((request, response, accessDeniedException) -> {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("Access rejected: " + accessDeniedException.getMessage());
-                }));
+                }));*/
 
         return http.build();
     }
