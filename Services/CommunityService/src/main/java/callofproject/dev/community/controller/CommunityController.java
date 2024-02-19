@@ -1,14 +1,8 @@
 package callofproject.dev.community.controller;
 
-import callofproject.dev.community.dto.CreateCommunityDTO;
-import callofproject.dev.community.service.CommunityService;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
-
-@RequestMapping("api/community/project")
+//@RequestMapping("api/community/project")
 public class CommunityController
-{
+{/*
     private final CommunityService m_communityService;
 
     public CommunityController(CommunityService communityService)
@@ -56,5 +50,5 @@ public class CommunityController
     public void getCommunity(@RequestParam("community_id") UUID communityId)
     {
         throw new UnsupportedOperationException("Not implemented");
-    }
+    }*/
 }

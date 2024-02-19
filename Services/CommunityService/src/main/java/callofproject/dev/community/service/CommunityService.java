@@ -1,28 +1,10 @@
 package callofproject.dev.community.service;
 
-import callofproject.dev.community.dto.CommunityDTO;
-import callofproject.dev.community.mapper.ICommunityMapper;
-import callofproject.dev.community.mapper.IUserMapper;
-import callofproject.dev.data.common.clas.ResponseMessage;
-import callofproject.dev.data.common.status.Status;
-import callofproject.dev.data.community.dal.CommunityServiceHelper;
-import callofproject.dev.data.community.entity.Community;
-import callofproject.dev.data.community.entity.User;
-import callofproject.dev.library.exception.service.DataServiceException;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
-
-import java.util.Optional;
-import java.util.UUID;
-
-import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
-
-
-@Component
-@Lazy
+/*@Component
+@Lazy*/
 public class CommunityService
 {
-    private final CommunityServiceHelper m_communityServiceHelper;
+   /* private final CommunityServiceHelper m_communityServiceHelper;
     private final ICommunityMapper m_communityMapper;
     private final IUserMapper m_userMapper;
 
@@ -34,16 +16,7 @@ public class CommunityService
         m_userMapper = userMapper;
     }
 
-    /* public ResponseMessage<Object> findCommunityByProjectId(UUID projectId)
-     {
-         return doForDataService(() -> prepareCommunityResponseMessage(findCommunityIfExists(CommunityFindType.BY_PROJECT_ID, projectId)), "CommunityService::findCommunityByProjectId");
-     }
 
-     public ResponseMessage<Object> findCommunityByProjectOwnerId(UUID ownerId)
-     {
-         return doForDataService(() -> prepareCommunityResponseMessage(findCommunityIfExists(CommunityFindType.BY_PROJECT_OWNER_ID, ownerId)), "CommunityService::findCommunityByProjectOwnerId");
-     }
- */
     public ResponseMessage<Object> findCommunityById(UUID communityId)
     {
         return doForDataService(() -> prepareCommunityResponseMessage(findCommunityIfExists(CommunityFindType.BY_ID, communityId)), "CommunityService::findCommunityById");
@@ -82,5 +55,5 @@ public class CommunityService
     private User findUserIfExist(UUID userId)
     {
         return m_communityServiceHelper.findUserById(userId).orElseThrow(() -> new DataServiceException("User not found"));
-    }
+    }*/
 }

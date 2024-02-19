@@ -49,7 +49,7 @@ public class ConnectionService implements IConnectionService
             var msg = format("%s sent you a connection request", user.getUsername());
             var approvalLink = format(m_approvalLink, owner.getUserId(), user.getUserId());
             var rejectLink = format(m_rejectLink, owner.getUserId(), user.getUserId());
-            sendNotificationToUser(user, owner, msg, approvalLink, rejectLink);
+            sendNotificationToUser(user, owner, msg, approvalLink, rejectLink, "Connection Request");
         }
 
         return result;
@@ -66,7 +66,7 @@ public class ConnectionService implements IConnectionService
             var friend = m_connectionServiceCallback.findUserByIdIfExist(friendId);
 
             var msg = format("%s %s your connection request!", user.getUsername(), answer ? "accepted" : "rejected");
-            sendNotificationToUser(user, friend, msg, "", "");
+            sendNotificationToUser(user, friend, msg, "", "", "Update Connection Request");
         }
 
         return result;
@@ -108,7 +108,7 @@ public class ConnectionService implements IConnectionService
         return doForDataService(() -> m_connectionServiceCallback.getBlockedConnectionsByUserId(userId), "ConnectionService::getBlockedConnectionsByUserId");
     }
 
-    private void sendNotificationToUser(User user, User owner, String message, String approvalLink, String rejectLink)
+    private void sendNotificationToUser(User user, User owner, String message, String approvalLink, String rejectLink, String title)
     {
         var notificationMessage = new NotificationKafkaDTO.Builder()
                 .setFromUserId(user.getUserId())
@@ -117,7 +117,7 @@ public class ConnectionService implements IConnectionService
                 .setNotificationType(NotificationType.INFORMATION)
                 .setNotificationLink("none")
                 .setNotificationImage(null)
-                .setNotificationTitle("Connection Request")
+                .setNotificationTitle(title)
                 .setNotificationDataType(NotificationDataType.REQUEST)
                 .setApproveLink(approvalLink)
                 .setRejectLink(rejectLink)
