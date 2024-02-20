@@ -24,7 +24,7 @@ public class KafkaConsumer
             groupId = "${spring.kafka.consumer.user-group-id}",
             containerFactory = "configUserKafkaListener"
     )
-    public void listenAuthenticationTopic(UserKafkaDTO dto)
+    public void consumeAuthenticationTopic(UserKafkaDTO dto)
     {
 
     }

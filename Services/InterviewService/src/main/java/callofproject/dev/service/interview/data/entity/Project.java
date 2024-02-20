@@ -42,6 +42,10 @@ public class Project
     @JoinColumn(name = "test_interview_id", referencedColumnName = "test_interview_id")
     private TestInterview m_testInterview;
 
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+    @JoinColumn(name = "coding_interview_id", referencedColumnName = "coding_interview_id")
+    private CodingInterview m_codingInterview;
+
     public Project()
     {
     }
