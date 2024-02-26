@@ -2,91 +2,158 @@ package callofproject.dev.service.interview.service;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
-import callofproject.dev.service.interview.data.dal.InterviewServiceHelper;
+import callofproject.dev.data.common.status.Status;
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
+import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
+
 @Service
 @Lazy
-public class CodingInterviewService
+public class CodingInterviewService implements ICodingService
 {
-    private final InterviewServiceHelper m_interviewServiceHelper;
+    private final CodingInterviewCallbackService m_callbackService;
 
-    public CodingInterviewService(InterviewServiceHelper interviewServiceHelper)
+    public CodingInterviewService(CodingInterviewCallbackService callbackService)
     {
-        m_interviewServiceHelper = interviewServiceHelper;
+        m_callbackService = callbackService;
     }
 
+    @Override
     public ResponseMessage<Object> createCodeInterview(CreateCodingInterviewDTO dto)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var codingInterview = doForDataService(() -> m_callbackService.createCodeInterview(dto),
+                "CodingInterviewService::createCodeInterview");
+
+        // send notification to Owner and Participants
+        if (codingInterview.getStatusCode() == Status.CREATED)
+        {
+            //........
+        }
+
+        return codingInterview;
     }
 
-    public ResponseMessage<Object> deleteCodeInterview(String codeInterviewId)
+    @Override
+    public ResponseMessage<Object> deleteCodeInterview(UUID ownerId, UUID codeInterviewId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var codingInterview = doForDataService(() -> m_callbackService.deleteCodeInterview(ownerId, codeInterviewId),
+                "CodingInterviewService::createCodeInterview");
+
+        // send notification to Owner and Participants
+        if (codingInterview.getStatusCode() == Status.OK)
+        {
+            //........
+        }
+
+        return codingInterview;
     }
 
-    public ResponseMessage<Object> deleteCodeInterviewByProjectId(String projectId)
+    @Override
+    public ResponseMessage<Object> deleteCodeInterviewByProjectId(UUID projectId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var codingInterview = doForDataService(() -> m_callbackService.deleteCodeInterviewByProjectId(projectId),
+                "CodingInterviewService::deleteCodeInterviewByProjectId");
+
+        // send notification to Owner and Participants
+        if (codingInterview.getStatusCode() == Status.OK)
+        {
+            //........
+        }
+
+        return codingInterview;
     }
 
-    public ResponseMessage<Object> addParticipant(String codeInterviewId, String userId)
+    @Override
+    public ResponseMessage<Object> addParticipant(UUID codeInterviewId, UUID userId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var result = doForDataService(() -> m_callbackService.addParticipant(codeInterviewId, userId),
+                "CodingInterviewService::addParticipant");
+
+        // send notification to Owner and Participants
+        if (result.getStatusCode() == Status.OK)
+        {
+            //........
+        }
+
+        return result;
     }
 
-    public ResponseMessage<Object> addParticipantByProjectId(String projectId, String userId)
+    @Override
+    public ResponseMessage<Object> addParticipantByProjectId(UUID projectId, UUID userId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var result = doForDataService(() -> m_callbackService.addParticipantByProjectId(projectId, userId),
+                "CodingInterviewService::addParticipantByProjectId");
+
+        // send notification to Owner and Participants
+        if (result.getStatusCode() == Status.OK)
+        {
+            //........
+        }
+
+        return result;
     }
 
-    public ResponseMessage<Object> removeParticipant(String codeInterviewId, String userId)
+    @Override
+    public ResponseMessage<Object> removeParticipant(UUID codeInterviewId, UUID userId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var result = doForDataService(() -> m_callbackService.removeParticipant(codeInterviewId, userId),
+                "CodingInterviewService::removeParticipant");
+
+        // send notification to Owner and Participants
+        if (result.getStatusCode() == Status.OK)
+        {
+            //........
+        }
+
+        return result;
     }
 
-
-    public ResponseMessage<Object> removeParticipantByProjectId(String projectId, String userId)
+    @Override
+    public ResponseMessage<Object> removeParticipantByProjectId(UUID projectId, UUID userId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var result = doForDataService(() -> m_callbackService.removeParticipantByProjectId(projectId, userId),
+                "CodingInterviewService::removeParticipantByProjectId");
+
+        // send notification to Owner and Participants
+        if (result.getStatusCode() == Status.OK)
+        {
+            //........
+        }
+
+        return result;
     }
 
-
-    public ResponseMessage<Object> getParticipants(String codeInterviewId)
+    @Override
+    public MultipleResponseMessage<Object> getParticipants(UUID codeInterviewId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return doForDataService(() -> m_callbackService.getParticipants(codeInterviewId), "CodingInterviewService::getParticipants");
     }
 
-
-    public MultipleResponseMessage<Object> getParticipantsByProjectId(String projectId)
+    @Override
+    public MultipleResponseMessage<Object> getParticipantsByProjectId(UUID projectId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return doForDataService(() -> m_callbackService.getParticipantsByProjectId(projectId), "CodingInterviewService::getParticipantsByProjectId");
     }
 
-
-    public ResponseMessage<Object> getInterviewByProjectId(String projectId)
+    @Override
+    public ResponseMessage<Object> getInterviewByProjectId(UUID projectId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return doForDataService(() -> m_callbackService.getInterviewByProjectId(projectId), "CodingInterviewService::getInterviewByProjectId");
     }
 
-
-    public ResponseMessage<Object> getInterview(String codeInterviewId)
+    @Override
+    public ResponseMessage<Object> getInterview(UUID codeInterviewId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return doForDataService(() -> m_callbackService.getInterview(codeInterviewId), "CodingInterviewService::getInterview");
     }
 
-
+    @Override
     public MultipleResponseMessage<Object> getAllInterviews()
     {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-
-    public MultipleResponseMessage<Object> getAllInterviewsByProjectId(String projectId)
-    {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return doForDataService(m_callbackService::getAllInterviews, "CodingInterviewService::getAllInterviews");
     }
 }

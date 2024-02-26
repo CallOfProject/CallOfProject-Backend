@@ -68,6 +68,16 @@ public class Project
         m_adminOperationStatus = adminOperationStatus;
     }
 
+    public CodingInterview getCodingInterview()
+    {
+        return m_codingInterview;
+    }
+
+    public void setCodingInterview(CodingInterview codingInterview)
+    {
+        m_codingInterview = codingInterview;
+    }
+
     public TestInterview getTestInterview()
     {
         return m_testInterview;

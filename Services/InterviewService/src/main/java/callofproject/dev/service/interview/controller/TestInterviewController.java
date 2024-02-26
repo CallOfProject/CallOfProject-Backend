@@ -1,6 +1,6 @@
 package callofproject.dev.service.interview.controller;
 
-import callofproject.dev.service.interview.dto.coding.TestInterviewSubmitAnswerDTO;
+import callofproject.dev.service.interview.dto.coding.CreateTestInterviewDTO;
 import callofproject.dev.service.interview.dto.test.AssignMultipleInterviewDTO;
 import callofproject.dev.service.interview.dto.test.CreateQuestionDTO;
 import callofproject.dev.service.interview.dto.test.CreateTestDTO;
@@ -91,7 +91,7 @@ public class TestInterviewController
     }
 
     @PostMapping("/submit/answer")
-    public ResponseEntity<Object> submitAnswer(@RequestBody TestInterviewSubmitAnswerDTO dto)
+    public ResponseEntity<Object> submitAnswer(@RequestBody CreateTestInterviewDTO dto)
     {
         return subscribe(() -> ok(m_testInterviewService.submitAnswer(dto)), ex -> internalServerError().body(ex.getMessage()));
     }

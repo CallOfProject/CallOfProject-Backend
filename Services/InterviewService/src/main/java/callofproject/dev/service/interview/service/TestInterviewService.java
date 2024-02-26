@@ -2,8 +2,8 @@ package callofproject.dev.service.interview.service;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
-import callofproject.dev.service.interview.data.dal.InterviewServiceHelper;
-import callofproject.dev.service.interview.dto.coding.TestInterviewSubmitAnswerDTO;
+import callofproject.dev.data.common.status.Status;
+import callofproject.dev.service.interview.dto.coding.CreateTestInterviewDTO;
 import callofproject.dev.service.interview.dto.test.AssignMultipleInterviewDTO;
 import callofproject.dev.service.interview.dto.test.CreateQuestionDTO;
 import callofproject.dev.service.interview.dto.test.CreateTestDTO;
@@ -11,89 +11,181 @@ import callofproject.dev.service.interview.dto.test.TestInterviewFinishDTO;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
+
 @Service
 @Lazy
 public class TestInterviewService
 {
-    private final InterviewServiceHelper m_interviewServiceHelper;
+    private final TestInterviewCallbackService m_callbackService;
 
-    public TestInterviewService(InterviewServiceHelper interviewServiceHelper)
+    public TestInterviewService(TestInterviewCallbackService callbackService)
     {
-        m_interviewServiceHelper = interviewServiceHelper;
+        m_callbackService = callbackService;
     }
 
     public ResponseMessage<Object> createInterview(CreateTestDTO dto)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var testInterview = doForDataService(() -> m_callbackService.createInterview(dto),
+                "TestInterviewService::createCodeInterview");
+
+        // send notification to Owner and Participants
+        if (testInterview.getStatusCode() == Status.CREATED)
+        {
+            //........
+        }
+
+        return testInterview;
     }
 
     public ResponseMessage<Object> addQuestion(CreateQuestionDTO createQuestionDTO)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var question = doForDataService(() -> m_callbackService.addQuestion(createQuestionDTO),
+                "TestInterviewService::addQuestion");
+
+        // send notification to Owner and Participants
+        if (question.getStatusCode() == Status.CREATED)
+        {
+            //........
+        }
+
+        return question;
     }
 
     public ResponseMessage<Object> assignTestInterview(String interviewId, String userId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var testInterview = doForDataService(() -> m_callbackService.assignTestInterview(interviewId, userId),
+                "TestInterviewService::assignTestInterview");
+
+        // send notification to Owner and Participants
+        if (testInterview.getStatusCode() == Status.CREATED)
+        {
+            //........
+        }
+
+        return testInterview;
     }
 
     public ResponseMessage<Object> assignMultipleTestInterview(AssignMultipleInterviewDTO dto)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var testInterview = doForDataService(() -> m_callbackService.assignMultipleTestInterview(dto),
+                "TestInterviewService::assignMultipleTestInterview");
+
+        // send notification to Owner and Participants
+        if (testInterview.getStatusCode() == Status.CREATED)
+        {
+            //........
+        }
+
+        return testInterview;
     }
 
     public ResponseMessage<Object> deleteTestInterview(String interviewId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var testInterview = doForDataService(() -> m_callbackService.deleteTestInterview(interviewId),
+                "TestInterviewService::deleteTestInterview");
+
+        // send notification to Owner and Participants
+        if (testInterview.getStatusCode() == Status.OK)
+        {
+            //........
+        }
+
+        return testInterview;
     }
 
     public ResponseMessage<Object> deleteTestInterviewByProjectId(String projectId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var testInterview = doForDataService(() -> m_callbackService.deleteTestInterviewByProjectId(projectId),
+                "TestInterviewService::deleteTestInterviewByProjectId");
+
+        // send notification to Owner and Participants
+        if (testInterview.getStatusCode() == Status.OK)
+        {
+            //........
+        }
+
+        return testInterview;
     }
 
     public ResponseMessage<Object> finishTestInterview(TestInterviewFinishDTO dto)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var testInterview = doForDataService(() -> m_callbackService.finishTestInterview(dto),
+                "TestInterviewService::finishTestInterview");
+
+        // send notification to Owner and Participants
+        if (testInterview.getStatusCode() == Status.OK)
+        {
+            //........
+        }
+
+        return testInterview;
     }
 
     public ResponseMessage<Object> startTestInterview(String interviewId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var testInterview = doForDataService(() -> m_callbackService.startTestInterview(interviewId),
+                "TestInterviewService::startTestInterview");
+
+        // send notification to Owner and Participants
+        if (testInterview.getStatusCode() == Status.OK)
+        {
+            //........
+        }
+
+        return testInterview;
     }
 
     public ResponseMessage<Object> startTestInterviewByProjectId(String projectId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var testInterview = doForDataService(() -> m_callbackService.startTestInterviewByProjectId(projectId),
+                "TestInterviewService::startTestInterviewByProjectId");
+
+        // send notification to Owner and Participants
+        if (testInterview.getStatusCode() == Status.OK)
+        {
+            //........
+        }
+
+        return testInterview;
     }
 
-    public ResponseMessage<Object> submitAnswer(TestInterviewSubmitAnswerDTO dto)
+    public ResponseMessage<Object> submitAnswer(CreateTestInterviewDTO dto)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        var testInterview = doForDataService(() -> m_callbackService.submitAnswer(dto),
+                "TestInterviewService::submitAnswer");
+
+        // send notification to Owner and Participants
+        if (testInterview.getStatusCode() == Status.OK)
+        {
+            //........
+        }
+
+        return testInterview;
     }
 
     public ResponseMessage<Object> getQuestion(String interviewId, int q)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return doForDataService(() -> m_callbackService.getQuestion(interviewId, q), "TestInterviewService::getQuestion");
     }
 
     public ResponseMessage<Object> getQuestionByProjectId(String projectId, int q)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return doForDataService(() -> m_callbackService.getQuestionByProjectId(projectId, q), "TestInterviewService::getQuestionByProjectId");
     }
 
     public ResponseMessage<Object> deleteQuestion(String questionId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return doForDataService(() -> m_callbackService.deleteQuestion(questionId), "TestInterviewService::deleteQuestion");
     }
 
     public MultipleResponseMessage<Object> getQuestions(String interviewId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return doForDataService(() -> m_callbackService.getQuestions(interviewId), "TestInterviewService::getQuestions");
     }
 
     public MultipleResponseMessage<Object> getQuestionsByProjectId(String projectId)
     {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return doForDataService(() -> m_callbackService.getQuestionsByProjectId(projectId), "TestInterviewService::getQuestionsByProjectId");
     }
 }

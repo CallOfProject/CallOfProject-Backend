@@ -1,9 +1,11 @@
 package callofproject.dev.service.interview.controller;
 
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
-import callofproject.dev.service.interview.service.CodingInterviewService;
+import callofproject.dev.service.interview.service.ICodingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.internalServerError;
@@ -13,9 +15,9 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequestMapping("/api/interview/coding")
 public class CodingInterviewController
 {
-    private final CodingInterviewService m_codingInterviewService;
+    private final ICodingService m_codingInterviewService;
 
-    public CodingInterviewController(CodingInterviewService codingInterviewService)
+    public CodingInterviewController(ICodingService codingInterviewService)
     {
         m_codingInterviewService = codingInterviewService;
     }
@@ -27,61 +29,61 @@ public class CodingInterviewController
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteCodeInterview(@RequestParam("interview_id") String codeInterviewId)
+    public ResponseEntity<?> deleteCodeInterview(@RequestParam("owner_id") UUID ownerId, @RequestParam("interview_id") UUID codeInterviewId)
     {
-        return subscribe(() -> ok(m_codingInterviewService.deleteCodeInterview(codeInterviewId)), ex -> internalServerError().body(ex.getMessage()));
+        return subscribe(() -> ok(m_codingInterviewService.deleteCodeInterview(ownerId, codeInterviewId)), ex -> internalServerError().body(ex.getMessage()));
     }
 
     @DeleteMapping("/delete/by/project-id")
-    public ResponseEntity<?> deleteCodeInterviewByProjectId(@RequestParam("project_id") String projectId)
+    public ResponseEntity<?> deleteCodeInterviewByProjectId(@RequestParam("project_id") UUID projectId)
     {
         return subscribe(() -> ok(m_codingInterviewService.deleteCodeInterviewByProjectId(projectId)), ex -> internalServerError().body(ex.getMessage()));
     }
 
     @PostMapping("/add/participant")
-    public ResponseEntity<Object> addParticipant(@RequestParam("interview_id") String codeInterviewId, @RequestParam("user_id") String userId)
+    public ResponseEntity<Object> addParticipant(@RequestParam("interview_id") UUID codeInterviewId, @RequestParam("user_id") UUID userId)
     {
         return subscribe(() -> ok(m_codingInterviewService.addParticipant(codeInterviewId, userId)), ex -> internalServerError().body(ex.getMessage()));
     }
 
     @PostMapping("/add/participant/by/project-id")
-    public ResponseEntity<Object> addParticipantByProjectId(@RequestParam("project_id") String projectId, @RequestParam("user_id") String userId)
+    public ResponseEntity<Object> addParticipantByProjectId(@RequestParam("project_id") UUID projectId, @RequestParam("user_id") UUID userId)
     {
         return subscribe(() -> ok(m_codingInterviewService.addParticipantByProjectId(projectId, userId)), ex -> internalServerError().body(ex.getMessage()));
     }
 
     @DeleteMapping("/remove/participant")
-    public ResponseEntity<Object> removeParticipant(@RequestParam("interview_id") String codeInterviewId, @RequestParam("user_id") String userId)
+    public ResponseEntity<Object> removeParticipant(@RequestParam("interview_id") UUID codeInterviewId, @RequestParam("user_id") UUID userId)
     {
         return subscribe(() -> ok(m_codingInterviewService.removeParticipant(codeInterviewId, userId)), ex -> internalServerError().body(ex.getMessage()));
     }
 
     @DeleteMapping("/remove/participant/by/project-id")
-    public ResponseEntity<Object> removeParticipantByProjectId(@RequestParam("project_id") String projectId, @RequestParam("user_id") String userId)
+    public ResponseEntity<Object> removeParticipantByProjectId(@RequestParam("project_id") UUID projectId, @RequestParam("user_id") UUID userId)
     {
         return subscribe(() -> ok(m_codingInterviewService.removeParticipantByProjectId(projectId, userId)), ex -> internalServerError().body(ex.getMessage()));
     }
 
     @GetMapping("/find/participants")
-    public ResponseEntity<Object> getParticipants(@RequestParam("interview_id") String codeInterviewId)
+    public ResponseEntity<Object> getParticipants(@RequestParam("interview_id") UUID codeInterviewId)
     {
         return subscribe(() -> ok(m_codingInterviewService.getParticipants(codeInterviewId)), ex -> internalServerError().body(ex.getMessage()));
     }
 
     @GetMapping("/find/participants/by/project-id")
-    public ResponseEntity<Object> getParticipantsByProjectId(@RequestParam("project_id") String projectId)
+    public ResponseEntity<Object> getParticipantsByProjectId(@RequestParam("project_id") UUID projectId)
     {
         return subscribe(() -> ok(m_codingInterviewService.getParticipantsByProjectId(projectId)), ex -> internalServerError().body(ex.getMessage()));
     }
 
     @GetMapping("/find/by/project-id")
-    public ResponseEntity<Object> getInterviewByProjectId(@RequestParam("project_id") String projectId)
+    public ResponseEntity<Object> getInterviewByProjectId(@RequestParam("project_id") UUID projectId)
     {
         return subscribe(() -> ok(m_codingInterviewService.getInterviewByProjectId(projectId)), ex -> internalServerError().body(ex.getMessage()));
     }
 
     @GetMapping("/find/by/interview-id")
-    public ResponseEntity<Object> getInterview(@RequestParam("interview_id") String codeInterviewId)
+    public ResponseEntity<Object> getInterview(@RequestParam("interview_id") UUID codeInterviewId)
     {
         return subscribe(() -> ok(m_codingInterviewService.getInterview(codeInterviewId)), ex -> internalServerError().body(ex.getMessage()));
     }
@@ -90,11 +92,5 @@ public class CodingInterviewController
     public ResponseEntity<Object> getAllInterviews()
     {
         return subscribe(() -> ok(m_codingInterviewService.getAllInterviews()), ex -> internalServerError().body(ex.getMessage()));
-    }
-
-    @GetMapping("/find/all/by/project-id")
-    public ResponseEntity<Object> getAllInterviewsByProjectId(@RequestParam("project_id") String projectId)
-    {
-        return subscribe(() -> ok(m_codingInterviewService.getAllInterviewsByProjectId(projectId)), ex -> internalServerError().body(ex.getMessage()));
     }
 }
