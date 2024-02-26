@@ -1,5 +1,11 @@
 package callofproject.dev.service.interview.dto.test;
 
-public record TestInterviewFinishDTO()
+import java.util.UUID;
+
+public record TestInterviewFinishDTO(
+        UUID projectId,
+        UUID interviewId,
+        UUID userId
+)
 {
 }

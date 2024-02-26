@@ -6,8 +6,6 @@ import java.util.UUID;
 public record AssignMultipleInterviewDTO(
         UUID interviewId,
         UUID projectId,
-        List<UUID> userId
-
-)
+        List<UUID> userIds)
 {
 }

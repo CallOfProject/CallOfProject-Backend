@@ -57,9 +57,8 @@ public class TestInterview
 
     }
 
-    public TestInterview(int questionCount, String title, long totalTimeMinutes, String description, Project project)
+    public TestInterview(int questionCount, String title, long totalTimeMinutes, String description)
     {
-        this.project = project;
         m_questionCount = questionCount;
         m_title = title;
         m_totalTimeMinutes = totalTimeMinutes;
@@ -69,9 +68,8 @@ public class TestInterview
     }
 
     public TestInterview(int questionCount, String title, long totalTimeMinutes, String description, int totalScore,
-                         InterviewStatus interviewStatus, Project project)
+                         InterviewStatus interviewStatus)
     {
-        this.project = project;
         m_questionCount = questionCount;
         m_title = title;
         m_totalTimeMinutes = totalTimeMinutes;

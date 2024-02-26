@@ -146,7 +146,7 @@ public class CodingInterviewCallbackService
 
     private CodingInterview findInterviewIfExistsById(UUID codeInterviewId)
     {
-        var interview = m_interviewServiceHelper.findInterviewById(codeInterviewId);
+        var interview = m_interviewServiceHelper.findCodingInterviewById(codeInterviewId);
 
         if (interview.isEmpty())
             throw new DataServiceException("Interview not found");

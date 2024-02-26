@@ -3,13 +3,14 @@ package callofproject.dev.service.interview.service;
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.status.Status;
-import callofproject.dev.service.interview.dto.coding.CreateTestInterviewDTO;
 import callofproject.dev.service.interview.dto.test.AssignMultipleInterviewDTO;
 import callofproject.dev.service.interview.dto.test.CreateQuestionDTO;
 import callofproject.dev.service.interview.dto.test.CreateTestDTO;
 import callofproject.dev.service.interview.dto.test.TestInterviewFinishDTO;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 
@@ -52,35 +53,17 @@ public class TestInterviewService
         return question;
     }
 
-    public ResponseMessage<Object> assignTestInterview(String interviewId, String userId)
+    public ResponseMessage<Object> assignTestInterview(UUID interviewId, UUID userId)
     {
-        var testInterview = doForDataService(() -> m_callbackService.assignTestInterview(interviewId, userId),
-                "TestInterviewService::assignTestInterview");
-
-        // send notification to Owner and Participants
-        if (testInterview.getStatusCode() == Status.CREATED)
-        {
-            //........
-        }
-
-        return testInterview;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     public ResponseMessage<Object> assignMultipleTestInterview(AssignMultipleInterviewDTO dto)
     {
-        var testInterview = doForDataService(() -> m_callbackService.assignMultipleTestInterview(dto),
-                "TestInterviewService::assignMultipleTestInterview");
-
-        // send notification to Owner and Participants
-        if (testInterview.getStatusCode() == Status.CREATED)
-        {
-            //........
-        }
-
-        return testInterview;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    public ResponseMessage<Object> deleteTestInterview(String interviewId)
+    public ResponseMessage<Object> deleteTestInterview(UUID interviewId)
     {
         var testInterview = doForDataService(() -> m_callbackService.deleteTestInterview(interviewId),
                 "TestInterviewService::deleteTestInterview");
@@ -94,7 +77,7 @@ public class TestInterviewService
         return testInterview;
     }
 
-    public ResponseMessage<Object> deleteTestInterviewByProjectId(String projectId)
+    public ResponseMessage<Object> deleteTestInterviewByProjectId(UUID projectId)
     {
         var testInterview = doForDataService(() -> m_callbackService.deleteTestInterviewByProjectId(projectId),
                 "TestInterviewService::deleteTestInterviewByProjectId");
@@ -122,7 +105,7 @@ public class TestInterviewService
         return testInterview;
     }
 
-    public ResponseMessage<Object> startTestInterview(String interviewId)
+    public ResponseMessage<Object> startTestInterview(UUID interviewId)
     {
         var testInterview = doForDataService(() -> m_callbackService.startTestInterview(interviewId),
                 "TestInterviewService::startTestInterview");
@@ -136,7 +119,7 @@ public class TestInterviewService
         return testInterview;
     }
 
-    public ResponseMessage<Object> startTestInterviewByProjectId(String projectId)
+    public ResponseMessage<Object> startTestInterviewByProjectId(UUID projectId)
     {
         var testInterview = doForDataService(() -> m_callbackService.startTestInterviewByProjectId(projectId),
                 "TestInterviewService::startTestInterviewByProjectId");
@@ -150,9 +133,9 @@ public class TestInterviewService
         return testInterview;
     }
 
-    public ResponseMessage<Object> submitAnswer(CreateTestInterviewDTO dto)
+    public ResponseMessage<Object> submitAnswer(UUID interviewId, long questionId)
     {
-        var testInterview = doForDataService(() -> m_callbackService.submitAnswer(dto),
+        var testInterview = doForDataService(() -> m_callbackService.submitAnswer(interviewId, questionId),
                 "TestInterviewService::submitAnswer");
 
         // send notification to Owner and Participants
@@ -164,28 +147,29 @@ public class TestInterviewService
         return testInterview;
     }
 
-    public ResponseMessage<Object> getQuestion(String interviewId, int q)
+    public ResponseMessage<Object> getQuestion(UUID interviewId, int q)
     {
         return doForDataService(() -> m_callbackService.getQuestion(interviewId, q), "TestInterviewService::getQuestion");
     }
 
-    public ResponseMessage<Object> getQuestionByProjectId(String projectId, int q)
+    public ResponseMessage<Object> getQuestionByProjectId(UUID projectId, int q)
     {
         return doForDataService(() -> m_callbackService.getQuestionByProjectId(projectId, q), "TestInterviewService::getQuestionByProjectId");
     }
 
-    public ResponseMessage<Object> deleteQuestion(String questionId)
+    public ResponseMessage<Object> deleteQuestion(long questionId)
     {
         return doForDataService(() -> m_callbackService.deleteQuestion(questionId), "TestInterviewService::deleteQuestion");
     }
 
-    public MultipleResponseMessage<Object> getQuestions(String interviewId)
+    public MultipleResponseMessage<Object> getQuestions(UUID interviewId)
     {
         return doForDataService(() -> m_callbackService.getQuestions(interviewId), "TestInterviewService::getQuestions");
     }
 
-    public MultipleResponseMessage<Object> getQuestionsByProjectId(String projectId)
+    public MultipleResponseMessage<Object> getQuestionsByProjectId(UUID projectId)
     {
         return doForDataService(() -> m_callbackService.getQuestionsByProjectId(projectId), "TestInterviewService::getQuestionsByProjectId");
     }
+
 }

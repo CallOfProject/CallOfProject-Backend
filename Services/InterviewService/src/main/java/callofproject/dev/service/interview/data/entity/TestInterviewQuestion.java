@@ -39,8 +39,13 @@ public class TestInterviewQuestion
     @JoinColumn(name = "test_interview_id", nullable = false)
     private TestInterview m_testInterview;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private QuestionStatus m_status;
+
     public TestInterviewQuestion()
     {
+        m_status = QuestionStatus.UNANSWERED;
     }
 
     public TestInterviewQuestion(String title, int point, String question)
@@ -48,6 +53,7 @@ public class TestInterviewQuestion
         m_title = title;
         m_point = point;
         m_question = question;
+        m_status = QuestionStatus.UNANSWERED;
     }
 
     public static class Builder
@@ -101,6 +107,15 @@ public class TestInterviewQuestion
         }
     }
 
+    public QuestionStatus getStatus()
+    {
+        return m_status;
+    }
+
+    public void setStatus(QuestionStatus status)
+    {
+        m_status = status;
+    }
 
     public long getId()
     {
