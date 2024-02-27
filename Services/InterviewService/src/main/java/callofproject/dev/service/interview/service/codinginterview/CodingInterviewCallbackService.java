@@ -1,4 +1,4 @@
-package callofproject.dev.service.interview.service;
+package callofproject.dev.service.interview.service.codinginterview;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
@@ -10,6 +10,7 @@ import callofproject.dev.service.interview.data.entity.Project;
 import callofproject.dev.service.interview.data.entity.User;
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
 import callofproject.dev.service.interview.mapper.ICodingInterviewMapper;
+import callofproject.dev.service.interview.mapper.IProjectMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -24,11 +25,13 @@ public class CodingInterviewCallbackService
 {
     private final InterviewServiceHelper m_interviewServiceHelper;
     private final ICodingInterviewMapper m_codingInterviewMapper;
+    private final IProjectMapper m_projectMapper;
 
-    public CodingInterviewCallbackService(InterviewServiceHelper interviewServiceHelper, ICodingInterviewMapper codingInterviewMapper)
+    public CodingInterviewCallbackService(InterviewServiceHelper interviewServiceHelper, ICodingInterviewMapper codingInterviewMapper, IProjectMapper projectMapper)
     {
         m_interviewServiceHelper = interviewServiceHelper;
         m_codingInterviewMapper = codingInterviewMapper;
+        m_projectMapper = projectMapper;
     }
 
     public ResponseMessage<Object> createCodeInterview(CreateCodingInterviewDTO dto)
@@ -36,11 +39,18 @@ public class CodingInterviewCallbackService
         // to dto
         var codingInterviewCreateEntity = m_codingInterviewMapper.toCodingInterview(dto);
 
+        var project = findProjectIfExistsById(dto.projectId());
+        codingInterviewCreateEntity.setProject(project);
+        project.setCodingInterview(codingInterviewCreateEntity);
+        m_interviewServiceHelper.createProject(project);
         // create coding interview
         var result = doForDataService(() -> m_interviewServiceHelper.createCodeInterview(codingInterviewCreateEntity),
                 "CodingInterviewCallbackService.createCodeInterview: Error creating coding interview");
 
-        return new ResponseMessage<>("Coding interview created successfully", Status.CREATED, result);
+        var p = m_projectMapper.toProjectDTO(result.getProject());
+        var codingDto = m_codingInterviewMapper.toCodingInterviewDTO(result, p);
+
+        return new ResponseMessage<>("Coding interview created successfully", Status.CREATED, codingDto);
     }
 
     public ResponseMessage<Object> deleteCodeInterview(UUID ownerId, UUID codeInterviewId)

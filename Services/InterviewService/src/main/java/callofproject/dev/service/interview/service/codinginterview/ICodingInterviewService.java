@@ -1,4 +1,4 @@
-package callofproject.dev.service.interview.service;
+package callofproject.dev.service.interview.service.codinginterview;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
@@ -6,7 +6,7 @@ import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
 
 import java.util.UUID;
 
-public interface ICodingService
+public interface ICodingInterviewService
 {
     ResponseMessage<Object> createCodeInterview(CreateCodingInterviewDTO dto);
 

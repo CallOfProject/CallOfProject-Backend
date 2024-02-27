@@ -103,4 +103,9 @@ public class InterviewServiceHelper
     {
         doForRepository(() -> m_repositoryFacade.m_testInterviewQuestionRepository.delete(question), "Error deleting question");
     }
+
+    public Project createProject(Project project)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_projectRepository.save(project), "Error creating project");
+    }
 }

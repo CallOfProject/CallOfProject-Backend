@@ -4,7 +4,7 @@ import callofproject.dev.service.interview.dto.test.AssignMultipleInterviewDTO;
 import callofproject.dev.service.interview.dto.test.CreateQuestionDTO;
 import callofproject.dev.service.interview.dto.test.CreateTestDTO;
 import callofproject.dev.service.interview.dto.test.TestInterviewFinishDTO;
-import callofproject.dev.service.interview.service.TestInterviewService;
+import callofproject.dev.service.interview.service.testinterview.TestInterviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

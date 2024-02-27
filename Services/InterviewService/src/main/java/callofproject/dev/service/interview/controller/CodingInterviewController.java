@@ -1,7 +1,7 @@
 package callofproject.dev.service.interview.controller;
 
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
-import callofproject.dev.service.interview.service.ICodingService;
+import callofproject.dev.service.interview.service.codinginterview.ICodingInterviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +15,9 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequestMapping("/api/interview/coding")
 public class CodingInterviewController
 {
-    private final ICodingService m_codingInterviewService;
+    private final ICodingInterviewService m_codingInterviewService;
 
-    public CodingInterviewController(ICodingService codingInterviewService)
+    public CodingInterviewController(ICodingInterviewService codingInterviewService)
     {
         m_codingInterviewService = codingInterviewService;
     }

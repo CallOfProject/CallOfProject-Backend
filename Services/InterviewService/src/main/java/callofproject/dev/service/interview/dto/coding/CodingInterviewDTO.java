@@ -1,14 +1,15 @@
 package callofproject.dev.service.interview.dto.coding;
 
-import java.util.UUID;
+import callofproject.dev.service.interview.dto.ProjectDTO;
 
-public record CreateCodingInterviewDTO(
+public record CodingInterviewDTO(
         String title,
         String description,
         long durationMinutes,
         String question,
         String answerFileName,
         int point,
-        UUID projectId)
+        ProjectDTO projectDTO
+)
 {
 }

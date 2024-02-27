@@ -3,6 +3,7 @@ package callofproject.dev.service.interview.data.entity;
 
 import callofproject.dev.service.interview.data.entity.enums.InterviewResult;
 import callofproject.dev.service.interview.data.entity.enums.InterviewStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -45,9 +46,11 @@ public class TestInterview
     private Project project;
 
     @OneToMany(mappedBy = "m_testInterview", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<TestInterviewQuestion> m_questions;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "m_testInterviews")
+    @JsonIgnore
     private Set<User> m_assignedUsers;
 
     public TestInterview()

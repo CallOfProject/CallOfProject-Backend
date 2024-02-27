@@ -3,6 +3,8 @@ package callofproject.dev.service.interview.config.kafka;
 import callofproject.dev.service.interview.config.kafka.dto.ProjectInfoKafkaDTO;
 import callofproject.dev.service.interview.config.kafka.dto.ProjectParticipantKafkaDTO;
 import callofproject.dev.service.interview.config.kafka.dto.UserKafkaDTO;
+import callofproject.dev.service.interview.data.dal.InterviewServiceHelper;
+import callofproject.dev.service.interview.mapper.IUserMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class KafkaConsumer
 {
+    private final IUserMapper m_userMapper;
+    private final InterviewServiceHelper m_serviceHelper;
+
+    public KafkaConsumer(IUserMapper userMapper, InterviewServiceHelper serviceHelper)
+    {
+        m_userMapper = userMapper;
+        m_serviceHelper = serviceHelper;
+    }
 
 
     /**
@@ -26,7 +36,7 @@ public class KafkaConsumer
     )
     public void consumeAuthenticationTopic(UserKafkaDTO dto)
     {
-
+        m_serviceHelper.saveUser(m_userMapper.toUser(dto));
     }
 
 

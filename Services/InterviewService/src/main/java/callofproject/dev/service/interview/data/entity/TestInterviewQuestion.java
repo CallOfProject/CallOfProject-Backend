@@ -36,7 +36,7 @@ public class TestInterviewQuestion
     private String m_answer;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "test_interview_id", nullable = false)
+    @JoinColumn(name = "test_interview_id")
     private TestInterview m_testInterview;
 
     @Enumerated(EnumType.STRING)

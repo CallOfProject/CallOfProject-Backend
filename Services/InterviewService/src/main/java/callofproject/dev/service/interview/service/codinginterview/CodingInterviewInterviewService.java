@@ -1,4 +1,4 @@
-package callofproject.dev.service.interview.service;
+package callofproject.dev.service.interview.service.codinginterview;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
@@ -13,11 +13,11 @@ import static callofproject.dev.library.exception.util.CopDataUtil.doForDataServ
 
 @Service
 @Lazy
-public class CodingInterviewService implements ICodingService
+public class CodingInterviewInterviewService implements ICodingInterviewService
 {
     private final CodingInterviewCallbackService m_callbackService;
 
-    public CodingInterviewService(CodingInterviewCallbackService callbackService)
+    public CodingInterviewInterviewService(CodingInterviewCallbackService callbackService)
     {
         m_callbackService = callbackService;
     }

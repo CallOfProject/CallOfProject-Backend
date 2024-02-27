@@ -1,4 +1,4 @@
-package callofproject.dev.service.interview.service;
+package callofproject.dev.service.interview.service.testinterview;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
@@ -39,25 +39,31 @@ public class TestInterviewCallbackService
     {
         var project = findProjectIfExistsById(dto.projectId());
         var testInterview = m_interviewServiceHelper.createInterview(m_testInterviewMapper.toTestInterview(dto));
+        project.setTestInterview(testInterview);
         testInterview.setProject(project);
+        m_interviewServiceHelper.createInterview(testInterview);
+
         // to question entity
-        var questions = dto.questions().stream().map(m_testInterviewQuestionMapper::toTestInterviewQuestion).toList();
+        var questions = dto.questionList().stream().map(m_testInterviewQuestionMapper::toTestInterviewQuestion).toList();
+        questions.forEach(q -> q.setTestInterview(testInterview));
         var savedQuestions = StreamSupport.stream(m_interviewServiceHelper.saveQuestions(questions).spliterator(), false).collect(Collectors.toSet());
         testInterview.setQuestions(savedQuestions);
 
-        var savedTestInterview = m_interviewServiceHelper.createInterview(testInterview);
+        var savedTestInterview = m_testInterviewMapper.toTestInterviewDTO(m_interviewServiceHelper.createInterview(testInterview));
 
         return new ResponseMessage<>("Test interview created successfully", Status.CREATED, savedTestInterview);
     }
 
     public ResponseMessage<Object> addQuestion(CreateQuestionDTO createQuestionDTO)
     {
-        var interview = findInterviewIfExistsById(createQuestionDTO.interviewId());
+      /*  var interview = findInterviewIfExistsById(createQuestionDTO.interviewId());
         var question = m_testInterviewQuestionMapper.toTestInterviewQuestion(createQuestionDTO);
         question.setTestInterview(interview);
         var savedQuestion = m_interviewServiceHelper.saveQuestion(question);
 
-        return new ResponseMessage<>("Question added successfully", Status.CREATED, savedQuestion);
+        return new ResponseMessage<>("Question added successfully", Status.CREATED, savedQuestion);*/
+
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     public ResponseMessage<Object> assignTestInterview(UUID interviewId, UUID userId)
