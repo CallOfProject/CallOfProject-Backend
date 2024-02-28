@@ -76,9 +76,7 @@ public class FeedbackSchedulerService
         {
             project.setProjectStatus(EProjectStatus.APPLICATION_FEEDBACK_TIMEOUT);
             project.setAdminNote("Project Application Feedback Timeout!");
-        }
-
-        else if (project.getProjectStatus() != EXTEND_APPLICATION_FEEDBACK && project.getProjectStatus() != EProjectStatus.APPLICATION_FEEDBACK_TIMEOUT)
+        } else if (project.getProjectStatus() != EXTEND_APPLICATION_FEEDBACK && project.getProjectStatus() != EProjectStatus.APPLICATION_FEEDBACK_TIMEOUT)
         {
             project.setProjectStatus(EXTEND_APPLICATION_FEEDBACK);
             project.setApplicationDeadline(project.getApplicationDeadline().plusWeeks(1));

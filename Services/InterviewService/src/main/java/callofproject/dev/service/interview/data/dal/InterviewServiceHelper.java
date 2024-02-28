@@ -108,4 +108,9 @@ public class InterviewServiceHelper
     {
         return doForRepository(() -> m_repositoryFacade.m_projectRepository.save(project), "Error creating project");
     }
+
+    public ProjectParticipant createProjectParticipant(ProjectParticipant participant)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_projectParticipantRepository.save(participant), "Error creating project participant");
+    }
 }

@@ -3,7 +3,9 @@ package callofproject.dev.service.interview.service.codinginterview;
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.status.Status;
+import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
+import callofproject.dev.service.interview.service.EInterviewStatus;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -28,11 +30,8 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
         var codingInterview = doForDataService(() -> m_callbackService.createCodeInterview(dto),
                 "CodingInterviewService::createCodeInterview");
 
-        // send notification to Owner and Participants
         if (codingInterview.getStatusCode() == Status.CREATED)
-        {
-            //........
-        }
+            m_callbackService.sendNotification((CodingInterviewDTO) codingInterview.getObject(), EInterviewStatus.CREATED);
 
         return codingInterview;
     }
@@ -45,9 +44,7 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
 
         // send notification to Owner and Participants
         if (codingInterview.getStatusCode() == Status.OK)
-        {
-            //........
-        }
+            m_callbackService.sendNotification((Boolean) codingInterview.getObject(), codeInterviewId, EInterviewStatus.REMOVED);
 
         return codingInterview;
     }
@@ -60,9 +57,7 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
 
         // send notification to Owner and Participants
         if (codingInterview.getStatusCode() == Status.OK)
-        {
-            //........
-        }
+            m_callbackService.sendNotification(projectId, true, EInterviewStatus.REMOVED);
 
         return codingInterview;
     }
@@ -75,9 +70,7 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
 
         // send notification to Owner and Participants
         if (result.getStatusCode() == Status.OK)
-        {
-            //........
-        }
+            m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.ASSIGNED);
 
         return result;
     }
@@ -90,9 +83,7 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
 
         // send notification to Owner and Participants
         if (result.getStatusCode() == Status.OK)
-        {
-            //........
-        }
+            m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.REMOVED);
 
         return result;
     }
@@ -106,7 +97,7 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
         // send notification to Owner and Participants
         if (result.getStatusCode() == Status.OK)
         {
-            //........
+            //m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.CANCELLED);
         }
 
         return result;
@@ -120,9 +111,7 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
 
         // send notification to Owner and Participants
         if (result.getStatusCode() == Status.OK)
-        {
-            //........
-        }
+            m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.CANCELLED);
 
         return result;
     }

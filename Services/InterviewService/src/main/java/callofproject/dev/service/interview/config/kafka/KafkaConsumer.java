@@ -4,9 +4,14 @@ import callofproject.dev.service.interview.config.kafka.dto.ProjectInfoKafkaDTO;
 import callofproject.dev.service.interview.config.kafka.dto.ProjectParticipantKafkaDTO;
 import callofproject.dev.service.interview.config.kafka.dto.UserKafkaDTO;
 import callofproject.dev.service.interview.data.dal.InterviewServiceHelper;
+import callofproject.dev.service.interview.data.entity.Project;
+import callofproject.dev.service.interview.data.entity.ProjectParticipant;
+import callofproject.dev.service.interview.data.entity.enums.AdminOperationStatus;
 import callofproject.dev.service.interview.mapper.IUserMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 /**
  * This class represents a Kafka consumer service responsible for listening to messages from a Kafka topic.
@@ -47,7 +52,20 @@ public class KafkaConsumer
     )
     public void consumeProjectInfo(ProjectInfoKafkaDTO projectDTO)
     {
+        var owner = m_serviceHelper.findUserById(projectDTO.projectOwner().userId());
+        var project = new Project(projectDTO.projectId(), projectDTO.projectName(), owner.get());
+        //var savedProject = m_projectRepository.save(project);
+        var participants = projectDTO.projectParticipants().stream().map(pp -> toProjectParticipant(pp, project)).collect(Collectors.toSet());
+        project.setProjectParticipants(participants);
+        project.setProjectStatus(projectDTO.projectStatus());
+        project.setAdminOperationStatus(AdminOperationStatus.valueOf(projectDTO.adminOperationStatus().name()));
+        m_serviceHelper.createProject(project);
+    }
 
+    private ProjectParticipant toProjectParticipant(ProjectParticipantKafkaDTO participant, Project project)
+    {
+        var user = m_serviceHelper.findUserById(participant.userId());
+        return new ProjectParticipant(project, user.get());
     }
 
 
@@ -58,7 +76,13 @@ public class KafkaConsumer
     )
     public void consumeProjectParticipant(ProjectParticipantKafkaDTO dto)
     {
+        var project = m_serviceHelper.findProjectById(dto.projectId());
 
+        if (project.isPresent())
+        {
+            var participant = toProjectParticipant(dto, project.get());
+            m_serviceHelper.createProjectParticipant(participant);
+        }
     }
 
 }

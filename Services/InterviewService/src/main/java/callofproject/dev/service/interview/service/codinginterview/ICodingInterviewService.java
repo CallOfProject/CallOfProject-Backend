@@ -22,13 +22,13 @@ public interface ICodingInterviewService
 
     ResponseMessage<Object> removeParticipantByProjectId(UUID projectId, UUID userId);
 
-    MultipleResponseMessage<Object> getParticipants(UUID codeInterviewId);
-
-    MultipleResponseMessage<Object> getParticipantsByProjectId(UUID projectId);
-
     ResponseMessage<Object> getInterviewByProjectId(UUID projectId);
 
     ResponseMessage<Object> getInterview(UUID codeInterviewId);
 
     MultipleResponseMessage<Object> getAllInterviews();
+
+    MultipleResponseMessage<Object> getParticipants(UUID codeInterviewId);
+
+    MultipleResponseMessage<Object> getParticipantsByProjectId(UUID projectId);
 }

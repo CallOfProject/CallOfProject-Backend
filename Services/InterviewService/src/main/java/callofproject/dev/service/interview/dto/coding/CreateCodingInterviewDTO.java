@@ -7,7 +7,6 @@ public record CreateCodingInterviewDTO(
         String description,
         long durationMinutes,
         String question,
-        String answerFileName,
         int point,
         UUID projectId)
 {

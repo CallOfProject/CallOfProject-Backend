@@ -123,7 +123,6 @@ public class ConnectionService implements IConnectionService
                 .setRejectLink(rejectLink)
                 .build();
 
-        // Send notification to project owner
         doForDataService(() -> m_kafkaProducer.sendNotification(notificationMessage), "ProjectService::sendNotificationToProjectOwner");
     }
 }

@@ -3,7 +3,9 @@ package callofproject.dev.service.interview.data.entity;
 import callofproject.dev.service.interview.data.entity.enums.InterviewResult;
 import callofproject.dev.service.interview.data.entity.enums.InterviewStatus;
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -49,6 +51,14 @@ public class CodingInterview
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "m_codingInterviews")
     private Set<User> m_assignedUsers;
 
+    @Column(name = "start_time")
+    @DateTimeFormat(pattern = "dd/MM/yyyy kk:mm:ss")
+    private LocalDateTime m_startTime;
+
+    @Column(name = "end_time")
+    @DateTimeFormat(pattern = "dd/MM/yyyy kk:mm:ss")
+    private LocalDateTime m_endTime;
+
     public CodingInterview()
     {
         m_interviewResult = InterviewResult.NOT_COMPLETED;
@@ -57,13 +67,13 @@ public class CodingInterview
 
     public CodingInterview(String title, String description, long durationMinutes, String question, String answerFileName, int point, Project project)
     {
+        this.project = project;
         m_title = title;
         m_description = description;
         m_durationMinutes = durationMinutes;
         m_question = question;
         m_answerFileName = answerFileName;
         m_point = point;
-        this.project = project;
     }
 
     public void addAssignedUser(User user)
