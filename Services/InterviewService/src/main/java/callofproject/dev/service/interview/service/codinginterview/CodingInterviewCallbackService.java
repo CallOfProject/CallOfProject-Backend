@@ -204,18 +204,16 @@ public class CodingInterviewCallbackService
 
     public MultipleResponseMessage<Object> findUserInterviewInformation(UUID userId)
     {
-        var user = findUserIfExistsById(userId);
+        findUserIfExistsById(userId);
         var projects = stream(m_interviewServiceHelper.findOwnerProjectsByUserId(userId).spliterator(), false);
+        var projectsOwnerDTO = m_projectMapper.toOwnerProjectsDTO(projects.map(this::toOwnerProjectDTO).toList());
+        return new MultipleResponseMessage<>(projectsOwnerDTO.ownerProjects().size(), "Projects are found!", projectsOwnerDTO);
+    }
 
-        var projectsOwnerDTO = new OwnerProjectsDTO(
-                projects.map(p -> {
-                    var participants = p.getProjectParticipants().stream();
-                    var participantsDTO = new ProjectParticipantsDTO(participants.map(pp -> new ProjectParticipantDTO(m_userMapper.toUserDTO(pp.getUser()))).toList());
-                    return new OwnerProjectDTO(p.getProjectId(), p.getProjectName(), p.getProjectStatus(), participantsDTO);
-                }).toList()
-        );
-
-        return new MultipleResponseMessage<>(1, "", projectsOwnerDTO);
+    private OwnerProjectDTO toOwnerProjectDTO(Project p)
+    {
+        var participantsDTO = m_projectMapper.toProjectsParticipantDTO(p.getProjectParticipants().stream().map(m_projectMapper::toProjectParticipantDTO).toList());
+        return m_projectMapper.toOwnerProjectDTO(p, participantsDTO);
     }
 
 

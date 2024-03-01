@@ -31,8 +31,8 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
         var codingInterview = doForDataService(() -> m_callbackService.createCodeInterview(dto),
                 "CodingInterviewService::createCodeInterview");
 
-        if (codingInterview.getStatusCode() == Status.CREATED)
-            m_callbackService.sendNotification((CodingInterviewDTO) codingInterview.getObject(), EInterviewStatus.CREATED);
+       /* if (codingInterview.getStatusCode() == Status.CREATED)
+            m_callbackService.sendNotification((CodingInterviewDTO) codingInterview.getObject(), EInterviewStatus.CREATED);*/
 
         return codingInterview;
     }
