@@ -14,10 +14,12 @@ public class RepositoryFacade
     public final ICodingInterviewRepository m_codingInterviewRepository;
     public final IProjectParticipantRepository m_projectParticipantRepository;
     public final ITestInterviewQuestionRepository m_testInterviewQuestionRepository;
+    public final IUserCodingInterviewsRepository m_userCodingInterviewsRepository;
+    public final IUserTestInterviewsRepository m_userTestInterviewsRepository;
 
     public RepositoryFacade(IUserRepository userRepository, IProjectRepository projectRepository, IProjectParticipantRepository projectParticipantRepository,
                             ITestInterviewRepository testInterviewRepository, ITestInterviewQuestionRepository testInterviewQuestionRepository,
-                            ICodingInterviewRepository codingInterviewRepository)
+                            ICodingInterviewRepository codingInterviewRepository, IUserCodingInterviewsRepository userCodingInterviewsRepository, IUserTestInterviewsRepository userTestInterviewsRepository)
     {
         m_userRepository = userRepository;
         m_projectRepository = projectRepository;
@@ -25,5 +27,7 @@ public class RepositoryFacade
         m_testInterviewRepository = testInterviewRepository;
         m_testInterviewQuestionRepository = testInterviewQuestionRepository;
         m_codingInterviewRepository = codingInterviewRepository;
+        m_userCodingInterviewsRepository = userCodingInterviewsRepository;
+        m_userTestInterviewsRepository = userTestInterviewsRepository;
     }
 }

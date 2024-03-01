@@ -6,5 +6,6 @@ public enum InterviewStatus
     FINISHED,
     CANCELED,
     NOT_STARTED,
-    SCHEDULED
+    SCHEDULED,
+    COMPLETED
 }

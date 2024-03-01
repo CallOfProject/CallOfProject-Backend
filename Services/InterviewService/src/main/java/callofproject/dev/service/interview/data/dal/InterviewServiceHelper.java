@@ -113,4 +113,35 @@ public class InterviewServiceHelper
     {
         return doForRepository(() -> m_repositoryFacade.m_projectParticipantRepository.save(participant), "Error creating project participant");
     }
+
+    public UserCodingInterviews createUserCodingInterviews(UserCodingInterviews userCodingInterviews)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_userCodingInterviewsRepository.save(userCodingInterviews), "Error creating user coding interviews");
+    }
+
+    public UserTestInterviews createUserTestInterviews(UserTestInterviews userTestInterviews)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_userTestInterviewsRepository.save(userTestInterviews), "Error creating user test interviews");
+    }
+
+    public Iterable<UserCodingInterviews> findCodingInterviewParticipantsById(UUID codingInterviewId)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_userCodingInterviewsRepository.findParticipantsByCodingInterview_Id(codingInterviewId), "Error finding coding interview participants by id");
+    }
+
+    public void removeCodingInterviewParticipants(List<UUID> list)
+    {
+        doForRepository(() -> m_repositoryFacade.m_userCodingInterviewsRepository.deleteAllById(list), "Error removing coding interview participants");
+    }
+
+    public UserCodingInterviews findUserCodingInterviewByUserIdAndInterviewId(UUID userId, UUID codeInterviewId)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_userCodingInterviewsRepository.findUserCodingInterviewsByUserIdAndCodingInterviewId(userId, codeInterviewId), "Error finding user coding interview by user id and interview id");
+    }
+
+    public void removeUserCodingInterview(UserCodingInterviews userCodingInterview)
+    {
+        doForRepository(() -> m_repositoryFacade.m_userCodingInterviewsRepository.delete(userCodingInterview), "Error removing user coding interview");
+    }
+
 }

@@ -3,6 +3,7 @@ package callofproject.dev.service.interview.service.codinginterview;
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -26,7 +27,11 @@ public interface ICodingInterviewService
 
     ResponseMessage<Object> getInterview(UUID codeInterviewId);
 
-    MultipleResponseMessage<Object> getAllInterviews();
+    ResponseMessage<Object> submitInterview(UUID userId, UUID codeInterviewId, MultipartFile file);
+
+    ResponseMessage<Object> runCode(MultipartFile file);
+
+    ResponseMessage<Object> runTests(MultipartFile file);
 
     MultipleResponseMessage<Object> getParticipants(UUID codeInterviewId);
 

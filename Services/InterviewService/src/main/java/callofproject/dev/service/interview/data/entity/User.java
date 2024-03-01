@@ -33,24 +33,18 @@ public class User
     @Column(name = "deleted_at")
     private LocalDateTime m_deletedAt;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_test_interviews",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "test_interview_id", referencedColumnName = "test_interview_id")})
-    private Set<TestInterview> m_testInterviews;
+    @OneToMany(mappedBy = "m_user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<UserTestInterviews> m_testInterviews;
 
-
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_coding_interviews",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "coding_interview_id", referencedColumnName = "coding_interview_id")})
-    private Set<CodingInterview> m_codingInterviews;
+    @OneToMany(mappedBy = "m_user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<UserCodingInterviews> m_codingInterviews;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")})
     private Set<Role> roles;
+
 
     public User()
     {
@@ -70,7 +64,7 @@ public class User
     }
 
 
-    public void addCodingInterview(CodingInterview codingInterview)
+    public void addCodingInterview(UserCodingInterviews codingInterview)
     {
         if (m_codingInterviews == null)
             m_codingInterviews = new HashSet<>();
@@ -78,7 +72,7 @@ public class User
         m_codingInterviews.add(codingInterview);
     }
 
-    public void addTestInterview(TestInterview testInterview)
+    public void addTestInterview(UserTestInterviews testInterview)
     {
         if (m_testInterviews == null)
             m_testInterviews = new HashSet<>();
@@ -86,24 +80,24 @@ public class User
         m_testInterviews.add(testInterview);
     }
 
-    public Set<CodingInterview> getCodingInterviews()
-    {
-        return m_codingInterviews;
-    }
-
-    public void setCodingInterviews(Set<CodingInterview> codingInterviews)
-    {
-        m_codingInterviews = codingInterviews;
-    }
-
-    public Set<TestInterview> getTestInterviews()
+    public Set<UserTestInterviews> getTestInterviews()
     {
         return m_testInterviews;
     }
 
-    public void setTestInterviews(Set<TestInterview> testInterviews)
+    public void setTestInterviews(Set<UserTestInterviews> testInterviews)
     {
         m_testInterviews = testInterviews;
+    }
+
+    public Set<UserCodingInterviews> getCodingInterviews()
+    {
+        return m_codingInterviews;
+    }
+
+    public void setCodingInterviews(Set<UserCodingInterviews> codingInterviews)
+    {
+        m_codingInterviews = codingInterviews;
     }
 
     public Set<Role> getRoles()

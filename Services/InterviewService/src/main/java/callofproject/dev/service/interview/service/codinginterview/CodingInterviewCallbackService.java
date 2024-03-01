@@ -9,23 +9,28 @@ import callofproject.dev.service.interview.config.kafka.KafkaProducer;
 import callofproject.dev.service.interview.data.dal.InterviewServiceHelper;
 import callofproject.dev.service.interview.data.entity.CodingInterview;
 import callofproject.dev.service.interview.data.entity.Project;
-import callofproject.dev.service.interview.data.entity.ProjectParticipant;
 import callofproject.dev.service.interview.data.entity.User;
+import callofproject.dev.service.interview.data.entity.UserCodingInterviews;
+import callofproject.dev.service.interview.data.entity.enums.InterviewStatus;
 import callofproject.dev.service.interview.dto.NotificationKafkaDTO;
 import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
 import callofproject.dev.service.interview.mapper.ICodingInterviewMapper;
 import callofproject.dev.service.interview.mapper.IProjectMapper;
+import callofproject.dev.service.interview.mapper.IUserMapper;
 import callofproject.dev.service.interview.service.EInterviewStatus;
+import callofproject.dev.service.interview.service.S3Service;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.StreamSupport;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
+import static java.util.stream.StreamSupport.stream;
 
 @Service
 @Lazy
@@ -33,15 +38,19 @@ public class CodingInterviewCallbackService
 {
     private final InterviewServiceHelper m_interviewServiceHelper;
     private final ICodingInterviewMapper m_codingInterviewMapper;
+    private final S3Service m_s3Service;
     private final IProjectMapper m_projectMapper;
+    private final IUserMapper m_userMapper;
     private final KafkaProducer m_kafkaProducer;
 
-    public CodingInterviewCallbackService(InterviewServiceHelper interviewServiceHelper, ICodingInterviewMapper codingInterviewMapper, KafkaProducer kafkaProducer, IProjectMapper projectMapper)
+    public CodingInterviewCallbackService(InterviewServiceHelper interviewServiceHelper, ICodingInterviewMapper codingInterviewMapper, S3Service s3Service, KafkaProducer kafkaProducer, IProjectMapper projectMapper, IUserMapper userMapper)
     {
         m_interviewServiceHelper = interviewServiceHelper;
         m_codingInterviewMapper = codingInterviewMapper;
+        m_s3Service = s3Service;
         m_kafkaProducer = kafkaProducer;
         m_projectMapper = projectMapper;
+        m_userMapper = userMapper;
     }
 
     public ResponseMessage<Object> createCodeInterview(CreateCodingInterviewDTO dto)
@@ -54,10 +63,14 @@ public class CodingInterviewCallbackService
         // update project
         m_interviewServiceHelper.createProject(project);
 
-        // set assigned users from project participants
-        codingInterviewCreateEntity.setAssignedUsers(project.getProjectParticipants().stream().map(ProjectParticipant::getUser).collect(toSet()));
         // Create coding interview
-        var savedInterview = doForDataService(() -> m_interviewServiceHelper.createCodeInterview(codingInterviewCreateEntity), "CodingInterviewCallbackService::createCodeInterview");
+        var savedInterview = doForDataService(() -> m_interviewServiceHelper.createCodeInterview(codingInterviewCreateEntity),
+                "CodingInterviewCallbackService::createCodeInterview");
+        var users = dto.userIds().stream().map(UUID::fromString).map(this::findUserIfExistsById).collect(toSet());
+
+        // Create user coding interviews
+        users.stream().map(u -> new UserCodingInterviews(u, savedInterview)).forEach(m_interviewServiceHelper::createUserCodingInterviews);
+
         var codingInterviewDTO = m_codingInterviewMapper.toCodingInterviewDTO(savedInterview, m_projectMapper.toProjectDTO(savedInterview.getProject()));
 
         return new ResponseMessage<>("Coding interview created successfully", Status.CREATED, codingInterviewDTO);
@@ -70,6 +83,7 @@ public class CodingInterviewCallbackService
         var owner = findUserIfExistsById(ownerId);
         // find the interview
         var interview = findInterviewIfExistsById(codeInterviewId);
+        var interviewParticipants = stream(m_interviewServiceHelper.findCodingInterviewParticipantsById(interview.getCodingInterviewId()).spliterator(), false);
 
         // check if the owner is authorized to delete the interview
         if (!owner.getUserId().equals(interview.getProject().getProjectOwner().getUserId()))
@@ -77,11 +91,14 @@ public class CodingInterviewCallbackService
 
         var project = findProjectIfExistsById(interview.getProject().getProjectId());
         project.setCodingInterview(null);
-        //project.setProjectParticipants(null);
+        // Update project
         m_interviewServiceHelper.createProject(project);
-        interview.getAssignedUsers().clear();
+        // Remove Interview participants
+        m_interviewServiceHelper.removeCodingInterviewParticipants(interviewParticipants.map(UserCodingInterviews::getId).toList());
+        // Delete interview
         m_interviewServiceHelper.deleteCodeInterview(interview);
-        return new ResponseMessage<>("Coding interview deleted successfully", Status.OK, true);
+        var dto = m_codingInterviewMapper.toCodingInterviewDTO(interview, m_projectMapper.toProjectDTO(project));
+        return new ResponseMessage<>("Coding interview deleted successfully", Status.OK, dto);
     }
 
     public ResponseMessage<Object> deleteCodeInterviewByProjectId(UUID projectId)
@@ -96,22 +113,23 @@ public class CodingInterviewCallbackService
         var interview = findInterviewIfExistsById(codeInterviewId);
         var user = findUserIfExistsById(userId);
 
-        interview.addAssignedUser(user);
-        user.addCodingInterview(interview);
+        // Create user coding interview
+        var userCodingInterview = new UserCodingInterviews(user, interview);
+        user.addCodingInterview(userCodingInterview);
 
-        m_interviewServiceHelper.createCodeInterview(interview);
+        // Save user so update user coding interview
         m_interviewServiceHelper.saveUser(user);
 
+        // convert to CodingInterviewDTO class
         var dto = m_codingInterviewMapper.toCodingInterviewDTO(interview, m_projectMapper.toProjectDTO(interview.getProject()));
         return new ResponseMessage<>("Participant added successfully", Status.OK, dto);
     }
 
     public ResponseMessage<Object> addParticipantByProjectId(UUID projectId, UUID userId)
     {
-        var user = findUserIfExistsById(userId);
         var project = findProjectIfExistsById(projectId);
 
-        return addParticipant(project.getCodingInterview().getCodingInterviewId(), user.getUserId());
+        return addParticipant(project.getCodingInterview().getCodingInterviewId(), userId);
     }
 
     public ResponseMessage<Object> removeParticipant(UUID codeInterviewId, UUID userId)
@@ -119,15 +137,16 @@ public class CodingInterviewCallbackService
         var interview = findInterviewIfExistsById(codeInterviewId);
         var user = findUserIfExistsById(userId);
 
-        interview.getAssignedUsers().removeIf(u -> u.getUserId().equals(userId));
-        user.getCodingInterviews().removeIf(i -> i.getCodingInterviewId().equals(codeInterviewId));
+        // Find user coding interview
+        var userCodingInterview = m_interviewServiceHelper.findUserCodingInterviewByUserIdAndInterviewId(user.getUserId(), codeInterviewId);
 
-        m_interviewServiceHelper.saveUser(user);
-        m_interviewServiceHelper.createCodeInterview(interview);
+        // Remove user coding interview from user and codingInterview then delete it from the database
+        user.getCodingInterviews().removeIf(ci -> ci.getId().equals(userCodingInterview.getId()));
+        interview.getCodingInterviews().removeIf(ci -> ci.getId().equals(userCodingInterview.getId()));
+        m_interviewServiceHelper.removeUserCodingInterview(userCodingInterview);
 
-        var p = m_projectMapper.toProjectDTO(interview.getProject());
-        var dto = m_codingInterviewMapper.toCodingInterviewDTO(interview, p);
-
+        // Convert to CodingInterviewDTO class
+        var dto = m_codingInterviewMapper.toCodingInterviewDTO(interview, m_projectMapper.toProjectDTO(interview.getProject()));
 
         return new ResponseMessage<>("Participant removed successfully", Status.OK, dto);
     }
@@ -143,35 +162,44 @@ public class CodingInterviewCallbackService
     public MultipleResponseMessage<Object> getParticipantsByProjectId(UUID projectId)
     {
         var project = findProjectIfExistsById(projectId);
-        var users = project.getCodingInterview().getAssignedUsers().stream().toList();
-        return new MultipleResponseMessage<>(users.size(), "Participants found successfully", users);
+        return getParticipants(project.getCodingInterview().getCodingInterviewId());
     }
 
     public MultipleResponseMessage<Object> getParticipants(UUID codeInterviewId)
     {
-        var interview = findInterviewIfExistsById(codeInterviewId);
-        var users = interview.getAssignedUsers().stream().toList();
+        findInterviewIfExistsById(codeInterviewId); // if not found, it will throw an exception
+        var userCodingInterview = stream(m_interviewServiceHelper.findCodingInterviewParticipantsById(codeInterviewId).spliterator(), false);
+        var users = userCodingInterview.map(UserCodingInterviews::getUser).map(m_userMapper::toUserDTO).toList();
         return new MultipleResponseMessage<>(users.size(), "Participants found successfully", users);
     }
 
     public ResponseMessage<Object> getInterviewByProjectId(UUID projectId)
     {
         var project = findProjectIfExistsById(projectId);
-        return new ResponseMessage<>("Interview found successfully", Status.OK, project.getCodingInterview());
+        var projectDTO = m_projectMapper.toProjectDTO(project);
+        var codingInterviewDTO = m_codingInterviewMapper.toCodingInterviewDTO(project.getCodingInterview(), projectDTO);
+        return new ResponseMessage<>("Interview found successfully", Status.OK, codingInterviewDTO);
     }
 
     public ResponseMessage<Object> getInterview(UUID codeInterviewId)
     {
         var interview = findInterviewIfExistsById(codeInterviewId);
-        return new ResponseMessage<>("Interview found successfully", Status.OK, interview);
+        var projectDTO = m_projectMapper.toProjectDTO(interview.getProject());
+        var codingInterviewDTO = m_codingInterviewMapper.toCodingInterviewDTO(interview, projectDTO);
+        return new ResponseMessage<>("Interview found successfully", Status.OK, codingInterviewDTO);
     }
 
-    public MultipleResponseMessage<Object> getAllInterviews()
+    public ResponseMessage<Object> submitInterview(UUID userId, UUID codeInterviewId, MultipartFile file)
     {
-        var interviews = StreamSupport.stream(m_interviewServiceHelper.findAllInterviews().spliterator(), false).toList();
-        return new MultipleResponseMessage<>(interviews.size(), "Interviews found successfully", interviews);
-    }
+        var userCodingInterview = m_interviewServiceHelper.findUserCodingInterviewByUserIdAndInterviewId(userId, codeInterviewId);
+        userCodingInterview.setAnswerFileName(Objects.requireNonNull(file.getOriginalFilename()));
+        userCodingInterview.setInterviewStatus(InterviewStatus.COMPLETED);
+        m_interviewServiceHelper.createUserCodingInterviews(userCodingInterview);
 
+        var result = m_s3Service.uploadToS3WithMultiPartFile(file, Objects.requireNonNull(file.getOriginalFilename()));
+
+        return new ResponseMessage<>("Interview submitted successfully", Status.OK, result);
+    }
 
     // helper methods
 
@@ -210,20 +238,24 @@ public class CodingInterviewCallbackService
 
     private void send(UUID owner, UUID userId, String message)
     {
-        var notificationDTO = new NotificationKafkaDTO.Builder()
+        var notificationMessage = new NotificationKafkaDTO.Builder()
                 .setFromUserId(owner)
                 .setToUserId(userId)
                 .setMessage(message)
                 .setNotificationType(NotificationType.INFORMATION)
-                //.setNotificationData(project)
+                .setNotificationLink("none")
+                .setMessage(message)
+                .setNotificationImage(null)
+                .setNotificationTitle("Interview Status")
                 .build();
-        m_kafkaProducer.sendNotification(notificationDTO);
+
+        m_kafkaProducer.sendNotification(notificationMessage);
     }
 
     public void sendNotification(CodingInterviewDTO object, EInterviewStatus status)
     {
         var project = findProjectIfExistsById(object.projectDTO().projectId());
-        var participants = project.getCodingInterview().getAssignedUsers();
+        var participants = project.getCodingInterview().getCodingInterviews().stream().map(UserCodingInterviews::getUser).toList();
         var message = "A coding interview has been %s for the Size %s Project application";
 
         switch (status)
@@ -234,23 +266,10 @@ public class CodingInterviewCallbackService
                     participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "removed", project.getProjectName())));
             case ASSIGNED ->
                     participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "assigned", project.getProjectName())));
+            case CANCELLED ->
+                    participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "cancelled", project.getProjectName())));
             default -> throw new DataServiceException("Invalid status");
         }
     }
 
-    public void sendNotification(boolean result, UUID interviewId, EInterviewStatus status)
-    {
-        // send notification to Owner and Participants
-    }
-
-    public void sendNotification(UUID projectId, boolean result, EInterviewStatus status)
-    {
-        var project = findProjectIfExistsById(projectId);
-        var participants = project.getCodingInterview().getAssignedUsers();
-        var owner = project.getCodingInterview().getProject().getProjectOwner().getUserId();
-        participants.forEach(p -> {
-            send(owner, p.getUserId(), "");
-        });
-
-    }
 }

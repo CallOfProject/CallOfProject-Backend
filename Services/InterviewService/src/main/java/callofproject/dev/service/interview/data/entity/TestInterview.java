@@ -1,7 +1,6 @@
 package callofproject.dev.service.interview.data.entity;
 
 
-import callofproject.dev.service.interview.data.entity.enums.InterviewResult;
 import callofproject.dev.service.interview.data.entity.enums.InterviewStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -35,12 +34,11 @@ public class TestInterview
     private int m_totalScore = 100;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "interview_result")
-    private InterviewResult m_interviewResult;
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "interview_status")
     private InterviewStatus m_interviewStatus;
+
+    @OneToMany(mappedBy = "m_testInterview", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<UserTestInterviews> m_testInterviews;
 
     @OneToOne(mappedBy = "m_testInterview", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     private Project project;
@@ -49,16 +47,13 @@ public class TestInterview
     @JsonIgnore
     private Set<TestInterviewQuestion> m_questions;
 
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "m_testInterviews")
-    @JsonIgnore
-    private Set<User> m_assignedUsers;
 
     public TestInterview()
     {
-        m_interviewResult = InterviewResult.NOT_COMPLETED;
         m_interviewStatus = InterviewStatus.NOT_STARTED;
 
     }
+
 
     public TestInterview(int questionCount, String title, long totalTimeMinutes, String description)
     {
@@ -66,7 +61,6 @@ public class TestInterview
         m_title = title;
         m_totalTimeMinutes = totalTimeMinutes;
         m_description = description;
-        m_interviewResult = InterviewResult.NOT_COMPLETED;
         m_interviewStatus = InterviewStatus.NOT_STARTED;
     }
 
@@ -79,15 +73,6 @@ public class TestInterview
         m_description = description;
         m_totalScore = totalScore;
         m_interviewStatus = interviewStatus;
-        m_interviewResult = InterviewResult.NOT_COMPLETED;
-    }
-
-    public void assignUser(User user)
-    {
-        if (m_assignedUsers == null)
-            m_assignedUsers = new HashSet<>();
-
-        m_assignedUsers.add(user);
     }
 
     public void addQuestion(TestInterviewQuestion question)
@@ -96,6 +81,16 @@ public class TestInterview
             m_questions = new HashSet<>();
 
         m_questions.add(question);
+    }
+
+    public Set<UserTestInterviews> getTestInterviews()
+    {
+        return m_testInterviews;
+    }
+
+    public void setTestInterviews(Set<UserTestInterviews> testInterviews)
+    {
+        m_testInterviews = testInterviews;
     }
 
     public Project getProject()
@@ -168,16 +163,6 @@ public class TestInterview
         m_totalScore = totalScore;
     }
 
-    public InterviewResult getInterviewResult()
-    {
-        return m_interviewResult;
-    }
-
-    public void setInterviewResult(InterviewResult interviewResult)
-    {
-        m_interviewResult = interviewResult;
-    }
-
     public InterviewStatus getInterviewStatus()
     {
         return m_interviewStatus;
@@ -196,15 +181,5 @@ public class TestInterview
     public void setQuestions(Set<TestInterviewQuestion> questions)
     {
         m_questions = questions;
-    }
-
-    public Set<User> getAssignedUsers()
-    {
-        return m_assignedUsers;
-    }
-
-    public void setAssignedUsers(Set<User> assignedUsers)
-    {
-        m_assignedUsers = assignedUsers;
     }
 }

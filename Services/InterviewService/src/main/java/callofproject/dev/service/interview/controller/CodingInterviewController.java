@@ -4,6 +4,7 @@ import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
 import callofproject.dev.service.interview.service.codinginterview.ICodingInterviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -88,9 +89,23 @@ public class CodingInterviewController
         return subscribe(() -> ok(m_codingInterviewService.getInterview(codeInterviewId)), ex -> internalServerError().body(ex.getMessage()));
     }
 
-    @GetMapping("/find/all")
-    public ResponseEntity<Object> getAllInterviews()
+    @PostMapping("/submit")
+    public ResponseEntity<Object> submitInterview(@RequestParam("interview_id") UUID codeInterviewId,
+                                                  @RequestParam("user_id") UUID userId,
+                                                  @RequestParam MultipartFile file)
     {
-        return subscribe(() -> ok(m_codingInterviewService.getAllInterviews()), ex -> internalServerError().body(ex.getMessage()));
+        return subscribe(() -> ok(m_codingInterviewService.submitInterview(userId, codeInterviewId, file)), ex -> internalServerError().body(ex.getMessage()));
+    }
+
+    @PostMapping("/run-code")
+    public ResponseEntity<Object> runCode(@RequestParam MultipartFile file)
+    {
+        return subscribe(() -> ok(m_codingInterviewService.runCode(file)), ex -> internalServerError().body(ex.getMessage()));
+    }
+
+    @PostMapping("/run-tests")
+    public ResponseEntity<Object> runTests(@RequestParam("interview_id") UUID interviewId, @RequestParam MultipartFile file)
+    {
+        return subscribe(() -> ok(m_codingInterviewService.runTests(file)), ex -> internalServerError().body(ex.getMessage()));
     }
 }

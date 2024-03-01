@@ -71,7 +71,7 @@ public class TestInterviewCallbackService
         var interview = findInterviewIfExistsById(interviewId);
         var user = findUserIfExistsById(userId);
 
-        user.addTestInterview(interview);
+       // user.addTestInterview(interview);
         m_interviewServiceHelper.saveUser(user);
 
         return new ResponseMessage<>("Test interview assigned successfully", Status.OK, true);
@@ -82,7 +82,7 @@ public class TestInterviewCallbackService
         var interview = findInterviewIfExistsById(dto.interviewId());
         var users = StreamSupport.stream(m_interviewServiceHelper.findUsersByIds(dto.userIds()).spliterator(), false).collect(Collectors.toSet());
 
-        users.forEach(usr -> usr.addTestInterview(interview));
+        //users.forEach(usr -> usr.addTestInterview(interview));
         m_interviewServiceHelper.saveUsers(users);
 
         return new ResponseMessage<>("Test interview assigned successfully", Status.OK, true);

@@ -5,5 +5,6 @@ public enum InterviewResult
     PASSED,
     FAILED,
     CANCELLED,
+    COMPLETED,
     NOT_COMPLETED
 }

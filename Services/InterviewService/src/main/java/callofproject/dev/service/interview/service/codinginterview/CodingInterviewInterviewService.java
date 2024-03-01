@@ -8,6 +8,7 @@ import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
 import callofproject.dev.service.interview.service.EInterviewStatus;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -42,9 +43,8 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
         var codingInterview = doForDataService(() -> m_callbackService.deleteCodeInterview(ownerId, codeInterviewId),
                 "CodingInterviewService::createCodeInterview");
 
-        // send notification to Owner and Participants
         if (codingInterview.getStatusCode() == Status.OK)
-            m_callbackService.sendNotification((Boolean) codingInterview.getObject(), codeInterviewId, EInterviewStatus.REMOVED);
+            m_callbackService.sendNotification((CodingInterviewDTO) codingInterview.getObject(), EInterviewStatus.REMOVED);
 
         return codingInterview;
     }
@@ -55,9 +55,8 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
         var codingInterview = doForDataService(() -> m_callbackService.deleteCodeInterviewByProjectId(projectId),
                 "CodingInterviewService::deleteCodeInterviewByProjectId");
 
-        // send notification to Owner and Participants
         if (codingInterview.getStatusCode() == Status.OK)
-            m_callbackService.sendNotification(projectId, true, EInterviewStatus.REMOVED);
+            m_callbackService.sendNotification((CodingInterviewDTO) codingInterview.getObject(), EInterviewStatus.REMOVED);
 
         return codingInterview;
     }
@@ -68,7 +67,6 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
         var result = doForDataService(() -> m_callbackService.addParticipant(codeInterviewId, userId),
                 "CodingInterviewService::addParticipant");
 
-        // send notification to Owner and Participants
         if (result.getStatusCode() == Status.OK)
             m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.ASSIGNED);
 
@@ -81,9 +79,8 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
         var result = doForDataService(() -> m_callbackService.addParticipantByProjectId(projectId, userId),
                 "CodingInterviewService::addParticipantByProjectId");
 
-        // send notification to Owner and Participants
         if (result.getStatusCode() == Status.OK)
-            m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.REMOVED);
+            m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.ASSIGNED);
 
         return result;
     }
@@ -94,11 +91,9 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
         var result = doForDataService(() -> m_callbackService.removeParticipant(codeInterviewId, userId),
                 "CodingInterviewService::removeParticipant");
 
-        // send notification to Owner and Participants
         if (result.getStatusCode() == Status.OK)
-        {
-            //m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.CANCELLED);
-        }
+            m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.CANCELLED);
+
 
         return result;
     }
@@ -141,8 +136,20 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
     }
 
     @Override
-    public MultipleResponseMessage<Object> getAllInterviews()
+    public ResponseMessage<Object> submitInterview(UUID userId, UUID codeInterviewId, MultipartFile file)
     {
-        return doForDataService(m_callbackService::getAllInterviews, "CodingInterviewService::getAllInterviews");
+        return doForDataService(() -> m_callbackService.submitInterview(userId, codeInterviewId, file), "CodingInterviewService::submitInterview");
+    }
+
+    @Override
+    public ResponseMessage<Object> runCode(MultipartFile file)
+    {
+        throw new UnsupportedOperationException("Not implemented yet!");
+    }
+
+    @Override
+    public ResponseMessage<Object> runTests(MultipartFile file)
+    {
+        throw new UnsupportedOperationException("Not implemented yet!");
     }
 }

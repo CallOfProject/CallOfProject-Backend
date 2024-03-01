@@ -1,12 +1,10 @@
 package callofproject.dev.service.interview.data.entity;
 
-import callofproject.dev.service.interview.data.entity.enums.InterviewResult;
 import callofproject.dev.service.interview.data.entity.enums.InterviewStatus;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,15 +29,8 @@ public class CodingInterview
     @Column(name = "question", nullable = false)
     private String m_question;
 
-    @Column(name = "question_file_name")
-    private String m_answerFileName;
-
     @Column(name = "point", nullable = false)
     private int m_point;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "interview_result")
-    private InterviewResult m_interviewResult;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "interview_status")
@@ -47,9 +38,6 @@ public class CodingInterview
 
     @OneToOne(mappedBy = "m_codingInterview", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     private Project project;
-
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "m_codingInterviews")
-    private Set<User> m_assignedUsers;
 
     @Column(name = "start_time")
     @DateTimeFormat(pattern = "dd/MM/yyyy kk:mm:ss")
@@ -59,29 +47,56 @@ public class CodingInterview
     @DateTimeFormat(pattern = "dd/MM/yyyy kk:mm:ss")
     private LocalDateTime m_endTime;
 
+    @OneToMany(mappedBy = "m_codingInterview", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<UserCodingInterviews> m_codingInterviews;
+
     public CodingInterview()
     {
-        m_interviewResult = InterviewResult.NOT_COMPLETED;
         m_interviewStatus = InterviewStatus.NOT_STARTED;
     }
 
-    public CodingInterview(String title, String description, long durationMinutes, String question, String answerFileName, int point, Project project)
+    public CodingInterview(String title, String description, long durationMinutes, String question, int point, Project project,
+                           LocalDateTime startTime, LocalDateTime endTime)
     {
         this.project = project;
         m_title = title;
         m_description = description;
         m_durationMinutes = durationMinutes;
         m_question = question;
-        m_answerFileName = answerFileName;
         m_point = point;
+        m_startTime = startTime;
+        m_endTime = endTime;
+        m_interviewStatus = InterviewStatus.NOT_STARTED;
     }
 
-    public void addAssignedUser(User user)
+    public LocalDateTime getStartTime()
     {
-        if (m_assignedUsers == null)
-            m_assignedUsers = new HashSet<>();
+        return m_startTime;
+    }
 
-        m_assignedUsers.add(user);
+    public Set<UserCodingInterviews> getCodingInterviews()
+    {
+        return m_codingInterviews;
+    }
+
+    public void setCodingInterviews(Set<UserCodingInterviews> codingInterviews)
+    {
+        m_codingInterviews = codingInterviews;
+    }
+
+    public void setStartTime(LocalDateTime startTime)
+    {
+        m_startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime()
+    {
+        return m_endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime)
+    {
+        m_endTime = endTime;
     }
 
     public UUID getCodingInterviewId()
@@ -134,16 +149,6 @@ public class CodingInterview
         m_question = question;
     }
 
-    public String getAnswerFileName()
-    {
-        return m_answerFileName;
-    }
-
-    public void setAnswerFileName(String answerFileName)
-    {
-        m_answerFileName = answerFileName;
-    }
-
     public int getPoint()
     {
         return m_point;
@@ -152,16 +157,6 @@ public class CodingInterview
     public void setPoint(int point)
     {
         m_point = point;
-    }
-
-    public InterviewResult getInterviewResult()
-    {
-        return m_interviewResult;
-    }
-
-    public void setInterviewResult(InterviewResult interviewResult)
-    {
-        m_interviewResult = interviewResult;
     }
 
     public InterviewStatus getInterviewStatus()
@@ -182,15 +177,5 @@ public class CodingInterview
     public void setProject(Project project)
     {
         this.project = project;
-    }
-
-    public Set<User> getAssignedUsers()
-    {
-        return m_assignedUsers;
-    }
-
-    public void setAssignedUsers(Set<User> assignedUsers)
-    {
-        m_assignedUsers = assignedUsers;
     }
 }

@@ -2,6 +2,7 @@ package callofproject.dev.service.interview.mapper;
 
 import callofproject.dev.service.interview.config.kafka.dto.UserKafkaDTO;
 import callofproject.dev.service.interview.data.entity.User;
+import callofproject.dev.service.interview.dto.UserDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -17,4 +18,5 @@ public interface IUserMapper
     @Mapping(target = "roles", source = "roles")
     User toUser(UserKafkaDTO userKafkaDTO);
 
+    UserDTO toUserDTO(User user);
 }
