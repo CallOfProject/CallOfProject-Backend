@@ -144,4 +144,8 @@ public class InterviewServiceHelper
         doForRepository(() -> m_repositoryFacade.m_userCodingInterviewsRepository.delete(userCodingInterview), "Error removing user coding interview");
     }
 
+    public Iterable<Project> findOwnerProjectsByUserId(UUID userId)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_projectRepository.findOwnerProjectsByUserId(userId), "Error finding projects by user id");
+    }
 }

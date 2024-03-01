@@ -12,7 +12,7 @@ import callofproject.dev.service.interview.data.entity.Project;
 import callofproject.dev.service.interview.data.entity.User;
 import callofproject.dev.service.interview.data.entity.UserCodingInterviews;
 import callofproject.dev.service.interview.data.entity.enums.InterviewStatus;
-import callofproject.dev.service.interview.dto.NotificationKafkaDTO;
+import callofproject.dev.service.interview.dto.*;
 import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
 import callofproject.dev.service.interview.mapper.ICodingInterviewMapper;
@@ -200,6 +200,24 @@ public class CodingInterviewCallbackService
 
         return new ResponseMessage<>("Interview submitted successfully", Status.OK, result);
     }
+
+
+    public MultipleResponseMessage<Object> findUserInterviewInformation(UUID userId)
+    {
+        var user = findUserIfExistsById(userId);
+        var projects = stream(m_interviewServiceHelper.findOwnerProjectsByUserId(userId).spliterator(), false);
+
+        var projectsOwnerDTO = new OwnerProjectsDTO(
+                projects.map(p -> {
+                    var participants = p.getProjectParticipants().stream();
+                    var participantsDTO = new ProjectParticipantsDTO(participants.map(pp -> new ProjectParticipantDTO(m_userMapper.toUserDTO(pp.getUser()))).toList());
+                    return new OwnerProjectDTO(p.getProjectId(), p.getProjectName(), p.getProjectStatus(), participantsDTO);
+                }).toList()
+        );
+
+        return new MultipleResponseMessage<>(1, "", projectsOwnerDTO);
+    }
+
 
     // helper methods
 

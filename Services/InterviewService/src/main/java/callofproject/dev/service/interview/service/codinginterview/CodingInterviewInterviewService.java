@@ -124,6 +124,12 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
     }
 
     @Override
+    public MultipleResponseMessage<Object> findUserInterviewInformation(UUID userId)
+    {
+        return doForDataService(() -> m_callbackService.findUserInterviewInformation(userId), "CodingInterviewService::findUserInterviewInformation");
+    }
+
+    @Override
     public ResponseMessage<Object> getInterviewByProjectId(UUID projectId)
     {
         return doForDataService(() -> m_callbackService.getInterviewByProjectId(projectId), "CodingInterviewService::getInterviewByProjectId");
@@ -142,14 +148,8 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
     }
 
     @Override
-    public ResponseMessage<Object> runCode(MultipartFile file)
-    {
-        throw new UnsupportedOperationException("Not implemented yet!");
-    }
-
-    @Override
     public ResponseMessage<Object> runTests(MultipartFile file)
     {
-        throw new UnsupportedOperationException("Not implemented yet!");
+        throw new UnsupportedOperationException("Unsupported operation for this project!");
     }
 }

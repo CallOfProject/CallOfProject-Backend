@@ -29,11 +29,11 @@ public interface ICodingInterviewService
 
     ResponseMessage<Object> submitInterview(UUID userId, UUID codeInterviewId, MultipartFile file);
 
-    ResponseMessage<Object> runCode(MultipartFile file);
-
     ResponseMessage<Object> runTests(MultipartFile file);
 
     MultipleResponseMessage<Object> getParticipants(UUID codeInterviewId);
 
     MultipleResponseMessage<Object> getParticipantsByProjectId(UUID projectId);
+
+    MultipleResponseMessage<Object> findUserInterviewInformation(UUID userId);
 }
