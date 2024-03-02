@@ -1,5 +1,6 @@
 package callofproject.dev.service.interview.data.dal;
 
+import callofproject.dev.service.interview.data.QuestionAnswer;
 import callofproject.dev.service.interview.data.entity.*;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -147,5 +148,15 @@ public class InterviewServiceHelper
     public Iterable<Project> findOwnerProjectsByUserId(UUID userId)
     {
         return doForRepository(() -> m_repositoryFacade.m_projectRepository.findOwnerProjectsByUserId(userId), "Error finding projects by user id");
+    }
+
+    public Optional<UserTestInterviews> findUserTestInterviewByUserAndTestInterviewId(UUID userId, UUID id)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_userTestInterviewsRepository.findUserTestInterviewsByUserAndTestInterviewId(userId, id), "Error finding user test interview by user and test interview id");
+    }
+
+    public QuestionAnswer createQuestionAnswer(QuestionAnswer questionAnswer)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_questionAnswerRepository.save(questionAnswer), "Error creating question answer");
     }
 }

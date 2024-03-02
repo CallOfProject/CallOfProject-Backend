@@ -1,10 +1,11 @@
 package callofproject.dev.service.interview.data.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "test_interview_question")
-public class TestInterviewQuestion
+public class TestInterviewQuestion implements Comparable<TestInterviewQuestion>
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,6 +55,12 @@ public class TestInterviewQuestion
         m_point = point;
         m_question = question;
         m_status = QuestionStatus.UNANSWERED;
+    }
+
+    @Override
+    public int compareTo(TestInterviewQuestion other)
+    {
+        return Long.compare(m_id, other.m_id);
     }
 
     public static class Builder

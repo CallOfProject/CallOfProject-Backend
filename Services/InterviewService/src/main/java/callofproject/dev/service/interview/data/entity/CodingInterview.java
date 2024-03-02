@@ -23,7 +23,7 @@ public class CodingInterview
     @Column(name = "description", nullable = false)
     private String m_description;
 
-    @Column(name = "duration_minutes", nullable = false)
+    @Column(name = "duration_minutes", nullable = false, length = 2000)
     private long m_durationMinutes;
 
     @Column(name = "question", nullable = false)
@@ -68,6 +68,7 @@ public class CodingInterview
         m_endTime = endTime;
         m_interviewStatus = InterviewStatus.NOT_STARTED;
     }
+
 
     public LocalDateTime getStartTime()
     {

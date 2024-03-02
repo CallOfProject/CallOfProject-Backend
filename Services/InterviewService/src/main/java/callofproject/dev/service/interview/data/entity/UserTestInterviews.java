@@ -1,10 +1,12 @@
 package callofproject.dev.service.interview.data.entity;
 
+import callofproject.dev.service.interview.data.QuestionAnswer;
 import callofproject.dev.service.interview.data.entity.enums.InterviewResult;
 import callofproject.dev.service.interview.data.entity.enums.InterviewStatus;
 import jakarta.persistence.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -33,8 +35,11 @@ public class UserTestInterviews
     @Column(name = "interview_status")
     private InterviewStatus m_interviewStatus;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> answers;
+    @Column(name = "score")
+    private int score;
+
+    @OneToMany(mappedBy = "m_userTestInterviews", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<QuestionAnswer> answers;
 
     public UserTestInterviews()
     {
@@ -48,6 +53,24 @@ public class UserTestInterviews
         m_testInterview = testInterview;
         m_interviewResult = InterviewResult.NOT_COMPLETED;
         m_interviewStatus = InterviewStatus.NOT_STARTED;
+    }
+
+    public void addAnswer(QuestionAnswer answer)
+    {
+        if (answers == null)
+            answers = new HashSet<>();
+
+        answers.add(answer);
+    }
+
+    public int getScore()
+    {
+        return score;
+    }
+
+    public void setScore(int score)
+    {
+        this.score = score;
     }
 
     public UUID getId()
@@ -100,12 +123,12 @@ public class UserTestInterviews
         m_interviewStatus = interviewStatus;
     }
 
-    public List<String> getAnswers()
+    public Set<QuestionAnswer> getAnswers()
     {
         return answers;
     }
 
-    public void setAnswers(List<String> answers)
+    public void setAnswers(Set<QuestionAnswer> answers)
     {
         this.answers = answers;
     }

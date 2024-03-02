@@ -7,12 +7,10 @@ import callofproject.dev.data.common.status.Status;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.service.interview.config.kafka.KafkaProducer;
 import callofproject.dev.service.interview.data.dal.InterviewServiceHelper;
-import callofproject.dev.service.interview.data.entity.CodingInterview;
-import callofproject.dev.service.interview.data.entity.Project;
-import callofproject.dev.service.interview.data.entity.User;
-import callofproject.dev.service.interview.data.entity.UserCodingInterviews;
+import callofproject.dev.service.interview.data.entity.*;
 import callofproject.dev.service.interview.data.entity.enums.InterviewStatus;
-import callofproject.dev.service.interview.dto.*;
+import callofproject.dev.service.interview.dto.NotificationKafkaDTO;
+import callofproject.dev.service.interview.dto.OwnerProjectDTO;
 import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
 import callofproject.dev.service.interview.mapper.ICodingInterviewMapper;
@@ -56,6 +54,10 @@ public class CodingInterviewCallbackService
     public ResponseMessage<Object> createCodeInterview(CreateCodingInterviewDTO dto)
     {
         var project = findProjectIfExistsById(dto.projectId());
+
+        if (project.getCodingInterview() != null)
+            deleteCodeInterview(project.getProjectOwner().getUserId(), project.getCodingInterview().getCodingInterviewId());
+
         var codingInterviewCreateEntity = m_codingInterviewMapper.toCodingInterview(dto);
         // set project to coding interview and set coding interview to project
         codingInterviewCreateEntity.setProject(project);
@@ -93,7 +95,10 @@ public class CodingInterviewCallbackService
         project.setCodingInterview(null);
         // Update project
         m_interviewServiceHelper.createProject(project);
+
         // Remove Interview participants
+        interview.getCodingInterviews().stream().map(UserCodingInterviews::getUser).forEach(u -> u.getCodingInterviews().removeIf(ci -> ci.getCodingInterview().getCodingInterviewId().equals(interview.getCodingInterviewId())));
+        interview.getCodingInterviews().clear();
         m_interviewServiceHelper.removeCodingInterviewParticipants(interviewParticipants.map(UserCodingInterviews::getId).toList());
         // Delete interview
         m_interviewServiceHelper.deleteCodeInterview(interview);
@@ -194,9 +199,10 @@ public class CodingInterviewCallbackService
         var userCodingInterview = m_interviewServiceHelper.findUserCodingInterviewByUserIdAndInterviewId(userId, codeInterviewId);
         userCodingInterview.setAnswerFileName(Objects.requireNonNull(file.getOriginalFilename()));
         userCodingInterview.setInterviewStatus(InterviewStatus.COMPLETED);
-        m_interviewServiceHelper.createUserCodingInterviews(userCodingInterview);
-
+        // upload file to s3
         var result = m_s3Service.uploadToS3WithMultiPartFile(file, Objects.requireNonNull(file.getOriginalFilename()));
+        userCodingInterview.setAnswerFileUrl(result);
+        m_interviewServiceHelper.createUserCodingInterviews(userCodingInterview);
 
         return new ResponseMessage<>("Interview submitted successfully", Status.OK, result);
     }
@@ -270,8 +276,11 @@ public class CodingInterviewCallbackService
 
     public void sendNotification(CodingInterviewDTO object, EInterviewStatus status)
     {
+        //var interview = findInterviewIfExistsById(object.codingInterviewId());
         var project = findProjectIfExistsById(object.projectDTO().projectId());
-        var participants = project.getCodingInterview().getCodingInterviews().stream().map(UserCodingInterviews::getUser).toList();
+
+
+        var participants = project.getProjectParticipants().stream().map(ProjectParticipant::getUser).toList();
         var message = "A coding interview has been %s for the Size %s Project application";
 
         switch (status)
@@ -288,4 +297,15 @@ public class CodingInterviewCallbackService
         }
     }
 
+    public ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId)
+    {
+        var userCodingInterview = m_interviewServiceHelper.findUserCodingInterviewByUserIdAndInterviewId(userId, interviewId);
+
+        if (userCodingInterview == null)
+            return new ResponseMessage<>("User not found", Status.NOT_FOUND, false);
+
+        var result = userCodingInterview.getInterviewStatus() == InterviewStatus.COMPLETED;
+
+        return new ResponseMessage<>("User solved before", Status.OK, result);
+    }
 }

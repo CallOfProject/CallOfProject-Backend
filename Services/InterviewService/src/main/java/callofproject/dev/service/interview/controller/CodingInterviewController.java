@@ -95,15 +95,15 @@ public class CodingInterviewController
         return subscribe(() -> ok(m_codingInterviewService.submitInterview(userId, codeInterviewId, file)), ex -> internalServerError().body(ex.getMessage()));
     }
 
-    @PostMapping("/run-tests")
-    public ResponseEntity<Object> runTests(@RequestParam("interview_id") UUID interviewId, @RequestParam MultipartFile file)
-    {
-        return subscribe(() -> ok(m_codingInterviewService.runTests(file)), ex -> internalServerError().body(ex.getMessage()));
-    }
-
     @GetMapping("/find/info")
     public ResponseEntity<Object> findUserInterviewInformation(@RequestParam("user_id") UUID userId)
     {
         return subscribe(() -> ok(m_codingInterviewService.findUserInterviewInformation(userId)), ex -> internalServerError().body(ex.getMessage()));
+    }
+
+    @GetMapping("/is-solved-before")
+    public ResponseEntity<Object> isUserSolvedBefore(@RequestParam("user_id") UUID userId, @RequestParam("interview_id") UUID interviewId)
+    {
+        return subscribe(() -> ok(m_codingInterviewService.isUserSolvedBefore(userId, interviewId)), ex -> internalServerError().body(ex.getMessage()));
     }
 }

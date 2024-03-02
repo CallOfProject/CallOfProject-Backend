@@ -35,6 +35,8 @@ public class UserCodingInterviews
     @Column(name = "answer_file")
     private String m_answerFileName;
 
+    @Column(name = "answer_file_url")
+    private String m_answerFileUrl;
 
     public UserCodingInterviews()
     {
@@ -48,6 +50,16 @@ public class UserCodingInterviews
         m_codingInterview = codingInterview;
         m_interviewResult = InterviewResult.NOT_COMPLETED;
         m_interviewStatus = InterviewStatus.NOT_STARTED;
+    }
+
+    public String getAnswerFileUrl()
+    {
+        return m_answerFileUrl;
+    }
+
+    public void setAnswerFileUrl(String answerFileUrl)
+    {
+        m_answerFileUrl = answerFileUrl;
     }
 
     public UUID getId()

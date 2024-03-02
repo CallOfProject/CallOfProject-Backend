@@ -1,5 +1,6 @@
 package callofproject.dev.project.service;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
@@ -48,12 +49,17 @@ public class S3Service
      */
     public String uploadToS3AndGetUrl(MultipartFile multipartFile, String fileName)
     {
-        var fileObject = doForDataService(() -> toFile(multipartFile), "Failed to convert multipart file to file");
+        try
+        {
+            m_s3Client.putObject(new PutObjectRequest(m_bucketName, fileName, multipartFile.getInputStream(), null)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
 
-        m_s3Client.putObject(new PutObjectRequest(m_bucketName, fileName, fileObject).withCannedAcl(CannedAccessControlList.PublicRead));
-        fileObject.delete();
-
-        return "https://" + m_bucketName + ".s3.amazonaws.com/" + fileName;
+            return "https://" + m_bucketName + ".s3.amazonaws.com/" + fileName;
+        } catch (IOException | SdkClientException e)
+        {
+            e.printStackTrace();
+            return "File upload failed: " + e.getMessage();
+        }
     }
 
     /**

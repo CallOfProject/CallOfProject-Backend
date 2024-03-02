@@ -28,11 +28,10 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
     @Override
     public ResponseMessage<Object> createCodeInterview(CreateCodingInterviewDTO dto)
     {
-        var codingInterview = doForDataService(() -> m_callbackService.createCodeInterview(dto),
-                "CodingInterviewService::createCodeInterview");
+        var codingInterview = doForDataService(() -> m_callbackService.createCodeInterview(dto), "CodingInterviewService::createCodeInterview");
 
-       /* if (codingInterview.getStatusCode() == Status.CREATED)
-            m_callbackService.sendNotification((CodingInterviewDTO) codingInterview.getObject(), EInterviewStatus.CREATED);*/
+        if (codingInterview.getStatusCode() == Status.CREATED)
+            m_callbackService.sendNotification((CodingInterviewDTO) codingInterview.getObject(), EInterviewStatus.CREATED);
 
         return codingInterview;
     }
@@ -40,8 +39,7 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
     @Override
     public ResponseMessage<Object> deleteCodeInterview(UUID ownerId, UUID codeInterviewId)
     {
-        var codingInterview = doForDataService(() -> m_callbackService.deleteCodeInterview(ownerId, codeInterviewId),
-                "CodingInterviewService::createCodeInterview");
+        var codingInterview = doForDataService(() -> m_callbackService.deleteCodeInterview(ownerId, codeInterviewId), "CodingInterviewService::createCodeInterview");
 
         if (codingInterview.getStatusCode() == Status.OK)
             m_callbackService.sendNotification((CodingInterviewDTO) codingInterview.getObject(), EInterviewStatus.REMOVED);
@@ -52,8 +50,7 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
     @Override
     public ResponseMessage<Object> deleteCodeInterviewByProjectId(UUID projectId)
     {
-        var codingInterview = doForDataService(() -> m_callbackService.deleteCodeInterviewByProjectId(projectId),
-                "CodingInterviewService::deleteCodeInterviewByProjectId");
+        var codingInterview = doForDataService(() -> m_callbackService.deleteCodeInterviewByProjectId(projectId), "CodingInterviewService::deleteCodeInterviewByProjectId");
 
         if (codingInterview.getStatusCode() == Status.OK)
             m_callbackService.sendNotification((CodingInterviewDTO) codingInterview.getObject(), EInterviewStatus.REMOVED);
@@ -64,8 +61,7 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
     @Override
     public ResponseMessage<Object> addParticipant(UUID codeInterviewId, UUID userId)
     {
-        var result = doForDataService(() -> m_callbackService.addParticipant(codeInterviewId, userId),
-                "CodingInterviewService::addParticipant");
+        var result = doForDataService(() -> m_callbackService.addParticipant(codeInterviewId, userId), "CodingInterviewService::addParticipant");
 
         if (result.getStatusCode() == Status.OK)
             m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.ASSIGNED);
@@ -76,8 +72,7 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
     @Override
     public ResponseMessage<Object> addParticipantByProjectId(UUID projectId, UUID userId)
     {
-        var result = doForDataService(() -> m_callbackService.addParticipantByProjectId(projectId, userId),
-                "CodingInterviewService::addParticipantByProjectId");
+        var result = doForDataService(() -> m_callbackService.addParticipantByProjectId(projectId, userId), "CodingInterviewService::addParticipantByProjectId");
 
         if (result.getStatusCode() == Status.OK)
             m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.ASSIGNED);
@@ -104,7 +99,6 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
         var result = doForDataService(() -> m_callbackService.removeParticipantByProjectId(projectId, userId),
                 "CodingInterviewService::removeParticipantByProjectId");
 
-        // send notification to Owner and Participants
         if (result.getStatusCode() == Status.OK)
             m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.CANCELLED);
 
@@ -130,6 +124,12 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
     }
 
     @Override
+    public ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId)
+    {
+        return doForDataService(() -> m_callbackService.isUserSolvedBefore(userId, interviewId), "CodingInterviewService::isUserSolvedBefore");
+    }
+
+    @Override
     public ResponseMessage<Object> getInterviewByProjectId(UUID projectId)
     {
         return doForDataService(() -> m_callbackService.getInterviewByProjectId(projectId), "CodingInterviewService::getInterviewByProjectId");
@@ -145,11 +145,5 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
     public ResponseMessage<Object> submitInterview(UUID userId, UUID codeInterviewId, MultipartFile file)
     {
         return doForDataService(() -> m_callbackService.submitInterview(userId, codeInterviewId, file), "CodingInterviewService::submitInterview");
-    }
-
-    @Override
-    public ResponseMessage<Object> runTests(MultipartFile file)
-    {
-        throw new UnsupportedOperationException("Unsupported operation for this project!");
     }
 }

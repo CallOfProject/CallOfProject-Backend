@@ -5,8 +5,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record CodingInterviewDTO(
+        @JsonProperty("interview_id")
+        UUID codingInterviewId,
         String title,
         String description,
         @JsonProperty("duration_minutes")

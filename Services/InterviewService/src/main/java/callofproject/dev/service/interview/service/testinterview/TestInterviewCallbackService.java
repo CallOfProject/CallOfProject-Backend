@@ -4,6 +4,8 @@ import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.status.Status;
 import callofproject.dev.library.exception.service.DataServiceException;
+import callofproject.dev.service.interview.config.kafka.KafkaProducer;
+import callofproject.dev.service.interview.data.QuestionAnswer;
 import callofproject.dev.service.interview.data.dal.InterviewServiceHelper;
 import callofproject.dev.service.interview.data.entity.*;
 import callofproject.dev.service.interview.data.entity.enums.InterviewStatus;
@@ -11,14 +13,18 @@ import callofproject.dev.service.interview.dto.test.AssignMultipleInterviewDTO;
 import callofproject.dev.service.interview.dto.test.CreateQuestionDTO;
 import callofproject.dev.service.interview.dto.test.CreateTestDTO;
 import callofproject.dev.service.interview.dto.test.TestInterviewFinishDTO;
+import callofproject.dev.service.interview.mapper.IProjectMapper;
 import callofproject.dev.service.interview.mapper.ITestInterviewMapper;
 import callofproject.dev.service.interview.mapper.ITestInterviewQuestionMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+
+import static java.util.stream.Collectors.toSet;
+import static java.util.stream.StreamSupport.stream;
 
 @Service
 @Lazy
@@ -26,32 +32,44 @@ public class TestInterviewCallbackService
 {
     private final InterviewServiceHelper m_interviewServiceHelper;
     private final ITestInterviewMapper m_testInterviewMapper;
+    private final IProjectMapper m_projectMapper;
     private final ITestInterviewQuestionMapper m_testInterviewQuestionMapper;
+    private final KafkaProducer m_kafkaProducer;
 
-    public TestInterviewCallbackService(InterviewServiceHelper interviewServiceHelper, ITestInterviewMapper testInterviewMapper, ITestInterviewQuestionMapper testInterviewQuestionMapper)
+    public TestInterviewCallbackService(InterviewServiceHelper interviewServiceHelper, ITestInterviewMapper testInterviewMapper, IProjectMapper projectMapper, ITestInterviewQuestionMapper testInterviewQuestionMapper, KafkaProducer kafkaProducer)
     {
         m_interviewServiceHelper = interviewServiceHelper;
         m_testInterviewMapper = testInterviewMapper;
+        m_projectMapper = projectMapper;
         m_testInterviewQuestionMapper = testInterviewQuestionMapper;
+        m_kafkaProducer = kafkaProducer;
     }
 
     public ResponseMessage<Object> createInterview(CreateTestDTO dto)
     {
         var project = findProjectIfExistsById(dto.projectId());
         var testInterview = m_interviewServiceHelper.createInterview(m_testInterviewMapper.toTestInterview(dto));
+
         project.setTestInterview(testInterview);
         testInterview.setProject(project);
         m_interviewServiceHelper.createInterview(testInterview);
 
         // to question entity
         var questions = dto.questionList().stream().map(m_testInterviewQuestionMapper::toTestInterviewQuestion).toList();
+        // Assign test interview to questions
         questions.forEach(q -> q.setTestInterview(testInterview));
-        var savedQuestions = StreamSupport.stream(m_interviewServiceHelper.saveQuestions(questions).spliterator(), false).collect(Collectors.toSet());
+        // Save questions
+        var savedQuestions = stream(m_interviewServiceHelper.saveQuestions(questions).spliterator(), false).collect(toSet());
+        //Assign questions to test interview
         testInterview.setQuestions(savedQuestions);
-
-        var savedTestInterview = m_testInterviewMapper.toTestInterviewDTO(m_interviewServiceHelper.createInterview(testInterview));
-
-        return new ResponseMessage<>("Test interview created successfully", Status.CREATED, savedTestInterview);
+        // Save test interview
+        var savedTestInterview = m_interviewServiceHelper.createInterview(testInterview);
+        // Create User Test Interview
+        var users = dto.userIds().stream().map(UUID::fromString).map(this::findUserIfExistsById).collect(toSet());
+        users.stream().map(u -> new UserTestInterviews(u, savedTestInterview)).forEach(m_interviewServiceHelper::createUserTestInterviews);
+        // Create DTO
+        var savedTestInterviewDTO = m_testInterviewMapper.toTestInterviewDTO(savedTestInterview, m_projectMapper.toProjectDTO(savedTestInterview.getProject()));
+        return new ResponseMessage<>("Test interview created successfully", Status.CREATED, savedTestInterviewDTO);
     }
 
     public ResponseMessage<Object> addQuestion(CreateQuestionDTO createQuestionDTO)
@@ -71,7 +89,7 @@ public class TestInterviewCallbackService
         var interview = findInterviewIfExistsById(interviewId);
         var user = findUserIfExistsById(userId);
 
-       // user.addTestInterview(interview);
+        // user.addTestInterview(interview);
         m_interviewServiceHelper.saveUser(user);
 
         return new ResponseMessage<>("Test interview assigned successfully", Status.OK, true);
@@ -80,7 +98,7 @@ public class TestInterviewCallbackService
     public ResponseMessage<Object> assignMultipleTestInterview(AssignMultipleInterviewDTO dto)
     {
         var interview = findInterviewIfExistsById(dto.interviewId());
-        var users = StreamSupport.stream(m_interviewServiceHelper.findUsersByIds(dto.userIds()).spliterator(), false).collect(Collectors.toSet());
+        var users = stream(m_interviewServiceHelper.findUsersByIds(dto.userIds()).spliterator(), false).collect(toSet());
 
         //users.forEach(usr -> usr.addTestInterview(interview));
         m_interviewServiceHelper.saveUsers(users);
@@ -130,7 +148,6 @@ public class TestInterviewCallbackService
     {
         var interview = findInterviewIfExistsById(interviewId);
         var question = interview.getQuestions().stream().filter(q -> q.getId() == questionId).findFirst().get();
-        question.setStatus(QuestionStatus.ANSWERED);
         m_interviewServiceHelper.saveQuestion(question);
 
         return new ResponseMessage<>("Answer submitted successfully", Status.OK, true);
@@ -143,8 +160,11 @@ public class TestInterviewCallbackService
         if (q > interview.getQuestions().size())
             throw new DataServiceException("Question not found");
 
-        return new ResponseMessage<>("Question retrieved successfully", Status.OK, interview.getQuestions().stream().skip(q).findFirst().get());
+        var question = interview.getQuestions().stream().sorted().toList().get(q);
+
+        return new ResponseMessage<>("Question retrieved successfully", Status.OK, m_testInterviewQuestionMapper.toQuestionDTO(question));
     }
+
 
     public ResponseMessage<Object> getQuestionByProjectId(UUID projectId, int q)
     {
@@ -215,5 +235,36 @@ public class TestInterviewCallbackService
             throw new DataServiceException("Project not found");
 
         return project.get();
+    }
+
+    public ResponseMessage<Object> submitInterview(UUID testInterviewId, UUID userId)
+    {
+        var user = findUserIfExistsById(userId);
+        var interview = findInterviewIfExistsById(testInterviewId);
+        var userTestInterview = m_interviewServiceHelper.findUserTestInterviewByUserAndTestInterviewId(user.getUserId(), interview.getId());
+
+        if (userTestInterview.isEmpty())
+            throw new DataServiceException("User not assigned to interview");
+
+        userTestInterview.get().setInterviewStatus(InterviewStatus.FINISHED);
+        var calculateScore = calculateScore(userTestInterview.get(), interview.getQuestions().stream().toList());
+        userTestInterview.get().setScore(calculateScore);
+        m_interviewServiceHelper.createUserTestInterviews(userTestInterview.get());
+
+        return new ResponseMessage<>("Interview submitted successfully", Status.OK, true);
+    }
+
+    private int calculateScore(UserTestInterviews userTestInterview, List<TestInterviewQuestion> questions)
+    {
+        var userAnswersMap = userTestInterview.getAnswers().stream()
+                .collect(Collectors.toMap(QuestionAnswer::getQuestionId, QuestionAnswer::getAnswer));
+        int score = 0;
+        for (var question : questions)
+        {
+            var userAnswer = userAnswersMap.get(question.getId());
+            if (userAnswer != null && userAnswer.equals(question.getAnswer()))
+                score += question.getPoint();
+        }
+        return score;
     }
 }

@@ -74,7 +74,7 @@ public class S3Service
             m_s3Client.putObject(new PutObjectRequest(m_bucketName, fileName, multipartFile.getInputStream(), null)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
 
-            return "File uploaded successfully.";
+            return "https://" + m_bucketName + ".s3.amazonaws.com/" + fileName;
         } catch (IOException | SdkClientException e)
         {
             e.printStackTrace();

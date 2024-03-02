@@ -31,6 +31,20 @@ public class TestInterviewController
         return subscribe(() -> ok(m_testInterviewService.createInterview(dto)), ex -> internalServerError().body(ex.getMessage()));
     }
 
+
+    @GetMapping("/find/question/by/interview-id")
+    public ResponseEntity<Object> getQuestion(@RequestParam("interview_id") UUID interviewId, @RequestParam("q") int q)
+    {
+        return subscribe(() -> ok(m_testInterviewService.getQuestion(interviewId, q)), ex -> internalServerError().body(ex.getMessage()));
+    }
+
+    @PostMapping("/submit/answer/question")
+    public ResponseEntity<Object> submitAnswer(@RequestParam("interview_id") UUID interviewId, @RequestParam("question_id") long questionId)
+    {
+        return subscribe(() -> ok(m_testInterviewService.submitAnswer(interviewId, questionId)), ex -> internalServerError().body(ex.getMessage()));
+    }
+
+
     @PostMapping("add/question")
     public ResponseEntity<?> addQuestion(@RequestBody CreateQuestionDTO createQuestionDTO)
     {
@@ -79,11 +93,6 @@ public class TestInterviewController
         return subscribe(() -> ok(m_testInterviewService.getQuestionsByProjectId(projectId)), ex -> internalServerError().body(ex.getMessage()));
     }
 
-    @GetMapping("/find/question/by/interview-id")
-    public ResponseEntity<Object> getQuestion(@RequestParam("interview_id") UUID interviewId, @RequestParam("q") int q)
-    {
-        return subscribe(() -> ok(m_testInterviewService.getQuestion(interviewId, q)), ex -> internalServerError().body(ex.getMessage()));
-    }
 
     @GetMapping("/find/question/by/project-id")
     public ResponseEntity<Object> getQuestionByProjectId(@RequestParam("project_id") UUID projectId, @RequestParam("q") int q)
@@ -91,11 +100,6 @@ public class TestInterviewController
         return subscribe(() -> ok(m_testInterviewService.getQuestionByProjectId(projectId, q)), ex -> internalServerError().body(ex.getMessage()));
     }
 
-    @PostMapping("/submit/answer")
-    public ResponseEntity<Object> submitAnswer(@RequestParam("interview_id") UUID interviewId, @RequestParam("question_id") long questionId)
-    {
-        return subscribe(() -> ok(m_testInterviewService.submitAnswer(interviewId, questionId)), ex -> internalServerError().body(ex.getMessage()));
-    }
 
     @PostMapping("/start")
     public ResponseEntity<Object> startTestInterview(@RequestParam("interview_id") UUID interviewId)
@@ -113,5 +117,11 @@ public class TestInterviewController
     public ResponseEntity<Object> finishTestInterview(@RequestBody TestInterviewFinishDTO dto)
     {
         return subscribe(() -> ok(m_testInterviewService.finishTestInterview(dto)), ex -> internalServerError().body(ex.getMessage()));
+    }
+
+    @PostMapping("/submit")
+    public ResponseEntity<Object> submitInterview(@RequestParam("interview_id") UUID testInterviewId, @RequestParam("user_id") UUID userId)
+    {
+        return subscribe(() -> ok(m_testInterviewService.submitInterview(userId, testInterviewId)), ex -> internalServerError().body(ex.getMessage()));
     }
 }

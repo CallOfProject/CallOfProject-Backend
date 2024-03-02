@@ -187,4 +187,18 @@ public class TestInterviewService implements ITestInterviewService
         return doForDataService(() -> m_callbackService.getQuestionsByProjectId(projectId), "TestInterviewService::getQuestionsByProjectId");
     }
 
+    @Override
+    public ResponseMessage<Object> submitInterview(UUID userId, UUID testInterviewId)
+    {
+        var testInterview = doForDataService(() -> m_callbackService.submitInterview(testInterviewId, userId),
+                "TestInterviewService::submitInterview");
+
+        // send notification to Owner and Participants
+        if (testInterview.getStatusCode() == Status.OK)
+        {
+            //........
+        }
+
+        return testInterview;
+    }
 }

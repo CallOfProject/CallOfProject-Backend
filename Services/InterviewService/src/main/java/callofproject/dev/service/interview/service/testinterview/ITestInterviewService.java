@@ -40,4 +40,6 @@ public interface ITestInterviewService
     MultipleResponseMessage<Object> getQuestions(UUID interviewId);
 
     MultipleResponseMessage<Object> getQuestionsByProjectId(UUID projectId);
+
+    ResponseMessage<Object> submitInterview(UUID userId, UUID testInterviewId);
 }
