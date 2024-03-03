@@ -1,9 +1,6 @@
 package callofproject.dev.service.interview.controller;
 
-import callofproject.dev.service.interview.dto.test.AssignMultipleInterviewDTO;
-import callofproject.dev.service.interview.dto.test.CreateQuestionDTO;
-import callofproject.dev.service.interview.dto.test.CreateTestDTO;
-import callofproject.dev.service.interview.dto.test.TestInterviewFinishDTO;
+import callofproject.dev.service.interview.dto.test.*;
 import callofproject.dev.service.interview.service.testinterview.TestInterviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,9 +36,9 @@ public class TestInterviewController
     }
 
     @PostMapping("/submit/answer/question")
-    public ResponseEntity<Object> submitAnswer(@RequestParam("interview_id") UUID interviewId, @RequestParam("question_id") long questionId)
+    public ResponseEntity<Object> submitAnswer(@RequestBody QuestionAnswerDTO dto)
     {
-        return subscribe(() -> ok(m_testInterviewService.submitAnswer(interviewId, questionId)), ex -> internalServerError().body(ex.getMessage()));
+        return subscribe(() -> ok(m_testInterviewService.submitAnswer(dto)), ex -> internalServerError().body(ex.getMessage()));
     }
 
 
@@ -123,5 +120,18 @@ public class TestInterviewController
     public ResponseEntity<Object> submitInterview(@RequestParam("interview_id") UUID testInterviewId, @RequestParam("user_id") UUID userId)
     {
         return subscribe(() -> ok(m_testInterviewService.submitInterview(userId, testInterviewId)), ex -> internalServerError().body(ex.getMessage()));
+    }
+
+    @GetMapping("/is-solved-before")
+    public ResponseEntity<Object> isUserSolvedBefore(@RequestParam("user_id") UUID userId, @RequestParam("interview_id") UUID interviewId)
+    {
+        return subscribe(() -> ok(m_testInterviewService.isUserSolvedBefore(userId, interviewId)), ex -> internalServerError().body(ex.getMessage()));
+    }
+
+
+    @GetMapping("/info/interview")
+    public ResponseEntity<Object> getInterviewInformation(@RequestParam("interview_id") UUID interviewId)
+    {
+        return subscribe(() -> ok(m_testInterviewService.getInterviewInformation(interviewId)), ex -> internalServerError().body(ex.getMessage()));
     }
 }

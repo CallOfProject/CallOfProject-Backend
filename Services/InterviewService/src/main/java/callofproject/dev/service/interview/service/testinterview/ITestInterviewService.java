@@ -2,10 +2,7 @@ package callofproject.dev.service.interview.service.testinterview;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
-import callofproject.dev.service.interview.dto.test.AssignMultipleInterviewDTO;
-import callofproject.dev.service.interview.dto.test.CreateQuestionDTO;
-import callofproject.dev.service.interview.dto.test.CreateTestDTO;
-import callofproject.dev.service.interview.dto.test.TestInterviewFinishDTO;
+import callofproject.dev.service.interview.dto.test.*;
 
 import java.util.UUID;
 
@@ -29,7 +26,7 @@ public interface ITestInterviewService
 
     ResponseMessage<Object> startTestInterviewByProjectId(UUID projectId);
 
-    ResponseMessage<Object> submitAnswer(UUID interviewId, long questionId);
+    ResponseMessage<Object> submitAnswer(QuestionAnswerDTO dto);
 
     ResponseMessage<Object> getQuestion(UUID interviewId, int q);
 
@@ -42,4 +39,8 @@ public interface ITestInterviewService
     MultipleResponseMessage<Object> getQuestionsByProjectId(UUID projectId);
 
     ResponseMessage<Object> submitInterview(UUID userId, UUID testInterviewId);
+
+    ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId);
+
+    ResponseMessage<Object> getInterviewInformation(UUID interviewId);
 }

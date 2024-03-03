@@ -36,7 +36,7 @@ public class UserTestInterviews
     private InterviewStatus m_interviewStatus;
 
     @Column(name = "score")
-    private int score;
+    private int score = 0;
 
     @OneToMany(mappedBy = "m_userTestInterviews", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<QuestionAnswer> answers;

@@ -223,6 +223,18 @@ public class CodingInterviewCallbackService
     }
 
 
+    public ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId)
+    {
+        var userCodingInterview = m_interviewServiceHelper.findUserCodingInterviewByUserIdAndInterviewId(userId, interviewId);
+
+        if (userCodingInterview == null)
+            return new ResponseMessage<>("User not found", Status.NOT_FOUND, false);
+
+        var result = userCodingInterview.getInterviewStatus() == InterviewStatus.COMPLETED;
+
+        return new ResponseMessage<>("User solved before", Status.OK, result);
+    }
+
     // helper methods
 
     private CodingInterview findInterviewIfExistsById(UUID codeInterviewId)
@@ -295,17 +307,5 @@ public class CodingInterviewCallbackService
                     participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "cancelled", project.getProjectName())));
             default -> throw new DataServiceException("Invalid status");
         }
-    }
-
-    public ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId)
-    {
-        var userCodingInterview = m_interviewServiceHelper.findUserCodingInterviewByUserIdAndInterviewId(userId, interviewId);
-
-        if (userCodingInterview == null)
-            return new ResponseMessage<>("User not found", Status.NOT_FOUND, false);
-
-        var result = userCodingInterview.getInterviewStatus() == InterviewStatus.COMPLETED;
-
-        return new ResponseMessage<>("User solved before", Status.OK, result);
     }
 }

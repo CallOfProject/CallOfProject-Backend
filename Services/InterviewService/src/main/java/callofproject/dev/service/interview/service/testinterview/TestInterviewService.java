@@ -3,10 +3,7 @@ package callofproject.dev.service.interview.service.testinterview;
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.status.Status;
-import callofproject.dev.service.interview.dto.test.AssignMultipleInterviewDTO;
-import callofproject.dev.service.interview.dto.test.CreateQuestionDTO;
-import callofproject.dev.service.interview.dto.test.CreateTestDTO;
-import callofproject.dev.service.interview.dto.test.TestInterviewFinishDTO;
+import callofproject.dev.service.interview.dto.test.*;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -143,9 +140,9 @@ public class TestInterviewService implements ITestInterviewService
     }
 
     @Override
-    public ResponseMessage<Object> submitAnswer(UUID interviewId, long questionId)
+    public ResponseMessage<Object> submitAnswer(QuestionAnswerDTO dto)
     {
-        var testInterview = doForDataService(() -> m_callbackService.submitAnswer(interviewId, questionId),
+        var testInterview = doForDataService(() -> m_callbackService.submitAnswer(dto),
                 "TestInterviewService::submitAnswer");
 
         // send notification to Owner and Participants
@@ -200,5 +197,17 @@ public class TestInterviewService implements ITestInterviewService
         }
 
         return testInterview;
+    }
+
+    @Override
+    public ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId)
+    {
+        return doForDataService(() -> m_callbackService.isUserSolvedBefore(userId, interviewId), "TestInterviewService::isUserSolvedBefore");
+    }
+
+    @Override
+    public ResponseMessage<Object> getInterviewInformation(UUID interviewId)
+    {
+        return doForDataService(() -> m_callbackService.getInterviewInformation(interviewId), "TestInterviewService::getInterviewInformation");
     }
 }

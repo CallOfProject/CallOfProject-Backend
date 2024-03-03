@@ -9,10 +9,7 @@ import callofproject.dev.service.interview.data.QuestionAnswer;
 import callofproject.dev.service.interview.data.dal.InterviewServiceHelper;
 import callofproject.dev.service.interview.data.entity.*;
 import callofproject.dev.service.interview.data.entity.enums.InterviewStatus;
-import callofproject.dev.service.interview.dto.test.AssignMultipleInterviewDTO;
-import callofproject.dev.service.interview.dto.test.CreateQuestionDTO;
-import callofproject.dev.service.interview.dto.test.CreateTestDTO;
-import callofproject.dev.service.interview.dto.test.TestInterviewFinishDTO;
+import callofproject.dev.service.interview.dto.test.*;
 import callofproject.dev.service.interview.mapper.IProjectMapper;
 import callofproject.dev.service.interview.mapper.ITestInterviewMapper;
 import callofproject.dev.service.interview.mapper.ITestInterviewQuestionMapper;
@@ -144,11 +141,15 @@ public class TestInterviewCallbackService
         return startTestInterview(project.getTestInterview().getId());
     }
 
-    public ResponseMessage<Object> submitAnswer(UUID interviewId, long questionId)
+    public ResponseMessage<Object> submitAnswer(QuestionAnswerDTO dto)
     {
-        var interview = findInterviewIfExistsById(interviewId);
-        var question = interview.getQuestions().stream().filter(q -> q.getId() == questionId).findFirst().get();
-        m_interviewServiceHelper.saveQuestion(question);
+        var interview = findInterviewIfExistsById(dto.interviewId());
+        var user = findUserIfExistsById(dto.userId());
+
+        var userTestInterview = m_interviewServiceHelper.findUserTestInterviewByUserAndTestInterviewId(user.getUserId(), interview.getId());
+        var question = m_interviewServiceHelper.findQuestionById(dto.questionId());
+        var answer = new QuestionAnswer(question.get().getId(), userTestInterview.get(), dto.answer());
+        m_interviewServiceHelper.createQuestionAnswer(answer);
 
         return new ResponseMessage<>("Answer submitted successfully", Status.OK, true);
     }
@@ -157,8 +158,8 @@ public class TestInterviewCallbackService
     {
         var interview = findInterviewIfExistsById(interviewId);
 
-        if (q > interview.getQuestions().size())
-            throw new DataServiceException("Question not found");
+        if (q >= interview.getQuestions().size())
+            return new ResponseMessage<>("Question not found", Status.NOT_FOUND, null);
 
         var question = interview.getQuestions().stream().sorted().toList().get(q);
 
@@ -194,6 +195,26 @@ public class TestInterviewCallbackService
         return getQuestions(findProjectIfExistsById(projectId).getTestInterview().getId());
     }
 
+    public ResponseMessage<Object> getInterviewInformation(UUID interviewId)
+    {
+        var interview = findInterviewIfExistsById(interviewId);
+
+        var dto = new TestInfoDTO(interview.getId(), interview.getQuestionCount(), interview.getTotalTimeMinutes());
+
+        return new ResponseMessage<>("Interview information retrieved successfully", Status.OK, dto);
+    }
+
+    public ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId)
+    {
+        var userTestInterview = m_interviewServiceHelper.findUserTestInterviewByUserAndTestInterviewId(userId, interviewId);
+
+        if (userTestInterview.isEmpty())
+            return new ResponseMessage<>("User not found", Status.NOT_FOUND, false);
+
+        var result = userTestInterview.get().getInterviewStatus() == InterviewStatus.COMPLETED;
+
+        return new ResponseMessage<>("User solved before", Status.OK, result);
+    }
     // private methods
 
     private TestInterview findInterviewIfExistsById(UUID testInterviewId)
@@ -267,4 +288,6 @@ public class TestInterviewCallbackService
         }
         return score;
     }
+
+
 }

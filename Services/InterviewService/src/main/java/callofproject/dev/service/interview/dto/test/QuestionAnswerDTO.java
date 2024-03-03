@@ -1,5 +1,16 @@
 package callofproject.dev.service.interview.dto.test;
 
-public record QuestionAnswerDTO(long id, String answer)
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.UUID;
+
+public record QuestionAnswerDTO(
+        @JsonProperty("user_id")
+        UUID userId,
+        @JsonProperty("interview_id")
+        UUID interviewId,
+        @JsonProperty("question_id")
+        long questionId,
+        String answer)
 {
 }
