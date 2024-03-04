@@ -1,6 +1,6 @@
 package callofproject.dev.service.interview.dto;
 
-import callofproject.dev.service.interview.data.entity.enums.EProjectStatus;
+import callofproject.dev.data.interview.entity.enums.EProjectStatus;
 
 import java.util.UUID;
 

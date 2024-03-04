@@ -1,6 +1,6 @@
 package callofproject.dev.service.interview.mapper;
 
-import callofproject.dev.service.interview.data.entity.CodingInterview;
+import callofproject.dev.data.interview.entity.CodingInterview;
 import callofproject.dev.service.interview.dto.ProjectDTO;
 import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;

@@ -2,7 +2,7 @@ package callofproject.dev.service.interview.config.kafka.dto;
 
 import callofproject.dev.data.common.enums.EOperation;
 
-import callofproject.dev.service.interview.data.entity.Role;
+import callofproject.dev.data.interview.entity.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;

@@ -1,7 +1,7 @@
 package callofproject.dev.service.interview.mapper;
 
 
-import callofproject.dev.service.interview.data.entity.TestInterviewQuestion;
+import callofproject.dev.data.interview.entity.TestInterviewQuestion;
 import callofproject.dev.service.interview.dto.test.CreateQuestionDTO;
 import callofproject.dev.service.interview.dto.test.QuestionDTO;
 import org.mapstruct.Mapper;

@@ -12,6 +12,9 @@ public class KafkaTopicProvider
 
     @Value("${spring.kafka.notification-topic-name}")
     private String m_notificationTopicName;
+    @Value("${spring.kafka.email-topic-name}")
+    private String m_emailTopicName;
+
 
     public KafkaTopicProvider()
     {
@@ -26,5 +29,11 @@ public class KafkaTopicProvider
     public NewTopic provideNotificationTopic()
     {
         return TopicBuilder.name(m_notificationTopicName).build();
+    }
+
+    @Bean("emailTopic")
+    public NewTopic provideEmailTopic()
+    {
+        return TopicBuilder.name(m_emailTopicName).build();
     }
 }

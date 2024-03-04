@@ -1,8 +1,7 @@
 package callofproject.dev.service.interview.config.kafka.dto;
 
 import callofproject.dev.data.common.enums.AdminOperationStatus;
-
-import callofproject.dev.service.interview.data.entity.enums.EProjectStatus;
+import callofproject.dev.data.interview.entity.enums.EProjectStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;

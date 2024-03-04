@@ -2,17 +2,20 @@ package callofproject.dev.service.interview.service.testinterview;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.data.common.dto.EmailTopic;
+import callofproject.dev.data.common.enums.EmailType;
 import callofproject.dev.data.common.status.Status;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.service.interview.config.kafka.KafkaProducer;
-import callofproject.dev.service.interview.data.QuestionAnswer;
-import callofproject.dev.service.interview.data.dal.InterviewServiceHelper;
-import callofproject.dev.service.interview.data.entity.*;
-import callofproject.dev.service.interview.data.entity.enums.InterviewStatus;
+import callofproject.dev.data.interview.entity.QuestionAnswer;
+import callofproject.dev.data.interview.dal.InterviewServiceHelper;
+import callofproject.dev.data.interview.entity.*;
+import callofproject.dev.data.interview.entity.enums.InterviewStatus;
 import callofproject.dev.service.interview.dto.test.*;
 import callofproject.dev.service.interview.mapper.IProjectMapper;
 import callofproject.dev.service.interview.mapper.ITestInterviewMapper;
 import callofproject.dev.service.interview.mapper.ITestInterviewQuestionMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static java.util.UUID.fromString;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.StreamSupport.stream;
 
@@ -31,6 +35,8 @@ public class TestInterviewCallbackService
     private final ITestInterviewMapper m_testInterviewMapper;
     private final IProjectMapper m_projectMapper;
     private final ITestInterviewQuestionMapper m_testInterviewQuestionMapper;
+    @Value("${test-interview.email.template}")
+    private String m_interviewEmail;
     private final KafkaProducer m_kafkaProducer;
 
     public TestInterviewCallbackService(InterviewServiceHelper interviewServiceHelper, ITestInterviewMapper testInterviewMapper, IProjectMapper projectMapper, ITestInterviewQuestionMapper testInterviewQuestionMapper, KafkaProducer kafkaProducer)
@@ -66,7 +72,22 @@ public class TestInterviewCallbackService
         users.stream().map(u -> new UserTestInterviews(u, savedTestInterview)).forEach(m_interviewServiceHelper::createUserTestInterviews);
         // Create DTO
         var savedTestInterviewDTO = m_testInterviewMapper.toTestInterviewDTO(savedTestInterview, m_projectMapper.toProjectDTO(savedTestInterview.getProject()));
+        sendEmails(savedTestInterviewDTO, users.stream().toList());
         return new ResponseMessage<>("Test interview created successfully", Status.CREATED, savedTestInterviewDTO);
+    }
+
+    private void sendEmails(TestInterviewDTO savedTestInterviewDTO, List<User> list)
+    {
+        list.forEach(u -> sendEmail(fromString(savedTestInterviewDTO.id()), u.getEmail(), savedTestInterviewDTO.projectDTO().projectName(), u.getUserId()));
+    }
+
+    private void sendEmail(UUID interviewId, String email, String projectName, UUID userId)
+    {
+        System.out.println("EMAIL: " + email);
+        var title = "Test Interview Assigned for " + projectName;
+        var emailStr = String.format(m_interviewEmail, interviewId, userId);
+        var topic = new EmailTopic(EmailType.ASSIGN_INTERVIEW, email, title, emailStr, null);
+        m_kafkaProducer.sendEmail(topic);
     }
 
     public ResponseMessage<Object> addQuestion(CreateQuestionDTO createQuestionDTO)
@@ -211,7 +232,7 @@ public class TestInterviewCallbackService
         if (userTestInterview.isEmpty())
             return new ResponseMessage<>("User not found", Status.NOT_FOUND, false);
 
-        var result = userTestInterview.get().getInterviewStatus() == InterviewStatus.COMPLETED;
+        var result = userTestInterview.get().getInterviewStatus() == InterviewStatus.FINISHED;
 
         return new ResponseMessage<>("User solved before", Status.OK, result);
     }

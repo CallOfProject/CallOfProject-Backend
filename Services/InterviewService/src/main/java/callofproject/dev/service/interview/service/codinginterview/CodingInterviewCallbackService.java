@@ -2,13 +2,15 @@ package callofproject.dev.service.interview.service.codinginterview;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.data.common.dto.EmailTopic;
+import callofproject.dev.data.common.enums.EmailType;
 import callofproject.dev.data.common.enums.NotificationType;
 import callofproject.dev.data.common.status.Status;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.service.interview.config.kafka.KafkaProducer;
-import callofproject.dev.service.interview.data.dal.InterviewServiceHelper;
-import callofproject.dev.service.interview.data.entity.*;
-import callofproject.dev.service.interview.data.entity.enums.InterviewStatus;
+import callofproject.dev.data.interview.dal.InterviewServiceHelper;
+import callofproject.dev.data.interview.entity.*;
+import callofproject.dev.data.interview.entity.enums.InterviewStatus;
 import callofproject.dev.service.interview.dto.NotificationKafkaDTO;
 import callofproject.dev.service.interview.dto.OwnerProjectDTO;
 import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
@@ -18,10 +20,12 @@ import callofproject.dev.service.interview.mapper.IProjectMapper;
 import callofproject.dev.service.interview.mapper.IUserMapper;
 import callofproject.dev.service.interview.service.EInterviewStatus;
 import callofproject.dev.service.interview.service.S3Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -40,7 +44,8 @@ public class CodingInterviewCallbackService
     private final IProjectMapper m_projectMapper;
     private final IUserMapper m_userMapper;
     private final KafkaProducer m_kafkaProducer;
-
+    @Value("${coding-interview.email.template}")
+    private String m_interviewEmail;
     public CodingInterviewCallbackService(InterviewServiceHelper interviewServiceHelper, ICodingInterviewMapper codingInterviewMapper, S3Service s3Service, KafkaProducer kafkaProducer, IProjectMapper projectMapper, IUserMapper userMapper)
     {
         m_interviewServiceHelper = interviewServiceHelper;
@@ -74,7 +79,7 @@ public class CodingInterviewCallbackService
         users.stream().map(u -> new UserCodingInterviews(u, savedInterview)).forEach(m_interviewServiceHelper::createUserCodingInterviews);
 
         var codingInterviewDTO = m_codingInterviewMapper.toCodingInterviewDTO(savedInterview, m_projectMapper.toProjectDTO(savedInterview.getProject()));
-
+        sendEmails(codingInterviewDTO, users.stream().toList());
         return new ResponseMessage<>("Coding interview created successfully", Status.CREATED, codingInterviewDTO);
     }
 
@@ -104,6 +109,20 @@ public class CodingInterviewCallbackService
         m_interviewServiceHelper.deleteCodeInterview(interview);
         var dto = m_codingInterviewMapper.toCodingInterviewDTO(interview, m_projectMapper.toProjectDTO(project));
         return new ResponseMessage<>("Coding interview deleted successfully", Status.OK, dto);
+    }
+
+    private void sendEmails(CodingInterviewDTO codingInterviewDTO, List<User> list)
+    {
+        list.forEach(u -> sendEmail(codingInterviewDTO.codingInterviewId(), u.getEmail(), codingInterviewDTO.projectDTO().projectName(), u.getUserId()));
+    }
+
+    private void sendEmail(UUID interviewId, String email, String projectName, UUID userId)
+    {
+        System.out.println("EMAIL: " + email);
+        var title = "Test Interview Assigned for " + projectName;
+        var emailStr = String.format(m_interviewEmail, interviewId, userId);
+        var topic = new EmailTopic(EmailType.ASSIGN_INTERVIEW, email, title, emailStr, null);
+        m_kafkaProducer.sendEmail(topic);
     }
 
     public ResponseMessage<Object> deleteCodeInterviewByProjectId(UUID projectId)

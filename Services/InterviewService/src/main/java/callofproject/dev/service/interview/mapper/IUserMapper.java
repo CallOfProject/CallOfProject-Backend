@@ -1,7 +1,7 @@
 package callofproject.dev.service.interview.mapper;
 
 import callofproject.dev.service.interview.config.kafka.dto.UserKafkaDTO;
-import callofproject.dev.service.interview.data.entity.User;
+import callofproject.dev.data.interview.entity.User;
 import callofproject.dev.service.interview.dto.UserDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

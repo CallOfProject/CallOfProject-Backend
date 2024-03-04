@@ -34,12 +34,11 @@ public class ProjectDatasourceConfig
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean projectEntityManagerFactory(
-            @Qualifier("projectDataSource") DataSource dataSource, JpaVendorAdapter jpaVendorAdapter)
+    public LocalContainerEntityManagerFactoryBean projectEntityManagerFactory(@Qualifier("projectDataSource") DataSource dataSource, JpaVendorAdapter jpaVendorAdapter)
     {
         JpaProperties jpaProperties = new JpaProperties();
-        EntityManagerFactoryBuilder builder = new EntityManagerFactoryBuilder(
-                jpaVendorAdapter, jpaProperties.getProperties(), null);
+        EntityManagerFactoryBuilder builder = new EntityManagerFactoryBuilder(jpaVendorAdapter, jpaProperties.getProperties(), null);
+
         return builder
                 .dataSource(dataSource)
                 .packages("callofproject.dev.data.project")
@@ -49,8 +48,7 @@ public class ProjectDatasourceConfig
 
     @Bean
     @Primary
-    public PlatformTransactionManager projectDbTransactionManager(
-            @Qualifier("projectEntityManagerFactory") EntityManagerFactory entityManagerFactory)
+    public PlatformTransactionManager projectDbTransactionManager(@Qualifier("projectEntityManagerFactory") EntityManagerFactory entityManagerFactory)
     {
         return new JpaTransactionManager(entityManagerFactory);
     }
