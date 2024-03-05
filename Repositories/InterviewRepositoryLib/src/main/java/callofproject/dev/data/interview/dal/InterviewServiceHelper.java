@@ -158,4 +158,10 @@ public class InterviewServiceHelper
     {
         return doForRepository(() -> m_repositoryFacade.m_questionAnswerRepository.save(questionAnswer), "Error creating question answer");
     }
+
+
+    public Iterable<TestInterview> findAllTestInterviews()
+    {
+        return doForRepository(m_repositoryFacade.m_testInterviewRepository::findAll, "Error finding all test interviews");
+    }
 }

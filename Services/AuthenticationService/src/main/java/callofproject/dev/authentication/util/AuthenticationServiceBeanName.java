@@ -3,12 +3,12 @@ package callofproject.dev.authentication.util;
 /**
  * Class containing constants for package names and file paths used in the project.
  */
-public final class Util
+public final class AuthenticationServiceBeanName
 {
     /**
      * Prevents instantiation of this utility class.
      */
-    private Util()
+    private AuthenticationServiceBeanName()
     {
     }
 

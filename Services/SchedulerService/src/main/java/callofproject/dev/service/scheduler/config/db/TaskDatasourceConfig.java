@@ -1,4 +1,4 @@
-package callofproject.dev.service.scheduler.config;
+package callofproject.dev.service.scheduler.config.db;
 
 
 import jakarta.persistence.EntityManagerFactory;
@@ -21,45 +21,43 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableJpaRepositories(
-        basePackages = "callofproject.dev.repository.authentication",
-        entityManagerFactoryRef = "authenticationEntityManagerFactory",
-        transactionManagerRef = "authenticationDbTransactionManager"
+        basePackages = "callofproject.dev.data.task",
+        entityManagerFactoryRef = "taskEntityManagerFactory",
+        transactionManagerRef = "taskDbTransactionManager"
 )
-public class AuthenticationDatasourceConfig
+public class TaskDatasourceConfig
 {
 
     @Bean
-    @ConfigurationProperties(prefix = "spring.datasource.auth-db")
-    public DataSource authenticationDataSource()
+    @ConfigurationProperties(prefix = "spring.datasource.task-db")
+    public DataSource taskDataSource()
     {
         return DataSourceBuilder.create().build();
     }
 
-    @Bean
+    @Bean(name = "vendor.task")
     public JpaVendorAdapter jpaVendorAdapter(JpaProperties jpaProperties)
     {
         return new HibernateJpaVendorAdapter();
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean authenticationEntityManagerFactory(
-            @Qualifier("authenticationDataSource") DataSource dataSource,
-            JpaVendorAdapter jpaVendorAdapter)
+    public LocalContainerEntityManagerFactoryBean taskEntityManagerFactory(@Qualifier("taskDataSource") DataSource dataSource,
+                                                                           @Qualifier("vendor.task") JpaVendorAdapter jpaVendorAdapter)
     {
         JpaProperties jpaProperties = new JpaProperties();
         EntityManagerFactoryBuilder builder = new EntityManagerFactoryBuilder(
                 jpaVendorAdapter, jpaProperties.getProperties(), null);
         return builder
                 .dataSource(dataSource)
-                .packages("callofproject.dev.repository.authentication")
-                .persistenceUnit("auth_db")
+                .packages("callofproject.dev.data.task")
+                .persistenceUnit("task_db")
                 .build();
     }
 
     @Bean
-    @ConditionalOnMissingBean(PlatformTransactionManager.class)
-    public PlatformTransactionManager authenticationDbTransactionManager(
-            @Qualifier("authenticationEntityManagerFactory") EntityManagerFactory entityManagerFactory)
+    //@ConditionalOnMissingBean(PlatformTransactionManager.class)
+    public PlatformTransactionManager taskDbTransactionManager(@Qualifier("taskEntityManagerFactory") EntityManagerFactory entityManagerFactory)
     {
         return new JpaTransactionManager(entityManagerFactory);
     }

@@ -24,7 +24,7 @@ import org.springframework.test.context.TestPropertySource;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import static callofproject.dev.authentication.util.Util.*;
+import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest

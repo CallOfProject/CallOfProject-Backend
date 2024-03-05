@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
-@Repository
+@Repository("callofproject.dev.data.interview.repository.IProjectParticipantRepository")
 @Lazy
 public interface IProjectParticipantRepository extends CrudRepository<ProjectParticipant, UUID>
 {

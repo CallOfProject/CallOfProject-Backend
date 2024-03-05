@@ -21,8 +21,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static callofproject.dev.authentication.util.Util.MAPPER_CONFIG_BEAN;
-import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
+import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.MAPPER_CONFIG_BEAN;
+import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.USER_MANAGEMENT_SERVICE;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static callofproject.dev.repository.authentication.BeanName.USER_MANAGEMENT_DAL_BEAN;
 import static callofproject.dev.util.stream.StreamUtil.toListConcurrent;

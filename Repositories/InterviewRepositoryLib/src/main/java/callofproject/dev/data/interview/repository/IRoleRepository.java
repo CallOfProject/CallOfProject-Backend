@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
+@Repository("callofproject.dev.data.interview.repository.IRoleRepository")
 @Lazy
 public interface IRoleRepository extends CrudRepository<Role, Long>
 {

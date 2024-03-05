@@ -1,4 +1,4 @@
-package callofproject.dev.service.scheduler.config;
+package callofproject.dev.service.scheduler.config.db;
 
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;

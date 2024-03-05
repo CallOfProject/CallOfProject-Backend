@@ -7,6 +7,7 @@ import callofproject.dev.data.project.entity.User;
 import callofproject.dev.data.project.entity.enums.EProjectStatus;
 import callofproject.dev.data.project.repository.IProjectRepository;
 import callofproject.dev.library.exception.service.DataServiceException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class FeedbackSchedulerService
     private final ProjectServiceHelper m_projectServiceHelper;
     private final IProjectRepository m_projectRepository;
 
-    public FeedbackSchedulerService(ProjectServiceHelper projectServiceHelper, IProjectRepository projectRepository)
+    public FeedbackSchedulerService(ProjectServiceHelper projectServiceHelper, @Qualifier("callofproject.dev.data.project.repository.IProjectRepository") IProjectRepository projectRepository)
     {
         m_projectServiceHelper = projectServiceHelper;
         m_projectRepository = projectRepository;
@@ -99,7 +100,7 @@ public class FeedbackSchedulerService
         }
     }
 
-    @Scheduled(cron = "0 00 03 * * *", zone = "Europe/Istanbul")
+    //@Scheduled(cron = "*/10 * * * * *", zone = "Europe/Istanbul")
     public void checkFeedbacks()
     {
         Predicate<Project> isRequestNotEmpty = p -> !p.getProjectParticipantRequests().isEmpty();

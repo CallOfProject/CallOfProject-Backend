@@ -3,7 +3,7 @@ package callofproject.dev.authentication.mapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import static callofproject.dev.authentication.util.Util.MAPPER_CONFIG_BEAN;
+import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.MAPPER_CONFIG_BEAN;
 
 /**
  * MapperConfiguration class for mapping entities to DTOs.

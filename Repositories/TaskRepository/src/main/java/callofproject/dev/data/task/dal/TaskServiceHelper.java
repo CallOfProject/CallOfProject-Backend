@@ -225,4 +225,19 @@ public class TaskServiceHelper
     {
         return doForRepository(() -> m_userRepository.findAllById(ids), "Failed to find users by ids in repository");
     }
+
+    public Iterable<Task> findAllTasksByEnDate(LocalDate endDate)
+    {
+        return doForRepository(() -> m_taskRepository.findAllByEndDate(endDate), "Failed to find all tasks by end date in repository");
+    }
+
+    public Iterable<Task> findAllTasksByEnDateBefore(LocalDate endDate)
+    {
+        return doForRepository(() -> m_taskRepository.findAllTasksByEnDateBefore(endDate), "Failed to find all tasks by end date in repository");
+    }
+
+    public Iterable<Task> saveAllTasks(Iterable<Task> tasks)
+    {
+        return doForRepository(() -> m_taskRepository.saveAll(tasks), "Failed to save all tasks in repository");
+    }
 }

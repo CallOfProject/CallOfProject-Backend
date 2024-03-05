@@ -4,7 +4,7 @@ package callofproject.dev.authentication.controller;
 import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.dto.auth.RegisterRequest;
 import callofproject.dev.authentication.service.AuthenticationService;
-import callofproject.dev.authentication.util.Util;
+import callofproject.dev.authentication.util.AuthenticationServiceBeanName;
 import callofproject.dev.data.common.clas.ErrorMessage;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +37,7 @@ public class AuthenticationController
      *
      * @param service The AuthenticationService object to be injected.
      */
-    public AuthenticationController(@Qualifier(Util.AUTHENTICATION_SERVICE) AuthenticationService service)
+    public AuthenticationController(@Qualifier(AuthenticationServiceBeanName.AUTHENTICATION_SERVICE) AuthenticationService service)
     {
         this.m_authenticationService = service;
     }

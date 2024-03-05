@@ -1,6 +1,7 @@
 package callofproject.dev.data.interview.dal;
 
 import callofproject.dev.data.interview.repository.*;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +19,15 @@ public class RepositoryFacade
     public final IUserTestInterviewsRepository m_userTestInterviewsRepository;
     public final IQuestionAnswerRepository m_questionAnswerRepository;
 
-    public RepositoryFacade(IUserRepository userRepository, IProjectRepository projectRepository, IProjectParticipantRepository projectParticipantRepository,
-                            ITestInterviewRepository testInterviewRepository, ITestInterviewQuestionRepository testInterviewQuestionRepository,
-                            ICodingInterviewRepository codingInterviewRepository, IUserCodingInterviewsRepository userCodingInterviewsRepository, IUserTestInterviewsRepository userTestInterviewsRepository, IQuestionAnswerRepository questionAnswerRepository)
+    public RepositoryFacade(@Qualifier("callofproject.dev.data.interview.repository.IUserRepository") IUserRepository userRepository,
+                            @Qualifier("callofproject.dev.data.interview.repository.IProjectRepository") IProjectRepository projectRepository,
+                            @Qualifier("callofproject.dev.data.interview.repository.IProjectParticipantRepository") IProjectParticipantRepository projectParticipantRepository,
+                            ITestInterviewRepository testInterviewRepository,
+                            ITestInterviewQuestionRepository testInterviewQuestionRepository,
+                            ICodingInterviewRepository codingInterviewRepository,
+                            IUserCodingInterviewsRepository userCodingInterviewsRepository,
+                            IUserTestInterviewsRepository userTestInterviewsRepository,
+                            IQuestionAnswerRepository questionAnswerRepository)
     {
         m_userRepository = userRepository;
         m_projectRepository = projectRepository;

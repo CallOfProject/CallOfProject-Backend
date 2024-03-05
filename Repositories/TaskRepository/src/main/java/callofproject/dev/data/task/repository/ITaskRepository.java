@@ -63,4 +63,18 @@ public interface ITaskRepository extends JpaRepository<Task, UUID>, JpaSpecifica
 
     @Override
     Page<Task> findAll(Specification<Task> spec, Pageable pageable);
+
+    @Query("from Task where m_endDate = :endDate")
+    Iterable<Task> findAllByEndDate(LocalDate endDate);
+
+    @Query("from Task where m_endDate < :endDate")
+    Iterable<Task> findAllTasksByEnDateBefore(LocalDate endDate);
+
+    @Query("""
+            from Task where m_endDate < :endDate and
+            m_taskStatus != 'COMPLETED' and
+            m_taskStatus != 'CANCELLED' and
+            m_taskStatus != 'IN_PROGRESS'
+            """)
+    Iterable<Task> findAllExpiredTasks(LocalDate endDate);
 }

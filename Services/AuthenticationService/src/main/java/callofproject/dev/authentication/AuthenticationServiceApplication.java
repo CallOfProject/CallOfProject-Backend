@@ -28,8 +28,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 
-import static callofproject.dev.authentication.util.Util.BASE_PACKAGE;
-import static callofproject.dev.authentication.util.Util.REPO_PACKAGE;
+import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.BASE_PACKAGE;
+import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.REPO_PACKAGE;
 
 @EnableFeignClients
 @SpringBootApplication

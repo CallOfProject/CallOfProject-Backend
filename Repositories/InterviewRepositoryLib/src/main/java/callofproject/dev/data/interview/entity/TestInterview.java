@@ -1,11 +1,13 @@
 package callofproject.dev.data.interview.entity;
 
 
-
 import callofproject.dev.data.interview.entity.enums.InterviewStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -30,6 +32,14 @@ public class TestInterview
 
     @Column(name = "description")
     private String m_description;
+
+    @Column(name = "start_time")
+    @DateTimeFormat(pattern = "dd/MM/yyyy kk:mm:ss")
+    private LocalDateTime m_startTime;
+
+    @Column(name = "end_time")
+    @DateTimeFormat(pattern = "dd/MM/yyyy kk:mm:ss")
+    private LocalDateTime m_endTime;
 
     @Column(name = "total_score")
     private int m_totalScore = 100;
@@ -56,8 +66,10 @@ public class TestInterview
     }
 
 
-    public TestInterview(int questionCount, String title, long totalTimeMinutes, String description)
+    public TestInterview(int questionCount, String title, long totalTimeMinutes, String description, LocalDateTime startTime, LocalDateTime endTime)
     {
+        m_startTime = startTime;
+        m_endTime = endTime;
         m_questionCount = questionCount;
         m_title = title;
         m_totalTimeMinutes = totalTimeMinutes;
@@ -82,6 +94,26 @@ public class TestInterview
             m_questions = new HashSet<>();
 
         m_questions.add(question);
+    }
+
+    public LocalDateTime getStartTime()
+    {
+        return m_startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime)
+    {
+        m_startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime()
+    {
+        return m_endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime)
+    {
+        m_endTime = endTime;
     }
 
     public Set<UserTestInterviews> getTestInterviews()

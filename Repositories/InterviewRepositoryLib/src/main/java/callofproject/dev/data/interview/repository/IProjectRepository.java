@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
-@Repository
+@Repository("callofproject.dev.data.interview.repository.IProjectRepository")
 @Lazy
 public interface IProjectRepository extends JpaRepository<Project, UUID>
 {

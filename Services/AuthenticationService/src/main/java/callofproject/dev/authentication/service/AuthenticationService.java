@@ -34,8 +34,8 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static callofproject.dev.authentication.util.Util.AUTHENTICATION_SERVICE;
-import static callofproject.dev.authentication.util.Util.USER_MANAGEMENT_SERVICE;
+import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.AUTHENTICATION_SERVICE;
+import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.USER_MANAGEMENT_SERVICE;
 import static callofproject.dev.data.common.enums.EOperation.REGISTER_NOT_VERIFY;
 import static callofproject.dev.data.common.enums.EmailType.EMAIL_VERIFICATION;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
