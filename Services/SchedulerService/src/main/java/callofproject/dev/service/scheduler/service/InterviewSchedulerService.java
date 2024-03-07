@@ -18,17 +18,27 @@ public class InterviewSchedulerService
         m_serviceCallback = serviceCallback;
     }
 
-    @Scheduled(cron = "*/10 * * * * *", zone = "Europe/Istanbul")
+    @Scheduled(cron = "00 00 00 * * *", zone = "Europe/Istanbul")
     public void checkExpiredTestInterviews()
     {
-        System.out.println("Checking expired test interviews");
         m_serviceCallback.checkExpiredTestInterviews();
     }
 
-    @Scheduled(cron = "*/30 * * * * *", zone = "Europe/Istanbul")
+    @Scheduled(cron = "00 00 00 * * *", zone = "Europe/Istanbul")
     public void checkExpiredCodingInterviews()
     {
-        System.out.println("Checking expired coding interviews");
         m_serviceCallback.checkExpiredCodingInterviews();
+    }
+
+    @Scheduled(cron = "00 30 01 * * *", zone = "Europe/Istanbul")
+    public void reminderCodingInterviews()
+    {
+        m_serviceCallback.reminderCodingInterviews();
+    }
+
+    @Scheduled(cron = "00 00 01 * * *", zone = "Europe/Istanbul")
+    public void reminderTestInterviews()
+    {
+        m_serviceCallback.reminderTestInterviews();
     }
 }

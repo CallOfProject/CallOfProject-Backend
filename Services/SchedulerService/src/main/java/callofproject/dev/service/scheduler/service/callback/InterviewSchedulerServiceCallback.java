@@ -1,5 +1,8 @@
 package callofproject.dev.service.scheduler.service.callback;
 
+import callofproject.dev.data.common.dto.EmailTopic;
+import callofproject.dev.data.common.enums.NotificationDataType;
+import callofproject.dev.data.common.enums.NotificationType;
 import callofproject.dev.data.interview.dal.InterviewServiceHelper;
 import callofproject.dev.data.interview.entity.CodingInterview;
 import callofproject.dev.data.interview.entity.TestInterview;
@@ -7,12 +10,19 @@ import callofproject.dev.data.interview.entity.UserCodingInterviews;
 import callofproject.dev.data.interview.entity.UserTestInterviews;
 import callofproject.dev.data.interview.entity.enums.InterviewResult;
 import callofproject.dev.data.interview.entity.enums.InterviewStatus;
+import callofproject.dev.service.scheduler.config.kafka.KafkaProducer;
+import callofproject.dev.service.scheduler.dto.NotificationKafkaDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
+import static callofproject.dev.data.common.enums.EmailType.REMAINDER;
+import static callofproject.dev.service.scheduler.util.Util.getEmailTemplate;
 import static callofproject.dev.util.stream.StreamUtil.toStream;
+import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
 
 @Service
@@ -20,17 +30,43 @@ import static java.time.LocalDateTime.now;
 public class InterviewSchedulerServiceCallback
 {
     private final InterviewServiceHelper m_serviceHelper;
+    private final KafkaProducer m_kafkaProducer;
 
-    public InterviewSchedulerServiceCallback(InterviewServiceHelper interviewServiceHelper)
+    @Value("${interview.email.template.path}")
+    private String m_emailTemplate;
+
+    @Value("${interview.coding.url}")
+    private String m_codingInterviewUrl;
+
+    @Value("${interview.test.url}")
+    private String m_testInterviewUrl;
+
+    @Value("${interview.email.expired.title}")
+    private String m_timeExpiredStr;
+
+    @Value("${interview.email.coding.reminder.title}")
+    private String m_codingInterviewReminderTitle;
+
+    @Value("${interview.email.test.reminder.title}")
+    private String m_testInterviewReminderTitle;
+
+    @Value("${interview.reminder.message-template}")
+    private String m_reminderMessageTemplate;
+
+    @Value("${interview.reminder-date-from-now}")
+    private int m_reminderDays;
+
+
+    public InterviewSchedulerServiceCallback(InterviewServiceHelper interviewServiceHelper, KafkaProducer kafkaProducer)
     {
         m_serviceHelper = interviewServiceHelper;
+        m_kafkaProducer = kafkaProducer;
     }
 
     // Check for expired coding interviews and mark them as completed
     public void checkExpiredCodingInterviews()
     {
-        var interviews = toStream(m_serviceHelper.findAllInterviews()).toList();
-        checkCodingInterviews(interviews);
+        checkCodingInterviews(toStream(m_serviceHelper.findAllInterviews()).toList());
     }
 
     // Check for expired test interviews and mark them as completed
@@ -39,6 +75,32 @@ public class InterviewSchedulerServiceCallback
         checkTestInterviews(toStream(m_serviceHelper.findAllTestInterviews()).toList());
     }
 
+    // Send reminder emails for coding interviews
+    public void reminderCodingInterviews()
+    {
+        var interviews = m_serviceHelper.findAllInterviewsByEnDate(now().plusDays(m_reminderDays));
+
+        for (var interview : interviews)
+        {
+            sendEmail(interview, m_codingInterviewReminderTitle);
+            sendNotification(interview, m_codingInterviewReminderTitle);
+        }
+    }
+
+
+    // Send reminder emails for test interviews
+    public void reminderTestInterviews()
+    {
+        var interviews = m_serviceHelper.findAllTestInterviewsByEnDate(now().plusDays(m_reminderDays));
+
+        for (var interview : interviews)
+        {
+            sendEmail(interview, m_testInterviewReminderTitle);
+            sendNotification(interview, m_testInterviewReminderTitle);
+        }
+    }
+
+
     // -----------------------------------------------------------------------------------------------------------------
     private void checkTestInterviews(List<TestInterview> testInterviews)
     {
@@ -46,7 +108,7 @@ public class InterviewSchedulerServiceCallback
 
         for (var ti : expiredTestInterviews)
         {
-            ti.setDescription("Interview is time Expired");
+            ti.setDescription(m_timeExpiredStr);
             ti.setInterviewStatus(InterviewStatus.COMPLETED);
             m_serviceHelper.createInterview(ti);
             markTestInterviewParticipantsAsCompleted(ti.getTestInterviews().stream().toList());
@@ -59,7 +121,7 @@ public class InterviewSchedulerServiceCallback
 
         for (var ci : expiredCodingInterviews)
         {
-            ci.setDescription("Interview is time Expired");
+            ci.setDescription(m_timeExpiredStr);
             ci.setInterviewStatus(InterviewStatus.COMPLETED);
             m_serviceHelper.createCodeInterview(ci);
             markCodingInterviewParticipantsAsCompleted(ci.getCodingInterviews().stream().toList());
@@ -84,5 +146,78 @@ public class InterviewSchedulerServiceCallback
             uci.setInterviewStatus(InterviewStatus.COMPLETED);
             m_serviceHelper.createUserTestInterviews(uci);
         }
+    }
+
+    private void sendEmail(CodingInterview interview, String title)
+    {
+        var userCodingInterviews = interview.getCodingInterviews().stream().toList();
+        var template = getEmailTemplate(m_emailTemplate).trim();
+
+        for (var p : userCodingInterviews)
+        {
+            var user = p.getUser();
+            var interviewLink = format(m_codingInterviewUrl, interview.getCodingInterviewId(), user.getUserId());
+            var message = format(template, user.getUsername(), interview.getProject().getProjectName(), interviewLink);
+            m_kafkaProducer.sendEmail(new EmailTopic(REMAINDER, user.getEmail(), title, message, null));
+        }
+    }
+
+    private void sendEmail(TestInterview interview, String title)
+    {
+        var userCodingInterviews = interview.getTestInterviews().stream().toList();
+        var template = getEmailTemplate(m_emailTemplate).trim();
+
+        for (var p : userCodingInterviews)
+        {
+            var user = p.getUser();
+            var interviewLink = format(m_testInterviewUrl, interview.getId(), user.getUserId());
+            var message = format(template, user.getUsername(), interview.getProject().getProjectName(), interviewLink);
+            m_kafkaProducer.sendEmail(new EmailTopic(REMAINDER, user.getEmail(), title, message, null));
+        }
+    }
+
+    private void sendNotification(CodingInterview interview, String title)
+    {
+        var userCodingInterviews = interview.getCodingInterviews().stream().toList();
+
+        for (var codingInterview : userCodingInterviews)
+        {
+            var user = codingInterview.getUser();
+            var owner = codingInterview.getCodingInterview().getProject().getProjectOwner();
+            var interviewLink = format(m_codingInterviewUrl, interview.getCodingInterviewId(), user.getUserId());
+            var msg = format(m_reminderMessageTemplate, interview.getTitle(), m_reminderDays);
+
+            send(owner.getUserId(), user.getUserId(), title, msg, interviewLink);
+        }
+    }
+
+    private void sendNotification(TestInterview interview, String title)
+    {
+        var userTestInterviews = interview.getTestInterviews().stream().toList();
+
+        for (var testInterview : userTestInterviews)
+        {
+            var user = testInterview.getUser();
+            var owner = testInterview.getTestInterview().getProject().getProjectOwner();
+            var interviewLink = format(m_testInterviewUrl, interview.getId(), user.getUserId());
+            var msg = format(m_reminderMessageTemplate, interview.getTitle(), m_reminderDays);
+
+            send(owner.getUserId(), user.getUserId(), title, msg, interviewLink);
+        }
+    }
+
+    private void send(UUID fromUserId, UUID toUserId, String title, String message, String link)
+    {
+        var notification = new NotificationKafkaDTO.Builder()
+                .setFromUserId(fromUserId)
+                .setToUserId(toUserId)
+                .setNotificationTitle(title)
+                .setMessage(message)
+                .setNotificationType(NotificationType.INFORMATION)
+                .setNotificationDataType(NotificationDataType.INTERVIEW)
+                .setNotificationLink(link)
+                .build();
+
+        m_kafkaProducer.sendNotification(notification);
     }
 }

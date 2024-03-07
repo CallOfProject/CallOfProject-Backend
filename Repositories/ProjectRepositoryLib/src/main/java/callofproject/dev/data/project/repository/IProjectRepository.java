@@ -50,6 +50,12 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>
 
     Page<Project> findAllByExpectedCompletionDateBefore(LocalDate date, Pageable pageable);
 
+    @Query("from Project where m_expectedCompletionDate < :date and m_projectStatus = 'IN_PROGRESS'")
+    Iterable<Project> findAllByExpectedCompletionDateBeforeIterable(LocalDate date);
+
+    @Query("from Project where m_expectedCompletionDate = :date and m_projectStatus = 'IN_PROGRESS'")
+    Iterable<Project> findAllByExpectedCompletionDate(LocalDate date);
+
     Page<Project> findAllByExpectedCompletionDateBetween(LocalDate start, LocalDate end, Pageable pageable);
 
 /*    Page<Project> findAllByExpectedProjectDeadline(LocalDate date, Pageable pageable);
@@ -108,6 +114,9 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>
 
     @Query("FROM Project p WHERE :userId IN (select w.m_user.m_userId FROM p.m_projectParticipantRequests as w)")
     Iterable<Project> findAllByUserUserId(UUID userId);
+
+    @Query("from Project where m_startDate = :date and m_projectStatus = 'NOT_STARTED'")
+    Iterable<Project> findAllByStartDate(LocalDate date);
 
     @Query("""
             from Project where (m_projectStatus = 'NOT_STARTED' or m_projectStatus = 'IN_PROGRESS')

@@ -4,6 +4,7 @@ import callofproject.dev.data.interview.entity.*;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -163,5 +164,16 @@ public class InterviewServiceHelper
     public Iterable<TestInterview> findAllTestInterviews()
     {
         return doForRepository(m_repositoryFacade.m_testInterviewRepository::findAll, "Error finding all test interviews");
+    }
+
+
+    public Iterable<CodingInterview> findAllInterviewsByEnDate(LocalDateTime endDate)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_codingInterviewRepository.findAllInterviewsByEnDate(endDate), "Error finding all coding interviews");
+    }
+
+    public Iterable<TestInterview> findAllTestInterviewsByEnDate(LocalDateTime endDate)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_testInterviewRepository.findAllTestInterviewsByEnDate(endDate), "Error finding all coding interviews");
     }
 }

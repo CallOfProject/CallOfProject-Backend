@@ -24,7 +24,6 @@ public class TaskFilterSpecifications
 
     public static Specification<Task> hasStartDate(LocalDate startDate)
     {
-        System.out.println(startDate);
         return (root, query, criteriaBuilder) ->
                 startDate == null ? criteriaBuilder.conjunction() : criteriaBuilder.equal(root.get("m_startDate"), startDate);
     }
