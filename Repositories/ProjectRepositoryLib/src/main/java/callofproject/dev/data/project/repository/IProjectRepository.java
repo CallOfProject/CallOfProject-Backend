@@ -39,8 +39,11 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>
 
     Page<Project> findAllByApplicationDeadlineBefore(LocalDate date, Pageable pageable);
 
-    @Query("from Project where m_applicationDeadline < :date")
+    @Query("from Project where m_applicationDeadline < :date and (m_projectStatus = 'IN_PROGRESS' or m_projectStatus = 'NOT_STARTED')")
     List<Project> findAllByApplicationDeadlineBefore(LocalDate date);
+
+    @Query("from Project where m_applicationDeadline = :date and (m_projectStatus = 'IN_PROGRESS' or m_projectStatus = 'NOT_STARTED')")
+    List<Project> findAllByApplicationDeadline(LocalDate date);
 
     Page<Project> findAllByApplicationDeadlineBetween(LocalDate start, LocalDate end, Pageable pageable);
 
@@ -57,14 +60,6 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>
     Iterable<Project> findAllByExpectedCompletionDate(LocalDate date);
 
     Page<Project> findAllByExpectedCompletionDateBetween(LocalDate start, LocalDate end, Pageable pageable);
-
-/*    Page<Project> findAllByExpectedProjectDeadline(LocalDate date, Pageable pageable);
-
-    Page<Project> findAllByExpectedProjectDeadlineBetween(LocalDate start, LocalDate end, Pageable pageable);
-
-    Page<Project> findAllByExpectedProjectDeadlineAfter(LocalDate date, Pageable pageable);
-
-    Page<Project> findAllByExpectedProjectDeadlineBefore(LocalDate date, Pageable pageable);*/
 
     Page<Project> findAllByMaxParticipant(int maxParticipant, Pageable pageable);
 
@@ -124,4 +119,8 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>
             and m_projectAccessType = 'PUBLIC'
             """)
     Page<Project> findAllByProjectStatusAndAdminOperationStatusAndProjectAccessType(Pageable pageable);
+
+
+    @Query("from Project where m_projectStatus = 'EXTEND_APPLICATION_FEEDBACK' and m_adminOperationStatus = 'ACTIVE'")
+    List<Project> findAllExtendedDateApplications();
 }

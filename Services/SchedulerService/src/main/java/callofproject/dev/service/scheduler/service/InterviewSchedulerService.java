@@ -24,21 +24,21 @@ public class InterviewSchedulerService
         m_serviceCallback.checkExpiredTestInterviews();
     }
 
-    @Scheduled(cron = "00 00 00 * * *", zone = "Europe/Istanbul")
+    @Scheduled(cron = "00 30 00 * * *", zone = "Europe/Istanbul")
     public void checkExpiredCodingInterviews()
     {
         m_serviceCallback.checkExpiredCodingInterviews();
-    }
-
-    @Scheduled(cron = "00 30 01 * * *", zone = "Europe/Istanbul")
-    public void reminderCodingInterviews()
-    {
-        m_serviceCallback.reminderCodingInterviews();
     }
 
     @Scheduled(cron = "00 00 01 * * *", zone = "Europe/Istanbul")
     public void reminderTestInterviews()
     {
         m_serviceCallback.reminderTestInterviews();
+    }
+
+    @Scheduled(cron = "00 30 01 * * *", zone = "Europe/Istanbul")
+    public void reminderCodingInterviews()
+    {
+        m_serviceCallback.reminderCodingInterviews();
     }
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Start Notification</title>
+    <title>Project Expired Notification</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -64,13 +64,17 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1>Project is Started!</h1>
+        <h1>Feedback Time extended!</h1>
     </div>
     <div class="details">
-        <p><strong>Project Name:</strong> %s</p>
-        <p><strong>Project Owner:</strong> %s</p>
-        <p><strong>Start Date:</strong> %s</p>
-        <p><strong>Expected Completion Date:</strong> %s</p>
+        <p>Hi, <strong>%s</strong>,</p>
+        <p><strong>%s</strong> project's response time for applications has expired! There are users to whom you haven't
+            responded. We
+            are giving you <strong>more 1 week [%s - %s]</strong>. Please provide the necessary feedback to the users.
+            Otherwise, your <strong>project will be closed in a week</strong>, and your response score will <strong>decrease</strong>
+            by
+            <strong>5</strong> points.</p>
+
     </div>
     <div class="footer">
         <img class="my-img" src="https://callofproject-images.s3.us-west-1.amazonaws.com/cop_logo.png"

@@ -19,14 +19,14 @@ public class TaskSchedulerService
     }
 
 
-    @Scheduled(cron = "00 00 03 * * *", zone = "Europe/Istanbul")
+    @Scheduled(cron = "00 00 04 * * *", zone = "Europe/Istanbul")
     public void notifyUsersForTask()
     {
         m_schedulerServiceCallback.runNotifyUsersForTask();
     }
 
 
-    @Scheduled(cron = "00 00 04 * * *", zone = "Europe/Istanbul")
+    @Scheduled(cron = "00 30 04 * * *", zone = "Europe/Istanbul")
     public void closeExpiredTasks()
     {
         m_schedulerServiceCallback.runCloseExpiredTasks();

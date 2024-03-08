@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -660,17 +661,18 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::findProjectParticipantByUserIdAndProjectId");
     }
 
-    public void  deleteProjectParticipant(ProjectParticipant participant)
+    public void deleteProjectParticipant(ProjectParticipant participant)
     {
         doForRepository(() -> m_facade.m_projectParticipantRepository.delete(participant),
                 "ProjectServiceHelper::deleteProjectParticipant");
     }
 
-    public void  deleteProjectParticipantById(UUID id)
+    public void deleteProjectParticipantById(UUID id)
     {
         doForRepository(() -> m_facade.m_projectParticipantRepository.deleteById(id),
                 "ProjectServiceHelper::deleteProjectParticipant");
     }
+
     public void changeAllProjectOwnerToRootWhenUserRemoved(UUID removedUserId, UUID rootUserId)
     {
         var rootUser = m_facade.m_userRepository.findById(rootUserId);
@@ -754,4 +756,9 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::findAllValidProjects");
     }
 
+    public void removeAllParticipantRequests(List<ProjectParticipantRequest> requests)
+    {
+        doForRepository(() -> m_facade.m_projectParticipantRequestRepository.deleteAll(requests),
+                "ProjectServiceHelper::removeAllParticipantRequests");
+    }
 }
