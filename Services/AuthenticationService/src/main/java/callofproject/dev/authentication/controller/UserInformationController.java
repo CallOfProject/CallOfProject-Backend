@@ -9,6 +9,7 @@ import callofproject.dev.data.common.clas.ErrorMessage;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -146,6 +147,35 @@ public class UserInformationController
     public ResponseEntity<Object> removeCourse(@RequestParam("uid") UUID userId, @RequestParam("id") UUID id)
     {
         return subscribe(() -> ok(m_service.removeCourse(userId, id)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    /**
+     * Upload user profile photo.
+     *
+     * @param userId represent the user id
+     * @param file   represent the file
+     * @return boolean value success or not
+     */
+    @PostMapping("upload/profile-photo")
+    public ResponseEntity<Object> uploadUserProfilePhoto(@RequestParam("uid") UUID userId, @RequestParam MultipartFile file)
+    {
+        return subscribe(() -> ok(m_service.uploadUserProfilePhoto(userId, file)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+
+    /**
+     * Upload user cv.
+     *
+     * @param userId represent the user id
+     * @param file   represent the file
+     * @return boolean value success or not
+     */
+    @PostMapping("upload/cv")
+    public ResponseEntity<Object> uploadUserCV(@RequestParam("uid") UUID userId, @RequestParam MultipartFile file)
+    {
+        return subscribe(() -> ok(m_service.uploadCV(userId, file)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 }

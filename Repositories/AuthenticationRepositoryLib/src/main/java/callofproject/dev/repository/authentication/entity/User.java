@@ -39,12 +39,9 @@ public class User
     @Column(name = "creation_date", nullable = false)
     private LocalDate creationDate = LocalDate.now();
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_profile_id", referencedColumnName = "user_profile_id")
     private UserProfile userProfile;
-
-    @Column(name = "user_profile_id")
-    private UUID userProfileId;
 
     @Column(name = "is_account_blocked")
     private boolean isAccountBlocked;
@@ -68,16 +65,6 @@ public class User
         isAccountBlocked = false;
         deleteAt = null;
         roles.add(new Role("ROLE_USER"));
-    }
-
-    public UUID getUserProfileId()
-    {
-        return userProfileId;
-    }
-
-    public void setUserProfileId(UUID userProfileId)
-    {
-        this.userProfileId = userProfileId;
     }
 
     public boolean isAccountBlocked()

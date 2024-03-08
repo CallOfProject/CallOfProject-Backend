@@ -9,7 +9,6 @@ public class BeanName
     public static final String COURSE_ORGANIZATION_REPOSITORY_BEAN = "callofproject.dev.repository.authentication.courseorganization";
     public static final String LINK_REPOSITORY_BEAN = "callofproject.dev.repository.authentication.link";
     public static final String EXPERIENCE_REPOSITORY_BEAN = "callofproject.dev.repository.authentication.experience";
-    public static final String USER_RATE_REPOSITORY_BEAN = "callofproject.dev.repository.authentication.userrate";
     public static final String ROLE_REPOSITORY_BEAN = "callofproject.dev.repository.authentication.userrole";
     public static final String ROLE_DAL_BEAN = "callofproject.dev.repository.authentication.dal.userrole";
     public static final String USER_MANAGEMENT_DAL_BEAN = "callofproject.dev.repository.authentication.dal.usermanagement";

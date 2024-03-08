@@ -11,6 +11,7 @@ import callofproject.dev.data.project.entity.ProjectParticipantRequest;
 import callofproject.dev.data.project.entity.User;
 import callofproject.dev.data.project.entity.enums.EProjectStatus;
 import callofproject.dev.data.project.repository.IProjectRepository;
+import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
 import callofproject.dev.service.scheduler.config.kafka.KafkaProducer;
 import callofproject.dev.service.scheduler.dto.NotificationKafkaDTO;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,6 +38,7 @@ import static java.util.stream.Collectors.toList;
 public class ProjectSchedulerServiceCallback
 {
     private final ProjectServiceHelper m_projectServiceHelper;
+    private final UserManagementServiceHelper m_userManagementServiceHelper;
     private final IProjectRepository m_projectRepository;
     private final KafkaProducer m_kafkaProducer;
 
@@ -62,11 +64,12 @@ public class ProjectSchedulerServiceCallback
     private String m_feedbackExtendedMessage;
 
 
-    public ProjectSchedulerServiceCallback(ProjectServiceHelper projectServiceHelper,
+    public ProjectSchedulerServiceCallback(ProjectServiceHelper projectServiceHelper, UserManagementServiceHelper userManagementServiceHelper,
                                            @Qualifier(PROJECT_SERVICE_PROJECT_REPOSITORY_NAME) IProjectRepository projectRepository,
                                            KafkaProducer kafkaProducer)
     {
         m_projectServiceHelper = projectServiceHelper;
+        m_userManagementServiceHelper = userManagementServiceHelper;
         m_projectRepository = projectRepository;
         m_kafkaProducer = kafkaProducer;
     }
@@ -163,6 +166,19 @@ public class ProjectSchedulerServiceCallback
         }
     }
 
+
+    public void setUserFeedbackRate(String username)
+    {
+        var userFromAuth = m_userManagementServiceHelper.getUserServiceHelper().findByUsername(username);
+
+        if (userFromAuth.isPresent())
+        {
+            var user = userFromAuth.get();
+            user.getUserProfile().setUserFeedbackRate(user.getUserProfile().getUserFeedbackRate() - .5);
+            m_userManagementServiceHelper.getUserServiceHelper().saveUser(user);
+        }
+    }
+
     private void removeParticipantRequestsAndUpdateStatus(List<ProjectParticipantRequest> requests, Project project)
     {
         for (var request : requests)
@@ -171,8 +187,8 @@ public class ProjectSchedulerServiceCallback
             user.getProjectParticipantRequests().removeIf(pr -> pr.getProject().getProjectId().equals(project.getProjectId()));
             m_projectServiceHelper.addUser(user);
         }
-        //var owner = project.getProjectOwner();
-        // TODO: DECREASE USER FEEDBACK RATE
+        var owner = project.getProjectOwner();
+        setUserFeedbackRate(owner.getUsername());
         project.setProjectStatus(EProjectStatus.APPLICATION_FEEDBACK_TIMEOUT);
         m_projectServiceHelper.removeAllParticipantRequests(requests);
         project.getProjectParticipantRequests().clear();

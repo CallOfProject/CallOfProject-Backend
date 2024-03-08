@@ -381,9 +381,7 @@ public class UserManagementService
 
         var links = m_mapperConfig.linkMapper.toLinksDTO(toListConcurrent(userProfile.getLinkList(), m_mapperConfig.linkMapper::toLinkDTO));
 
-        var userRate = m_mapperConfig.userRateMapper.toUserRateDTO(userProfile.getUserRate());
-
-        return m_mapperConfig.userProfileMapper.toUserProfileDTO(userProfile, educations, experiences, courses, links, userRate);
+        return m_mapperConfig.userProfileMapper.toUserProfileDTO(userProfile, educations, experiences, courses, links);
     }
 
 

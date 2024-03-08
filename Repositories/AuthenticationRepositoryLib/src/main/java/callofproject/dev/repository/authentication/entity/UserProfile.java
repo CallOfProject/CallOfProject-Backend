@@ -17,17 +17,21 @@ public class UserProfile
 
     @Column(name = "cv")
     private String cv;
+
     @Column(name = "profile_photo")
     private String profilePhoto;
+
     @Column(name = "about_me", length = 500)
     private String aboutMe;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "userProfile", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_rate_id")
-    private UserRate userRate;
+    @Column(name = "user_rate", nullable = false)
+    private double userRate;
+
+    @Column(name = "user_feedback_rate", nullable = false)
+    private double userFeedbackRate;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_profiles_to_education",
@@ -54,6 +58,8 @@ public class UserProfile
 
     public UserProfile()
     {
+        this.userRate = 10.0;
+        this.userFeedbackRate = 10.0;
     }
 
     public UserProfile(String cv, String profilePhoto, String aboutMe)
@@ -61,6 +67,8 @@ public class UserProfile
         this.cv = cv;
         this.profilePhoto = profilePhoto;
         this.aboutMe = aboutMe;
+        this.userRate = 10.0;
+        this.userFeedbackRate = 10.0;
     }
 
     public void addCourse(Course course)
@@ -181,16 +189,6 @@ public class UserProfile
         this.user = user;
     }
 
-    public UserRate getUserRate()
-    {
-        return userRate;
-    }
-
-    public void setUserRate(UserRate userRate)
-    {
-        this.userRate = userRate;
-    }
-
     public Set<Education> getEducationList()
     {
         return educationList;
@@ -231,5 +229,23 @@ public class UserProfile
         this.linkList = linkList;
     }
 
+    public double getUserRate()
+    {
+        return userRate;
+    }
 
+    public void setUserRate(double userRate)
+    {
+        this.userRate = userRate;
+    }
+
+    public double getUserFeedbackRate()
+    {
+        return userFeedbackRate;
+    }
+
+    public void setUserFeedbackRate(double userFeedbackRate)
+    {
+        this.userFeedbackRate = userFeedbackRate;
+    }
 }

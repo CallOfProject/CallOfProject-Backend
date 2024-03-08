@@ -14,9 +14,13 @@ import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.nosql.dal.MatchServiceHelper;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
 import callofproject.dev.repository.authentication.entity.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import static callofproject.dev.data.common.util.UtilityMethod.convert;
@@ -34,6 +38,9 @@ public class UserInformationService
     private final MatchServiceHelper m_matchServiceHelper;
     private final IEnvironmentClientService m_environmentClient;
     private final MapperConfiguration m_mapperConfig;
+    private final S3Service m_s3Service;
+    @Value("${application.cv-bucket.name}")
+    private String m_cvBucketName;
 
     /**
      * Constructs a new UserInformationService with the given dependencies.
@@ -44,12 +51,13 @@ public class UserInformationService
      * @param mapperConfig       The MapperConfiguration for mapping DTOs to entities.
      */
     public UserInformationService(UserManagementServiceHelper serviceHelper, MatchServiceHelper matchServiceHelper,
-                                  IEnvironmentClientService environmentClient, MapperConfiguration mapperConfig)
+                                  IEnvironmentClientService environmentClient, MapperConfiguration mapperConfig, S3Service s3Service)
     {
         m_serviceHelper = serviceHelper;
         m_matchServiceHelper = matchServiceHelper;
         m_environmentClient = environmentClient;
         m_mapperConfig = mapperConfig;
+        m_s3Service = s3Service;
     }
 
     /**
@@ -156,9 +164,48 @@ public class UserInformationService
         return doForDataService(() -> removeCourseOrganizationCallback(userId, id), "Course organization cannot be removed!");
     }
 
+
+    /**
+     * Uploads a user profile photo for the given user ID.
+     *
+     * @param userId The UUID of the user whose profile photo is being uploaded.
+     * @param file   The MultipartFile containing the user profile photo.
+     * @return A ResponseMessage indicating the success of the profile photo upload operation.
+     */
+    public ResponseMessage<Object> uploadUserProfilePhoto(UUID userId, MultipartFile file)
+    {
+        var userProfile = getUserProfile(userId);
+
+        var fileNameSplit = Objects.requireNonNull(file.getOriginalFilename()).split("\\.");
+        var extension = fileNameSplit[fileNameSplit.length - 1];
+        var fileName = "cv_" + userProfile.getUser().getUserId() + "_" + userProfile.getUserProfileId() + "." + extension;
+
+        var profilePhoto = m_s3Service.uploadToS3WithMultiPartFileV2(file, fileName, Optional.empty());
+
+        userProfile.setProfilePhoto(profilePhoto);
+
+        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile);
+
+        return new ResponseMessage<>("Profile photo uploaded successfully!", 200, profilePhoto);
+    }
+
+    public ResponseMessage<Object> uploadCV(UUID userId, MultipartFile file)
+    {
+        var userProfile = getUserProfile(userId);
+        var fileNameSplit = Objects.requireNonNull(file.getOriginalFilename()).split("\\.");
+        var extension = fileNameSplit[fileNameSplit.length - 1];
+        var fileName = "cv_" + userProfile.getUser().getUserId() + "." + extension;
+        System.out.println("FN: " + fileName);
+        System.out.println("BN: " + m_cvBucketName);
+        var cv = m_s3Service.uploadToS3WithMultiPartFileV2(file, fileName, Optional.of(m_cvBucketName));
+        userProfile.setCv(cv);
+        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile);
+        return new ResponseMessage<>("CV uploaded successfully!", 200, cv);
+    }
     //------------------------------------------------------------------------------------------------------------------
     //####################################################-CALLBACKS-###################################################
     //------------------------------------------------------------------------------------------------------------------
+
 
     /**
      * Retrieves the user profile for the given user ID.
@@ -465,4 +512,5 @@ public class UserInformationService
 
         return new ResponseMessage<>("Course organization removed successfully!", 200, true);
     }
+
 }

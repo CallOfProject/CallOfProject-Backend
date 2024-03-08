@@ -167,7 +167,6 @@ public final class Util
         userProfileDTO.cv = "Sample CV Text";
         userProfileDTO.profilePhoto = "https://example.com/profile.jpg";
         userProfileDTO.aboutMe = "About me information";
-        userProfileDTO.userRateDTO = userRateDTO;
         userProfileDTO.courses = courses;
         userProfileDTO.educations = educations;
         userProfileDTO.experiences = experiences;

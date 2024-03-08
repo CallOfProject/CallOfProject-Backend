@@ -1,5 +1,6 @@
 package callofproject.dev.authentication.service;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
@@ -13,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Objects;
+import java.util.Optional;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 
@@ -54,6 +56,30 @@ public class S3Service
         fileObject.delete();
 
         return "https://" + m_bucketName + ".s3.amazonaws.com/" + fileName;
+    }
+
+    /**
+     * Uploads a file to Amazon S3 using MultipartFile and deletes any existing files with similar names.
+     *
+     * @param multipartFile The file to be uploaded as a MultipartFile.
+     * @param fileName      The name to be assigned to the file on S3.
+     * @return A success message upon successful upload.
+     */
+    public String uploadToS3WithMultiPartFileV2(MultipartFile multipartFile, String fileName, Optional<String> bucketName)
+    {
+        try
+        {
+            bucketName = bucketName.isEmpty() ? Optional.of(m_bucketName) : bucketName;
+
+            m_s3Client.putObject(new PutObjectRequest(bucketName.get(), fileName, multipartFile.getInputStream(), null)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+
+            return "https://" + m_bucketName + ".s3.amazonaws.com/" + fileName;
+        } catch (IOException | SdkClientException e)
+        {
+            e.printStackTrace();
+            return "File upload failed: " + e.getMessage();
+        }
     }
 
     /**

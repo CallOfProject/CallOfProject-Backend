@@ -18,7 +18,6 @@ public class MapperConfiguration
     public final ILinkMapper linkMapper;
     public final IUserMapper userMapper;
     public final IUserProfileMapper userProfileMapper;
-    public final IUserRateMapper userRateMapper;
 
     /**
      * Constructor for MapperConfiguration.
@@ -29,9 +28,8 @@ public class MapperConfiguration
      * @param linkMapper        The ILinkMapper to be injected.
      * @param userMapper        The IUserMapper to be injected.
      * @param userProfileMapper The IUserProfileMapper to be injected.
-     * @param userRateMapper    The IUserRateMapper to be injected.
      */
-    public MapperConfiguration(ICourseMapper courseMapper, IEducationMapper educationMapper, IExperienceMapper experienceMapper, ILinkMapper linkMapper, IUserMapper userMapper, IUserProfileMapper userProfileMapper, IUserRateMapper userRateMapper)
+    public MapperConfiguration(ICourseMapper courseMapper, IEducationMapper educationMapper, IExperienceMapper experienceMapper, ILinkMapper linkMapper, IUserMapper userMapper, IUserProfileMapper userProfileMapper)
     {
         this.courseMapper = courseMapper;
         this.educationMapper = educationMapper;
@@ -39,6 +37,5 @@ public class MapperConfiguration
         this.linkMapper = linkMapper;
         this.userMapper = userMapper;
         this.userProfileMapper = userProfileMapper;
-        this.userRateMapper = userRateMapper;
     }
 }

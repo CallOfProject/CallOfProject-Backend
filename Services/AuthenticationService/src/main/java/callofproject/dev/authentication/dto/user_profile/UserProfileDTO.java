@@ -14,8 +14,10 @@ public class UserProfileDTO
     public String profilePhoto;
     @JsonProperty("about_me")
     public String aboutMe;
-    @JsonProperty("user_rates")
-    public UserRateDTO userRateDTO;
+    @JsonProperty("user_rate")
+    public double userRate;
+    @JsonProperty("user_feedback_rate")
+    public double userFeedbackRate;
     public List<CourseDTO> courses;
     public List<EducationDTO> educations;
     public List<ExperienceDTO> experiences;

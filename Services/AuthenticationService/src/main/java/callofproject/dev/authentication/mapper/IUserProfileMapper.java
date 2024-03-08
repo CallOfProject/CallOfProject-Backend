@@ -25,11 +25,9 @@ public interface IUserProfileMapper
             @Mapping(target = "educations", source = "educationsDTO.educations"),
             @Mapping(target = "experiences", source = "experiencesDTO.experiences"),
             @Mapping(target = "courses", source = "coursesDTO.courses"),
-            @Mapping(target = "links", source = "linksDTO.links"),
-            @Mapping(target = "userRateDTO", source = "userRateDTO")
+            @Mapping(target = "links", source = "linksDTO.links")
     })
     UserProfileDTO toUserProfileDTO(UserProfile userProfile,
                                     EducationsDTO educationsDTO, ExperiencesDTO experiencesDTO,
-                                    CoursesDTO coursesDTO, LinksDTO linksDTO,
-                                    UserRateDTO userRateDTO);
+                                    CoursesDTO coursesDTO, LinksDTO linksDTO);
 }
