@@ -82,11 +82,16 @@ public class ProjectOwnerService implements IProjectOwnerService
     @Override
     public ResponseMessage<Boolean> addParticipant(SaveProjectParticipantDTO dto)
     {
-        var response = doForDataService(() -> m_projectServiceHelper.addProjectParticipant(dto.project_id(), dto.user_id()),
+        var project = findProjectIfExistsByProjectId(dto.project_id());
+        var user = findUserIfExists(dto.user_id());
+        var response = doForDataService(() -> m_projectServiceHelper.addProjectParticipant(new ProjectParticipant(project, user)),
                 "ProjectService::addParticipant");
 
-        if (response)
+        if (response != null)
+        {
+            m_kafkaProducer.sendProjectParticipant(new ProjectParticipantKafkaDTO(response.getProjectId(), response.getProject().getProjectId(), response.getUser().getUserId(), response.getJoinDate(), false));
             return new ResponseMessage<>("Participant added to project!", OK, true);
+        }
 
         return new ResponseMessage<>("Participant is already added to project!", NOT_ACCEPTED, false);
     }
@@ -136,7 +141,7 @@ public class ProjectOwnerService implements IProjectOwnerService
     {
         var participant = m_projectServiceHelper.findProjectParticipantByUserIdAndProjectId(info.user().getUserId(), info.project().getProjectId());
         m_kafkaProducer.sendProjectParticipant(new ProjectParticipantKafkaDTO(participant.get().getProjectId(), participant.get().getProject().getProjectId(),
-                participant.get().getUser().getUserId(), participant.get().getJoinDate()));
+                participant.get().getUser().getUserId(), participant.get().getJoinDate(), false));
     }
 
     /**
@@ -238,6 +243,7 @@ public class ProjectOwnerService implements IProjectOwnerService
         m_projectServiceHelper.addUser(user);
         m_projectServiceHelper.deleteProjectParticipant(participant.get());
 
+        m_kafkaProducer.sendProjectParticipant(new ProjectParticipantKafkaDTO(participant.get().getProjectId(), projectId, userId, participant.get().getJoinDate(), true));
         var message = format("%s removed you from %s project!", project.getProjectOwner().getFullName(), project.getProjectName());
 
         return new ResponseMessage<>(message, OK, true);

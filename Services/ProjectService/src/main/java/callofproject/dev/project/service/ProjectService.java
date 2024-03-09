@@ -148,7 +148,7 @@ public class ProjectService implements IProjectService
     private ProjectParticipantKafkaDTO toProjectParticipantKafkaDTO(ProjectParticipant participant)
     {
         return new ProjectParticipantKafkaDTO(participant.getProjectId(), participant.getProject().getProjectId(),
-                participant.getUser().getUserId(), participant.getJoinDate());
+                participant.getUser().getUserId(), participant.getJoinDate(), false);
     }
 
 

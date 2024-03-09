@@ -106,4 +106,5 @@ public class CodingInterviewController
     {
         return subscribe(() -> ok(m_codingInterviewService.isUserSolvedBefore(userId, interviewId)), ex -> internalServerError().body(ex.getMessage()));
     }
+
 }

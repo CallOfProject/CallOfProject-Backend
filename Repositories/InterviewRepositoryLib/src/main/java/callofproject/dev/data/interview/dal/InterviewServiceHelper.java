@@ -176,4 +176,29 @@ public class InterviewServiceHelper
     {
         return doForRepository(() -> m_repositoryFacade.m_testInterviewRepository.findAllTestInterviewsByEnDate(endDate), "Error finding all coding interviews");
     }
+
+
+    public Iterable<CodingInterview> findCodingInterviewsByOwnerId(UUID ownerId)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_codingInterviewRepository.findCodingInterviewsByOwnerId(ownerId), "Error finding coding interviews by owner id");
+    }
+
+    public Iterable<TestInterview> findTestInterviewsByOwnerId(UUID ownerId)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_testInterviewRepository.findTestInterviewsByOwnerId(ownerId), "Error finding test interviews by owner id");
+    }
+
+    public void removeProjectParticipantById(UUID id)
+    {
+        doForRepository(() -> m_repositoryFacade.m_projectParticipantRepository.deleteById(id), "Error removing project participant by id");
+    }
+
+    public Optional<ProjectParticipant> findProjectParticipantByUserIdAndProjectId(UUID userId, UUID projectId)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_projectParticipantRepository.findProjectParticipantByUserIdAndProjectId(userId, projectId), "Error finding project participant by user id and project id");
+    }
+    public void removeProjectParticipant(ProjectParticipant projectParticipant)
+    {
+        doForRepository(() -> m_repositoryFacade.m_projectParticipantRepository.delete(projectParticipant), "Error removing project participant");
+    }
 }

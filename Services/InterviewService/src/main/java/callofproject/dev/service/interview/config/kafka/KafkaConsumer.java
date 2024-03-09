@@ -1,15 +1,17 @@
 package callofproject.dev.service.interview.config.kafka;
 
-import callofproject.dev.service.interview.config.kafka.dto.ProjectInfoKafkaDTO;
-import callofproject.dev.service.interview.config.kafka.dto.ProjectParticipantKafkaDTO;
-import callofproject.dev.service.interview.config.kafka.dto.UserKafkaDTO;
 import callofproject.dev.data.interview.dal.InterviewServiceHelper;
 import callofproject.dev.data.interview.entity.Project;
 import callofproject.dev.data.interview.entity.ProjectParticipant;
+import callofproject.dev.data.interview.entity.User;
 import callofproject.dev.data.interview.entity.enums.AdminOperationStatus;
+import callofproject.dev.service.interview.config.kafka.dto.ProjectInfoKafkaDTO;
+import callofproject.dev.service.interview.config.kafka.dto.ProjectParticipantKafkaDTO;
+import callofproject.dev.service.interview.config.kafka.dto.UserKafkaDTO;
 import callofproject.dev.service.interview.mapper.IUserMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.Collectors;
 
@@ -74,15 +76,36 @@ public class KafkaConsumer
             groupId = "${spring.kafka.consumer.project-participant-group-id}",
             containerFactory = "configProjectParticipantKafkaListener"
     )
+    @Transactional
     public void consumeProjectParticipant(ProjectParticipantKafkaDTO dto)
     {
         var project = m_serviceHelper.findProjectById(dto.projectId());
+        var user = m_serviceHelper.findUserById(dto.userId());
 
-        if (project.isPresent())
-        {
-            var participant = toProjectParticipant(dto, project.get());
-            m_serviceHelper.createProjectParticipant(participant);
-        }
+        if (project.isEmpty() || user.isEmpty())
+            return;
+
+        if (!dto.isDeleted())
+            addParticipant(dto, project.get(), user.get());
+
+        else removeParticipant(project.get(), user.get());
     }
 
+    private void removeParticipant(Project project, User user)
+    {
+        var participant = m_serviceHelper.findProjectParticipantByUserIdAndProjectId(user.getUserId(), project.getProjectId());
+
+        if (participant.isEmpty())
+            return;
+
+        project.getProjectParticipants().remove(participant.get());
+        user.getProjectParticipants().remove(participant.get());
+        m_serviceHelper.removeProjectParticipant(participant.get());
+    }
+
+    private void addParticipant(ProjectParticipantKafkaDTO dto, Project project, User user)
+    {
+        var participant = new ProjectParticipant(dto.projectParticipantId(), project, user, dto.joinDate());
+        m_serviceHelper.createProjectParticipant(participant);
+    }
 }

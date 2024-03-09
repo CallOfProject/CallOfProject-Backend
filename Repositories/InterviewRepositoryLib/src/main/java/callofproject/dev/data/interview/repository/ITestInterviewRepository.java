@@ -22,4 +22,7 @@ public interface ITestInterviewRepository extends CrudRepository<TestInterview, 
             "m_interviewStatus = 'SCHEDULED' or " +
             "m_interviewStatus = 'NOT_STARTED')")
     Iterable<TestInterview> findAllTestInterviewsByEnDate(LocalDateTime endDate);
+
+    @Query("from TestInterview where project.m_projectOwner.m_userId = :ownerId")
+    Iterable<TestInterview> findTestInterviewsByOwnerId(UUID ownerId);
 }

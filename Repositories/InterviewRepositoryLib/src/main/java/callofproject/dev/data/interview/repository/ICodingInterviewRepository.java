@@ -21,4 +21,7 @@ public interface ICodingInterviewRepository extends CrudRepository<CodingIntervi
             "m_interviewStatus = 'SCHEDULED' or " +
             "m_interviewStatus = 'NOT_STARTED')")
     Iterable<CodingInterview> findAllInterviewsByEnDate(LocalDateTime endDate);
+
+    @Query("from CodingInterview where project.m_projectOwner.m_userId = :ownerId")
+    Iterable<CodingInterview> findCodingInterviewsByOwnerId(UUID ownerId);
 }
