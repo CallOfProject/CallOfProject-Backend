@@ -1,4 +1,4 @@
-package callofproject.dev.service.filterandsearch.config;
+package callofproject.dev.service.filterandsearch.config.db;
 
 
 import jakarta.persistence.EntityManagerFactory;

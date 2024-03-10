@@ -4,8 +4,13 @@ import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.status.Status;
 import callofproject.dev.data.interview.dal.InterviewServiceHelper;
-import callofproject.dev.data.interview.entity.UserCodingInterviews;
+import callofproject.dev.data.interview.entity.TestInterview;
+import callofproject.dev.data.interview.entity.UserTestInterviews;
 import callofproject.dev.service.interview.dto.CodingAndTestInterviewsDTO;
+import callofproject.dev.service.interview.dto.ProjectDTO;
+import callofproject.dev.service.interview.dto.UserTestInterviewDTO;
+import callofproject.dev.service.interview.dto.test.QuestionAnswerDTO;
+import callofproject.dev.service.interview.dto.test.TestInterviewDTO;
 import callofproject.dev.service.interview.mapper.*;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -22,15 +27,17 @@ public class InterviewManagementService
     private final ITestInterviewMapper m_testInterviewMapper;
     private final ICodingInterviewMapper m_codingInterviewMapper;
     private final IUserCodingInterviewMapper m_userCodingInterviewMapper;
+    private final IUserTestInterviewMapper m_userTestInterviewMapper;
     private final IUserMapper m_userMapper;
     private final IProjectMapper m_projectMapper;
 
-    public InterviewManagementService(InterviewServiceHelper interviewServiceHelper, ITestInterviewMapper testInterviewMapper, ICodingInterviewMapper codingInterviewMapper, IUserCodingInterviewMapper userCodingInterviewMapper, IUserMapper userMapper, IProjectMapper projectMapper)
+    public InterviewManagementService(InterviewServiceHelper interviewServiceHelper, ITestInterviewMapper testInterviewMapper, ICodingInterviewMapper codingInterviewMapper, IUserCodingInterviewMapper userCodingInterviewMapper, IUserTestInterviewMapper userTestInterviewMapper, IUserMapper userMapper, IProjectMapper projectMapper)
     {
         m_interviewServiceHelper = interviewServiceHelper;
         m_testInterviewMapper = testInterviewMapper;
         m_codingInterviewMapper = codingInterviewMapper;
         m_userCodingInterviewMapper = userCodingInterviewMapper;
+        m_userTestInterviewMapper = userTestInterviewMapper;
         m_userMapper = userMapper;
         m_projectMapper = projectMapper;
     }
@@ -59,12 +66,39 @@ public class InterviewManagementService
 
         var projectDTO = m_projectMapper.toProjectDTO(codingInterview.get().getProject());
         var codingInterviewDTO = m_codingInterviewMapper.toCodingInterviewDTO(codingInterview.get(), projectDTO);
-        //var users = codingInterview.get().getCodingInterviews().stream().map(UserCodingInterviews::getUser).map(m_userMapper::toUserDTO).toList();
-
 
         var userCodingInterviewList = codingInterview.get().getCodingInterviews().stream()
                 .map(uci -> m_userCodingInterviewMapper.toUserCodingInterviewDTOV2(uci, codingInterviewDTO, projectDTO, m_userMapper.toUserDTO(uci.getUser()))).toList();
 
         return new ResponseMessage<>("Coding Interview found!", Status.OK, userCodingInterviewList);
+    }
+
+
+    public ResponseMessage<Object> findTestInterviewOwner(UUID interviewId)
+    {
+        var testInterview = m_interviewServiceHelper.findTestInterviewById(interviewId);
+
+        if (testInterview.isEmpty())
+            return new ResponseMessage<>("Test Interview not found!", Status.NOT_FOUND, null);
+
+        var projectDTO = m_projectMapper.toProjectDTO(testInterview.get().getProject());
+        var testInterviewDTO = m_testInterviewMapper.toTestInterviewDTO(testInterview.get(), projectDTO);
+
+
+        var userTestInterviewList = testInterview.get().getTestInterviews().stream()
+                .map(uti -> toUserTestInterviewDTO(uti, testInterview.get(), projectDTO, testInterviewDTO)).toList();
+
+        return new ResponseMessage<>("Coding Interview found!", Status.OK, userTestInterviewList);
+    }
+
+    private UserTestInterviewDTO toUserTestInterviewDTO(UserTestInterviews uti, TestInterview testInterview, ProjectDTO projectDTO, TestInterviewDTO testInterviewDTO)
+    {
+        var userId = uti.getUser().getUserId();
+
+        var userAnswers = uti.getAnswers().stream()
+                .map(qa -> new QuestionAnswerDTO(userId, testInterview.getId(), qa.getQuestionId(), qa.getAnswer()))
+                .toList();
+
+        return m_userTestInterviewMapper.toUserTestInterviewDTO(uti, testInterviewDTO, userAnswers, projectDTO, m_userMapper.toUserDTO(uti.getUser()));
     }
 }

@@ -37,4 +37,10 @@ public class InterviewManagementController
     {
         return subscribe(() -> ok(m_managementService.findCodingInterviewOwner(interviewId)), ex -> internalServerError().body(ex.getMessage()));
     }
+
+    @GetMapping("/find/test-interview/owner")
+    public ResponseEntity<Object> findTestInterviewOwner(@RequestParam("interview_id") UUID interviewId)
+    {
+        return subscribe(() -> ok(m_managementService.findTestInterviewOwner(interviewId)), ex -> internalServerError().body(ex.getMessage()));
+    }
 }
