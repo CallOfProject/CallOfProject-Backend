@@ -107,4 +107,9 @@ public class CodingInterviewController
         return subscribe(() -> ok(m_codingInterviewService.isUserSolvedBefore(userId, interviewId)), ex -> internalServerError().body(ex.getMessage()));
     }
 
+    @PostMapping("/accept")
+    public ResponseEntity<Object> acceptInterview(@RequestParam("user_coding_iw_id") UUID id, @RequestParam("accepted") boolean isAccepted)
+    {
+        return subscribe(() -> ok(m_codingInterviewService.acceptInterview(id, isAccepted)), ex -> internalServerError().body(ex.getMessage()));
+    }
 }

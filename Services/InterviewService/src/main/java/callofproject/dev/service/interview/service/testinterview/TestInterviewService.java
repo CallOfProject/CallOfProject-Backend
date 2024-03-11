@@ -2,7 +2,16 @@ package callofproject.dev.service.interview.service.testinterview;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.data.common.dto.EmailTopic;
+import callofproject.dev.data.common.enums.EmailType;
+import callofproject.dev.data.common.enums.NotificationDataType;
+import callofproject.dev.data.common.enums.NotificationType;
 import callofproject.dev.data.common.status.Status;
+import callofproject.dev.data.interview.entity.User;
+import callofproject.dev.data.interview.entity.UserTestInterviews;
+import callofproject.dev.service.interview.config.kafka.KafkaProducer;
+import callofproject.dev.service.interview.dto.InterviewResultDTO;
+import callofproject.dev.service.interview.dto.NotificationKafkaDTO;
 import callofproject.dev.service.interview.dto.test.*;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -16,23 +25,22 @@ import static callofproject.dev.library.exception.util.CopDataUtil.doForDataServ
 public class TestInterviewService implements ITestInterviewService
 {
     private final TestInterviewCallbackService m_callbackService;
+    private final KafkaProducer m_kafkaProducer;
 
-    public TestInterviewService(TestInterviewCallbackService callbackService)
+    public TestInterviewService(TestInterviewCallbackService callbackService, KafkaProducer kafkaProducer)
     {
         m_callbackService = callbackService;
+        m_kafkaProducer = kafkaProducer;
     }
 
     @Override
     public ResponseMessage<Object> createInterview(CreateTestDTO dto)
     {
-        var testInterview = doForDataService(() -> m_callbackService.createInterview(dto),
-                "TestInterviewService::createCodeInterview");
+        var testInterview = doForDataService(() -> m_callbackService.createInterview(dto), "TestInterviewService::createCodeInterview");
 
-        // send notification to Owner and Participants
         if (testInterview.getStatusCode() == Status.CREATED)
-        {
-            //........
-        }
+            sendNotification((TestInterviewDTO) testInterview.getObject(), "Test Interview Assigned");
+
 
         return testInterview;
     }
@@ -40,28 +48,7 @@ public class TestInterviewService implements ITestInterviewService
     @Override
     public ResponseMessage<Object> addQuestion(CreateQuestionDTO createQuestionDTO)
     {
-        var question = doForDataService(() -> m_callbackService.addQuestion(createQuestionDTO),
-                "TestInterviewService::addQuestion");
-
-        // send notification to Owner and Participants
-        if (question.getStatusCode() == Status.CREATED)
-        {
-            //........
-        }
-
-        return question;
-    }
-
-    @Override
-    public ResponseMessage<Object> assignTestInterview(UUID interviewId, UUID userId)
-    {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    @Override
-    public ResponseMessage<Object> assignMultipleTestInterview(AssignMultipleInterviewDTO dto)
-    {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return doForDataService(() -> m_callbackService.addQuestion(createQuestionDTO), "TestInterviewService::addQuestion");
     }
 
     @Override
@@ -70,11 +57,8 @@ public class TestInterviewService implements ITestInterviewService
         var testInterview = doForDataService(() -> m_callbackService.deleteTestInterview(interviewId),
                 "TestInterviewService::deleteTestInterview");
 
-        // send notification to Owner and Participants
         if (testInterview.getStatusCode() == Status.OK)
-        {
-            //........
-        }
+            sendNotification((TestInterviewDTO) testInterview.getObject(), "Test Interview Deleted");
 
         return testInterview;
     }
@@ -85,11 +69,8 @@ public class TestInterviewService implements ITestInterviewService
         var testInterview = doForDataService(() -> m_callbackService.deleteTestInterviewByProjectId(projectId),
                 "TestInterviewService::deleteTestInterviewByProjectId");
 
-        // send notification to Owner and Participants
         if (testInterview.getStatusCode() == Status.OK)
-        {
-            //........
-        }
+            sendNotification((TestInterviewDTO) testInterview.getObject(), "Test Interview Deleted");
 
         return testInterview;
     }
@@ -97,62 +78,33 @@ public class TestInterviewService implements ITestInterviewService
     @Override
     public ResponseMessage<Object> finishTestInterview(TestInterviewFinishDTO dto)
     {
-        var testInterview = doForDataService(() -> m_callbackService.finishTestInterview(dto),
-                "TestInterviewService::finishTestInterview");
-
-        // send notification to Owner and Participants
-        if (testInterview.getStatusCode() == Status.OK)
-        {
-            //........
-        }
-
-        return testInterview;
+        return doForDataService(() -> m_callbackService.finishTestInterview(dto), "TestInterviewService::finishTestInterview");
     }
 
     @Override
     public ResponseMessage<Object> startTestInterview(UUID interviewId)
     {
-        var testInterview = doForDataService(() -> m_callbackService.startTestInterview(interviewId),
-                "TestInterviewService::startTestInterview");
-
-        // send notification to Owner and Participants
-        if (testInterview.getStatusCode() == Status.OK)
-        {
-            //........
-        }
-
-        return testInterview;
+        return doForDataService(() -> m_callbackService.startTestInterview(interviewId), "TestInterviewService::startTestInterview");
     }
 
     @Override
     public ResponseMessage<Object> startTestInterviewByProjectId(UUID projectId)
     {
-        var testInterview = doForDataService(() -> m_callbackService.startTestInterviewByProjectId(projectId),
-                "TestInterviewService::startTestInterviewByProjectId");
-
-        // send notification to Owner and Participants
-        if (testInterview.getStatusCode() == Status.OK)
-        {
-            //........
-        }
-
-        return testInterview;
+        return doForDataService(() -> m_callbackService.startTestInterviewByProjectId(projectId), "TestInterviewService::startTestInterviewByProjectId");
     }
 
     @Override
     public ResponseMessage<Object> submitAnswer(QuestionAnswerDTO dto)
     {
-        var testInterview = doForDataService(() -> m_callbackService.submitAnswer(dto),
-                "TestInterviewService::submitAnswer");
-
-        // send notification to Owner and Participants
-        if (testInterview.getStatusCode() == Status.OK)
-        {
-            //........
-        }
-
-        return testInterview;
+        return doForDataService(() -> m_callbackService.submitAnswer(dto), "TestInterviewService::submitAnswer");
     }
+
+    @Override
+    public ResponseMessage<Object> submitInterview(UUID userId, UUID testInterviewId)
+    {
+        return doForDataService(() -> m_callbackService.submitInterview(testInterviewId, userId), "TestInterviewService::submitInterview");
+    }
+
 
     @Override
     public ResponseMessage<Object> getQuestion(UUID interviewId, int q)
@@ -184,20 +136,6 @@ public class TestInterviewService implements ITestInterviewService
         return doForDataService(() -> m_callbackService.getQuestionsByProjectId(projectId), "TestInterviewService::getQuestionsByProjectId");
     }
 
-    @Override
-    public ResponseMessage<Object> submitInterview(UUID userId, UUID testInterviewId)
-    {
-        var testInterview = doForDataService(() -> m_callbackService.submitInterview(testInterviewId, userId),
-                "TestInterviewService::submitInterview");
-
-        // send notification to Owner and Participants
-        if (testInterview.getStatusCode() == Status.OK)
-        {
-            //........
-        }
-
-        return testInterview;
-    }
 
     @Override
     public ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId)
@@ -210,4 +148,43 @@ public class TestInterviewService implements ITestInterviewService
     {
         return doForDataService(() -> m_callbackService.getInterviewInformation(interviewId), "TestInterviewService::getInterviewInformation");
     }
+
+    @Override
+    public ResponseMessage<Object> acceptInterview(UUID id, boolean isAccepted)
+    {
+        var result = doForDataService(() -> m_callbackService.acceptInterview(id, isAccepted), "TestInterviewService::acceptInterview");
+
+        if (result.getStatusCode() == Status.OK)
+        {
+            var dto = (InterviewResultDTO) result.getObject();
+            m_kafkaProducer.sendEmail(new EmailTopic(EmailType.PROJECT_INVITATION, dto.email(), "Interview Feedback", dto.message(), null));
+        }
+
+        return result;
+    }
+
+
+    private void sendNotification(TestInterviewDTO dto, String title)
+    {
+        var ownerId = dto.projectDTO().projectId();
+        var userTestInterviews = m_callbackService.findInterviewIfExistsById(UUID.fromString(dto.id()));
+        var participants = userTestInterviews.getTestInterviews().stream().map(UserTestInterviews::getUser).map(User::getUserId).toList();
+        var message = "Test Interview " + title + " has been created for project " + dto.projectDTO().projectName();
+        participants.forEach(participant -> sendNotification(ownerId, participant, message, title));
+    }
+
+    private void sendNotification(UUID fromUserId, UUID toUserId, String message, String title)
+    {
+        var dto = new NotificationKafkaDTO.Builder()
+                .setFromUserId(fromUserId)
+                .setToUserId(toUserId)
+                .setMessage(message)
+                .setNotificationTitle(title)
+                .setNotificationType(NotificationType.INFORMATION)
+                .setNotificationDataType(NotificationDataType.INTERVIEW)
+                .build();
+
+        m_kafkaProducer.sendNotification(dto);
+    }
+
 }

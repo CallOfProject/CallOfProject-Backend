@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -18,4 +19,7 @@ public interface IUserCodingInterviewsRepository extends CrudRepository<UserCodi
 
     @Query("from UserCodingInterviews uci where uci.m_user.m_userId = :userId and uci.m_codingInterview.m_codingInterviewId = :codeInterviewId")
     UserCodingInterviews findUserCodingInterviewsByUserIdAndCodingInterviewId(UUID userId, UUID codeInterviewId);
+
+    @Query("from UserCodingInterviews uci where uci.m_id = :codeInterviewId")
+    Optional<UserCodingInterviews> findUserCodingInterviewsByCodingInterviewId(UUID codeInterviewId);
 }

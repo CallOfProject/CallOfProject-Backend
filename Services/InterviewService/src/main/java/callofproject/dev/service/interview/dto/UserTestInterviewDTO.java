@@ -20,6 +20,7 @@ public record UserTestInterviewDTO(
         InterviewStatus interviewStatus,
         @JsonProperty("user_answers")
         List<QuestionAnswerDTO> userAnswers,
+        int score,
         @JsonProperty("project")
         ProjectDTO projectDTO
 )

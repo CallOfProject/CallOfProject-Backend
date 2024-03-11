@@ -16,10 +16,12 @@ public interface IUserCodingInterviewMapper
 {
 
     @Mapping(target = "projectDTO", source = "codingInterviewDTO.projectDTO")
+    @Mapping(target = "interviewStatus", source = "userCodingInterviews.interviewStatus")
     UserCodingInterviewDTO toUserCodingInterviewDTO(UserCodingInterviews userCodingInterviews, CodingInterviewDTO codingInterviewDTO,
                                                     ProjectDTO projectDTO, List<UserDTO> users);
 
     @Mapping(target = "projectDTO", source = "codingInterviewDTO.projectDTO")
+    @Mapping(target = "interviewStatus", source = "userCodingInterviews.interviewStatus")
     UserCodingInterviewDTOV2 toUserCodingInterviewDTOV2(UserCodingInterviews userCodingInterviews, CodingInterviewDTO codingInterviewDTO,
                                                         ProjectDTO projectDTO, UserDTO user);
 }

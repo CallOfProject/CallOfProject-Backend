@@ -13,5 +13,6 @@ public interface ITestInterviewMapper
     TestInterview toTestInterview(CreateTestDTO dto);
 
     @Mapping(target = "projectDTO", source = "projectDTO")
+    @Mapping(target = "interviewStatus", source = "testInterview.interviewStatus")
     TestInterviewDTO toTestInterviewDTO(TestInterview testInterview, ProjectDTO projectDTO);
 }

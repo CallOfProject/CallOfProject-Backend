@@ -101,7 +101,53 @@ public class InterviewSchedulerServiceCallback
     }
 
 
+    public void checkStartedTestInterviews()
+    {
+        var interviews = m_serviceHelper.finAllTestInterviewsByStartDate(now());
+
+        for (var interview : interviews)
+        {
+            interview.setDescription("Interview has started");
+            interview.setInterviewStatus(InterviewStatus.STARTED);
+            m_serviceHelper.createInterview(interview);
+            markTestInterviewParticipantsAsStarted(interview.getTestInterviews().stream().toList());
+        }
+    }
+
+
+    public void checkStartedCodingInterviews()
+    {
+        var interviews = m_serviceHelper.finAllCodingInterviewsByStartDate(now());
+
+        for (var interview : interviews)
+        {
+            interview.setDescription("Interview has started");
+            interview.setInterviewStatus(InterviewStatus.STARTED);
+            m_serviceHelper.createCodeInterview(interview);
+            markCodingInterviewParticipantsAsStarted(interview.getCodingInterviews().stream().toList());
+        }
+    }
+
+
     // -----------------------------------------------------------------------------------------------------------------
+    private void markTestInterviewParticipantsAsStarted(List<UserTestInterviews> list)
+    {
+        for (var uci : list)
+        {
+            uci.setInterviewStatus(InterviewStatus.STARTED);
+            m_serviceHelper.createUserTestInterviews(uci);
+        }
+    }
+
+    private void markCodingInterviewParticipantsAsStarted(List<UserCodingInterviews> list)
+    {
+        for (var uci : list)
+        {
+            uci.setInterviewStatus(InterviewStatus.STARTED);
+            m_serviceHelper.createUserCodingInterviews(uci);
+        }
+    }
+
     private void checkTestInterviews(List<TestInterview> testInterviews)
     {
         var expiredTestInterviews = testInterviews.stream().filter(ci -> ci.getStartTime().isBefore(now())).toList();
@@ -220,4 +266,5 @@ public class InterviewSchedulerServiceCallback
 
         m_kafkaProducer.sendNotification(notification);
     }
+
 }

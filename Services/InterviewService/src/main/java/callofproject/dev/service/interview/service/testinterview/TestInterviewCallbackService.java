@@ -5,12 +5,13 @@ import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.dto.EmailTopic;
 import callofproject.dev.data.common.enums.EmailType;
 import callofproject.dev.data.common.status.Status;
-import callofproject.dev.library.exception.service.DataServiceException;
-import callofproject.dev.service.interview.config.kafka.KafkaProducer;
-import callofproject.dev.data.interview.entity.QuestionAnswer;
 import callofproject.dev.data.interview.dal.InterviewServiceHelper;
 import callofproject.dev.data.interview.entity.*;
+import callofproject.dev.data.interview.entity.enums.InterviewResult;
 import callofproject.dev.data.interview.entity.enums.InterviewStatus;
+import callofproject.dev.library.exception.service.DataServiceException;
+import callofproject.dev.service.interview.config.kafka.KafkaProducer;
+import callofproject.dev.service.interview.dto.InterviewResultDTO;
 import callofproject.dev.service.interview.dto.test.*;
 import callofproject.dev.service.interview.mapper.IProjectMapper;
 import callofproject.dev.service.interview.mapper.ITestInterviewMapper;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static java.util.UUID.fromString;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.StreamSupport.stream;
@@ -127,10 +129,41 @@ public class TestInterviewCallbackService
     public ResponseMessage<Object> deleteTestInterview(UUID interviewId)
     {
         var interview = findInterviewIfExistsById(interviewId);
+
+        var project = interview.getProject();
+        var userTestInterviews = interview.getTestInterviews();
+        var questions = interview.getQuestions();
+
+        // Remove question answers
+        userTestInterviews.forEach(uti -> {
+            m_interviewServiceHelper.removeQuestionAnswers(uti.getAnswers().stream().toList());
+        });
+
+        // Clear test interviews from users
+        userTestInterviews.forEach(uti -> {
+            var user = uti.getUser();
+            user.getTestInterviews().removeIf(testInterview -> testInterview.getTestInterview().getId().equals(interviewId));
+            m_interviewServiceHelper.saveUser(user); // Assuming there's a method to update user in your service
+        });
+
+        // Remove test interview questions
+        m_interviewServiceHelper.removeTestInterviewQuestions(questions.stream().toList());
+
+        // Remove test interviews from project
+        project.setTestInterview(null);
+        m_interviewServiceHelper.createProject(project);
+
+        // Remove user test interviews
+        m_interviewServiceHelper.removeUserTestInterviews(userTestInterviews.stream().toList());
+
+        // Finally, delete the test interview itself
         m_interviewServiceHelper.deleteTestInterview(interview);
 
-        return new ResponseMessage<>("Test interview deleted successfully", Status.OK, true);
+        var dto = m_testInterviewMapper.toTestInterviewDTO(interview, m_projectMapper.toProjectDTO(project));
+
+        return new ResponseMessage<>("Test interview deleted successfully", Status.OK, dto);
     }
+
 
     public ResponseMessage<Object> deleteTestInterviewByProjectId(UUID projectId)
     {
@@ -238,7 +271,7 @@ public class TestInterviewCallbackService
     }
     // private methods
 
-    private TestInterview findInterviewIfExistsById(UUID testInterviewId)
+    public TestInterview findInterviewIfExistsById(UUID testInterviewId)
     {
         var interview = m_interviewServiceHelper.findTestInterviewById(testInterviewId);
 
@@ -288,7 +321,7 @@ public class TestInterviewCallbackService
         if (userTestInterview.isEmpty())
             throw new DataServiceException("User not assigned to interview");
 
-        userTestInterview.get().setInterviewStatus(InterviewStatus.FINISHED);
+        userTestInterview.get().setInterviewStatus(InterviewStatus.COMPLETED);
         var calculateScore = calculateScore(userTestInterview.get(), interview.getQuestions().stream().toList());
         userTestInterview.get().setScore(calculateScore);
         m_interviewServiceHelper.createUserTestInterviews(userTestInterview.get());
@@ -311,4 +344,23 @@ public class TestInterviewCallbackService
     }
 
 
+    public ResponseMessage<Object> acceptInterview(UUID id, boolean isAccepted)
+    {
+        var userTestInterview = m_interviewServiceHelper.findUserTestInterviewByInterviewId(id);
+
+        if (userTestInterview.isEmpty())
+            return new ResponseMessage<>("Interview not found", Status.NOT_FOUND, null);
+
+
+        userTestInterview.get().setInterviewResult(isAccepted ? InterviewResult.PASSED : InterviewResult.FAILED);
+        m_interviewServiceHelper.createUserTestInterviews(userTestInterview.get());
+
+        var testInterview = userTestInterview.get().getTestInterview();
+        var project = testInterview.getProject();
+        var user = userTestInterview.get().getUser();
+        var emailMsg = format("Hi %s! Your interview is %s!.", user.getUsername(), isAccepted ? "accepted" : "rejected");
+        var dto = new InterviewResultDTO(project.getProjectOwner().getUserId(), user.getUserId(), project.getProjectName(), emailMsg, user.getEmail());
+        var msg = format("Interview is %s!.", isAccepted ? "accepted" : "rejected");
+        return new ResponseMessage<>(msg, Status.OK, dto);
+    }
 }

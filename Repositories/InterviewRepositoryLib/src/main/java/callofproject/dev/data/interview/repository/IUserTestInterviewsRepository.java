@@ -16,4 +16,7 @@ public interface IUserTestInterviewsRepository extends CrudRepository<UserTestIn
 {
     @Query("from UserTestInterviews where m_user.m_userId = :userId and m_testInterview.m_id = :id")
     Optional<UserTestInterviews> findUserTestInterviewsByUserAndTestInterviewId(UUID userId, UUID id);
+
+    @Query("from UserTestInterviews where m_testInterview.m_id = :testInterviewId")
+    Optional<UserTestInterviews> findUserTestInterviewsByTestInterviewId(UUID testInterviewId);
 }

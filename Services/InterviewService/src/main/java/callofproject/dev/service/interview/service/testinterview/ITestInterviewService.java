@@ -12,10 +12,6 @@ public interface ITestInterviewService
 
     ResponseMessage<Object> addQuestion(CreateQuestionDTO createQuestionDTO);
 
-    ResponseMessage<Object> assignTestInterview(UUID interviewId, UUID userId);
-
-    ResponseMessage<Object> assignMultipleTestInterview(AssignMultipleInterviewDTO dto);
-
     ResponseMessage<Object> deleteTestInterview(UUID interviewId);
 
     ResponseMessage<Object> deleteTestInterviewByProjectId(UUID projectId);
@@ -43,4 +39,6 @@ public interface ITestInterviewService
     ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId);
 
     ResponseMessage<Object> getInterviewInformation(UUID interviewId);
+
+    ResponseMessage<Object> acceptInterview(UUID id, boolean isAccepted);
 }

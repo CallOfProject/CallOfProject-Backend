@@ -6,17 +6,20 @@ import callofproject.dev.data.common.dto.EmailTopic;
 import callofproject.dev.data.common.enums.EmailType;
 import callofproject.dev.data.common.enums.NotificationType;
 import callofproject.dev.data.common.status.Status;
-import callofproject.dev.library.exception.service.DataServiceException;
-import callofproject.dev.service.interview.config.kafka.KafkaProducer;
 import callofproject.dev.data.interview.dal.InterviewServiceHelper;
 import callofproject.dev.data.interview.entity.*;
+import callofproject.dev.data.interview.entity.enums.InterviewResult;
 import callofproject.dev.data.interview.entity.enums.InterviewStatus;
+import callofproject.dev.library.exception.service.DataServiceException;
+import callofproject.dev.service.interview.config.kafka.KafkaProducer;
+import callofproject.dev.service.interview.dto.InterviewResultDTO;
 import callofproject.dev.service.interview.dto.NotificationKafkaDTO;
 import callofproject.dev.service.interview.dto.OwnerProjectDTO;
 import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
 import callofproject.dev.service.interview.mapper.ICodingInterviewMapper;
 import callofproject.dev.service.interview.mapper.IProjectMapper;
+import callofproject.dev.service.interview.mapper.IUserCodingInterviewMapper;
 import callofproject.dev.service.interview.mapper.IUserMapper;
 import callofproject.dev.service.interview.service.EInterviewStatus;
 import callofproject.dev.service.interview.service.S3Service;
@@ -40,16 +43,19 @@ public class CodingInterviewCallbackService
 {
     private final InterviewServiceHelper m_interviewServiceHelper;
     private final ICodingInterviewMapper m_codingInterviewMapper;
+    private final IUserCodingInterviewMapper m_userCodingInterviewMapper;
     private final S3Service m_s3Service;
     private final IProjectMapper m_projectMapper;
     private final IUserMapper m_userMapper;
     private final KafkaProducer m_kafkaProducer;
     @Value("${coding-interview.email.template}")
     private String m_interviewEmail;
-    public CodingInterviewCallbackService(InterviewServiceHelper interviewServiceHelper, ICodingInterviewMapper codingInterviewMapper, S3Service s3Service, KafkaProducer kafkaProducer, IProjectMapper projectMapper, IUserMapper userMapper)
+
+    public CodingInterviewCallbackService(InterviewServiceHelper interviewServiceHelper, ICodingInterviewMapper codingInterviewMapper, IUserCodingInterviewMapper userCodingInterviewMapper, S3Service s3Service, KafkaProducer kafkaProducer, IProjectMapper projectMapper, IUserMapper userMapper)
     {
         m_interviewServiceHelper = interviewServiceHelper;
         m_codingInterviewMapper = codingInterviewMapper;
+        m_userCodingInterviewMapper = userCodingInterviewMapper;
         m_s3Service = s3Service;
         m_kafkaProducer = kafkaProducer;
         m_projectMapper = projectMapper;
@@ -326,5 +332,25 @@ public class CodingInterviewCallbackService
                     participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "cancelled", project.getProjectName())));
             default -> throw new DataServiceException("Invalid status");
         }
+    }
+
+    public ResponseMessage<Object> acceptInterview(UUID id, boolean isAccepted)
+    {
+        var userCodingInterview = m_interviewServiceHelper.findUserCodingInterviewByInterviewId(id);
+
+        if (userCodingInterview.isEmpty())
+            return new ResponseMessage<>("Interview not found", Status.NOT_FOUND, null);
+
+
+        userCodingInterview.get().setInterviewResult(isAccepted ? InterviewResult.PASSED : InterviewResult.FAILED);
+        m_interviewServiceHelper.createUserCodingInterviews(userCodingInterview.get());
+
+        var codingInterview = userCodingInterview.get().getCodingInterview();
+        var project = codingInterview.getProject();
+        var user = userCodingInterview.get().getUser();
+        var emailMsg = format("Hi %s! Your interview is %s!.", user.getUsername(), isAccepted ? "accepted" : "rejected");
+        var dto = new InterviewResultDTO(project.getProjectOwner().getUserId(), user.getUserId(), project.getProjectName(), emailMsg, user.getEmail());
+        var msg = format("Interview is %s!.", isAccepted ? "accepted" : "rejected");
+        return new ResponseMessage<>(msg, Status.OK, dto);
     }
 }

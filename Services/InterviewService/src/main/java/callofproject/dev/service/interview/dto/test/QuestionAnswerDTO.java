@@ -11,6 +11,13 @@ public record QuestionAnswerDTO(
         UUID interviewId,
         @JsonProperty("question_id")
         long questionId,
-        String answer)
+        String question,
+        String answer,
+        String option1,
+        String option2,
+        String option3,
+        String option4,
+        @JsonProperty("correct_answer")
+        String correctAnswer)
 {
 }

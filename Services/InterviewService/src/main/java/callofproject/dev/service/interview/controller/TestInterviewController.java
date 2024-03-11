@@ -1,6 +1,9 @@
 package callofproject.dev.service.interview.controller;
 
-import callofproject.dev.service.interview.dto.test.*;
+import callofproject.dev.service.interview.dto.test.CreateQuestionDTO;
+import callofproject.dev.service.interview.dto.test.CreateTestDTO;
+import callofproject.dev.service.interview.dto.test.QuestionAnswerDTO;
+import callofproject.dev.service.interview.dto.test.TestInterviewFinishDTO;
 import callofproject.dev.service.interview.service.testinterview.TestInterviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +31,6 @@ public class TestInterviewController
         return subscribe(() -> ok(m_testInterviewService.createInterview(dto)), ex -> internalServerError().body(ex.getMessage()));
     }
 
-
     @GetMapping("/find/question/by/interview-id")
     public ResponseEntity<Object> getQuestion(@RequestParam("interview_id") UUID interviewId, @RequestParam("q") int q)
     {
@@ -46,18 +48,6 @@ public class TestInterviewController
     public ResponseEntity<?> addQuestion(@RequestBody CreateQuestionDTO createQuestionDTO)
     {
         return subscribe(() -> ok(m_testInterviewService.addQuestion(createQuestionDTO)), ex -> internalServerError().body(ex.getMessage()));
-    }
-
-    @PostMapping("/assign")
-    public ResponseEntity<Object> assignTestInterview(@RequestParam("interview_id") UUID interviewId, @RequestParam("user_id") UUID userId)
-    {
-        return subscribe(() -> ok(m_testInterviewService.assignTestInterview(interviewId, userId)), ex -> internalServerError().body(ex.getMessage()));
-    }
-
-    @PostMapping("/assign/multiple")
-    public ResponseEntity<Object> assignMultipleTestInterview(@RequestBody AssignMultipleInterviewDTO dto)
-    {
-        return subscribe(() -> ok(m_testInterviewService.assignMultipleTestInterview(dto)), ex -> internalServerError().body(ex.getMessage()));
     }
 
     @DeleteMapping("/delete")
@@ -133,5 +123,11 @@ public class TestInterviewController
     public ResponseEntity<Object> getInterviewInformation(@RequestParam("interview_id") UUID interviewId)
     {
         return subscribe(() -> ok(m_testInterviewService.getInterviewInformation(interviewId)), ex -> internalServerError().body(ex.getMessage()));
+    }
+
+    @PostMapping("/accept")
+    public ResponseEntity<Object> acceptInterview(@RequestParam("user_test_iw_id") String id, @RequestParam("accepted") boolean isAccepted)
+    {
+        return subscribe(() -> ok(m_testInterviewService.acceptInterview(UUID.fromString(id), isAccepted)), ex -> internalServerError().body(ex.getMessage()));
     }
 }

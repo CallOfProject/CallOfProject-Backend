@@ -25,4 +25,13 @@ public interface ITestInterviewRepository extends CrudRepository<TestInterview, 
 
     @Query("from TestInterview where project.m_projectOwner.m_userId = :ownerId")
     Iterable<TestInterview> findTestInterviewsByOwnerId(UUID ownerId);
+
+
+    @Query("from TestInterview where " +
+            "YEAR(m_startTime) = YEAR(:startDate) and " +
+            "MONTH(m_startTime) = MONTH(:startDate) and " +
+            "DAY(m_startTime) = DAY(:startDate) and (" +
+            "m_interviewStatus = 'SCHEDULED' or " +
+            "m_interviewStatus = 'NOT_STARTED')")
+    Iterable<TestInterview> findAllTestInterviewsByStartDate(LocalDateTime startDate);
 }

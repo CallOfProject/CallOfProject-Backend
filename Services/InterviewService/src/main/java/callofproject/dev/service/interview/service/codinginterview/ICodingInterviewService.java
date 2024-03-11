@@ -37,4 +37,6 @@ public interface ICodingInterviewService
     MultipleResponseMessage<Object> findUserInterviewInformation(UUID userId);
 
     ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId);
+
+    ResponseMessage<Object> acceptInterview(UUID id, boolean isAccepted);
 }

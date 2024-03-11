@@ -201,4 +201,42 @@ public class InterviewServiceHelper
     {
         doForRepository(() -> m_repositoryFacade.m_projectParticipantRepository.delete(projectParticipant), "Error removing project participant");
     }
+
+
+    public void removeQuestionAnswers(List<QuestionAnswer> questionAnswers)
+    {
+        doForRepository(() -> m_repositoryFacade.m_questionAnswerRepository.deleteAll(questionAnswers), "Error removing question answers");
+    }
+
+    public void removeTestInterviewQuestions(List<TestInterviewQuestion> questions)
+    {
+        doForRepository(() -> m_repositoryFacade.m_testInterviewQuestionRepository.deleteAll(questions), "Error removing test interview questions");
+    }
+
+    public void removeUserTestInterviews(List<UserTestInterviews> userTestInterviews)
+    {
+        doForRepository(() -> m_repositoryFacade.m_userTestInterviewsRepository.deleteAll(userTestInterviews), "Error removing user test interviews");
+    }
+
+
+    public Iterable<CodingInterview> finAllCodingInterviewsByStartDate(LocalDateTime startDate)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_codingInterviewRepository.findAllCodingInterviewsByStartDate(startDate), "Error finding all coding interviews by start date");
+    }
+
+    public Iterable<TestInterview> finAllTestInterviewsByStartDate(LocalDateTime startDate)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_testInterviewRepository.findAllTestInterviewsByStartDate(startDate), "Error finding all test interviews by start date");
+    }
+
+
+    public Optional<UserCodingInterviews> findUserCodingInterviewByInterviewId(UUID codeInterviewId)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_userCodingInterviewsRepository.findUserCodingInterviewsByCodingInterviewId(codeInterviewId), "Error finding user coding interview by interview id");
+    }
+
+    public Optional<UserTestInterviews> findUserTestInterviewByInterviewId(UUID codeInterviewId)
+    {
+        return doForRepository(() -> m_repositoryFacade.m_userTestInterviewsRepository.findUserTestInterviewsByTestInterviewId(codeInterviewId), "Error finding user coding interview by interview id");
+    }
 }

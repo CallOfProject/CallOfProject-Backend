@@ -16,6 +16,8 @@ public interface IUserTestInterviewMapper
 {
     @Mapping(target = "projectDTO", source = "testInterview.projectDTO")
     @Mapping(target = "id", source = "userTestInterview.id")
+    @Mapping(target = "interviewStatus", source = "userTestInterview.interviewStatus")
+    @Mapping(target = "interviewResult", source = "userTestInterview.interviewResult")
     UserTestInterviewDTO toUserTestInterviewDTO(UserTestInterviews userTestInterview,
                                                 TestInterviewDTO testInterview,
                                                 List<QuestionAnswerDTO> userAnswers,

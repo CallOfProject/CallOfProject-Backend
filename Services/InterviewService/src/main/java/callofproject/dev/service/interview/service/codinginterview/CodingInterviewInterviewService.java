@@ -2,7 +2,11 @@ package callofproject.dev.service.interview.service.codinginterview;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.data.common.dto.EmailTopic;
+import callofproject.dev.data.common.enums.EmailType;
 import callofproject.dev.data.common.status.Status;
+import callofproject.dev.service.interview.config.kafka.KafkaProducer;
+import callofproject.dev.service.interview.dto.InterviewResultDTO;
 import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
 import callofproject.dev.service.interview.service.EInterviewStatus;
@@ -19,10 +23,12 @@ import static callofproject.dev.library.exception.util.CopDataUtil.doForDataServ
 public class CodingInterviewInterviewService implements ICodingInterviewService
 {
     private final CodingInterviewCallbackService m_callbackService;
+    private final KafkaProducer m_kafkaProducer;
 
-    public CodingInterviewInterviewService(CodingInterviewCallbackService callbackService)
+    public CodingInterviewInterviewService(CodingInterviewCallbackService callbackService, KafkaProducer kafkaProducer)
     {
         m_callbackService = callbackService;
+        m_kafkaProducer = kafkaProducer;
     }
 
     @Override
@@ -127,6 +133,20 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
     public ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId)
     {
         return doForDataService(() -> m_callbackService.isUserSolvedBefore(userId, interviewId), "CodingInterviewService::isUserSolvedBefore");
+    }
+
+    @Override
+    public ResponseMessage<Object> acceptInterview(UUID id, boolean isAccepted)
+    {
+        var result = doForDataService(() -> m_callbackService.acceptInterview(id, isAccepted), "CodingInterviewService::acceptInterview");
+
+        if (result.getStatusCode() == Status.OK)
+        {
+            var dto = (InterviewResultDTO) result.getObject();
+            m_kafkaProducer.sendEmail(new EmailTopic(EmailType.PROJECT_INVITATION, dto.email(), "Interview Feedback", dto.message(), null));
+        }
+
+        return result;
     }
 
     @Override

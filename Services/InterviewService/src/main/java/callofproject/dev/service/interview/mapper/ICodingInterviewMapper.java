@@ -13,5 +13,6 @@ public interface ICodingInterviewMapper
     CodingInterview toCodingInterview(CreateCodingInterviewDTO dto);
 
     @Mapping(target = "projectDTO", source = "projectDTO")
+    @Mapping(target = "interviewStatus", source = "codingInterview.interviewStatus")
     CodingInterviewDTO toCodingInterviewDTO(CodingInterview codingInterview, ProjectDTO projectDTO);
 }
