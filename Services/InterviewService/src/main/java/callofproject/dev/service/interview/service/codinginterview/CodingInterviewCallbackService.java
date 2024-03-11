@@ -2,6 +2,7 @@ package callofproject.dev.service.interview.service.codinginterview;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.data.common.dsa.Pair;
 import callofproject.dev.data.common.dto.EmailTopic;
 import callofproject.dev.data.common.enums.EmailType;
 import callofproject.dev.data.common.enums.NotificationType;
@@ -12,9 +13,7 @@ import callofproject.dev.data.interview.entity.enums.InterviewResult;
 import callofproject.dev.data.interview.entity.enums.InterviewStatus;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.service.interview.config.kafka.KafkaProducer;
-import callofproject.dev.service.interview.dto.InterviewResultDTO;
-import callofproject.dev.service.interview.dto.NotificationKafkaDTO;
-import callofproject.dev.service.interview.dto.OwnerProjectDTO;
+import callofproject.dev.service.interview.dto.*;
 import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
 import callofproject.dev.service.interview.mapper.ICodingInterviewMapper;
@@ -23,11 +22,14 @@ import callofproject.dev.service.interview.mapper.IUserCodingInterviewMapper;
 import callofproject.dev.service.interview.mapper.IUserMapper;
 import callofproject.dev.service.interview.service.EInterviewStatus;
 import callofproject.dev.service.interview.service.S3Service;
+import callofproject.dev.service.interview.util.Util;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -85,8 +87,8 @@ public class CodingInterviewCallbackService
         users.stream().map(u -> new UserCodingInterviews(u, savedInterview)).forEach(m_interviewServiceHelper::createUserCodingInterviews);
 
         var codingInterviewDTO = m_codingInterviewMapper.toCodingInterviewDTO(savedInterview, m_projectMapper.toProjectDTO(savedInterview.getProject()));
-        sendEmails(codingInterviewDTO, users.stream().toList());
-        return new ResponseMessage<>("Coding interview created successfully", Status.CREATED, codingInterviewDTO);
+        var userList = users.stream().map(m_userMapper::toUserEmailDTO).toList();
+        return new ResponseMessage<>("Coding interview created successfully", Status.CREATED, new Pair<>(codingInterviewDTO, userList));
     }
 
     // After participants, remove interviews from project participants
@@ -117,17 +119,28 @@ public class CodingInterviewCallbackService
         return new ResponseMessage<>("Coding interview deleted successfully", Status.OK, dto);
     }
 
-    private void sendEmails(CodingInterviewDTO codingInterviewDTO, List<User> list)
+    public void sendEmails(CodingInterviewDTO codingInterviewDTO, List<UserEmailDTO> list, String template)
     {
-        list.forEach(u -> sendEmail(codingInterviewDTO.codingInterviewId(), u.getEmail(), codingInterviewDTO.projectDTO().projectName(), u.getUserId()));
+        list.forEach(u -> sendEmail(codingInterviewDTO.codingInterviewId(), u.email(), codingInterviewDTO.projectDTO().projectName(), u.userId(), template));
     }
 
-    private void sendEmail(UUID interviewId, String email, String projectName, UUID userId)
+    private String toLocalDateTimeString(LocalDateTime localDateTime)
     {
-        System.out.println("EMAIL: " + email);
-        var title = "Test Interview Assigned for " + projectName;
+        return localDateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy kk:mm:ss"));
+    }
+
+    private void sendEmail(UUID interviewId, String email, String projectName, UUID userId, String templateName)
+    {
+        var template = Util.getEmailTemplate(templateName);
+        var user = findUserIfExistsById(userId);
+        var interview = findInterviewIfExistsById(interviewId);
+        var startDate = toLocalDateTimeString(interview.getStartTime());
+        var endDate = toLocalDateTimeString(interview.getEndTime());
         var emailStr = String.format(m_interviewEmail, interviewId, userId);
-        var topic = new EmailTopic(EmailType.ASSIGN_INTERVIEW, email, title, emailStr, null);
+        var title = "Coding Interview Assigned for " + projectName;
+        var msg = format(template, projectName, user.getUsername(), interview.getTitle(), startDate, endDate, emailStr);
+
+        var topic = new EmailTopic(EmailType.ASSIGN_INTERVIEW, email, title, msg, null);
         m_kafkaProducer.sendEmail(topic);
     }
 

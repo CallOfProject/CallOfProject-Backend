@@ -2,6 +2,7 @@ package callofproject.dev.service.interview.service.testinterview;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.data.common.dsa.Pair;
 import callofproject.dev.data.common.dto.EmailTopic;
 import callofproject.dev.data.common.enums.EmailType;
 import callofproject.dev.data.common.enums.NotificationDataType;
@@ -12,10 +13,14 @@ import callofproject.dev.data.interview.entity.UserTestInterviews;
 import callofproject.dev.service.interview.config.kafka.KafkaProducer;
 import callofproject.dev.service.interview.dto.InterviewResultDTO;
 import callofproject.dev.service.interview.dto.NotificationKafkaDTO;
+import callofproject.dev.service.interview.dto.UserEmailDTO;
+import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
 import callofproject.dev.service.interview.dto.test.*;
+import callofproject.dev.service.interview.service.EInterviewStatus;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
@@ -39,8 +44,11 @@ public class TestInterviewService implements ITestInterviewService
         var testInterview = doForDataService(() -> m_callbackService.createInterview(dto), "TestInterviewService::createCodeInterview");
 
         if (testInterview.getStatusCode() == Status.CREATED)
-            sendNotification((TestInterviewDTO) testInterview.getObject(), "Test Interview Assigned");
-
+        {
+            var object = (Pair<TestInterviewDTO, List<UserEmailDTO>>) testInterview.getObject();
+            m_callbackService.sendNotification(object.getFirst(), EInterviewStatus.CREATED);
+            m_callbackService.sendEmails(object.getFirst(), object.getSecond(), "create_interview.html");
+        }
 
         return testInterview;
     }

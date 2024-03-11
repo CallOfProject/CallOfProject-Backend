@@ -2,11 +2,15 @@ package callofproject.dev.service.interview.service.codinginterview;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.data.common.dsa.Pair;
 import callofproject.dev.data.common.dto.EmailTopic;
 import callofproject.dev.data.common.enums.EmailType;
 import callofproject.dev.data.common.status.Status;
+import callofproject.dev.data.interview.entity.User;
 import callofproject.dev.service.interview.config.kafka.KafkaProducer;
 import callofproject.dev.service.interview.dto.InterviewResultDTO;
+import callofproject.dev.service.interview.dto.UserDTO;
+import callofproject.dev.service.interview.dto.UserEmailDTO;
 import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
 import callofproject.dev.service.interview.service.EInterviewStatus;
@@ -14,6 +18,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
@@ -37,7 +42,11 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
         var codingInterview = doForDataService(() -> m_callbackService.createCodeInterview(dto), "CodingInterviewService::createCodeInterview");
 
         if (codingInterview.getStatusCode() == Status.CREATED)
-            m_callbackService.sendNotification((CodingInterviewDTO) codingInterview.getObject(), EInterviewStatus.CREATED);
+        {
+            var object = (Pair<CodingInterviewDTO, List<UserEmailDTO>>) codingInterview.getObject();
+            m_callbackService.sendNotification(object.getFirst(), EInterviewStatus.CREATED);
+            m_callbackService.sendEmails(object.getFirst(), object.getSecond(), "create_interview.html");
+        }
 
         return codingInterview;
     }

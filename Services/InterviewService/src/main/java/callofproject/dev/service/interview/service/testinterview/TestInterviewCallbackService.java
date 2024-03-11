@@ -2,8 +2,10 @@ package callofproject.dev.service.interview.service.testinterview;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.data.common.dsa.Pair;
 import callofproject.dev.data.common.dto.EmailTopic;
 import callofproject.dev.data.common.enums.EmailType;
+import callofproject.dev.data.common.enums.NotificationType;
 import callofproject.dev.data.common.status.Status;
 import callofproject.dev.data.interview.dal.InterviewServiceHelper;
 import callofproject.dev.data.interview.entity.*;
@@ -12,14 +14,23 @@ import callofproject.dev.data.interview.entity.enums.InterviewStatus;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.service.interview.config.kafka.KafkaProducer;
 import callofproject.dev.service.interview.dto.InterviewResultDTO;
+import callofproject.dev.service.interview.dto.NotificationKafkaDTO;
+import callofproject.dev.service.interview.dto.UserEmailDTO;
+import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
 import callofproject.dev.service.interview.dto.test.*;
 import callofproject.dev.service.interview.mapper.IProjectMapper;
 import callofproject.dev.service.interview.mapper.ITestInterviewMapper;
 import callofproject.dev.service.interview.mapper.ITestInterviewQuestionMapper;
+import callofproject.dev.service.interview.mapper.IUserMapper;
+import callofproject.dev.service.interview.service.EInterviewStatus;
+import callofproject.dev.service.interview.util.Util;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -36,16 +47,18 @@ public class TestInterviewCallbackService
     private final InterviewServiceHelper m_interviewServiceHelper;
     private final ITestInterviewMapper m_testInterviewMapper;
     private final IProjectMapper m_projectMapper;
+    private final IUserMapper m_userMapper;
     private final ITestInterviewQuestionMapper m_testInterviewQuestionMapper;
     @Value("${test-interview.email.template}")
     private String m_interviewEmail;
     private final KafkaProducer m_kafkaProducer;
 
-    public TestInterviewCallbackService(InterviewServiceHelper interviewServiceHelper, ITestInterviewMapper testInterviewMapper, IProjectMapper projectMapper, ITestInterviewQuestionMapper testInterviewQuestionMapper, KafkaProducer kafkaProducer)
+    public TestInterviewCallbackService(InterviewServiceHelper interviewServiceHelper, ITestInterviewMapper testInterviewMapper, IProjectMapper projectMapper, IUserMapper userMapper, ITestInterviewQuestionMapper testInterviewQuestionMapper, KafkaProducer kafkaProducer)
     {
         m_interviewServiceHelper = interviewServiceHelper;
         m_testInterviewMapper = testInterviewMapper;
         m_projectMapper = projectMapper;
+        m_userMapper = userMapper;
         m_testInterviewQuestionMapper = testInterviewQuestionMapper;
         m_kafkaProducer = kafkaProducer;
     }
@@ -54,6 +67,9 @@ public class TestInterviewCallbackService
     {
         var project = findProjectIfExistsById(dto.projectId());
         var testInterview = m_interviewServiceHelper.createInterview(m_testInterviewMapper.toTestInterview(dto));
+
+        if (testInterview.getStartTime().toLocalDate().equals(LocalDate.now()))
+            testInterview.setInterviewStatus(InterviewStatus.STARTED);
 
         project.setTestInterview(testInterview);
         testInterview.setProject(project);
@@ -74,21 +90,72 @@ public class TestInterviewCallbackService
         users.stream().map(u -> new UserTestInterviews(u, savedTestInterview)).forEach(m_interviewServiceHelper::createUserTestInterviews);
         // Create DTO
         var savedTestInterviewDTO = m_testInterviewMapper.toTestInterviewDTO(savedTestInterview, m_projectMapper.toProjectDTO(savedTestInterview.getProject()));
-        sendEmails(savedTestInterviewDTO, users.stream().toList());
-        return new ResponseMessage<>("Test interview created successfully", Status.CREATED, savedTestInterviewDTO);
+        var userList = users.stream().map(m_userMapper::toUserEmailDTO).toList();
+
+        return new ResponseMessage<>("Test interview created successfully", Status.CREATED, new Pair<>(savedTestInterviewDTO, userList));
     }
 
-    private void sendEmails(TestInterviewDTO savedTestInterviewDTO, List<User> list)
+    public void sendEmails(TestInterviewDTO savedTestInterviewDTO, List<UserEmailDTO> list, String template)
     {
-        list.forEach(u -> sendEmail(fromString(savedTestInterviewDTO.id()), u.getEmail(), savedTestInterviewDTO.projectDTO().projectName(), u.getUserId()));
+        list.forEach(u -> sendEmail(fromString(savedTestInterviewDTO.id()), u.email(), savedTestInterviewDTO.projectDTO().projectName(), u.userId(), template));
     }
 
-    private void sendEmail(UUID interviewId, String email, String projectName, UUID userId)
+    private String toLocalDateTimeString(LocalDateTime localDateTime)
     {
-        System.out.println("EMAIL: " + email);
-        var title = "Test Interview Assigned for " + projectName;
+        return localDateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy kk:mm:ss"));
+    }
+
+    public void sendNotification(TestInterviewDTO object, EInterviewStatus status)
+    {
+        //var interview = findInterviewIfExistsById(object.codingInterviewId());
+        var project = findProjectIfExistsById(object.projectDTO().projectId());
+
+
+        var participants = project.getProjectParticipants().stream().map(ProjectParticipant::getUser).toList();
+        var message = "A test interview has been %s for the Size %s Project application";
+
+        switch (status)
+        {
+            case CREATED ->
+                    participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "created", project.getProjectName())));
+            case REMOVED ->
+                    participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "removed", project.getProjectName())));
+            case ASSIGNED ->
+                    participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "assigned", project.getProjectName())));
+            case CANCELLED ->
+                    participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "cancelled", project.getProjectName())));
+            default -> throw new DataServiceException("Invalid status");
+        }
+    }
+
+    private void send(UUID owner, UUID userId, String message)
+    {
+        var notificationMessage = new NotificationKafkaDTO.Builder()
+                .setFromUserId(owner)
+                .setToUserId(userId)
+                .setMessage(message)
+                .setNotificationType(NotificationType.INFORMATION)
+                .setNotificationLink("none")
+                .setMessage(message)
+                .setNotificationImage(null)
+                .setNotificationTitle("Interview Status")
+                .build();
+
+        m_kafkaProducer.sendNotification(notificationMessage);
+    }
+
+    private void sendEmail(UUID interviewId, String email, String projectName, UUID userId, String templateName)
+    {
+        var template = Util.getEmailTemplate(templateName);
+        var user = findUserIfExistsById(userId);
+        var interview = findInterviewIfExistsById(interviewId);
+        var startDate = toLocalDateTimeString(interview.getStartTime());
+        var endDate = toLocalDateTimeString(interview.getEndTime());
         var emailStr = String.format(m_interviewEmail, interviewId, userId);
-        var topic = new EmailTopic(EmailType.ASSIGN_INTERVIEW, email, title, emailStr, null);
+        var title = "Test Interview Assigned for " + projectName;
+        var msg = format(template, projectName, user.getUsername(), interview.getTitle(), startDate, endDate, emailStr);
+
+        var topic = new EmailTopic(EmailType.ASSIGN_INTERVIEW, email, title, msg, null);
         m_kafkaProducer.sendEmail(topic);
     }
 
@@ -337,7 +404,7 @@ public class TestInterviewCallbackService
         for (var question : questions)
         {
             var userAnswer = userAnswersMap.get(question.getId());
-            if (userAnswer != null && userAnswer.equals(question.getAnswer()))
+            if (userAnswer.equals(question.getAnswer()))
                 score += question.getPoint();
         }
         return score;
