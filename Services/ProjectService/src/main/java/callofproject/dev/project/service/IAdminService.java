@@ -2,6 +2,8 @@ package callofproject.dev.project.service;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.project.dto.ProjectAdminDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -37,4 +39,8 @@ public interface IAdminService
      * @return A MultipleResponseMessagePageable containing a list of objects (projects) with pagination information.
      */
     MultipleResponseMessagePageable<Object> findAll(int page);
+
+    MultipleResponseMessagePageable<Object> findAllProjectsByPage(int page);
+
+    ResponseMessage<Object> updateProject(ProjectAdminDTO dto, MultipartFile file);
 }

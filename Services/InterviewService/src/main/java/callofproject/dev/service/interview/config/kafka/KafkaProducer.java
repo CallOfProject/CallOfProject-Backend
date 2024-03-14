@@ -20,8 +20,10 @@ public class KafkaProducer
     private final KafkaTemplate<String, EmailTopic> m_emailKafkaTemplate;
 
 
-    public KafkaProducer(@Qualifier("notificationTopic") NewTopic notificationTopic, @Qualifier("emailTopic") NewTopic emailTopic,
-                         KafkaTemplate<String, NotificationKafkaDTO> kafkaTemplate, KafkaTemplate<String, EmailTopic> emailKafkaTemplate)
+    public KafkaProducer(@Qualifier("notificationTopic") NewTopic notificationTopic,
+                         @Qualifier("emailTopic") NewTopic emailTopic,
+                         KafkaTemplate<String, NotificationKafkaDTO> kafkaTemplate,
+                         KafkaTemplate<String, EmailTopic> emailKafkaTemplate)
     {
         m_notificationTopic = notificationTopic;
         m_emailTopic = emailTopic;
@@ -39,12 +41,6 @@ public class KafkaProducer
         m_kafkaTemplate.send(msg);
     }
 
-
-    /**
-     * Send a message to the Kafka topic.
-     *
-     * @param emailTopic The message to send.
-     */
     public void sendEmail(EmailTopic emailTopic)
     {
         var msg = MessageBuilder

@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -73,14 +74,37 @@ public class S3Service
 
             m_s3Client.putObject(new PutObjectRequest(bucketName.get(), fileName, multipartFile.getInputStream(), null)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
-
-            return "https://" + m_bucketName + ".s3.amazonaws.com/" + fileName;
+            return "https://" + bucketName.get() + ".s3.amazonaws.com/" + fileName;
         } catch (IOException | SdkClientException e)
         {
             e.printStackTrace();
             return "File upload failed: " + e.getMessage();
         }
     }
+
+
+    public String uploadToS3WithByteArray(byte[] fileBytes, String fileName, Optional<String> bucketName)
+    {
+        try
+        {
+            bucketName = bucketName.isEmpty() ? Optional.of(m_bucketName) : bucketName;
+
+            // Byte dizisinden ByteArrayInputStream oluşturma
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(fileBytes);
+
+            // Amazon S3'ye dosyayı yükleme işlemi
+            m_s3Client.putObject(new PutObjectRequest(bucketName.get(), fileName, inputStream, null)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+
+            // Yükleme işlemi başarılı olursa dosyanın URL'sini döndürme
+            return "https://" + m_bucketName + ".s3.amazonaws.com/" + fileName;
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return "File upload failed: " + e.getMessage();
+        }
+    }
+
 
     /**
      * Uploads a file to Amazon S3 using MultipartFile and deletes any existing files with similar names.

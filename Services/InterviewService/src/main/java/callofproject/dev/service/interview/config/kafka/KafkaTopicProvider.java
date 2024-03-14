@@ -20,11 +20,6 @@ public class KafkaTopicProvider
     {
     }
 
-    /**
-     * Create a new Kafka topic.
-     *
-     * @return The newly created Kafka notification topic.
-     */
     @Bean("notificationTopic")
     public NewTopic provideNotificationTopic()
     {

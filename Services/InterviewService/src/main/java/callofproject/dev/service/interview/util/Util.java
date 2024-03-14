@@ -24,7 +24,8 @@ public final class Util
             reader.close();
 
             return templateContent;
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             System.err.println("Error reading email template");
         }

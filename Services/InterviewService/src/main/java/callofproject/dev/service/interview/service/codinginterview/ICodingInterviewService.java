@@ -29,14 +29,13 @@ public interface ICodingInterviewService
 
     ResponseMessage<Object> submitInterview(UUID userId, UUID codeInterviewId, MultipartFile file);
 
+    ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId);
+
+    ResponseMessage<Object> acceptInterview(UUID id, boolean isAccepted);
 
     MultipleResponseMessage<Object> getParticipants(UUID codeInterviewId);
 
     MultipleResponseMessage<Object> getParticipantsByProjectId(UUID projectId);
 
     MultipleResponseMessage<Object> findUserInterviewInformation(UUID userId);
-
-    ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId);
-
-    ResponseMessage<Object> acceptInterview(UUID id, boolean isAccepted);
 }

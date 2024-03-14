@@ -20,6 +20,14 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.MAPPER_CONFIG_BEAN;
@@ -298,39 +306,82 @@ public class UserManagementService
      */
     private ResponseMessage<Object> upsertUserProfileCallback(UserProfileUpdateDTO dto, MultipartFile profilePhoto, MultipartFile cvFile)
     {
-        var user = getUserIfExists(dto.userId());
+        var user = getUserIfExists(UUID.fromString(dto.userId()));
 
-        var userProfile = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(dto.userId());
+        var userProfile = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(user.getUserId());
 
         if (userProfile.isEmpty())
             throw new DataServiceException("User profile does not exists!");
+        if (profilePhoto != null)
+            compressImageToJPEG(profilePhoto);
 
-        var profilePhotoUrl = uploadProfilePhoto(profilePhoto, userProfile.get(), user);
-        var cvUrl = uploadCV(cvFile, userProfile.get(), user);
+        var compressedPhoto = profilePhoto != null && profilePhoto.getSize() > 0 ? compressImageToJPEG(profilePhoto) : null;
+        var cvUrl = cvFile != null && cvFile.getSize() > 0 ? uploadCV(cvFile, userProfile.get(), user) : null;
 
+        var profilePhotoUrl = compressedPhoto != null ? uploadProfilePhoto(compressedPhoto, userProfile.get(), user) : null;
+
+        if (profilePhotoUrl != null)
+            userProfile.get().setProfilePhoto(profilePhotoUrl);
+
+        if (cvUrl != null)
+            userProfile.get().setCv(cvUrl);
         userProfile.get().setAboutMe(dto.aboutMe());
-        userProfile.get().setProfilePhoto(profilePhotoUrl);
-        userProfile.get().setCv(cvUrl);
+        userProfile.get().setUserRate(dto.userRate());
+        userProfile.get().setUserFeedbackRate(dto.userFeedbackRate());
 
         m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile.get());
 
         return new ResponseMessage<>("User profile updated successfully!", 200, getUserProfile(user));
     }
 
-    private String uploadProfilePhoto(MultipartFile profilePhoto, UserProfile userProfile, User user)
+    public byte[] compressImageToJPEG(MultipartFile file)
     {
-        var fileNameSplit = Objects.requireNonNull(profilePhoto.getOriginalFilename()).split("\\.");
-        var extension = fileNameSplit[fileNameSplit.length - 1];
-        var fileName = "pp_" + user.getUserId() + "_" + userProfile.getUserProfileId() + "." + extension;
+        try
+        {
+            BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
-        return m_storageService.uploadToS3WithMultiPartFileV2(profilePhoto, fileName, Optional.empty());
+            // Create a BufferedImage with RGB color space for compatibility with JPEG
+            BufferedImage rgbImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+            rgbImage.createGraphics().drawImage(originalImage, 0, 0, null);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            // Create JPEG writer with specified quality
+            ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+            ImageWriteParam param = writer.getDefaultWriteParam();
+            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            param.setCompressionQuality(0.5f); // You can adjust the compression quality here
+
+            // Write the compressed image to the output stream
+            writer.setOutput(new MemoryCacheImageOutputStream(outputStream));
+            writer.write(null, new IIOImage(rgbImage, null, null), param);
+
+            // Encode the output stream to base64 or return byte array
+            byte[] compressedBytes = outputStream.toByteArray();
+
+            // Close writer and output stream
+            writer.dispose();
+            outputStream.close();
+
+            return compressedBytes;
+        } catch (IOException e)
+        {
+            throw new DataServiceException("Error occurred while compressing image!", e);
+        }
+    }
+
+
+    private String uploadProfilePhoto(byte[] profilePhoto, UserProfile userProfile, User user)
+    {
+        var fileName = "pp_" + user.getUserId() + "_" + userProfile.getUserProfileId() + "_" + System.currentTimeMillis() + ".jpg";
+        return m_storageService.uploadToS3WithByteArray(profilePhoto, fileName, Optional.empty());
     }
 
     private String uploadCV(MultipartFile cv, UserProfile userProfile, User user)
     {
         var fileNameSplit = Objects.requireNonNull(cv.getOriginalFilename()).split("\\.");
         var extension = fileNameSplit[fileNameSplit.length - 1];
-        var fileName = "pp_" + user.getUserId() + "_" + userProfile.getUserProfileId() + "." + extension;
+        var fileName = "cv_" + user.getUserId() + "_" + userProfile.getUserProfileId() + "_" + System.currentTimeMillis() + "." + extension;
 
         return m_storageService.uploadToS3WithMultiPartFileV2(cv, fileName, Optional.of("callofproject-cv"));
     }

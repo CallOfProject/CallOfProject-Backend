@@ -2,11 +2,6 @@ package callofproject.dev.service.interview.service.management;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.ResponseMessage;
-import callofproject.dev.data.interview.entity.TestInterview;
-import callofproject.dev.data.interview.entity.UserTestInterviews;
-import callofproject.dev.service.interview.dto.ProjectDTO;
-import callofproject.dev.service.interview.dto.UserTestInterviewDTO;
-import callofproject.dev.service.interview.dto.test.TestInterviewDTO;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -41,11 +36,5 @@ public class InterviewManagementService implements IInterviewManagementService
     public ResponseMessage<Object> findTestInterviewOwner(UUID interviewId)
     {
         return doForDataService(() -> m_managementCallbackService.findTestInterviewOwner(interviewId), "InterviewManagementService.findTestInterviewOwner");
-    }
-
-    @Override
-    public UserTestInterviewDTO toUserTestInterviewDTO(UserTestInterviews uti, TestInterview testInterview, ProjectDTO projectDTO, TestInterviewDTO testInterviewDTO)
-    {
-        return doForDataService(() -> m_managementCallbackService.toUserTestInterviewDTO(uti, testInterview, projectDTO, testInterviewDTO), "InterviewManagementService.toUserTestInterviewDTO");
     }
 }

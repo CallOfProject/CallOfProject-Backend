@@ -4,6 +4,7 @@ import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.data.project.entity.ProjectParticipant;
 import callofproject.dev.data.project.entity.User;
 import callofproject.dev.nosql.entity.ProjectTag;
+import callofproject.dev.project.dto.ProjectAdminDTO;
 import callofproject.dev.project.dto.ProjectsParticipantDTO;
 import callofproject.dev.project.dto.detail.ProjectDetailDTO;
 import callofproject.dev.project.dto.detail.ProjectsDetailDTO;
@@ -134,4 +135,16 @@ public interface IProjectMapper
             @Mapping(source = "projectsParticipantDTO.projectParticipants", target = "projectParticipants"),
     })
     ProjectOwnerViewDTO toProjectOwnerViewDTO(Project project, List<ProjectTag> projectTags, ProjectsParticipantDTO projectsParticipantDTO);
+
+
+    /**
+     * Maps from Project entity to ProjectAdminDTO.
+     *
+     * @param project The Project entity to be mapped.
+     * @return The mapped ProjectAdminDTO.
+     */
+    @Mapping(source = "project.projectOwner.username", target = "projectOwnerUsername")
+    @Mapping(target = "currentParticipants", expression = "java(project.getProjectParticipants().size())")
+    @Mapping(target = "maxParticipants", source = "project.maxParticipant")
+    ProjectAdminDTO toProjectAdminDTO(Project project);
 }

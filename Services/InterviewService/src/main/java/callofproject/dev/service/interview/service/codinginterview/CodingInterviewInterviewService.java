@@ -6,10 +6,8 @@ import callofproject.dev.data.common.dsa.Pair;
 import callofproject.dev.data.common.dto.EmailTopic;
 import callofproject.dev.data.common.enums.EmailType;
 import callofproject.dev.data.common.status.Status;
-import callofproject.dev.data.interview.entity.User;
 import callofproject.dev.service.interview.config.kafka.KafkaProducer;
 import callofproject.dev.service.interview.dto.InterviewResultDTO;
-import callofproject.dev.service.interview.dto.UserDTO;
 import callofproject.dev.service.interview.dto.UserEmailDTO;
 import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
@@ -25,6 +23,7 @@ import static callofproject.dev.library.exception.util.CopDataUtil.doForDataServ
 
 @Service
 @Lazy
+@SuppressWarnings("unchecked")
 public class CodingInterviewInterviewService implements ICodingInterviewService
 {
     private final CodingInterviewCallbackService m_callbackService;
@@ -34,6 +33,42 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
     {
         m_callbackService = callbackService;
         m_kafkaProducer = kafkaProducer;
+    }
+
+    @Override
+    public ResponseMessage<Object> addParticipant(UUID codeInterviewId, UUID userId)
+    {
+        var result = doForDataService(() -> m_callbackService.addParticipant(codeInterviewId, userId), "CodingInterviewService::addParticipant");
+
+        if (result.getStatusCode() == Status.OK)
+            m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.ASSIGNED);
+
+        return result;
+    }
+
+    @Override
+    public ResponseMessage<Object> addParticipantByProjectId(UUID projectId, UUID userId)
+    {
+        var result = doForDataService(() -> m_callbackService.addParticipantByProjectId(projectId, userId), "CodingInterviewService::addParticipantByProjectId");
+
+        if (result.getStatusCode() == Status.OK)
+            m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.ASSIGNED);
+
+        return result;
+    }
+
+    @Override
+    public ResponseMessage<Object> acceptInterview(UUID id, boolean isAccepted)
+    {
+        var result = doForDataService(() -> m_callbackService.acceptInterview(id, isAccepted), "CodingInterviewService::acceptInterview");
+
+        if (result.getStatusCode() == Status.OK)
+        {
+            var dto = (InterviewResultDTO) result.getObject();
+            m_kafkaProducer.sendEmail(new EmailTopic(EmailType.PROJECT_INVITATION, dto.email(), "Interview Feedback", dto.message(), null));
+        }
+
+        return result;
     }
 
     @Override
@@ -74,88 +109,15 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
     }
 
     @Override
-    public ResponseMessage<Object> addParticipant(UUID codeInterviewId, UUID userId)
-    {
-        var result = doForDataService(() -> m_callbackService.addParticipant(codeInterviewId, userId), "CodingInterviewService::addParticipant");
-
-        if (result.getStatusCode() == Status.OK)
-            m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.ASSIGNED);
-
-        return result;
-    }
-
-    @Override
-    public ResponseMessage<Object> addParticipantByProjectId(UUID projectId, UUID userId)
-    {
-        var result = doForDataService(() -> m_callbackService.addParticipantByProjectId(projectId, userId), "CodingInterviewService::addParticipantByProjectId");
-
-        if (result.getStatusCode() == Status.OK)
-            m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.ASSIGNED);
-
-        return result;
-    }
-
-    @Override
-    public ResponseMessage<Object> removeParticipant(UUID codeInterviewId, UUID userId)
-    {
-        var result = doForDataService(() -> m_callbackService.removeParticipant(codeInterviewId, userId),
-                "CodingInterviewService::removeParticipant");
-
-        if (result.getStatusCode() == Status.OK)
-            m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.CANCELLED);
-
-
-        return result;
-    }
-
-    @Override
-    public ResponseMessage<Object> removeParticipantByProjectId(UUID projectId, UUID userId)
-    {
-        var result = doForDataService(() -> m_callbackService.removeParticipantByProjectId(projectId, userId),
-                "CodingInterviewService::removeParticipantByProjectId");
-
-        if (result.getStatusCode() == Status.OK)
-            m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.CANCELLED);
-
-        return result;
-    }
-
-    @Override
-    public MultipleResponseMessage<Object> getParticipants(UUID codeInterviewId)
-    {
-        return doForDataService(() -> m_callbackService.getParticipants(codeInterviewId), "CodingInterviewService::getParticipants");
-    }
-
-    @Override
-    public MultipleResponseMessage<Object> getParticipantsByProjectId(UUID projectId)
-    {
-        return doForDataService(() -> m_callbackService.getParticipantsByProjectId(projectId), "CodingInterviewService::getParticipantsByProjectId");
-    }
-
-    @Override
     public MultipleResponseMessage<Object> findUserInterviewInformation(UUID userId)
     {
         return doForDataService(() -> m_callbackService.findUserInterviewInformation(userId), "CodingInterviewService::findUserInterviewInformation");
     }
 
     @Override
-    public ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId)
+    public MultipleResponseMessage<Object> getParticipants(UUID codeInterviewId)
     {
-        return doForDataService(() -> m_callbackService.isUserSolvedBefore(userId, interviewId), "CodingInterviewService::isUserSolvedBefore");
-    }
-
-    @Override
-    public ResponseMessage<Object> acceptInterview(UUID id, boolean isAccepted)
-    {
-        var result = doForDataService(() -> m_callbackService.acceptInterview(id, isAccepted), "CodingInterviewService::acceptInterview");
-
-        if (result.getStatusCode() == Status.OK)
-        {
-            var dto = (InterviewResultDTO) result.getObject();
-            m_kafkaProducer.sendEmail(new EmailTopic(EmailType.PROJECT_INVITATION, dto.email(), "Interview Feedback", dto.message(), null));
-        }
-
-        return result;
+        return doForDataService(() -> m_callbackService.getParticipants(codeInterviewId), "CodingInterviewService::getParticipants");
     }
 
     @Override
@@ -168,6 +130,40 @@ public class CodingInterviewInterviewService implements ICodingInterviewService
     public ResponseMessage<Object> getInterview(UUID codeInterviewId)
     {
         return doForDataService(() -> m_callbackService.getInterview(codeInterviewId), "CodingInterviewService::getInterview");
+    }
+
+    @Override
+    public MultipleResponseMessage<Object> getParticipantsByProjectId(UUID projectId)
+    {
+        return doForDataService(() -> m_callbackService.getParticipantsByProjectId(projectId), "CodingInterviewService::getParticipantsByProjectId");
+    }
+
+    @Override
+    public ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId)
+    {
+        return doForDataService(() -> m_callbackService.isUserSolvedBefore(userId, interviewId), "CodingInterviewService::isUserSolvedBefore");
+    }
+
+    @Override
+    public ResponseMessage<Object> removeParticipant(UUID codeInterviewId, UUID userId)
+    {
+        var result = doForDataService(() -> m_callbackService.removeParticipant(codeInterviewId, userId), "CodingInterviewService::removeParticipant");
+
+        if (result.getStatusCode() == Status.OK)
+            m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.CANCELLED);
+
+        return result;
+    }
+
+    @Override
+    public ResponseMessage<Object> removeParticipantByProjectId(UUID projectId, UUID userId)
+    {
+        var result = doForDataService(() -> m_callbackService.removeParticipantByProjectId(projectId, userId), "CodingInterviewService::removeParticipantByProjectId");
+
+        if (result.getStatusCode() == Status.OK)
+            m_callbackService.sendNotification((CodingInterviewDTO) result.getObject(), EInterviewStatus.CANCELLED);
+
+        return result;
     }
 
     @Override

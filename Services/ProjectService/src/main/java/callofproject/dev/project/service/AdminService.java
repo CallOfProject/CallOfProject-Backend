@@ -7,14 +7,25 @@ import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.nosql.dal.ProjectTagServiceHelper;
+import callofproject.dev.project.dto.ProjectAdminDTO;
 import callofproject.dev.project.dto.ProjectsParticipantDTO;
 import callofproject.dev.project.dto.detail.ProjectDetailDTO;
 import callofproject.dev.project.mapper.IProjectMapper;
 import callofproject.dev.project.mapper.IProjectParticipantMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
@@ -34,6 +45,7 @@ public class AdminService implements IAdminService
     private final ProjectTagServiceHelper m_projectTagServiceHelper;
     private final IProjectParticipantMapper m_participantMapper;
     private final IProjectMapper m_projectMapper;
+    private final S3Service m_storageService;
 
     /**
      * Constructor for the AdminService class.
@@ -45,13 +57,14 @@ public class AdminService implements IAdminService
      * @param participantMapper       The IProjectParticipantMapper object to be injected.
      * @param projectMapper           The IProjectMapper object to be injected.
      */
-    public AdminService(ProjectServiceHelper projectServiceHelper, ProjectTagServiceHelper tagServiceHelper, ProjectTagServiceHelper projectTagServiceHelper, IProjectParticipantMapper participantMapper, IProjectMapper projectMapper)
+    public AdminService(ProjectServiceHelper projectServiceHelper, ProjectTagServiceHelper tagServiceHelper, ProjectTagServiceHelper projectTagServiceHelper, IProjectParticipantMapper participantMapper, IProjectMapper projectMapper, S3Service storageService)
     {
         m_projectServiceHelper = projectServiceHelper;
         m_tagServiceHelper = tagServiceHelper;
         m_projectTagServiceHelper = projectTagServiceHelper;
         m_participantMapper = participantMapper;
         m_projectMapper = projectMapper;
+        m_storageService = storageService;
     }
 
     /**
@@ -96,6 +109,100 @@ public class AdminService implements IAdminService
     public MultipleResponseMessagePageable<Object> findAll(int page)
     {
         return doForDataService(() -> findAllCallback(page), "ProjectService::findAll");
+    }
+
+    @Override
+    public MultipleResponseMessagePageable<Object> findAllProjectsByPage(int page)
+    {
+        return doForDataService(() -> findAllProjectsByPageCallback(page), "ProjectService::findAll");
+    }
+
+    @Override
+    public ResponseMessage<Object> updateProject(ProjectAdminDTO dto, MultipartFile file)
+    {
+        var project = findProjectIfExistsByProjectId(dto.projectId());
+
+
+        var compressedPhoto = file != null ? compressImageToJPEG(file) : null;
+
+        var profilePhotoUrl = compressedPhoto != null ? uploadProfilePhoto(compressedPhoto, project, dto.projectOwnerUsername()) : null;
+
+        if (profilePhotoUrl != null)
+            project.setProjectImagePath(profilePhotoUrl);
+
+        project.setProjectName(dto.projectName());
+        project.setProjectSummary(dto.projectSummary());
+        project.setDescription(dto.description());
+        project.setProjectAim(dto.projectAim());
+        project.setProjectStatus(dto.projectStatus());
+        project.setProjectAccessType(dto.projectAccessType());
+        project.setProfessionLevel(dto.professionLevel());
+        project.setDegree(dto.degree());
+        project.setProjectLevel(dto.projectLevel());
+        project.setStartDate(dto.startDate());
+        project.setExpectedCompletionDate(dto.expectedCompletionDate());
+        project.setApplicationDeadline(dto.applicationDeadline());
+        project.setCompletionDate(dto.completionDate());
+        project.setMaxParticipant(dto.maxParticipants());
+        m_projectServiceHelper.saveProject(project);
+
+        return new ResponseMessage<>("Project is updated!", Status.OK, profilePhotoUrl);
+    }
+
+    private String uploadProfilePhoto(byte[] profilePhoto, Project project, String username)
+    {
+        var fileName = "pp_" + username + "_" + project.getProjectId() + "_" + System.currentTimeMillis() + ".jpg";
+        return m_storageService.uploadToS3WithByteArray(profilePhoto, fileName, Optional.empty());
+    }
+
+    public byte[] compressImageToJPEG(MultipartFile file)
+    {
+        try
+        {
+            BufferedImage originalImage = ImageIO.read(file.getInputStream());
+
+            // Create a BufferedImage with RGB color space for compatibility with JPEG
+            BufferedImage rgbImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+            rgbImage.createGraphics().drawImage(originalImage, 0, 0, null);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            // Create JPEG writer with specified quality
+            ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+            ImageWriteParam param = writer.getDefaultWriteParam();
+            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            param.setCompressionQuality(0.5f); // You can adjust the compression quality here
+
+            // Write the compressed image to the output stream
+            writer.setOutput(new MemoryCacheImageOutputStream(outputStream));
+            writer.write(null, new IIOImage(rgbImage, null, null), param);
+
+            // Encode the output stream to base64 or return byte array
+            byte[] compressedBytes = outputStream.toByteArray();
+
+            // Close writer and output stream
+            writer.dispose();
+            outputStream.close();
+
+            return compressedBytes;
+        } catch (IOException e)
+        {
+            throw new DataServiceException("Error occurred while compressing image!", e);
+        }
+    }
+
+    private MultipleResponseMessagePageable<Object> findAllProjectsByPageCallback(int page)
+    {
+        var projectPageable = m_projectServiceHelper.findAllProjectsPageable(page);
+        var projects = toStreamConcurrent(projectPageable).toList();
+        var totalPage = projectPageable.getTotalPages();
+
+        if (projects.isEmpty())
+            return new MultipleResponseMessagePageable<>(totalPage, page, 0, "Projects not found!", null);
+
+        var projectsAdminDTO = projects.stream().map(m_projectMapper::toProjectAdminDTO).toList();
+
+        return new MultipleResponseMessagePageable<>(totalPage, page, projectsAdminDTO.size(), "Projects found!", projectsAdminDTO);
     }
 
 
@@ -162,4 +269,5 @@ public class AdminService implements IAdminService
 
         return project.get();
     }
+
 }

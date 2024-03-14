@@ -2,16 +2,28 @@ package callofproject.dev.authentication.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.UUID;
-
 /**
  * Data Transfer Object for updating a user profile.
  */
 public record UserProfileUpdateDTO(
-        @JsonProperty("updated_user_id")
-        UUID userId,
+        @JsonProperty("user_rate")
+        double userRate,
+        @JsonProperty("user_feedback_rate")
+        double userFeedbackRate,
+        @JsonProperty("user_id")
+        String userId,
         @JsonProperty("about_me")
         String aboutMe)
 {
 
+        @Override
+        public String toString()
+        {
+                return "UserProfileUpdateDTO{" +
+                        "userRate=" + userRate +
+                        ", userFeedbackRate=" + userFeedbackRate +
+                        ", userId=" + userId +
+                        ", aboutMe='" + aboutMe + '\'' +
+                        '}';
+        }
 }

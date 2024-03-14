@@ -9,11 +9,13 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Objects;
+import java.util.Optional;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 
@@ -94,6 +96,29 @@ public class S3Service
         fileObject.delete();
         return fileName + " upload success";
     }
+
+    public String uploadToS3WithByteArray(byte[] fileBytes, String fileName, Optional<String> bucketName)
+    {
+        try
+        {
+            bucketName = bucketName.isEmpty() ? Optional.of(m_bucketName) : bucketName;
+
+            // Byte dizisinden ByteArrayInputStream oluşturma
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(fileBytes);
+
+            // Amazon S3'ye dosyayı yükleme işlemi
+            m_s3Client.putObject(new PutObjectRequest(bucketName.get(), fileName, inputStream, null)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+
+            // Yükleme işlemi başarılı olursa dosyanın URL'sini döndürme
+            return "https://" + m_bucketName + ".s3.amazonaws.com/" + fileName;
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return "File upload failed: " + e.getMessage();
+        }
+    }
+
 
     /**
      * Uploads a file to Amazon S3 using a File object.

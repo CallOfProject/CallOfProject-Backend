@@ -104,13 +104,8 @@ public class InterviewManagementCallbackService
     private QuestionAnswerDTO toQuestionAnswerDTO(UUID userId, UUID interviewId, QuestionAnswer qa, List<TestInterviewQuestion> questions)
     {
         var q = getQuestion(questions, qa.getQuestionId());
-        return new QuestionAnswerDTO(userId, interviewId, qa.getQuestionId(), q.getQuestion(), qa.getAnswer(),
-                q.getOption1(),
-                q.getOption2(),
-                q.getOption3(),
-                q.getOption4(),
-                q.getAnswer()
-        );
+        return new QuestionAnswerDTO(userId, interviewId, qa.getQuestionId(), q.getQuestion(), qa.getAnswer(), q.getOption1(),
+                q.getOption2(), q.getOption3(), q.getOption4(), q.getAnswer());
     }
 
     public UserTestInterviewDTO toUserTestInterviewDTO(UserTestInterviews uti, TestInterview testInterview, ProjectDTO projectDTO, TestInterviewDTO testInterviewDTO)

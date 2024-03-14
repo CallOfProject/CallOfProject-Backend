@@ -4,6 +4,8 @@ import callofproject.dev.authentication.dto.UserProfileUpdateDTO;
 import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.authentication.service.UserManagementService;
 import callofproject.dev.data.common.clas.ErrorMessage;
+import callofproject.dev.library.exception.util.CopDataUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +29,7 @@ import static org.springframework.http.ResponseEntity.ok;
 public class UserManagementController
 {
     private final UserManagementService m_service;
-
+    private final ObjectMapper m_objectMapper;
 
     /**
      * Constructor for the UserManagementController class.
@@ -35,9 +37,10 @@ public class UserManagementController
      *
      * @param service The UserManagementService object to be injected.
      */
-    public UserManagementController(UserManagementService service)
+    public UserManagementController(UserManagementService service, ObjectMapper objectMapper)
     {
         m_service = service;
+        m_objectMapper = objectMapper;
     }
 
     /**
@@ -84,15 +87,16 @@ public class UserManagementController
     /**
      * Find user with given id
      *
-     * @param dto is update user profile dto
      * @return UserDTO wrapped in MessageResponseDTO
      */
     @PostMapping(value = "update/user/profile")
-    public ResponseEntity<Object> updateUserProfile(@RequestParam("user_id") String userId, @RequestParam("about_me") String aboutMe,
+    public ResponseEntity<Object> updateUserProfile(@RequestParam("dto") String dto,
                                                     @RequestParam(value = "photo", required = false) MultipartFile photo,
                                                     @RequestParam(value = "cv", required = false) MultipartFile cv)
     {
-        return subscribe(() -> ok(m_service.upsertUserProfile(new UserProfileUpdateDTO(UUID.fromString(userId), aboutMe), photo, cv)),
+        var obj = CopDataUtil.doForDataService(() -> m_objectMapper.readValue(dto, UserProfileUpdateDTO.class), "ProjectSaveDTO");
+
+        return subscribe(() -> ok(m_service.upsertUserProfile(obj, photo, cv)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 

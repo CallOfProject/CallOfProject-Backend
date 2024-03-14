@@ -1,6 +1,5 @@
 package callofproject.dev.service.interview.controller;
 
-import callofproject.dev.service.interview.dto.test.CreateQuestionDTO;
 import callofproject.dev.service.interview.dto.test.CreateTestDTO;
 import callofproject.dev.service.interview.dto.test.QuestionAnswerDTO;
 import callofproject.dev.service.interview.dto.test.TestInterviewFinishDTO;
@@ -41,13 +40,6 @@ public class TestInterviewController
     public ResponseEntity<Object> submitAnswer(@RequestBody QuestionAnswerDTO dto)
     {
         return subscribe(() -> ok(m_testInterviewService.submitAnswer(dto)), ex -> internalServerError().body(ex.getMessage()));
-    }
-
-
-    @PostMapping("add/question")
-    public ResponseEntity<?> addQuestion(@RequestBody CreateQuestionDTO createQuestionDTO)
-    {
-        return subscribe(() -> ok(m_testInterviewService.addQuestion(createQuestionDTO)), ex -> internalServerError().body(ex.getMessage()));
     }
 
     @DeleteMapping("/delete")

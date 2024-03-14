@@ -31,51 +31,28 @@ public class KafkaConsumer
     }
 
 
-    /**
-     * Listens to the specified Kafka topic and processes UserDTO messages.
-     *
-     * @param dto The UserDTO message received from Kafka.
-     */
-    @KafkaListener(
-            topics = "${spring.kafka.user-topic-name}",
-            groupId = "${spring.kafka.consumer.user-group-id}",
-            containerFactory = "configUserKafkaListener"
-    )
+    @KafkaListener(topics = "${spring.kafka.user-topic-name}", groupId = "${spring.kafka.consumer.user-group-id}", containerFactory = "configUserKafkaListener")
     public void consumeAuthenticationTopic(UserKafkaDTO dto)
     {
         m_serviceHelper.saveUser(m_userMapper.toUser(dto));
     }
 
 
-    @KafkaListener(
-            topics = "${spring.kafka.project-info-topic-name}",
-            groupId = "${spring.kafka.consumer.project-info-group-id}",
-            containerFactory = "configProjectInfoKafkaListener"
-    )
+    @KafkaListener(topics = "${spring.kafka.project-info-topic-name}", groupId = "${spring.kafka.consumer.project-info-group-id}", containerFactory = "configProjectInfoKafkaListener")
     public void consumeProjectInfo(ProjectInfoKafkaDTO projectDTO)
     {
         var owner = m_serviceHelper.findUserById(projectDTO.projectOwner().userId());
         var project = new Project(projectDTO.projectId(), projectDTO.projectName(), owner.get());
-        //var savedProject = m_projectRepository.save(project);
         var participants = projectDTO.projectParticipants().stream().map(pp -> toProjectParticipant(pp, project)).collect(Collectors.toSet());
+
         project.setProjectParticipants(participants);
         project.setProjectStatus(projectDTO.projectStatus());
         project.setAdminOperationStatus(AdminOperationStatus.valueOf(projectDTO.adminOperationStatus().name()));
         m_serviceHelper.createProject(project);
     }
 
-    private ProjectParticipant toProjectParticipant(ProjectParticipantKafkaDTO participant, Project project)
-    {
-        var user = m_serviceHelper.findUserById(participant.userId());
-        return new ProjectParticipant(project, user.get());
-    }
 
-
-    @KafkaListener(
-            topics = "${spring.kafka.project-participant-topic-name}",
-            groupId = "${spring.kafka.consumer.project-participant-group-id}",
-            containerFactory = "configProjectParticipantKafkaListener"
-    )
+    @KafkaListener(topics = "${spring.kafka.project-participant-topic-name}", groupId = "${spring.kafka.consumer.project-participant-group-id}", containerFactory = "configProjectParticipantKafkaListener")
     @Transactional
     public void consumeProjectParticipant(ProjectParticipantKafkaDTO dto)
     {
@@ -107,5 +84,10 @@ public class KafkaConsumer
     {
         var participant = new ProjectParticipant(dto.projectParticipantId(), project, user, dto.joinDate());
         m_serviceHelper.createProjectParticipant(participant);
+    }
+
+    private ProjectParticipant toProjectParticipant(ProjectParticipantKafkaDTO participant, Project project)
+    {
+        return new ProjectParticipant(project, m_serviceHelper.findUserById(participant.userId()).get());
     }
 }

@@ -14,8 +14,10 @@ import callofproject.dev.service.interview.config.kafka.KafkaProducer;
 import callofproject.dev.service.interview.dto.InterviewResultDTO;
 import callofproject.dev.service.interview.dto.NotificationKafkaDTO;
 import callofproject.dev.service.interview.dto.UserEmailDTO;
-import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
-import callofproject.dev.service.interview.dto.test.*;
+import callofproject.dev.service.interview.dto.test.CreateTestDTO;
+import callofproject.dev.service.interview.dto.test.QuestionAnswerDTO;
+import callofproject.dev.service.interview.dto.test.TestInterviewDTO;
+import callofproject.dev.service.interview.dto.test.TestInterviewFinishDTO;
 import callofproject.dev.service.interview.service.EInterviewStatus;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ import static callofproject.dev.library.exception.util.CopDataUtil.doForDataServ
 
 @Service
 @Lazy
+@SuppressWarnings("unchecked")
 public class TestInterviewService implements ITestInterviewService
 {
     private final TestInterviewCallbackService m_callbackService;
@@ -54,19 +57,13 @@ public class TestInterviewService implements ITestInterviewService
     }
 
     @Override
-    public ResponseMessage<Object> addQuestion(CreateQuestionDTO createQuestionDTO)
-    {
-        return doForDataService(() -> m_callbackService.addQuestion(createQuestionDTO), "TestInterviewService::addQuestion");
-    }
-
-    @Override
     public ResponseMessage<Object> deleteTestInterview(UUID interviewId)
     {
         var testInterview = doForDataService(() -> m_callbackService.deleteTestInterview(interviewId),
                 "TestInterviewService::deleteTestInterview");
 
         if (testInterview.getStatusCode() == Status.OK)
-            sendNotification((TestInterviewDTO) testInterview.getObject(), "Test Interview Deleted");
+            sendNotification((TestInterviewDTO) testInterview.getObject());
 
         return testInterview;
     }
@@ -78,7 +75,7 @@ public class TestInterviewService implements ITestInterviewService
                 "TestInterviewService::deleteTestInterviewByProjectId");
 
         if (testInterview.getStatusCode() == Status.OK)
-            sendNotification((TestInterviewDTO) testInterview.getObject(), "Test Interview Deleted");
+            sendNotification((TestInterviewDTO) testInterview.getObject());
 
         return testInterview;
     }
@@ -172,27 +169,26 @@ public class TestInterviewService implements ITestInterviewService
     }
 
 
-    private void sendNotification(TestInterviewDTO dto, String title)
+    private void sendNotification(TestInterviewDTO dto)
     {
         var ownerId = dto.projectDTO().projectId();
         var userTestInterviews = m_callbackService.findInterviewIfExistsById(UUID.fromString(dto.id()));
         var participants = userTestInterviews.getTestInterviews().stream().map(UserTestInterviews::getUser).map(User::getUserId).toList();
-        var message = "Test Interview " + title + " has been created for project " + dto.projectDTO().projectName();
-        participants.forEach(participant -> sendNotification(ownerId, participant, message, title));
+        var message = "Test Interview Deleted" + " has been created for project " + dto.projectDTO().projectName();
+        participants.forEach(participant -> sendNotification(ownerId, participant, message));
     }
 
-    private void sendNotification(UUID fromUserId, UUID toUserId, String message, String title)
+    private void sendNotification(UUID fromUserId, UUID toUserId, String message)
     {
         var dto = new NotificationKafkaDTO.Builder()
                 .setFromUserId(fromUserId)
                 .setToUserId(toUserId)
                 .setMessage(message)
-                .setNotificationTitle(title)
+                .setNotificationTitle("Test Interview Deleted")
                 .setNotificationType(NotificationType.INFORMATION)
                 .setNotificationDataType(NotificationDataType.INTERVIEW)
                 .build();
 
         m_kafkaProducer.sendNotification(dto);
     }
-
 }

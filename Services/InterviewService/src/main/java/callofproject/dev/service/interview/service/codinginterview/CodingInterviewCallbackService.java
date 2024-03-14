@@ -326,7 +326,6 @@ public class CodingInterviewCallbackService
 
     public void sendNotification(CodingInterviewDTO object, EInterviewStatus status)
     {
-        //var interview = findInterviewIfExistsById(object.codingInterviewId());
         var project = findProjectIfExistsById(object.projectDTO().projectId());
 
 

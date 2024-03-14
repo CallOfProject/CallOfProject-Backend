@@ -16,7 +16,6 @@ import callofproject.dev.service.interview.config.kafka.KafkaProducer;
 import callofproject.dev.service.interview.dto.InterviewResultDTO;
 import callofproject.dev.service.interview.dto.NotificationKafkaDTO;
 import callofproject.dev.service.interview.dto.UserEmailDTO;
-import callofproject.dev.service.interview.dto.coding.CodingInterviewDTO;
 import callofproject.dev.service.interview.dto.test.*;
 import callofproject.dev.service.interview.mapper.IProjectMapper;
 import callofproject.dev.service.interview.mapper.ITestInterviewMapper;
@@ -42,6 +41,7 @@ import static java.util.stream.StreamSupport.stream;
 
 @Service
 @Lazy
+@SuppressWarnings("all")
 public class TestInterviewCallbackService
 {
     private final InterviewServiceHelper m_interviewServiceHelper;
@@ -107,7 +107,6 @@ public class TestInterviewCallbackService
 
     public void sendNotification(TestInterviewDTO object, EInterviewStatus status)
     {
-        //var interview = findInterviewIfExistsById(object.codingInterviewId());
         var project = findProjectIfExistsById(object.projectDTO().projectId());
 
 
@@ -157,40 +156,6 @@ public class TestInterviewCallbackService
 
         var topic = new EmailTopic(EmailType.ASSIGN_INTERVIEW, email, title, msg, null);
         m_kafkaProducer.sendEmail(topic);
-    }
-
-    public ResponseMessage<Object> addQuestion(CreateQuestionDTO createQuestionDTO)
-    {
-      /*  var interview = findInterviewIfExistsById(createQuestionDTO.interviewId());
-        var question = m_testInterviewQuestionMapper.toTestInterviewQuestion(createQuestionDTO);
-        question.setTestInterview(interview);
-        var savedQuestion = m_interviewServiceHelper.saveQuestion(question);
-
-        return new ResponseMessage<>("Question added successfully", Status.CREATED, savedQuestion);*/
-
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    public ResponseMessage<Object> assignTestInterview(UUID interviewId, UUID userId)
-    {
-        var interview = findInterviewIfExistsById(interviewId);
-        var user = findUserIfExistsById(userId);
-
-        // user.addTestInterview(interview);
-        m_interviewServiceHelper.saveUser(user);
-
-        return new ResponseMessage<>("Test interview assigned successfully", Status.OK, true);
-    }
-
-    public ResponseMessage<Object> assignMultipleTestInterview(AssignMultipleInterviewDTO dto)
-    {
-        var interview = findInterviewIfExistsById(dto.interviewId());
-        var users = stream(m_interviewServiceHelper.findUsersByIds(dto.userIds()).spliterator(), false).collect(toSet());
-
-        //users.forEach(usr -> usr.addTestInterview(interview));
-        m_interviewServiceHelper.saveUsers(users);
-
-        return new ResponseMessage<>("Test interview assigned successfully", Status.OK, true);
     }
 
     public ResponseMessage<Object> deleteTestInterview(UUID interviewId)

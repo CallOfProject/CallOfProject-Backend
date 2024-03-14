@@ -43,7 +43,9 @@ public final class Util
     public static UserProfileUpdateDTO createUserProfileUpdateDTO()
     {
         return new UserProfileUpdateDTO(
-                UUID.randomUUID(),
+                10,
+                10,
+                UUID.randomUUID().toString(),
                 "About me text"
         );
     }

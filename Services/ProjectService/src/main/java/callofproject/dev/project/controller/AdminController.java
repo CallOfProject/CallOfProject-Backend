@@ -1,10 +1,15 @@
 package callofproject.dev.project.controller;
 
 import callofproject.dev.data.common.clas.ErrorMessage;
+import callofproject.dev.data.project.entity.Project;
+import callofproject.dev.library.exception.util.CopDataUtil;
+import callofproject.dev.project.dto.ProjectAdminDTO;
 import callofproject.dev.project.service.IAdminService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -21,6 +26,7 @@ import static org.springframework.http.ResponseEntity.*;
 public class AdminController
 {
     private final IAdminService m_adminService;
+    private final ObjectMapper m_objectMapper;
 
 
     /**
@@ -28,9 +34,10 @@ public class AdminController
      *
      * @param adminService The AdminService instance used for handling administrative operations.
      */
-    public AdminController(IAdminService adminService)
+    public AdminController(IAdminService adminService, ObjectMapper objectMapper)
     {
         m_adminService = adminService;
+        m_objectMapper = objectMapper;
     }
 
     /**
@@ -58,4 +65,17 @@ public class AdminController
         return subscribe(() -> ok(m_adminService.findAll(page)), msg -> badRequest().body(msg.getMessage()));
     }
 
+
+    @GetMapping("/find/all/page")
+    public ResponseEntity<Object> findAllProjectsByPage(@RequestParam("p") int page)
+    {
+        return subscribe(() -> ok(m_adminService.findAllProjectsByPage(page)), msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<Object> updateProject(@RequestParam("dto") String dto, @RequestParam(value = "file",required = false) MultipartFile file)
+    {
+        var obj = CopDataUtil.doForDataService(() -> m_objectMapper.readValue(dto, ProjectAdminDTO.class), "ProjectSaveDTO");
+        return subscribe(() -> ok(m_adminService.updateProject(obj, file)), msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
 }
