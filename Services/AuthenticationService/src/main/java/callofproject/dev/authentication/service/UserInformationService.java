@@ -178,7 +178,7 @@ public class UserInformationService
 
         var fileNameSplit = Objects.requireNonNull(file.getOriginalFilename()).split("\\.");
         var extension = fileNameSplit[fileNameSplit.length - 1];
-        var fileName = "cv_" + userProfile.getUser().getUserId() + "_" + userProfile.getUserProfileId() + "." + extension;
+        var fileName = "pp_" + userProfile.getUser().getUserId() + "_" + userProfile.getUserProfileId() + "." + extension;
 
         var profilePhoto = m_s3Service.uploadToS3WithMultiPartFileV2(file, fileName, Optional.empty());
 

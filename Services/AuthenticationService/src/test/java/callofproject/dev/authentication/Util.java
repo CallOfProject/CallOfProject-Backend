@@ -44,8 +44,6 @@ public final class Util
     {
         return new UserProfileUpdateDTO(
                 UUID.randomUUID(),
-                "Sample CV",
-                "https://example.com/profile.jpg",
                 "About me text"
         );
     }

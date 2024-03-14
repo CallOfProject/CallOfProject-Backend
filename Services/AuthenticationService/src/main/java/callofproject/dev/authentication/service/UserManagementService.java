@@ -18,6 +18,7 @@ import callofproject.dev.service.jwt.JwtUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -130,12 +131,14 @@ public class UserManagementService
     /**
      * Update user profile with given dto class.
      *
-     * @param dto represent the dto class
+     * @param dto  represent the dto class
+     * @param file
+     * @param cv
      * @return MessageResponseDTO.
      */
-    public ResponseMessage<Object> upsertUserProfile(UserProfileUpdateDTO dto)
+    public ResponseMessage<Object> upsertUserProfile(UserProfileUpdateDTO dto, MultipartFile file, MultipartFile cv)
     {
-        return doForDataService(() -> upsertUserProfileCallback(dto), "UserManagementService::upsertUserProfile");
+        return doForDataService(() -> upsertUserProfileCallback(dto, file, cv), "UserManagementService::upsertUserProfile");
     }
 
     /**
@@ -289,10 +292,11 @@ public class UserManagementService
     /**
      * Update user profile with given dto class.
      *
-     * @param dto represent the dto class
+     * @param dto          represent the dto class
+     * @param profilePhoto
      * @return MessageResponseDTO.
      */
-    private ResponseMessage<Object> upsertUserProfileCallback(UserProfileUpdateDTO dto)
+    private ResponseMessage<Object> upsertUserProfileCallback(UserProfileUpdateDTO dto, MultipartFile profilePhoto, MultipartFile cvFile)
     {
         var user = getUserIfExists(dto.userId());
 
@@ -301,15 +305,35 @@ public class UserManagementService
         if (userProfile.isEmpty())
             throw new DataServiceException("User profile does not exists!");
 
+        var profilePhotoUrl = uploadProfilePhoto(profilePhoto, userProfile.get(), user);
+        var cvUrl = uploadCV(cvFile, userProfile.get(), user);
+
         userProfile.get().setAboutMe(dto.aboutMe());
-        userProfile.get().setCv(dto.cv());
-        userProfile.get().setProfilePhoto(dto.profilePhoto());
+        userProfile.get().setProfilePhoto(profilePhotoUrl);
+        userProfile.get().setCv(cvUrl);
 
         m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile.get());
 
         return new ResponseMessage<>("User profile updated successfully!", 200, getUserProfile(user));
     }
 
+    private String uploadProfilePhoto(MultipartFile profilePhoto, UserProfile userProfile, User user)
+    {
+        var fileNameSplit = Objects.requireNonNull(profilePhoto.getOriginalFilename()).split("\\.");
+        var extension = fileNameSplit[fileNameSplit.length - 1];
+        var fileName = "pp_" + user.getUserId() + "_" + userProfile.getUserProfileId() + "." + extension;
+
+        return m_storageService.uploadToS3WithMultiPartFileV2(profilePhoto, fileName, Optional.empty());
+    }
+
+    private String uploadCV(MultipartFile cv, UserProfile userProfile, User user)
+    {
+        var fileNameSplit = Objects.requireNonNull(cv.getOriginalFilename()).split("\\.");
+        var extension = fileNameSplit[fileNameSplit.length - 1];
+        var fileName = "pp_" + user.getUserId() + "_" + userProfile.getUserProfileId() + "." + extension;
+
+        return m_storageService.uploadToS3WithMultiPartFileV2(cv, fileName, Optional.of("callofproject-cv"));
+    }
 
     /**
      * Find user profile with given user id.

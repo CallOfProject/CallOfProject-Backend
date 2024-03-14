@@ -7,6 +7,7 @@ import callofproject.dev.data.common.clas.ErrorMessage;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -86,10 +87,12 @@ public class UserManagementController
      * @param dto is update user profile dto
      * @return UserDTO wrapped in MessageResponseDTO
      */
-    @PutMapping("update/user/profile")
-    public ResponseEntity<Object> updateUserProfile(@RequestBody UserProfileUpdateDTO dto)
+    @PostMapping(value = "update/user/profile")
+    public ResponseEntity<Object> updateUserProfile(@RequestParam("user_id") String userId, @RequestParam("about_me") String aboutMe,
+                                                    @RequestParam(value = "photo", required = false) MultipartFile photo,
+                                                    @RequestParam(value = "cv", required = false) MultipartFile cv)
     {
-        return subscribe(() -> ok(m_service.upsertUserProfile(dto)),
+        return subscribe(() -> ok(m_service.upsertUserProfile(new UserProfileUpdateDTO(UUID.fromString(userId), aboutMe), photo, cv)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 

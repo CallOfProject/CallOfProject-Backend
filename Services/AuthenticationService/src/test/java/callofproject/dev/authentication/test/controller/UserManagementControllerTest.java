@@ -80,9 +80,9 @@ public class UserManagementControllerTest
         // given
         var dto = createUserProfileUpdateDTO();
         var expectedResult = new ResponseMessage<Object>("User profile updated successfully!", 200, createUserProfile());
-        when(userManagementService.upsertUserProfile(any(UserProfileUpdateDTO.class))).thenReturn(expectedResult);
+        when(userManagementService.upsertUserProfile(any(UserProfileUpdateDTO.class), null, null)).thenReturn(expectedResult);
         // Act
-        ResponseEntity<Object> response = userManagementController.updateUserProfile(dto);
+        ResponseEntity<Object> response = userManagementController.updateUserProfile(dto.userId().toString(), dto.aboutMe(), null, null);
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -92,9 +92,9 @@ public class UserManagementControllerTest
     {
         // given
         var dto = createUserProfileUpdateDTO();
-        when(userManagementService.upsertUserProfile(any(UserProfileUpdateDTO.class))).thenThrow(new DataServiceException("Profile cannot be updated!"));
+        when(userManagementService.upsertUserProfile(any(UserProfileUpdateDTO.class), null, null)).thenThrow(new DataServiceException("Profile cannot be updated!"));
         // Act
-        ResponseEntity<Object> response = userManagementController.updateUserProfile(dto);
+        ResponseEntity<Object> response = userManagementController.updateUserProfile(dto.userId().toString(), dto.aboutMe(), null, null);
         // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
