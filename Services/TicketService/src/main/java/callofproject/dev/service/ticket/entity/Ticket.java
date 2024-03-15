@@ -1,10 +1,10 @@
 package callofproject.dev.service.ticket.entity;
 
-import callofproject.dev.data.common.enums.EOperation;
-import callofproject.dev.data.common.status.Status;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
@@ -18,28 +18,74 @@ public class Ticket
     @Id
     private String id;
     private UUID userId;
+    private UUID adminId;
+    private String adminUsername;
     private String username;
     private String title;
-    private String topic;
+    private LocalDate feedbackDeadline;
     private String description;
-    private LocalDate date;
+    private String userEmail;
+    private String answer;
+    private LocalDate answeredDate;
+    private LocalDate createdDate;
     @Enumerated(value = EnumType.STRING)
-    private EOperation status;
-
-    public Ticket(String username, UUID userId, String title, String topic, String description, EOperation status)
-    {
-        this.username = username;
-        this.userId = userId;
-        this.title = title;
-        this.topic = topic;
-        this.description = description;
-        this.date = now();
-        this.status = status;
-    }
+    private TicketStatus status;
 
     public Ticket()
     {
-        date = now();
+        this.feedbackDeadline = now().plusDays(7);
+        this.status = TicketStatus.OPEN;
+        this.createdDate = now();
+    }
+
+    public String getUserEmail()
+    {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail)
+    {
+        this.userEmail = userEmail;
+    }
+
+    public LocalDate getFeedbackDeadline()
+    {
+        return feedbackDeadline;
+    }
+
+    public void setFeedbackDeadline(LocalDate feedbackDeadline)
+    {
+        this.feedbackDeadline = feedbackDeadline;
+    }
+
+    public String getAnswer()
+    {
+        return answer;
+    }
+
+    public void setAnswer(String answer)
+    {
+        this.answer = answer;
+    }
+
+    public String getAdminUsername()
+    {
+        return adminUsername;
+    }
+
+    public void setAdminUsername(String adminUsername)
+    {
+        this.adminUsername = adminUsername;
+    }
+
+    public UUID getAdminId()
+    {
+        return adminId;
+    }
+
+    public void setAdminId(UUID adminId)
+    {
+        this.adminId = adminId;
     }
 
     public String getUsername()
@@ -82,14 +128,24 @@ public class Ticket
         this.title = title;
     }
 
-    public String getTopic()
+    public LocalDate getFeedbackDeadlineDay()
     {
-        return topic;
+        return feedbackDeadline;
     }
 
-    public void setTopic(String topic)
+    public void setFeedbackDeadlineDay(LocalDate feedbackDeadlineDay)
     {
-        this.topic = topic;
+        this.feedbackDeadline = feedbackDeadlineDay;
+    }
+
+    public LocalDate getCreatedDate()
+    {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDate createdDate)
+    {
+        this.createdDate = createdDate;
     }
 
     public String getDescription()
@@ -102,22 +158,22 @@ public class Ticket
         this.description = description;
     }
 
-    public LocalDate getDate()
+    public LocalDate getAnsweredDate()
     {
-        return date;
+        return answeredDate;
     }
 
-    public void setDate(LocalDate date)
+    public void setAnsweredDate(LocalDate answeredDate)
     {
-        this.date = date;
+        this.answeredDate = answeredDate;
     }
 
-    public EOperation getStatus()
+    public TicketStatus getStatus()
     {
         return status;
     }
 
-    public void setStatus(EOperation status)
+    public void setStatus(TicketStatus status)
     {
         this.status = status;
     }
