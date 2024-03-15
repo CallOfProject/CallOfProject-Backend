@@ -112,6 +112,7 @@ public class InterviewSchedulerServiceCallback
             m_serviceHelper.createInterview(interview);
             markTestInterviewParticipantsAsStarted(interview.getTestInterviews().stream().toList());
         }
+        System.out.println("finished checkStartedTestInterviews");
     }
 
 

@@ -25,6 +25,7 @@ public class SchedulerServiceFacade
     {
         try
         {
+            System.out.println("Checking started test interviews");
             m_interviewSchedulerService.checkStartedTestInterviews();
             return "'Started test interviews' scheduler is started.";
         } catch (Throwable ex)
@@ -37,6 +38,7 @@ public class SchedulerServiceFacade
     {
         try
         {
+            System.out.println("Checking started coding interviews");
             m_interviewSchedulerService.checkStartedCodingInterviews();
             return "'Started coding interviews' scheduler is started.";
         } catch (Throwable ex)
@@ -49,6 +51,7 @@ public class SchedulerServiceFacade
     {
         try
         {
+            System.out.println("Checking expired test interviews");
             m_interviewSchedulerService.checkExpiredTestInterviews();
             return "'Expired test interviews' scheduler is started.";
         } catch (Throwable ex)
@@ -61,6 +64,7 @@ public class SchedulerServiceFacade
     {
         try
         {
+            System.out.println("Checking expired coding interviews");
             m_interviewSchedulerService.checkExpiredCodingInterviews();
             return "'Expired coding interviews' scheduler is started.";
         } catch (Throwable ex)
@@ -73,6 +77,7 @@ public class SchedulerServiceFacade
     {
         try
         {
+            System.out.println("Checking reminder test interviews");
             m_interviewSchedulerService.reminderTestInterviews();
             return "'Reminder test interviews' scheduler is started.";
         } catch (Throwable ex)
@@ -85,6 +90,7 @@ public class SchedulerServiceFacade
     {
         try
         {
+            System.out.println("Checking reminder coding interviews");
             m_interviewSchedulerService.reminderCodingInterviews();
             return "'Reminder coding interviews' scheduler is started.";
         } catch (Throwable ex)
@@ -98,6 +104,7 @@ public class SchedulerServiceFacade
     {
         try
         {
+            System.out.println("Checking notify users for task");
             m_taskSchedulerService.runNotifyUsersForTask();
             return "'Notify users for task' scheduler is started.";
         } catch (Throwable ex)
@@ -111,6 +118,7 @@ public class SchedulerServiceFacade
     {
         try
         {
+            System.out.println("Checking close expired tasks");
             m_taskSchedulerService.runCloseExpiredTasks();
             return "'Close expired tasks' scheduler is started.";
         } catch (Throwable ex)
@@ -123,6 +131,7 @@ public class SchedulerServiceFacade
     {
         try
         {
+            System.out.println("Checking feedback timeout");
             m_projectSchedulerService.checkFeedbackTimeout();
             return "'Check feedback timeout' scheduler is started.";
         } catch (Throwable ex)
@@ -135,6 +144,7 @@ public class SchedulerServiceFacade
     {
         try
         {
+            System.out.println("Checking project deadlines");
             m_projectSchedulerService.checkProjectDeadlines();
             return "'Check project deadlines' scheduler is started.";
         } catch (Throwable ex)
@@ -148,6 +158,7 @@ public class SchedulerServiceFacade
     {
         try
         {
+            System.out.println("Checking feedbacks");
             m_projectSchedulerService.checkFeedbacks();
             return "'Check feedbacks' scheduler is started.";
         } catch (Throwable ex)
@@ -161,6 +172,7 @@ public class SchedulerServiceFacade
 
         try
         {
+            System.out.println("Checking project start dates");
             m_projectSchedulerService.checkProjectStartDates();
             return "'Check project start dates' scheduler is started.";
         } catch (Throwable ex)
