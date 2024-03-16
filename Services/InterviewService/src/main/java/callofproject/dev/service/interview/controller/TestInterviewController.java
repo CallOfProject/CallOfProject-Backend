@@ -80,18 +80,6 @@ public class TestInterviewController
     }
 
 
-    @PostMapping("/start")
-    public ResponseEntity<Object> startTestInterview(@RequestParam("interview_id") UUID interviewId)
-    {
-        return subscribe(() -> ok(m_testInterviewService.startTestInterview(interviewId)), ex -> internalServerError().body(ex.getMessage()));
-    }
-
-    @PostMapping("/start/by/project-id")
-    public ResponseEntity<Object> startTestInterviewByProjectId(@RequestParam("project_id") UUID projectId)
-    {
-        return subscribe(() -> ok(m_testInterviewService.startTestInterviewByProjectId(projectId)), ex -> internalServerError().body(ex.getMessage()));
-    }
-
     @PostMapping("/finish")
     public ResponseEntity<Object> finishTestInterview(@RequestBody TestInterviewFinishDTO dto)
     {
