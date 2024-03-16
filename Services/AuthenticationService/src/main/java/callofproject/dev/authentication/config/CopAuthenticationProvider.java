@@ -1,9 +1,9 @@
 package callofproject.dev.authentication.config;
 
+import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
 import callofproject.dev.repository.authentication.entity.Role;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -56,8 +56,8 @@ public class CopAuthenticationProvider implements AuthenticationProvider
                 return new UsernamePasswordAuthenticationToken(username, pwd,
                         getGrantedAuthorities(user.get().getRoles()));
             else
-                throw new BadCredentialsException("Invalid password!");
-        } else throw new BadCredentialsException("No user registered with this details!");
+                throw new DataServiceException("Invalid password!");
+        } else throw new DataServiceException("No user registered with this details!");
     }
 
     /**

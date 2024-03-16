@@ -1,4 +1,4 @@
-package callofproject.dev.authentication.service;
+package callofproject.dev.data.common.scheduler;
 
 import java.util.Timer;
 import java.util.TimerTask;

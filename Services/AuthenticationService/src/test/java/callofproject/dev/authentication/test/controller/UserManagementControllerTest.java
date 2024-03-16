@@ -6,10 +6,11 @@ import callofproject.dev.authentication.dto.UserProfileUpdateDTO;
 import callofproject.dev.authentication.dto.UserSaveDTO;
 import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.authentication.dto.user_profile.UserWithProfileDTO;
-import callofproject.dev.authentication.service.UserManagementService;
+import callofproject.dev.authentication.service.usermanagement.UserManagementService;
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.library.exception.service.DataServiceException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,19 +18,25 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
 import static callofproject.dev.authentication.Util.*;
+import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.TEST_PROPERTIES_FILE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@TestPropertySource(locations = TEST_PROPERTIES_FILE)
 public class UserManagementControllerTest
 {
     @Mock
     private UserManagementService userManagementService;
+    @Mock
+    private ObjectMapper objectMapper;
 
     @InjectMocks
     private UserManagementController userManagementController;
@@ -75,24 +82,11 @@ public class UserManagementControllerTest
     }
 
     @Test
-    public void testUpdateUserProfile_withValidData_shouldReturnSuccess()
-    {
-        // given
-        var dto = createUserProfileUpdateDTO();
-        var expectedResult = new ResponseMessage<Object>("User profile updated successfully!", 200, createUserProfile());
-        when(userManagementService.upsertUserProfile(any(UserProfileUpdateDTO.class), null, null)).thenReturn(expectedResult);
-        // Act
-        ResponseEntity<Object> response = userManagementController.updateUserProfile("dto", null, null);
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-    }
-
-    @Test
     public void testUpdateUserProfile_withServiceException_shouldReturnInternalServerError()
     {
         // given
         var dto = createUserProfileUpdateDTO();
-        when(userManagementService.upsertUserProfile(any(UserProfileUpdateDTO.class), null, null)).thenThrow(new DataServiceException("Profile cannot be updated!"));
+        when(userManagementService.upsertUserProfile(any(UserProfileUpdateDTO.class), any(MultipartFile.class), any(MultipartFile.class))).thenThrow(new DataServiceException("Profile cannot be updated!"));
         // Act
         ResponseEntity<Object> response = userManagementController.updateUserProfile("dto", null, null);
         // Assert

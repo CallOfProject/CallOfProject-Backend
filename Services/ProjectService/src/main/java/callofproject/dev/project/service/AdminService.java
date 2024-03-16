@@ -1,5 +1,6 @@
 package callofproject.dev.project.service;
 
+import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.status.Status;
@@ -112,6 +113,12 @@ public class AdminService implements IAdminService
     }
 
     @Override
+    public MultipleResponseMessage<Object> findAllProjects()
+    {
+        return doForDataService(this::findAllProjectsCallback, "ProjectService::findAll");
+    }
+
+    @Override
     public MultipleResponseMessagePageable<Object> findAllProjectsByPage(int page)
     {
         return doForDataService(() -> findAllProjectsByPageCallback(page), "ProjectService::findAll");
@@ -147,6 +154,14 @@ public class AdminService implements IAdminService
         m_projectServiceHelper.saveProject(project);
 
         return new ResponseMessage<>("Project is updated!", Status.OK, profilePhotoUrl);
+    }
+
+    @Override
+    public ResponseMessage<Object> getTotalProjectCount()
+    {
+        var projects = toStreamConcurrent(m_projectServiceHelper.findAllProjects()).toList();
+
+        return new ResponseMessage<>("Total project count found!", Status.OK, projects.size());
     }
 
     private String uploadProfilePhoto(byte[] profilePhoto, Project project, String username)
@@ -237,6 +252,18 @@ public class AdminService implements IAdminService
         var projectWithParticipants = doForDataService(() -> m_projectMapper.toProjectsDetailDTO(projectDetails), "ProjectService::findAllParticipantProjectByUserId");
 
         return new MultipleResponseMessagePageable<>(totalPage, page, projectDetails.size(), "Projects found!", projectWithParticipants);
+    }
+
+    private MultipleResponseMessage<Object> findAllProjectsCallback()
+    {
+        var projects = toStreamConcurrent(m_projectServiceHelper.findAllProjects()).toList();
+
+        if (projects.isEmpty())
+            return new MultipleResponseMessage<>(0, "Projects not found!", null);
+
+        var projectsAdminDTO = projects.stream().map(m_projectMapper::toProjectAdminDTO).toList();
+
+        return new MultipleResponseMessage<>(projectsAdminDTO.size(), "Projects found!", projectsAdminDTO);
     }
 
     /**

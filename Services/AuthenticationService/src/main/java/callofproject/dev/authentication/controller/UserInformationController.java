@@ -4,7 +4,7 @@ import callofproject.dev.authentication.dto.environments.CourseUpsertDTO;
 import callofproject.dev.authentication.dto.environments.EducationUpsertDTO;
 import callofproject.dev.authentication.dto.environments.ExperienceUpsertDTO;
 import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
-import callofproject.dev.authentication.service.UserInformationService;
+import callofproject.dev.authentication.service.userinformation.UserInformationService;
 import callofproject.dev.data.common.clas.ErrorMessage;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;

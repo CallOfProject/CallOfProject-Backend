@@ -38,7 +38,7 @@ public class User
     @Column(name = "deleted_at")
     private LocalDateTime m_deletedAt;
 
-    @OneToMany(mappedBy = "m_projectOwner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "m_projectOwner", cascade = {REFRESH, DETACH, MERGE, PERSIST}, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<Project> m_projects; // projects that he owns
 

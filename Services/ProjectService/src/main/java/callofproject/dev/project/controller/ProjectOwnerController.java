@@ -76,6 +76,18 @@ public class ProjectOwnerController
         return subscribe(() -> ok(m_projectOwnerService.removeProject(userId, projectId)), msg -> badRequest().body(msg.getMessage()));
     }
 
+    /**
+     * Handles the HTTP DELETE request to remove a project.
+     *
+     * @param projectId The unique identifier (UUID) of the project to be removed.
+     * @return ResponseEntity with the result of the operation as ProjectDetailDTO if successful, or an error message in case of failure.
+     */
+    @DeleteMapping("delete/soft")
+    public ResponseEntity<Object> softDeleteProject(@RequestParam("pid") UUID projectId)
+    {
+        return subscribe(() -> ok(m_projectOwnerService.softDeleteProject(projectId)), msg -> badRequest().body(msg.getMessage()));
+    }
+
     //---------------------------------------------------PARTICIPANT----------------------------------------------------
 
     /**

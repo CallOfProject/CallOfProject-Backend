@@ -1,4 +1,4 @@
-package callofproject.dev.authentication.service;
+package callofproject.dev.authentication.service.authentication;
 
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
 import callofproject.dev.authentication.dto.UserKafkaDTO;
@@ -6,8 +6,11 @@ import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.dto.auth.AuthenticationResponse;
 import callofproject.dev.authentication.dto.auth.RegisterRequest;
+import callofproject.dev.authentication.service.usermanagement.UserManagementService;
+import callofproject.dev.authentication.util.Util;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.dto.EmailTopic;
+import callofproject.dev.data.common.scheduler.CountDownScheduler;
 import callofproject.dev.data.common.status.Status;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserServiceHelper;
@@ -18,7 +21,6 @@ import callofproject.dev.service.jwt.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
@@ -34,23 +36,17 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.AUTHENTICATION_SERVICE;
-import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.USER_MANAGEMENT_SERVICE;
 import static callofproject.dev.data.common.enums.EOperation.REGISTER_NOT_VERIFY;
 import static callofproject.dev.data.common.enums.EmailType.EMAIL_VERIFICATION;
-import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static callofproject.dev.service.jwt.JwtUtil.extractClaim;
 import static callofproject.dev.service.jwt.JwtUtil.extractUsername;
+import static java.lang.String.format;
 import static java.time.LocalDateTime.parse;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 
-/**
- * Service class for authentication-related operations.
- * It implements the IAuthenticationService interface.
- */
-@Service(AUTHENTICATION_SERVICE)
+@Service
 @Lazy
-public class AuthenticationService
+public class AuthenticationServiceCallback
 {
     private final UserManagementService m_userManagementService;
     private final PasswordEncoder m_passwordEncoder;
@@ -64,24 +60,10 @@ public class AuthenticationService
     private int m_verifyUserTokenExpirationTime;
     private final ExecutorService m_executorService;
 
-    /**
-     * Constructor for the AuthenticationService class.
-     * It is used to inject dependencies into the service.
-     *
-     * @param userManagementService  The UserManagementService object to be injected.
-     * @param authenticationProvider The AuthenticationProvider object to be injected.
-     * @param passwordEncoder        The PasswordEncoder object to be injected.
-     * @param kafkaProducer          The KafkaProducer object to be injected.
-     * @param serviceHelper          The UserServiceHelper object to be injected.
-     * @param userRepository         The IUserRepository object to be injected.
-     * @param executorService        The ExecutorService object to be injected.
-     */
-    public AuthenticationService(@Qualifier(USER_MANAGEMENT_SERVICE) UserManagementService userManagementService,
-                                 AuthenticationProvider authenticationProvider,
-                                 PasswordEncoder passwordEncoder, KafkaProducer kafkaProducer, UserServiceHelper serviceHelper, IUserRepository userRepository, ExecutorService executorService)
+    public AuthenticationServiceCallback(UserManagementService userManagementService, PasswordEncoder passwordEncoder, AuthenticationProvider authenticationProvider, KafkaProducer kafkaProducer, UserServiceHelper serviceHelper, IUserRepository userRepository, ExecutorService executorService)
     {
-        m_passwordEncoder = passwordEncoder;
         m_userManagementService = userManagementService;
+        m_passwordEncoder = passwordEncoder;
         m_authenticationProvider = authenticationProvider;
         m_kafkaProducer = kafkaProducer;
         m_serviceHelper = serviceHelper;
@@ -89,49 +71,6 @@ public class AuthenticationService
         m_executorService = executorService;
     }
 
-    /**
-     * Register user with given RegisterRequest parameter.
-     *
-     * @param request represent the request.
-     * @return AuthenticationResponse.
-     */
-    public AuthenticationResponse register(RegisterRequest request)
-    {
-        var result = doForDataService(() -> registerUserCallback(request), "AuthenticationService::register");
-
-        if (result.isSuccess())
-            sendAuthenticationEmail(new UserSignUpRequestDTO(request.getEmail(), request.getFirst_name(),
-                    request.getMiddle_name(), request.getLast_name(), request.getUsername(),
-                    m_passwordEncoder.encode(request.getPassword()), request.getBirth_date(),
-                    RoleEnum.ROLE_USER));
-        return result;
-    }
-
-    /**
-     * Login operation for users.
-     *
-     * @param request represent the AuthenticationRequest
-     * @return the AuthenticationResponse
-     */
-    public AuthenticationResponse authenticate(AuthenticationRequest request)
-    {
-        return doForDataService(() -> authenticateCallback(request), "AuthenticationService::authenticate");
-    }
-
-    /**
-     * Validate given token.
-     *
-     * @param token represent the jwt.
-     * @return boolean value.
-     */
-    public boolean validateToken(String token)
-    {
-        return doForDataService(() -> validateTokenCallback(token), "AuthenticationService::validateToken");
-    }
-
-    //------------------------------------------------------------------------------------------------------------------
-    //####################################################-CALLBACKS-###################################################
-    //------------------------------------------------------------------------------------------------------------------
 
     /**
      * Register user with given RegisterRequest parameter.
@@ -160,8 +99,13 @@ public class AuthenticationService
     {
         var claims = createClaimsForRegister();
         var token = JwtUtil.generateToken(claims, dto.getUsername());
-        var message = String.format(m_url, token);
-        var emailTopic = new EmailTopic(EMAIL_VERIFICATION, dto.getEmail(), "Call-Of-Project Verification Link", message, null);
+
+        var template = Util.getEmailTemplate("generic_template.html");
+        var title = "Call-Of-Project Verification Link";
+        var contentMessage = "Please click the link below to verify your account. If you did not register, please ignore this email.";
+        var message = format(template, title, title, dto.getUsername(), contentMessage, format(m_url, token), "Verify Account");
+
+        var emailTopic = new EmailTopic(EMAIL_VERIFICATION, dto.getEmail(), title, message, null);
         m_kafkaProducer.sendEmail(emailTopic);
         m_executorService.execute(() -> startTimerForUserVerification(dto.getUsername()));
     }
@@ -226,7 +170,7 @@ public class AuthenticationService
      * @param token represent the token.
      * @return ResponseMessage
      */
-    public ResponseMessage<Object> verifyUserAndRegister(String token)
+    public ResponseMessage<Object> verifyUserAndRegisterCallback(String token)
     {
         var username = extractUsername(token);
         var endTime = parse((String) extractClaim(token, date -> date.get("endTime")), ISO_DATE_TIME);
@@ -255,7 +199,7 @@ public class AuthenticationService
      * @param request represent the login information.
      * @return if success returns AuthenticationResponse that include token and status else return ErrorMessage.
      */
-    private AuthenticationResponse authenticateCallback(AuthenticationRequest request)
+    public AuthenticationResponse authenticateCallback(AuthenticationRequest request)
     {
         if (request == null)
             throw new DataServiceException("AuthenticationRequest is null!");
@@ -313,7 +257,7 @@ public class AuthenticationService
      * @return boolean value.
      * @throws IOException if an I/O error occurs.
      */
-    public boolean refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException
+    public boolean refreshTokenCallback(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String refreshToken;
@@ -348,7 +292,7 @@ public class AuthenticationService
      * @param token represent the jwt.
      * @return boolean value.
      */
-    private boolean validateTokenCallback(String token)
+    public boolean validateTokenCallback(String token)
     {
         var username = extractUsername(token);
 
@@ -367,7 +311,7 @@ public class AuthenticationService
      * @param username represent the username.
      * @return User.
      */
-    public Optional<User> findUserByUsername(String username)
+    public Optional<User> findUserByUsernameCallback(String username)
     {
         return m_serviceHelper.findByUsername(username);
     }

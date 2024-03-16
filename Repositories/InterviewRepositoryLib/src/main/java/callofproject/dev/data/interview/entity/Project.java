@@ -6,6 +6,7 @@ import callofproject.dev.data.interview.entity.enums.EProjectStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,7 +24,7 @@ public class Project
     @Column(name = "title", nullable = false, length = 100)
     private String m_projectName;
 
-    @ManyToOne(cascade = ALL)
+    @ManyToOne(cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User m_projectOwner;
 
@@ -47,6 +48,9 @@ public class Project
     @JoinColumn(name = "coding_interview_id", referencedColumnName = "coding_interview_id")
     private CodingInterview m_codingInterview;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime m_deletedAt = null;
+
     public Project()
     {
     }
@@ -67,6 +71,16 @@ public class Project
         m_projectParticipants = projectParticipants;
         m_projectStatus = projectStatus;
         m_adminOperationStatus = adminOperationStatus;
+    }
+
+    public LocalDateTime getDeletedAt()
+    {
+        return m_deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt)
+    {
+        m_deletedAt = deletedAt;
     }
 
     public CodingInterview getCodingInterview()

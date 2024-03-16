@@ -239,4 +239,9 @@ public class InterviewServiceHelper
     {
         return doForRepository(() -> m_repositoryFacade.m_userTestInterviewsRepository.findUserTestInterviewsByTestInterviewId(codeInterviewId), "Error finding user coding interview by interview id");
     }
+
+    public void removeProjectById(UUID projectId)
+    {
+        doForRepository(() -> m_repositoryFacade.m_projectRepository.deleteById(projectId), "Error removing project");
+    }
 }

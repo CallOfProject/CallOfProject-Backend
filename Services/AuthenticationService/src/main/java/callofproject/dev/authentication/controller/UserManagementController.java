@@ -2,7 +2,7 @@ package callofproject.dev.authentication.controller;
 
 import callofproject.dev.authentication.dto.UserProfileUpdateDTO;
 import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
-import callofproject.dev.authentication.service.UserManagementService;
+import callofproject.dev.authentication.service.usermanagement.UserManagementService;
 import callofproject.dev.data.common.clas.ErrorMessage;
 import callofproject.dev.library.exception.util.CopDataUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;

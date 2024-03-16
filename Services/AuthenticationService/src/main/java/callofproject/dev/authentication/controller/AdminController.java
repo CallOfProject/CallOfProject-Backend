@@ -2,7 +2,7 @@ package callofproject.dev.authentication.controller;
 
 import callofproject.dev.authentication.dto.admin.UserUpdateDTOAdmin;
 import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
-import callofproject.dev.authentication.service.AdminService;
+import callofproject.dev.authentication.service.admin.AdminService;
 import callofproject.dev.data.common.clas.ErrorMessage;
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -62,6 +62,19 @@ public class AdminController
     {
         return subscribe(() -> ok(m_adminService.findAllUsersPageable(page)), msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
+
+
+    /**
+     * Find all users page by page
+     *
+     * @return UserShowingAdminDTO
+     */
+    @GetMapping("find/all")
+    public ResponseEntity<Object> findAllUsers()
+    {
+        return subscribe(() -> ok(m_adminService.findAllUsers()), msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
 
     /**
      * Find all users with given parameters are word and page

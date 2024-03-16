@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -73,7 +74,7 @@ public class Project
     @Column(name = "interview_type")
     private EInterviewType m_interviewType;
 
-    @ManyToOne(cascade = ALL)
+    @ManyToOne(cascade = {DETACH, MERGE, PERSIST, REFRESH})
     @JoinColumn(name = "user_id", nullable = false)
     private User m_projectOwner;
 
@@ -99,6 +100,8 @@ public class Project
     @Column(name = "feedback_time_range")
     private EFeedbackTimeRange m_feedbackTimeRange;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime m_deletedAt = null;
 
     public Project()
     {
@@ -191,7 +194,15 @@ public class Project
         m_specialRequirements = other.getSpecialRequirements();
         return this;
     }
+    public LocalDateTime getDeletedAt()
+    {
+        return m_deletedAt;
+    }
 
+    public void setDeletedAt(LocalDateTime deletedAt)
+    {
+        m_deletedAt = deletedAt;
+    }
     public static class Builder
     {
         private final Project m_project;

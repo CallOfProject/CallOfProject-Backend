@@ -2,6 +2,7 @@ package callofproject.dev.authentication.service;
 
 import callofproject.dev.authentication.config.kafka.KafkaProducer;
 import callofproject.dev.authentication.dto.ForgotPasswordDTO;
+import callofproject.dev.authentication.util.Util;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.dto.EmailTopic;
 import callofproject.dev.data.common.enums.EmailType;
@@ -87,12 +88,18 @@ public class ForgotPasswordService
         if (user.isEmpty())
             throw new DataServiceException("User not found!");
 
+        // set the claims for the token
         var claims = new HashMap<String, Object>();
         claims.put("uuid", user.get().getUserId());
         var passwordResetToken = generateToken(claims, user.get().getUsername());
 
+        // prepare the email content
+        var title = "Call-Of-Project Password Reset";
         var url = format(m_forgotPasswordUrl, passwordResetToken);
-        var message = format("Hello %s, \n\nYou can reset your password by clicking the link below: \n%s", user.get().getUsername(), url);
+        var template = Util.getEmailTemplate("generic_template.html");
+        var contentMessage = "You can reset your password by clicking the link below:";
+        var message = format(template, title, title, user.get().getUsername(), contentMessage, url, "Verify Account");
+        // send the email
         var emailTopic = new EmailTopic(EmailType.PASSWORD_RESET, user.get().getEmail(), "Reset Password", message, null);
         m_kafkaProducer.sendEmail(emailTopic);
         return new ResponseMessage<>("Reset password link sent to your email!", 200, true);

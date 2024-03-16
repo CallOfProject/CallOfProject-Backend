@@ -1,11 +1,15 @@
 package callofproject.dev.data.task.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import static jakarta.persistence.CascadeType.*;
+import static jakarta.persistence.CascadeType.REFRESH;
 
 @Entity
 @Table(name = "users")
@@ -42,6 +46,10 @@ public class User
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")})
     private Set<Role> roles;
 
+    @OneToMany(mappedBy = "m_user", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
+    @JsonIgnore
+    private Set<ProjectParticipant> m_projectParticipants; // projects that he owns
+
     public User()
     {
         m_deletedAt = null;
@@ -65,6 +73,16 @@ public class User
             m_assignedTasks = new HashSet<>();
 
         m_assignedTasks.add(task);
+    }
+
+    public Set<ProjectParticipant> getProjectParticipants()
+    {
+        return m_projectParticipants;
+    }
+
+    public void setProjectParticipants(Set<ProjectParticipant> projectParticipants)
+    {
+        m_projectParticipants = projectParticipants;
     }
 
     public Set<Task> getAssignedTasks()

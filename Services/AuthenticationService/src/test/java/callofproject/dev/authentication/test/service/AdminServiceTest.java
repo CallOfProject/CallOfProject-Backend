@@ -183,7 +183,7 @@ public class AdminServiceTest
         var exception = assertThrows(DataServiceException.class,
                 () -> m_injection.getAdminService().updateUser(userUpdateDTO));
 
-        assertEquals("Message: AdminService::updateUser , Cause Message:Message: User not found! ",
+        assertEquals("Message: User not found! ",
                 exception.getMessage());
     }
 
@@ -206,7 +206,7 @@ public class AdminServiceTest
         var exception = assertThrows(DataServiceException.class,
                 () -> m_injection.getAdminService().updateUser(userUpdateDTO));
 
-        assertEquals("Message: AdminService::updateUser , Cause Message:Message: User not found! ",
+        assertEquals("Message: User not found! ",
                 exception.getMessage());
     }
 
@@ -230,7 +230,7 @@ public class AdminServiceTest
         var exception = assertThrows(DataServiceException.class,
                 () -> m_injection.getAdminService().updateUser(userUpdateDTO));
 
-        assertEquals("Message: AdminService::updateUser , Cause Message:Message: Denied Permissions! ",
+        assertEquals("Message: Permissions Denied! ",
                 exception.getMessage());
     }
 
@@ -254,7 +254,7 @@ public class AdminServiceTest
         var exception = assertThrows(DataServiceException.class,
                 () -> m_injection.getAdminService().updateUser(userUpdateDTO));
 
-        assertEquals("Message: AdminService::updateUser , Cause Message:Message: You cannot edit this user! ",
+        assertEquals("Message: You cannot edit this user! ",
                 exception.getMessage());
     }
 
@@ -275,7 +275,6 @@ public class AdminServiceTest
     @AfterEach
     public void tearDown()
     {
-        System.out.println("cleaning up");
         m_databaseCleaner.clearH2Database();
     }
 }

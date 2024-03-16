@@ -1,11 +1,14 @@
 package callofproject.dev.project.service;
 
 import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.data.common.enums.EOperation;
+import callofproject.dev.data.common.status.Status;
 import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.data.project.entity.ProjectParticipant;
 import callofproject.dev.data.project.entity.ProjectParticipantRequest;
 import callofproject.dev.data.project.entity.User;
+import callofproject.dev.data.project.entity.enums.AdminOperationStatus;
 import callofproject.dev.data.project.entity.enums.EProjectStatus;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.nosql.dal.NotificationServiceHelper;
@@ -13,7 +16,9 @@ import callofproject.dev.nosql.dal.ProjectTagServiceHelper;
 import callofproject.dev.nosql.entity.ProjectTag;
 import callofproject.dev.nosql.enums.NotificationType;
 import callofproject.dev.project.config.kafka.KafkaProducer;
+import callofproject.dev.project.config.kafka.dto.ProjectInfoKafkaDTO;
 import callofproject.dev.project.config.kafka.dto.ProjectParticipantKafkaDTO;
+import callofproject.dev.project.config.kafka.dto.UserKafkaDTO;
 import callofproject.dev.project.dto.*;
 import callofproject.dev.project.mapper.IProjectMapper;
 import callofproject.dev.project.mapper.IProjectParticipantMapper;
@@ -22,7 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -184,6 +189,12 @@ public class ProjectOwnerService implements IProjectOwnerService
         return doForDataService(() -> removeProjectCallback(userId, projectId), "ProjectService::removeProject");
     }
 
+    @Override
+    public ResponseMessage<Object> softDeleteProject(UUID projectId)
+    {
+        return doForDataService(() -> softDeleteProjectCallback(projectId), "ProjectService::removeProject");
+    }
+
     /**
      * Callback for approving a participant's request to join a project.
      *
@@ -237,6 +248,7 @@ public class ProjectOwnerService implements IProjectOwnerService
         if (participant.isEmpty())
             throw new DataServiceException("Participant is not found!");
 
+
         project.getProjectParticipants().remove(participant.get());
         user.getProjectParticipants().remove(participant.get());
         m_projectServiceHelper.saveProject(project);
@@ -247,6 +259,13 @@ public class ProjectOwnerService implements IProjectOwnerService
         var message = format("%s removed you from %s project!", project.getProjectOwner().getFullName(), project.getProjectName());
 
         return new ResponseMessage<>(message, OK, true);
+    }
+
+
+    public void removeParticipantRequestsCallback(Project project, User user)
+    {
+        user.getProjectParticipantRequests().removeIf(req -> req.getProject().getProjectId().equals(project.getProjectId()));
+        m_projectServiceHelper.addUser(user);
     }
 
     /**
@@ -465,27 +484,79 @@ public class ProjectOwnerService implements IProjectOwnerService
      */
     public ResponseMessage<Object> removeProjectCallback(UUID userId, UUID projectId)
     {
+        var users = toStream(m_projectServiceHelper.findAllProjectParticipantByProjectId(projectId)).map(ProjectParticipant::getUser).toList();
         var project = findProjectIfExistsByProjectId(projectId);
-        var user = findUserIfExists(userId);
 
-        if (!project.getProjectOwner().getUserId().equals(user.getUserId()))
-            throw new DataServiceException("You are not owner of this project!");
+        var participants = project.getProjectParticipants().stream().toList();
+        var requests = project.getProjectParticipantRequests().stream().toList();
+        project.getProjectParticipants().clear();
+        project.getProjectParticipantRequests().clear();
 
-       /* if (!project.getProjectParticipants().isEmpty())
-        {
+        project.getProjectOwner().getProjects().removeIf(p -> p.getProjectId().equals(projectId));
+        project.getProjectOwner().getProjectParticipants().removeIf(p -> p.getProject().getProjectId().equals(projectId));
+        project.getProjectOwner().getProjectParticipantRequests().removeIf(p -> p.getProject().getProjectId().equals(projectId));
+        users.forEach(usr -> usr.getProjects().removeIf(p -> p.getProjectId().equals(projectId)));
+        users.forEach(usr -> usr.getProjectParticipants().removeIf(p -> p.getProject().getProjectId().equals(projectId)));
+        users.forEach(usr -> usr.getProjectParticipantRequests().removeIf(p -> p.getProject().getProjectId().equals(projectId)));
 
-        }*/
+        m_projectServiceHelper.addUser(project.getProjectOwner());
+        m_projectServiceHelper.saveAllUsers(users);
+        m_projectServiceHelper.removeAllParticipantRequests(requests);
 
-        if (project.getStartDate().isAfter(LocalDate.now()))
-        {
-            project.getProjectParticipants().forEach(p -> {
-                var message = format("%s removed you from %s project!", project.getProjectOwner().getFullName(), project.getProjectName());
-                sendNotificationToUser(project, p.getUser(), project.getProjectOwner(), message);
-            });
-            m_projectServiceHelper.removeProjectById(projectId);
-        }
+        participants.forEach(p -> removeParticipantCallback(projectId, p.getUser().getUserId()));
 
-        return null;
+        m_projectServiceHelper.saveProject(project);
+
+        var user = project.getProjectOwner();
+        var ownerDTO = new UserKafkaDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(), user.getMiddleName(), user.getLastName(), EOperation.UPDATE, user.getPassword()
+                , user.getRoles(), user.getDeletedAt(), user.getOwnerProjectCount(), user.getParticipantProjectCount(), user.getTotalProjectCount());
+
+        var participantsDTO = project.getProjectParticipants().stream()
+                .map(pp -> new ProjectParticipantKafkaDTO(pp.getProjectId(), pp.getProject().getProjectId(), pp.getUser().getUserId(), pp.getJoinDate(), true)).toList();
+        var dto = new ProjectInfoKafkaDTO(project.getProjectId(), project.getProjectName(), ownerDTO, participantsDTO, project.getProjectStatus(), AdminOperationStatus.ACTIVE, EOperation.DELETE);
+
+        m_kafkaProducer.sendProjectInfo(dto);
+
+        m_projectServiceHelper.removeProjectById(projectId);
+
+        return new ResponseMessage<>("Project successfully removed", Status.OK, true);
     }
 
+    public ResponseMessage<Object> softDeleteProjectCallback(UUID projectId)
+    {
+        var users = toStream(m_projectServiceHelper.findAllProjectParticipantByProjectId(projectId)).map(ProjectParticipant::getUser).toList();
+        var project = findProjectIfExistsByProjectId(projectId);
+        var user = project.getProjectOwner();
+        var ownerDTO = new UserKafkaDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(), user.getMiddleName(), user.getLastName(), EOperation.UPDATE, user.getPassword()
+                , user.getRoles(), user.getDeletedAt(), user.getOwnerProjectCount(), user.getParticipantProjectCount(), user.getTotalProjectCount());
+
+        var participantsDTO = project.getProjectParticipants().stream()
+                .map(pp -> new ProjectParticipantKafkaDTO(pp.getProjectId(), pp.getProject().getProjectId(), pp.getUser().getUserId(), pp.getJoinDate(), true)).toList();
+        var dto = new ProjectInfoKafkaDTO(project.getProjectId(), project.getProjectName(), ownerDTO, participantsDTO, project.getProjectStatus(), AdminOperationStatus.ACTIVE, EOperation.SOFT_DELETED);
+
+        m_kafkaProducer.sendProjectInfo(dto);
+
+        var participants = project.getProjectParticipants().stream().toList();
+        var requests = project.getProjectParticipantRequests().stream().toList();
+        project.getProjectParticipants().clear();
+        project.getProjectParticipantRequests().clear();
+
+        project.getProjectOwner().getProjects().removeIf(p -> p.getProjectId().equals(projectId));
+        project.getProjectOwner().getProjectParticipants().removeIf(p -> p.getProject().getProjectId().equals(projectId));
+        project.getProjectOwner().getProjectParticipantRequests().removeIf(p -> p.getProject().getProjectId().equals(projectId));
+        users.forEach(usr -> usr.getProjects().removeIf(p -> p.getProjectId().equals(projectId)));
+        users.forEach(usr -> usr.getProjectParticipants().removeIf(p -> p.getProject().getProjectId().equals(projectId)));
+        users.forEach(usr -> usr.getProjectParticipantRequests().removeIf(p -> p.getProject().getProjectId().equals(projectId)));
+
+        m_projectServiceHelper.addUser(project.getProjectOwner());
+        m_projectServiceHelper.saveAllUsers(users);
+        m_projectServiceHelper.removeAllParticipantRequests(requests);
+
+        participants.forEach(p -> removeParticipantCallback(projectId, p.getUser().getUserId()));
+
+        project.setDeletedAt(LocalDateTime.now());
+        m_projectServiceHelper.saveProject(project);
+
+        return new ResponseMessage<>("Project successfully removed", Status.OK, true);
+    }
 }

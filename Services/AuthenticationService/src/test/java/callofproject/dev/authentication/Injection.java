@@ -1,6 +1,10 @@
 package callofproject.dev.authentication;
 
-import callofproject.dev.authentication.service.*;
+import callofproject.dev.authentication.service.RootService;
+import callofproject.dev.authentication.service.admin.AdminServiceCallback;
+import callofproject.dev.authentication.service.authentication.AuthenticationServiceCallback;
+import callofproject.dev.authentication.service.userinformation.UserInformationServiceCallback;
+import callofproject.dev.authentication.service.usermanagement.UserManagementServiceCallback;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,16 +15,16 @@ import org.springframework.stereotype.Component;
 public class Injection
 {
     @Autowired
-    private UserManagementService ms_userManagementService;
+    private UserManagementServiceCallback ms_userManagementService;
 
     @Autowired
-    private AuthenticationService ms_authenticationService;
+    private AuthenticationServiceCallback ms_authenticationService;
 
     @Autowired
-    private AdminService m_adminService;
+    private AdminServiceCallback m_adminService;
 
     @Autowired
-    private UserInformationService m_userInformationService;
+    private UserInformationServiceCallback m_userInformationService;
 
     @Autowired
     private RootService m_rootService;
@@ -28,22 +32,22 @@ public class Injection
     @Autowired
     private IUserRepository m_userRepository;
 
-    public UserInformationService getUserInformationService()
+    public UserInformationServiceCallback getUserInformationService()
     {
         return m_userInformationService;
     }
 
-    public AdminService getAdminService()
+    public AdminServiceCallback getAdminService()
     {
         return m_adminService;
     }
 
-    public UserManagementService getUserManagementService()
+    public UserManagementServiceCallback getUserManagementService()
     {
         return ms_userManagementService;
     }
 
-    public AuthenticationService getAuthenticationService()
+    public AuthenticationServiceCallback getAuthenticationService()
     {
         return ms_authenticationService;
     }

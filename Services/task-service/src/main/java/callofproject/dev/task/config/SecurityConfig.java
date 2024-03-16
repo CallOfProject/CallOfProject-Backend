@@ -2,7 +2,6 @@ package callofproject.dev.task.config;
 
 import callofproject.dev.service.jwt.filter.JWTTokenGeneratorFilter;
 import callofproject.dev.service.jwt.filter.JWTTokenValidatorFilter;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -39,13 +38,10 @@ public class SecurityConfig
      */
     private static void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests)
     {
-        requests.anyRequest().permitAll()
-               /* .requestMatchers(antMatcher("/api-docs/**")).permitAll()
+        requests
+                .requestMatchers(antMatcher("/api-docs/**")).permitAll()
                 .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
-                .requestMatchers(antMatcher("/api/project/admin/**")).hasAnyRole("ADMIN", "ROOT")
-                .requestMatchers(antMatcher("/api/project/project-owner/**")).hasAnyRole("ADMIN", "USER", "ROOT")
-                .requestMatchers(antMatcher("/api/project/project/**")).hasAnyRole("ROOT", "USER", "ADMIN")
-                .requestMatchers(antMatcher("/api/project/storage/**")).hasAnyRole("ADMIN", "USER", "ROOT")*/;
+                .requestMatchers(antMatcher("/api/task/**")).hasAnyRole("ADMIN", "USER", "ROOT");
     }
 
 
@@ -61,17 +57,18 @@ public class SecurityConfig
     {
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(h -> h.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+                //.cors(corsCustomizer -> corsCustomizer.configurationSource(this::setCorsConfig))
                 .csrf(AbstractHttpConfigurer::disable);
 
         http.addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(SecurityConfig::customize)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .exceptionHandling(ex -> ex.accessDeniedHandler((request, response, accessDeniedException) -> {
+                .httpBasic(AbstractHttpConfigurer::disable);
+                /*.exceptionHandling(ex -> ex.accessDeniedHandler((request, response, accessDeniedException) -> {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("Access rejected: " + accessDeniedException.getMessage());
-                }));
+                }));*/
 
         return http.build();
     }

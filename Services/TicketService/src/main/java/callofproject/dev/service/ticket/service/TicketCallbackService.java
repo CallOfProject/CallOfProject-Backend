@@ -1,5 +1,6 @@
 package callofproject.dev.service.ticket.service;
 
+import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.status.Status;
@@ -10,7 +11,6 @@ import callofproject.dev.service.ticket.dto.TicketGiveResponseDTO;
 import callofproject.dev.service.ticket.entity.TicketStatus;
 import callofproject.dev.service.ticket.mapper.ITicketMapper;
 import callofproject.dev.service.ticket.repository.ITicketRepository;
-import org.antlr.v4.runtime.misc.Triple;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -70,6 +70,14 @@ public class TicketCallbackService
         return new MultipleResponseMessagePageable<>(totalPages, page, ticketList.size(), format("%d Tickets are found!", ticketList.size()), ticketsDTO);
     }
 
+
+    public MultipleResponseMessage<Object> findAllTicketsCallback()
+    {
+        var tickets = doForDataService(() -> ticketRepository.findTicketsByStatus(TicketStatus.OPEN), "Error while fetching tickets");
+        var ticketsDTO = tickets.stream().map(m_ticketMapper::toTicketDTO).toList();
+        return new MultipleResponseMessage<>(ticketsDTO.size(), format("%d Tickets are found!", ticketsDTO.size()), ticketsDTO);
+    }
+
     public ResponseMessage<Object> findOpenTicketCount()
     {
         var openTicketCount = doForDataService(() -> ticketRepository.findTicketsByStatus(TicketStatus.OPEN),
@@ -85,5 +93,13 @@ public class TicketCallbackService
     public void sendEmail(TicketDTO object)
     {
 
+    }
+
+    public ResponseMessage<Object> findClosedTicketCount()
+    {
+        var openTicketCount = doForDataService(() -> ticketRepository.findTicketsByStatus(TicketStatus.CLOSED),
+                "Error while fetching close ticket count");
+
+        return new ResponseMessage<>(format("%d open tickets are found!", openTicketCount.size()), Status.OK, openTicketCount.size());
     }
 }

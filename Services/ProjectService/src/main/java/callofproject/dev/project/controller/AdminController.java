@@ -1,7 +1,6 @@
 package callofproject.dev.project.controller;
 
 import callofproject.dev.data.common.clas.ErrorMessage;
-import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.library.exception.util.CopDataUtil;
 import callofproject.dev.project.dto.ProjectAdminDTO;
 import callofproject.dev.project.service.IAdminService;
@@ -65,6 +64,12 @@ public class AdminController
         return subscribe(() -> ok(m_adminService.findAll(page)), msg -> badRequest().body(msg.getMessage()));
     }
 
+    @GetMapping("/find/all")
+    public ResponseEntity<Object> findAllProjects()
+    {
+        return subscribe(() -> ok(m_adminService.findAllProjects()), msg -> badRequest().body(msg.getMessage()));
+    }
+
 
     @GetMapping("/find/all/page")
     public ResponseEntity<Object> findAllProjectsByPage(@RequestParam("p") int page)
@@ -73,9 +78,16 @@ public class AdminController
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Object> updateProject(@RequestParam("dto") String dto, @RequestParam(value = "file",required = false) MultipartFile file)
+    public ResponseEntity<Object> updateProject(@RequestParam("dto") String dto, @RequestParam(value = "file", required = false) MultipartFile file)
     {
         var obj = CopDataUtil.doForDataService(() -> m_objectMapper.readValue(dto, ProjectAdminDTO.class), "ProjectSaveDTO");
         return subscribe(() -> ok(m_adminService.updateProject(obj, file)), msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+
+    @GetMapping("/total-project-count")
+    public ResponseEntity<Object> getTotalProjectCount()
+    {
+        return subscribe(() -> ok(m_adminService.getTotalProjectCount()), msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 }

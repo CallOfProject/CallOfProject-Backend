@@ -1,9 +1,9 @@
 package callofproject.dev.service.ticket.service;
 
+import callofproject.dev.data.common.clas.MultipleResponseMessage;
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.status.Status;
-import callofproject.dev.library.exception.util.CopDataUtil;
 import callofproject.dev.service.ticket.dto.TicketCreateDTO;
 import callofproject.dev.service.ticket.dto.TicketDTO;
 import callofproject.dev.service.ticket.dto.TicketGiveResponseDTO;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static callofproject.dev.service.ticket.BeanName.TICKET_SERVICE;
-import static java.lang.String.format;
 
 @Service(TICKET_SERVICE)
 @Lazy
@@ -44,6 +43,11 @@ public class TicketService
         return result;
     }
 
+    public MultipleResponseMessage<Object> findAllTickets()
+    {
+        return doForDataService(m_callbackService::findAllTicketsCallback, "TicketService::findAllTicketsPageable");
+    }
+
     public MultipleResponseMessagePageable<Object> findAllTicketsPageable(int page)
     {
         return doForDataService(() -> m_callbackService.findAllTicketsPageableCallback(page), "TicketService::findAllTicketsPageable");
@@ -52,5 +56,10 @@ public class TicketService
     public ResponseMessage<Object> findOpenTicketCount()
     {
         return doForDataService(m_callbackService::findOpenTicketCount, "TicketService::findOpenTicketCount");
+    }
+
+    public ResponseMessage<Object> findClosedTicketCount()
+    {
+        return doForDataService(m_callbackService::findClosedTicketCount, "TicketService::findClosedTicketCount");
     }
 }

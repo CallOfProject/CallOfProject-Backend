@@ -16,9 +16,4 @@ import static callofproject.dev.data.project.ProjectRepositoryBeanName.PROJECT_P
 @Lazy
 public interface IProjectParticipantRequestRepository extends CrudRepository<ProjectParticipantRequest, UUID>
 {
-    @Query("from ProjectParticipantRequest where m_participantRequestId = :projectParticipantRequestId")
-    Optional<ProjectParticipantRequest> findProjectParticipantRequestByParticipantRequestId(UUID projectParticipantRequestId);
-
-    @Query("from ProjectParticipantRequest where m_project.m_projectId = :projectId")
-    List<ProjectParticipantRequest> findAllByProjectId(UUID projectId);
 }

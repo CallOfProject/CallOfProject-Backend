@@ -1,4 +1,4 @@
-package callofproject.dev.authentication.service;
+package callofproject.dev.authentication.service.userinformation;
 
 import callofproject.dev.authentication.dto.client.CompanySaveDTO;
 import callofproject.dev.authentication.dto.client.CourseOrganizationSaveDTO;
@@ -9,6 +9,8 @@ import callofproject.dev.authentication.dto.environments.EducationUpsertDTO;
 import callofproject.dev.authentication.dto.environments.ExperienceUpsertDTO;
 import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
 import callofproject.dev.authentication.mapper.MapperConfiguration;
+import callofproject.dev.authentication.service.IEnvironmentClientService;
+import callofproject.dev.authentication.service.S3Service;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.nosql.dal.MatchServiceHelper;
@@ -27,13 +29,11 @@ import static callofproject.dev.data.common.util.UtilityMethod.convert;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static java.util.Optional.of;
 
-/**
- * Service class for managing user information, including education, experience, courses, links, and more.
- */
 @Service
 @Lazy
-public class UserInformationService
+public class UserInformationServiceCallback
 {
+
     private final UserManagementServiceHelper m_serviceHelper;
     private final MatchServiceHelper m_matchServiceHelper;
     private final IEnvironmentClientService m_environmentClient;
@@ -42,16 +42,7 @@ public class UserInformationService
     @Value("${application.cv-bucket.name}")
     private String m_cvBucketName;
 
-    /**
-     * Constructs a new UserInformationService with the given dependencies.
-     *
-     * @param serviceHelper      The UserManagementServiceHelper to be used by this service.
-     * @param matchServiceHelper The MatchServiceHelper to be used by this service.
-     * @param environmentClient  The IEnvironmentClientService to interact with the environment.
-     * @param mapperConfig       The MapperConfiguration for mapping DTOs to entities.
-     */
-    public UserInformationService(UserManagementServiceHelper serviceHelper, MatchServiceHelper matchServiceHelper,
-                                  IEnvironmentClientService environmentClient, MapperConfiguration mapperConfig, S3Service s3Service)
+    public UserInformationServiceCallback(UserManagementServiceHelper serviceHelper, MatchServiceHelper matchServiceHelper, IEnvironmentClientService environmentClient, MapperConfiguration mapperConfig, S3Service s3Service)
     {
         m_serviceHelper = serviceHelper;
         m_matchServiceHelper = matchServiceHelper;
@@ -60,169 +51,6 @@ public class UserInformationService
         m_s3Service = s3Service;
     }
 
-    /**
-     * Upsert education with given dto class.
-     *
-     * @param dto represent the dto class
-     * @return MessageResponseDTO.
-     */
-    public ResponseMessage<Object> upsertEducation(EducationUpsertDTO dto)
-    {
-        return doForDataService(() -> upsertEducationCallback(dto), "Education cannot be upserted!");
-    }
-
-    /**
-     * Upsert experience with given dto class.
-     *
-     * @param dto represent the dto class
-     * @return MessageResponseDTO.
-     */
-    public ResponseMessage<Object> upsertExperience(ExperienceUpsertDTO dto)
-    {
-        return doForDataService(() -> upsertExperienceCallback(dto), "Experience cannot be upserted!");
-    }
-
-    /**
-     * Upsert course with given dto class.
-     *
-     * @param dto represent the dto class
-     * @return MessageResponseDTO.
-     */
-    public ResponseMessage<Object> upsertCourse(CourseUpsertDTO dto)
-    {
-        return doForDataService(() -> upsertCourseCallback(dto), "Course cannot be upserted!");
-    }
-
-    /**
-     * Upsert link with given dto class.
-     *
-     * @param dto represent the dto class
-     * @return MessageResponseDTO.
-     */
-    public ResponseMessage<Object> upsertLink(LinkUpsertDTO dto)
-    {
-        return doForDataService(() -> upsertLinkCallback(dto), "Link cannot be upserted!");
-    }
-
-    /**
-     * Remove education with given id.
-     *
-     * @param userId represent the user id.
-     * @param id     represent the education id.
-     * @return MessageResponseDTO.
-     */
-    public ResponseMessage<Object> removeEducation(UUID userId, UUID id)
-    {
-        return doForDataService(() -> removeEducationCallback(userId, id), "Education cannot be removed!");
-    }
-
-    /**
-     * Remove course with given id.
-     *
-     * @param userId represent the user id.
-     * @param id     represent the course id.
-     * @return MessageResponseDTO.
-     */
-    public ResponseMessage<Object> removeCourse(UUID userId, UUID id)
-    {
-        return doForDataService(() -> removeCourseCallback(userId, id), "Course cannot be removed!");
-    }
-
-    /**
-     * Remove experience with given id.
-     *
-     * @param userId represent the user id.
-     * @param id     represent the experience id.
-     * @return MessageResponseDTO.
-     */
-    public ResponseMessage<Object> removeExperience(UUID userId, UUID id)
-    {
-        return doForDataService(() -> removeExperienceCallback(userId, id), "Experience cannot be removed!");
-    }
-
-    /**
-     * Remove link with given id.
-     *
-     * @param userId represent the user id.
-     * @param id     represent the link id.
-     * @return MessageResponseDTO.
-     */
-    public ResponseMessage<Object> removeLink(UUID userId, long id)
-    {
-        return doForDataService(() -> removeLinkCallback(userId, id), "Link cannot be removed!");
-    }
-
-    /**
-     * Remove course organization with given id.
-     *
-     * @param userId represent the user id.
-     * @param id     represent the course organization id.
-     * @return MessageResponseDTO.
-     */
-    public ResponseMessage<Object> removeCourseOrganization(UUID userId, UUID id)
-    {
-        return doForDataService(() -> removeCourseOrganizationCallback(userId, id), "Course organization cannot be removed!");
-    }
-
-
-    /**
-     * Uploads a user profile photo for the given user ID.
-     *
-     * @param userId The UUID of the user whose profile photo is being uploaded.
-     * @param file   The MultipartFile containing the user profile photo.
-     * @return A ResponseMessage indicating the success of the profile photo upload operation.
-     */
-    public ResponseMessage<Object> uploadUserProfilePhoto(UUID userId, MultipartFile file)
-    {
-        var userProfile = getUserProfile(userId);
-
-        var fileNameSplit = Objects.requireNonNull(file.getOriginalFilename()).split("\\.");
-        var extension = fileNameSplit[fileNameSplit.length - 1];
-        var fileName = "pp_" + userProfile.getUser().getUserId() + "_" + userProfile.getUserProfileId() + "." + extension;
-
-        var profilePhoto = m_s3Service.uploadToS3WithMultiPartFileV2(file, fileName, Optional.empty());
-
-        userProfile.setProfilePhoto(profilePhoto);
-
-        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile);
-
-        return new ResponseMessage<>("Profile photo uploaded successfully!", 200, profilePhoto);
-    }
-
-    public ResponseMessage<Object> uploadCV(UUID userId, MultipartFile file)
-    {
-        var userProfile = getUserProfile(userId);
-        var fileNameSplit = Objects.requireNonNull(file.getOriginalFilename()).split("\\.");
-        var extension = fileNameSplit[fileNameSplit.length - 1];
-        var fileName = "cv_" + userProfile.getUser().getUserId() + "." + extension;
-        System.out.println("FN: " + fileName);
-        System.out.println("BN: " + m_cvBucketName);
-        var cv = m_s3Service.uploadToS3WithMultiPartFileV2(file, fileName, Optional.of(m_cvBucketName));
-        userProfile.setCv(cv);
-        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile);
-        return new ResponseMessage<>("CV uploaded successfully!", 200, cv);
-    }
-    //------------------------------------------------------------------------------------------------------------------
-    //####################################################-CALLBACKS-###################################################
-    //------------------------------------------------------------------------------------------------------------------
-
-
-    /**
-     * Retrieves the user profile for the given user ID.
-     *
-     * @param userId The UUID of the user whose profile is being retrieved.
-     * @return The UserProfile associated with the given user ID.
-     * @throws DataServiceException if the user profile does not exist.
-     */
-    private UserProfile getUserProfile(UUID userId)
-    {
-        var userProfile = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(userId);
-
-        if (userProfile.isEmpty())
-            throw new DataServiceException("User profile does not exists!");
-
-        return userProfile.get();
-    }
 
     /**
      * Adds or updates educational information for a user based on the provided EducationUpsertDTO.
@@ -231,7 +59,7 @@ public class UserInformationService
      * @return A ResponseMessage indicating the success of the education upsert operation.
      * @throws DataServiceException if the user or education information does not exist.
      */
-    private ResponseMessage<Object> upsertEducationCallback(EducationUpsertDTO dto)
+    public ResponseMessage<Object> upsertEducationCallback(EducationUpsertDTO dto)
     {
         // save to environment client if not exists
         var educationOnClient = m_environmentClient.saveUniversity(new UniversitySaveDTO(dto.getSchoolName()));
@@ -271,7 +99,7 @@ public class UserInformationService
      * @return A ResponseMessage indicating the success of the experience upsert operation.
      * @throws DataServiceException if the user or experience information does not exist.
      */
-    private ResponseMessage<Object> upsertExperienceCallback(ExperienceUpsertDTO dto)
+    public ResponseMessage<Object> upsertExperienceCallback(ExperienceUpsertDTO dto)
     {
         // save to environment client if not exists
         var experienceOnClient = m_environmentClient.saveCompany(new CompanySaveDTO(dto.getCompanyName()));
@@ -310,7 +138,7 @@ public class UserInformationService
      * @return A ResponseMessage indicating the success of the course upsert operation.
      * @throws DataServiceException if the user or course information does not exist.
      */
-    private ResponseMessage<Object> upsertCourseCallback(CourseUpsertDTO dto)
+    public ResponseMessage<Object> upsertCourseCallback(CourseUpsertDTO dto)
     {
         // save to environment client if not exists
         var courseOnClient = m_environmentClient.saveCourse(new CourseSaveDTO(dto.getCourseName()));
@@ -360,12 +188,11 @@ public class UserInformationService
      * @param dto The DTO containing link information to be upserted.
      * @return A ResponseMessage indicating the success of the link upsert operation.
      */
-    private ResponseMessage<Object> upsertLinkCallback(LinkUpsertDTO dto)
+    public ResponseMessage<Object> upsertLinkCallback(LinkUpsertDTO dto)
     {
         var user = getUserProfile(dto.userId());
 
-        var upsertedLink = doForDataService(() -> m_serviceHelper.getLinkServiceHelper()
-                .saveLink(m_mapperConfig.linkMapper.toLink(dto)), "Link cannot be upserted!");
+        var upsertedLink = doForDataService(() -> m_serviceHelper.getLinkServiceHelper().saveLink(m_mapperConfig.linkMapper.toLink(dto)), "Link cannot be upserted!");
 
         user.addLink(upsertedLink);
         m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(user);
@@ -381,7 +208,7 @@ public class UserInformationService
      * @return A ResponseMessage indicating the success of the education removal operation.
      * @throws DataServiceException if the education entry does not exist.
      */
-    private ResponseMessage<Object> removeEducationCallback(UUID userId, UUID id)
+    public ResponseMessage<Object> removeEducationCallback(UUID userId, UUID id)
     {
         var userProfile = getUserProfile(userId);
 
@@ -409,7 +236,7 @@ public class UserInformationService
      * @return A ResponseMessage indicating the success of the course removal operation.
      * @throws DataServiceException if the course entry does not exist.
      */
-    private ResponseMessage<Object> removeCourseCallback(UUID userId, UUID id)
+    public ResponseMessage<Object> removeCourseCallback(UUID userId, UUID id)
     {
         var userProfile = getUserProfile(userId);
 
@@ -437,7 +264,7 @@ public class UserInformationService
      * @return A ResponseMessage indicating the success of the experience removal operation.
      * @throws DataServiceException if the experience entry does not exist.
      */
-    private ResponseMessage<Object> removeExperienceCallback(UUID userId, UUID id)
+    public ResponseMessage<Object> removeExperienceCallback(UUID userId, UUID id)
     {
         var userProfile = getUserProfile(userId);
 
@@ -465,7 +292,7 @@ public class UserInformationService
      * @return A ResponseMessage indicating the success of the link removal operation.
      * @throws DataServiceException if the link does not exist.
      */
-    private ResponseMessage<Object> removeLinkCallback(UUID userId, long id)
+    public ResponseMessage<Object> removeLinkCallback(UUID userId, long id)
     {
         var userProfile = getUserProfile(userId);
 
@@ -493,7 +320,7 @@ public class UserInformationService
      * @return A ResponseMessage indicating the success of the course organization removal operation.
      * @throws DataServiceException if the course organization entry does not exist.
      */
-    private ResponseMessage<Object> removeCourseOrganizationCallback(UUID userId, UUID id)
+    public ResponseMessage<Object> removeCourseOrganizationCallback(UUID userId, UUID id)
     {
         var userProfile = getUserProfile(userId);
 
@@ -511,6 +338,66 @@ public class UserInformationService
         m_serviceHelper.getCourseOrganizationServiceHelper().removeCourseOrganization(courseOrganization.get().getCourseOrganization());
 
         return new ResponseMessage<>("Course organization removed successfully!", 200, true);
+    }
+
+    /**
+     * Uploads a user profile photo for the given user ID.
+     *
+     * @param userId The UUID of the user whose profile photo is being uploaded.
+     * @param file   The MultipartFile containing the user profile photo.
+     * @return A ResponseMessage indicating the success of the profile photo upload operation.
+     */
+    public ResponseMessage<Object> uploadUserProfilePhotoCallback(UUID userId, MultipartFile file)
+    {
+        var userProfile = getUserProfile(userId);
+
+        var fileNameSplit = Objects.requireNonNull(file.getOriginalFilename()).split("\\.");
+        var extension = fileNameSplit[fileNameSplit.length - 1];
+        var fileName = "pp_" + userProfile.getUser().getUserId() + "_" + userProfile.getUserProfileId() + "." + extension;
+
+        var profilePhoto = m_s3Service.uploadToS3WithMultiPartFileV2(file, fileName, Optional.empty());
+
+        userProfile.setProfilePhoto(profilePhoto);
+
+        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile);
+
+        return new ResponseMessage<>("Profile photo uploaded successfully!", 200, profilePhoto);
+    }
+
+    /**
+     * Uploads a user CV for the given user ID.
+     *
+     * @param userId The UUID of the user whose CV is being uploaded.
+     * @param file   The MultipartFile containing the user CV.
+     * @return A ResponseMessage indicating the success of the CV upload operation.
+     */
+    public ResponseMessage<Object> uploadCVCallback(UUID userId, MultipartFile file)
+    {
+        var userProfile = getUserProfile(userId);
+        var fileNameSplit = Objects.requireNonNull(file.getOriginalFilename()).split("\\.");
+        var extension = fileNameSplit[fileNameSplit.length - 1];
+        var fileName = "cv_" + userProfile.getUser().getUserId() + "." + extension;
+        var cv = m_s3Service.uploadToS3WithMultiPartFileV2(file, fileName, Optional.of(m_cvBucketName));
+        userProfile.setCv(cv);
+        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile);
+        return new ResponseMessage<>("CV uploaded successfully!", 200, cv);
+    }
+
+    /**
+     * Retrieves the user profile for the given user ID.
+     *
+     * @param userId The UUID of the user whose profile is being retrieved.
+     * @return The UserProfile associated with the given user ID.
+     * @throws DataServiceException if the user profile does not exist.
+     */
+    private UserProfile getUserProfile(UUID userId)
+    {
+        var userProfile = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(userId);
+
+        if (userProfile.isEmpty())
+            throw new DataServiceException("User profile does not exists!");
+
+        return userProfile.get();
     }
 
 }

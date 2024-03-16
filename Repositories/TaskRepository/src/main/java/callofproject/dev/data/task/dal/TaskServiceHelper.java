@@ -240,4 +240,19 @@ public class TaskServiceHelper
     {
         return doForRepository(() -> m_taskRepository.saveAll(tasks), "Failed to save all tasks in repository");
     }
+
+    public Optional<ProjectParticipant> findProjectParticipantByProjectIdAndUserId(UUID projectId, UUID userId)
+    {
+        return doForRepository(() -> m_participantRepository.findProjectParticipantByProjectIdAndUserId(projectId, userId), "Failed to find participant by project id and user id in repository");
+    }
+
+    public void removeProjectParticipant(ProjectParticipant participant)
+    {
+        doForRepository(() -> m_participantRepository.delete(participant), "Failed to remove project participant in repository");
+    }
+
+    public void deleteProjectById(UUID id)
+    {
+        doForRepository(() -> m_projectRepository.deleteById(id), "Failed to delete project by id in repository");
+    }
 }

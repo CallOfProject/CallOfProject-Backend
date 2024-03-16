@@ -79,7 +79,7 @@ public class AuthenticationServiceTest
     public void testLoginOperation_withGivenValidCredentials_shouldNotNull()
     {
         var loginRequest = new AuthenticationRequest(user2.getUsername(), "12345");
-        var loginResponse = m_injection.getAuthenticationService().authenticate(loginRequest);
+        var loginResponse = m_injection.getAuthenticationService().authenticateCallback(loginRequest);
 
         assertNotNull(loginResponse);
         assertEquals("ROLE_USER", loginResponse.getRole());
@@ -94,8 +94,8 @@ public class AuthenticationServiceTest
         var loginRequest = new AuthenticationRequest("qwerty", "dsadsafs");
 
         var exception = assertThrows(DataServiceException.class,
-                () -> m_injection.getAuthenticationService().authenticate(loginRequest));
-        assertEquals("Message: AuthenticationService::authenticate , Cause Message:No user registered with this details!", exception.getMessage());
+                () -> m_injection.getAuthenticationService().authenticateCallback(loginRequest));
+        assertEquals("Message: No user registered with this details! ", exception.getMessage());
 
     }
 
@@ -106,8 +106,8 @@ public class AuthenticationServiceTest
         var loginRequest = new AuthenticationRequest(user2.getUsername(), "password321");
 
         var exception = assertThrows(DataServiceException.class,
-                () -> m_injection.getAuthenticationService().authenticate(loginRequest));
-        assertEquals("Message: AuthenticationService::authenticate , Cause Message:Invalid password!", exception.getMessage());
+                () -> m_injection.getAuthenticationService().authenticateCallback(loginRequest));
+        assertEquals("Message: Invalid password! ", exception.getMessage());
     }
 
     @Test
@@ -116,8 +116,8 @@ public class AuthenticationServiceTest
         var loginRequest = new AuthenticationRequest("emirr", user2.getPassword());
 
         var exception = assertThrows(DataServiceException.class,
-                () -> m_injection.getAuthenticationService().authenticate(loginRequest));
-        assertEquals("Message: AuthenticationService::authenticate , Cause Message:No user registered with this details!", exception.getMessage());
+                () -> m_injection.getAuthenticationService().authenticateCallback(loginRequest));
+        assertEquals("Message: No user registered with this details! ", exception.getMessage());
     }
 
 
@@ -127,8 +127,8 @@ public class AuthenticationServiceTest
         var loginRequest = new AuthenticationRequest("", "");
 
         var exception = assertThrows(DataServiceException.class,
-                () -> m_injection.getAuthenticationService().authenticate(loginRequest));
-        assertEquals("Message: AuthenticationService::authenticate , Cause Message:No user registered with this details!", exception.getMessage());
+                () -> m_injection.getAuthenticationService().authenticateCallback(loginRequest));
+        assertEquals("Message: No user registered with this details! ", exception.getMessage());
     }
 
     @Test
@@ -136,7 +136,7 @@ public class AuthenticationServiceTest
     {
         var loginRequest = new AuthenticationRequest(user1.getUsername(), "12345");
 
-        var request = m_injection.getAuthenticationService().authenticate(loginRequest);
+        var request = m_injection.getAuthenticationService().authenticateCallback(loginRequest);
         assertFalse(request.isSuccess());
         assertTrue(request.isBlocked());
     }
@@ -146,8 +146,8 @@ public class AuthenticationServiceTest
     {
 
         var exception = assertThrows(DataServiceException.class,
-                () -> m_injection.getAuthenticationService().authenticate(null));
-        assertEquals("Message: AuthenticationService::authenticate , Cause Message:Message: AuthenticationRequest is null! ", exception.getMessage());
+                () -> m_injection.getAuthenticationService().authenticateCallback(null));
+        assertEquals("Message: AuthenticationRequest is null! ", exception.getMessage());
     }
 
     @Test

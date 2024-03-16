@@ -297,7 +297,7 @@ public class TestInterviewCallbackService
         if (userTestInterview.isEmpty())
             return new ResponseMessage<>("User not found", Status.NOT_FOUND, false);
 
-        var result = userTestInterview.get().getInterviewStatus() == InterviewStatus.FINISHED;
+        var result = userTestInterview.get().getInterviewStatus() == InterviewStatus.COMPLETED;
 
         return new ResponseMessage<>("User solved before", Status.OK, result);
     }
@@ -354,6 +354,7 @@ public class TestInterviewCallbackService
             throw new DataServiceException("User not assigned to interview");
 
         userTestInterview.get().setInterviewStatus(InterviewStatus.COMPLETED);
+        userTestInterview.get().getAnswers().forEach(a -> a.setAnswer(a.getAnswer() == null ? "no_answer" : a.getAnswer()));
         var calculateScore = calculateScore(userTestInterview.get(), interview.getQuestions().stream().toList());
         userTestInterview.get().setScore(calculateScore);
         m_interviewServiceHelper.createUserTestInterviews(userTestInterview.get());
@@ -369,7 +370,7 @@ public class TestInterviewCallbackService
         for (var question : questions)
         {
             var userAnswer = userAnswersMap.get(question.getId());
-            if (userAnswer.equals(question.getAnswer()))
+            if (userAnswer != null && userAnswer.equals(question.getAnswer()))
                 score += question.getPoint();
         }
         return score;

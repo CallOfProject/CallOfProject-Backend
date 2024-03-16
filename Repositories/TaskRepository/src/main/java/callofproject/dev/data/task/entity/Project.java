@@ -6,6 +6,7 @@ import callofproject.dev.data.task.entity.enums.EProjectStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -44,6 +45,9 @@ public class Project
     @JsonIgnore
     private Set<Task> m_tasks;
 
+    @Column(name = "created_at")
+    private LocalDateTime m_deletedAt = null;
+
     public Project()
     {
     }
@@ -72,6 +76,16 @@ public class Project
             m_tasks = new HashSet<>();
 
         m_tasks.add(task);
+    }
+
+    public LocalDateTime getDeletedAt()
+    {
+        return m_deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt)
+    {
+        m_deletedAt = deletedAt;
     }
 
     public Set<Task> getTasks()

@@ -13,16 +13,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
+import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.TEST_PROPERTIES_FILE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@TestPropertySource(locations = TEST_PROPERTIES_FILE)
 public class RootControllerTest
 {
     @Mock

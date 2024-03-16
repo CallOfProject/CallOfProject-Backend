@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
@@ -83,21 +84,21 @@ public class UserInformationTest
         var savedUser2 = m_injection.getUserManagementService().saveUserCallback(user2);
 
 
-        link1 = (Link) m_injection.getUserInformationService().upsertLink(new LinkUpsertDTO(savedUser1.getObject().userId(), "Link Title", "http://link.com")).getObject();
-        link2 = (Link) m_injection.getUserInformationService().upsertLink(new LinkUpsertDTO(savedUser2.getObject().userId(), "Link Title", "http://link.com")).getObject();
+        link1 = (Link) m_injection.getUserInformationService().upsertLinkCallback(new LinkUpsertDTO(savedUser1.getObject().userId(), "Link Title", "http://link.com")).getObject();
+        link2 = (Link) m_injection.getUserInformationService().upsertLinkCallback(new LinkUpsertDTO(savedUser2.getObject().userId(), "Link Title", "http://link.com")).getObject();
 
 
-        education1 = (Education) m_injection.getUserInformationService().upsertEducation(new EducationUpsertDTO(savedUser1.getObject().userId(), "YASAR UNIVERSITY",
+        education1 = (Education) m_injection.getUserInformationService().upsertEducationCallback(new EducationUpsertDTO(savedUser1.getObject().userId(), "YASAR UNIVERSITY",
                 "ENGINEERING", "SOFTWARE ENGINEERING", LocalDate.now(), LocalDate.now().plusYears(4), true, 3.5)).getObject();
-        education2 = (Education) m_injection.getUserInformationService().upsertEducation(new EducationUpsertDTO(savedUser2.getObject().userId(),
+        education2 = (Education) m_injection.getUserInformationService().upsertEducationCallback(new EducationUpsertDTO(savedUser2.getObject().userId(),
                 "EGE UNIVERSITY", "ENGINEERING", "SOFTWARE ENGINEERING", LocalDate.now(), LocalDate.now().plusYears(4), true, 2.5)).getObject();
 
-        experience1 = (Experience) m_injection.getUserInformationService().upsertExperience(new ExperienceUpsertDTO(savedUser1.getObject().userId(), "Company Name", "Description", "http://website.com", LocalDate.now(), LocalDate.now().plusYears(2), true, "Job Definition")).getObject();
-        experience2 = (Experience) m_injection.getUserInformationService().upsertExperience(new ExperienceUpsertDTO(savedUser2.getObject().userId(), "Company Name", "Description", "http://website.com", LocalDate.now(), LocalDate.now().plusYears(2), true, "Job Definition")).getObject();
+        experience1 = (Experience) m_injection.getUserInformationService().upsertExperienceCallback(new ExperienceUpsertDTO(savedUser1.getObject().userId(), "Company Name", "Description", "http://website.com", LocalDate.now(), LocalDate.now().plusYears(2), true, "Job Definition")).getObject();
+        experience2 = (Experience) m_injection.getUserInformationService().upsertExperienceCallback(new ExperienceUpsertDTO(savedUser2.getObject().userId(), "Company Name", "Description", "http://website.com", LocalDate.now(), LocalDate.now().plusYears(2), true, "Job Definition")).getObject();
 
 
-        course1 = (Course) m_injection.getUserInformationService().upsertCourse(new CourseUpsertDTO(savedUser1.getObject().userId(), "Organizator", "Course Name", LocalDate.now(), LocalDate.now().plusMonths(6), false, "Description")).getObject();
-        course2 = (Course) m_injection.getUserInformationService().upsertCourse(new CourseUpsertDTO(savedUser2.getObject().userId(), "Organizator", "Course Name", LocalDate.now(), LocalDate.now().plusMonths(6), false, "Description")).getObject();
+        course1 = (Course) m_injection.getUserInformationService().upsertCourseCallback(new CourseUpsertDTO(savedUser1.getObject().userId(), "Organizator", "Course Name", LocalDate.now(), LocalDate.now().plusMonths(6), false, "Description")).getObject();
+        course2 = (Course) m_injection.getUserInformationService().upsertCourseCallback(new CourseUpsertDTO(savedUser2.getObject().userId(), "Organizator", "Course Name", LocalDate.now(), LocalDate.now().plusMonths(6), false, "Description")).getObject();
 
         assertNotNull(savedUser1);
         assertNotNull(savedUser2);
@@ -118,7 +119,7 @@ public class UserInformationTest
     public void testUpsertEducation_withValidData_shouldReturnSuccessResponse()
     {
         EducationUpsertDTO dto = new EducationUpsertDTO(user2Id, "DOKUZ EYLUL UNIVERSITY", "Department", "Description", LocalDate.now(), LocalDate.now().plusYears(4), true, 3.5);
-        var response = m_injection.getUserInformationService().upsertEducation(dto);
+        var response = m_injection.getUserInformationService().upsertEducationCallback(dto);
         assertNotNull(response);
     }
 
@@ -127,14 +128,14 @@ public class UserInformationTest
     {
         EducationUpsertDTO dto = new EducationUpsertDTO(UUID.randomUUID(), "YASAR UNIVERSITY",
                 "ENGINEERING", "SOFTWARE ENGINEERING", null, null, true, -1);
-        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().upsertEducation(dto));
+        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().upsertEducationCallback(dto));
     }
 
     @Test
     public void testUpsertExperience_withValidData_shouldReturnSuccessResponse()
     {
         ExperienceUpsertDTO dto = new ExperienceUpsertDTO(user1Id, "Company Name", "Description", "http://website.com", LocalDate.now(), LocalDate.now().plusYears(2), true, "Job Definition");
-        var response = m_injection.getUserInformationService().upsertExperience(dto);
+        var response = m_injection.getUserInformationService().upsertExperienceCallback(dto);
         assertNotNull(response);
     }
 
@@ -142,14 +143,16 @@ public class UserInformationTest
     public void testUpsertExperience_withInvalidData_shouldThrowException()
     {
         ExperienceUpsertDTO dto = new ExperienceUpsertDTO(user2Id, "", "", "", null, null, false, ""); // Invalid data
-        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().upsertExperience(dto));
+        assertThrows(DataIntegrityViolationException.class, () -> m_injection.getUserInformationService().upsertExperienceCallback(dto));
     }
 
     @Test
     public void testUpsertCourse_withValidData_shouldReturnSuccessResponse()
     {
-        CourseUpsertDTO dto = new CourseUpsertDTO(user1Id, "Organizator", "Course Name", LocalDate.now(), LocalDate.now().plusMonths(6), false, "Description");
-        var response = m_injection.getUserInformationService().upsertCourse(dto);
+        System.out.println("user1Id: " + user1Id);
+        CourseUpsertDTO dto = new CourseUpsertDTO(user1Id, "Organizator", "Course Name", LocalDate.now(),
+                LocalDate.now(), false, "Description");
+        var response = m_injection.getUserInformationService().upsertCourseCallback(dto);
         assertNotNull(response);
     }
 
@@ -157,14 +160,14 @@ public class UserInformationTest
     public void testUpsertCourse_withInvalidData_shouldThrowException()
     {
         CourseUpsertDTO dto = new CourseUpsertDTO(user2Id, "", "", null, null, false, ""); // Invalid data
-        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().upsertCourse(dto));
+        assertThrows(DataIntegrityViolationException.class, () -> m_injection.getUserInformationService().upsertCourseCallback(dto));
     }
 
     @Test
     public void testUpsertLink_withValidData_shouldReturnSuccessResponse()
     {
         LinkUpsertDTO dto = new LinkUpsertDTO(user1Id, "Link Title", "http://link.com");
-        var response = m_injection.getUserInformationService().upsertLink(dto);
+        var response = m_injection.getUserInformationService().upsertLinkCallback(dto);
         assertNotNull(response);
     }
 
@@ -172,30 +175,28 @@ public class UserInformationTest
     public void testUpsertLink_withInvalidData_shouldThrowException()
     {
         LinkUpsertDTO dto = new LinkUpsertDTO(user1Id, null, null); // Invalid data
-        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().upsertLink(dto));
+        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().upsertLinkCallback(dto));
     }
 
     @Test
     public void testRemoveEducation_withValidId_shouldReturnSuccessResponse()
     {
-        var response = m_injection.getUserInformationService().removeEducation(user1Id, education1.getEducation_id());
+        var response = m_injection.getUserInformationService().removeEducationCallback(user1Id, education1.getEducation_id());
         assertNotNull(response);
     }
-
-
 
 
     @Test
     public void testRemoveEducation_withInvalidId_shouldReturnErrorResponse()
     {
         UUID invalidEducationId = UUID.randomUUID();
-        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().removeEducation(user2Id, invalidEducationId));
+        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().removeEducationCallback(user2Id, invalidEducationId));
     }
 
     @Test
     public void testRemoveCourse_withValidId_shouldReturnSuccessResponse()
     {
-        var response = m_injection.getUserInformationService().removeCourse(user1Id, course1.getCourse_id());
+        var response = m_injection.getUserInformationService().removeCourseCallback(user1Id, course1.getCourse_id());
         assertNotNull(response);
     }
 
@@ -203,13 +204,13 @@ public class UserInformationTest
     public void testRemoveCourse_withInvalidId_shouldReturnErrorResponse()
     {
         UUID invalidCourseId = UUID.randomUUID();
-        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().removeCourse(user2Id, invalidCourseId));
+        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().removeCourseCallback(user2Id, invalidCourseId));
     }
 
     @Test
     public void testRemoveExperience_withValidId_shouldReturnSuccessResponse()
     {
-        var response = m_injection.getUserInformationService().removeExperience(user2Id, experience2.getExperience_id());
+        var response = m_injection.getUserInformationService().removeExperienceCallback(user2Id, experience2.getExperience_id());
         assertNotNull(response);
     }
 
@@ -217,13 +218,13 @@ public class UserInformationTest
     public void testRemoveExperience_withInvalidId_shouldReturnErrorResponse()
     {
         UUID invalidExperienceId = UUID.randomUUID();
-        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().removeExperience(user2Id, invalidExperienceId));
+        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().removeExperienceCallback(user2Id, invalidExperienceId));
     }
 
     @Test
     public void testRemoveLink_withValidId_shouldReturnSuccessResponse()
     {
-        var response = m_injection.getUserInformationService().removeLink(user1Id, link1.getLink_id());
+        var response = m_injection.getUserInformationService().removeLinkCallback(user1Id, link1.getLink_id());
         assertNotNull(response);
     }
 
@@ -231,7 +232,7 @@ public class UserInformationTest
     public void testRemoveLink_withInvalidId_shouldReturnErrorResponse()
     {
         long invalidLinkId = -1L;
-        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().removeLink(user2Id, invalidLinkId));
+        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().removeLinkCallback(user2Id, invalidLinkId));
     }
 
 

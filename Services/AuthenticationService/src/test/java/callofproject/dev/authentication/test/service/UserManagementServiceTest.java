@@ -116,7 +116,7 @@ public class UserManagementServiceTest
     @Test
     public void testFindUserProfileByUserName_withGivenUsername_shouldNotNull()
     {
-        var user = m_injection.getUserManagementService().findUserProfileByUsername("canozturk");
+        var user = m_injection.getUserManagementService().findUserProfileByUserUsernameCallback("canozturk");
 
         assertNotNull(user);
         assertNotNull(user.getObject());
@@ -127,15 +127,15 @@ public class UserManagementServiceTest
     public void testFindUserProfileByUserName_withGivenUsername_shouldThrowDataServiceException()
     {
         var exception = assertThrows(DataServiceException.class,
-                () -> m_injection.getUserManagementService().findUserProfileByUsername("no_name"));
+                () -> m_injection.getUserManagementService().findUserProfileByUserUsernameCallback("no_name"));
 
-        assertEquals("Message: UserManagementService::findUserProfileByUserId , Cause Message:Message: User does not exists! ", exception.getMessage());
+        assertEquals("Message: User does not exists! ", exception.getMessage());
     }
 
     @Test
     public void testFindUserProfileByUserId_withGivenUserId_shouldNotNull()
     {
-        var user = m_injection.getUserManagementService().findUserProfileByUserId(user1Id);
+        var user = m_injection.getUserManagementService().findUserProfileByUserIdCallback(user1Id);
 
         assertNotNull(user);
         assertNotNull(user.getObject());
@@ -146,16 +146,16 @@ public class UserManagementServiceTest
     public void testFindUserProfileByUserId_withGivenUserId_shouldThrowDataServiceException()
     {
         var exception = assertThrows(DataServiceException.class,
-                () -> m_injection.getUserManagementService().findUserProfileByUserId(UUID.randomUUID()));
+                () -> m_injection.getUserManagementService().findUserProfileByUserIdCallback(UUID.randomUUID()));
 
-        assertEquals("Message: UserManagementService::findUserProfileByUserId , Cause Message:Message: User does not exists! "
+        assertEquals("Message: User does not exists! "
                 , exception.getMessage());
     }
 
     @Test
     public void testFindUserWithProfileByUserId_withGivenUserId_shouldNotNull()
     {
-        var user = m_injection.getUserManagementService().findUserWithProfile(user1Id);
+        var user = m_injection.getUserManagementService().findUserWithProfileCallback(user1Id);
 
         assertNotNull(user);
         assertNotNull(user.getObject());
@@ -166,8 +166,8 @@ public class UserManagementServiceTest
     public void testFindUserWithProfileByUserId_withGivenUserId_shouldThrowDataServiceException()
     {
         var exception = assertThrows(DataServiceException.class,
-                () -> m_injection.getUserManagementService().findUserWithProfile(UUID.randomUUID()));
+                () -> m_injection.getUserManagementService().findUserWithProfileCallback(UUID.randomUUID()));
 
-        assertEquals("Message: UserManagementService::findUserWithProfile , Cause Message:Message: User does not exists! ", exception.getMessage());
+        assertEquals("Message: User does not exists! ", exception.getMessage());
     }
 }

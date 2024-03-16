@@ -5,7 +5,7 @@ import callofproject.dev.authentication.dto.environments.CourseUpsertDTO;
 import callofproject.dev.authentication.dto.environments.EducationUpsertDTO;
 import callofproject.dev.authentication.dto.environments.ExperienceUpsertDTO;
 import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
-import callofproject.dev.authentication.service.UserInformationService;
+import callofproject.dev.authentication.service.userinformation.UserInformationService;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.library.exception.service.DataServiceException;
 import org.junit.jupiter.api.Test;
@@ -15,15 +15,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
+import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.TEST_PROPERTIES_FILE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@TestPropertySource(locations = TEST_PROPERTIES_FILE)
 public class UserInformationControllerTest
 {
     @Mock

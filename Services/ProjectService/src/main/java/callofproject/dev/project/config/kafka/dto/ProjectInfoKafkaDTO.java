@@ -1,5 +1,6 @@
 package callofproject.dev.project.config.kafka.dto;
 
+import callofproject.dev.data.common.enums.EOperation;
 import callofproject.dev.data.project.entity.enums.AdminOperationStatus;
 import callofproject.dev.data.project.entity.enums.EProjectStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,6 +20,9 @@ public record ProjectInfoKafkaDTO(
         @JsonProperty("project_status")
         EProjectStatus m_projectStatus,
         @JsonProperty("admin_operation_status")
-        AdminOperationStatus m_adminOperationStatus)
+        AdminOperationStatus m_adminOperationStatus,
+        @JsonProperty("operation")
+        EOperation m_operation
+        )
 {
 }

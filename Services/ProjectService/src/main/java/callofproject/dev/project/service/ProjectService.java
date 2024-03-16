@@ -2,6 +2,7 @@ package callofproject.dev.project.service;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.data.common.enums.EOperation;
 import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.data.project.entity.ProjectParticipant;
@@ -20,13 +21,13 @@ import callofproject.dev.nosql.repository.IProjectTagRepository;
 import callofproject.dev.project.config.kafka.KafkaProducer;
 import callofproject.dev.project.config.kafka.dto.ProjectInfoKafkaDTO;
 import callofproject.dev.project.config.kafka.dto.ProjectParticipantKafkaDTO;
-import callofproject.dev.project.config.kafka.dto.UserKafkaDTO;
 import callofproject.dev.project.dto.*;
 import callofproject.dev.project.dto.overview.ProjectOverviewDTO;
 import callofproject.dev.project.mapper.IProjectMapper;
 import callofproject.dev.project.mapper.IProjectParticipantMapper;
 import callofproject.dev.project.mapper.IUserMapper;
 import callofproject.dev.project.util.Policy;
+import callofproject.dev.project.util.Util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,14 +35,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.MemoryCacheImageOutputStream;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -95,7 +88,8 @@ public class ProjectService implements IProjectService
     public ProjectService(@Qualifier(PROJECT_SERVICE_HELPER_BEAN) ProjectServiceHelper serviceHelper,
                           @Qualifier(PROJECT_TAG_SERVICE_HELPER_BEAN_NAME) ProjectTagServiceHelper projectTagServiceHelper,
                           @Qualifier(TAG_SERVICE_HELPER_BEAN_NAME) TagServiceHelper tagServiceHelper, KafkaProducer kafkaProducer, ObjectMapper objectMapper,
-                          IProjectMapper projectMapper, S3Service s3Service, IProjectParticipantMapper projectParticipantMapper, IProjectTagRepository projectTagRepository, IUserMapper userMapper)
+                          IProjectMapper projectMapper, S3Service s3Service, IProjectParticipantMapper projectParticipantMapper,
+                          IProjectTagRepository projectTagRepository, IUserMapper userMapper)
     {
         m_serviceHelper = serviceHelper;
         m_projectTagServiceHelper = projectTagServiceHelper;
@@ -147,7 +141,7 @@ public class ProjectService implements IProjectService
             var userOwner = findUserIfExists(projectOverviewDTO.projectOwnerName());
             var owner = m_userMapper.toUserKafkaDTO(userOwner);
             var projectKafkaDTO = new ProjectInfoKafkaDTO(project.getProjectId(), projectOverviewDTO.projectTitle(), owner, participants,
-                    projectOverviewDTO.projectStatus(), project.getAdminOperationStatus());
+                    projectOverviewDTO.projectStatus(), project.getAdminOperationStatus(), EOperation.CREATE);
 
             m_kafkaProducer.sendProjectInfo(projectKafkaDTO);
         }
@@ -158,12 +152,6 @@ public class ProjectService implements IProjectService
     {
         return new ProjectParticipantKafkaDTO(participant.getProjectId(), participant.getProject().getProjectId(),
                 participant.getUser().getUserId(), participant.getJoinDate(), false);
-    }
-
-
-    private UserKafkaDTO createUserKafkaDTO(User user)
-    {
-        return m_userMapper.toUserKafkaDTO(user);
     }
 
     /**
@@ -587,7 +575,7 @@ public class ProjectService implements IProjectService
             return new ResponseMessage<>(format("You cannot create or join to project! Max project count is: %d", Policy.MAX_PROJECT_COUNT),
                     NOT_ACCEPTED, false);
 
-        var compressedPhoto = file != null && file.getSize() > 0 ? compressImageToJPEG(file) : null;
+        var compressedPhoto = file != null && file.getSize() > 0 ? Util.compressImageToJPEG(file) : null;
 
         var projectPhoto = compressedPhoto != null ? uploadProjectPhoto(compressedPhoto, user) : null;
 
@@ -626,42 +614,6 @@ public class ProjectService implements IProjectService
         m_serviceHelper.addUser(user);
 
         return new ResponseMessage<>("Project Created Successfully!", CREATED, m_projectMapper.toProjectOverviewDTO(savedProject, tagList));
-    }
-
-    public byte[] compressImageToJPEG(MultipartFile file)
-    {
-        try
-        {
-            BufferedImage originalImage = ImageIO.read(file.getInputStream());
-
-            // Create a BufferedImage with RGB color space for compatibility with JPEG
-            BufferedImage rgbImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
-            rgbImage.createGraphics().drawImage(originalImage, 0, 0, null);
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-            // Create JPEG writer with specified quality
-            ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
-            ImageWriteParam param = writer.getDefaultWriteParam();
-            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            param.setCompressionQuality(0.5f); // You can adjust the compression quality here
-
-            // Write the compressed image to the output stream
-            writer.setOutput(new MemoryCacheImageOutputStream(outputStream));
-            writer.write(null, new IIOImage(rgbImage, null, null), param);
-
-            // Encode the output stream to base64 or return byte array
-            byte[] compressedBytes = outputStream.toByteArray();
-
-            // Close writer and output stream
-            writer.dispose();
-            outputStream.close();
-
-            return compressedBytes;
-        } catch (IOException e)
-        {
-            throw new DataServiceException("Error occurred while compressing image!", e);
-        }
     }
 
 
@@ -721,7 +673,6 @@ public class ProjectService implements IProjectService
         var user = findUserIfExists(username);
 
         var projects = m_serviceHelper.findAllProjectByProjectOwnerUserId(user.getUserId(), page);
-
 
         var dtoList = m_projectMapper.toProjectsDetailDTO(toList(projects.getContent(),
                 obj -> m_projectMapper.toProjectDetailDTO(obj, findTagList(obj), findProjectParticipantsDTOByProjectId(obj))));
@@ -948,10 +899,8 @@ public class ProjectService implements IProjectService
             if (m_tagServiceHelper.existsByTagNameContainsIgnoreCase(tagName)) // If tag already exists then save project tag
             {
                 m_projectTagServiceHelper.saveProjectTag(new ProjectTag(tagName, savedProject.getProjectId()));
-            }
-            else // If tag not exists then save tag and project tag
+            } else // If tag not exists then save tag and project tag
             {
-                //System.out.println("here-3");
                 m_tagServiceHelper.saveTag(new Tag(tagName));
                 m_projectTagServiceHelper.saveProjectTag(new ProjectTag(tagName, savedProject.getProjectId()));
             }
@@ -959,6 +908,4 @@ public class ProjectService implements IProjectService
         }
 
     }
-
-
 }

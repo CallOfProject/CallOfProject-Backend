@@ -36,10 +36,24 @@ public class TicketController
                 msg -> ResponseEntity.badRequest().body(msg.getMessage()));
     }
 
-    @GetMapping("/find/all")
-    public ResponseEntity<Object> getAllTickets(@RequestParam("page") int page)
+    @GetMapping("/find/close-count")
+    public ResponseEntity<Object> getCloseTicketCount()
+    {
+        return subscribe(() -> ok(m_ticketService.findClosedTicketCount()),
+                msg -> ResponseEntity.badRequest().body(msg.getMessage()));
+    }
+
+    @GetMapping("/find/all/page")
+    public ResponseEntity<Object> getAllTicketsPageable(@RequestParam("page") int page)
     {
         return subscribe(() -> ok(m_ticketService.findAllTicketsPageable(page)),
+                msg -> ResponseEntity.badRequest().body(msg.getMessage()));
+    }
+
+    @GetMapping("/find/all")
+    public ResponseEntity<Object> getAllTickets()
+    {
+        return subscribe(() -> ok(m_ticketService.findAllTickets()),
                 msg -> ResponseEntity.badRequest().body(msg.getMessage()));
     }
 

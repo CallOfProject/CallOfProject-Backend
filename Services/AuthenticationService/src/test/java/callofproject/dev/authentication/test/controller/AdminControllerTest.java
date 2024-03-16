@@ -6,7 +6,7 @@ import callofproject.dev.authentication.dto.admin.UserUpdateDTOAdmin;
 import callofproject.dev.authentication.dto.admin.UsersShowingAdminDTO;
 import callofproject.dev.authentication.dto.auth.AuthenticationRequest;
 import callofproject.dev.authentication.dto.auth.AuthenticationResponse;
-import callofproject.dev.authentication.service.AdminService;
+import callofproject.dev.authentication.service.admin.AdminService;
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.repository.authentication.entity.Role;
@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,11 +30,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static callofproject.dev.authentication.util.AuthenticationServiceBeanName.TEST_PROPERTIES_FILE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@TestPropertySource(locations = TEST_PROPERTIES_FILE)
 public class AdminControllerTest
 {
     @Mock

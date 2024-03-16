@@ -83,4 +83,13 @@ public interface IProjectOwnerService
      * @return A ResponseMessage containing the result of the remove operation callback.
      */
     ResponseMessage<Object> removeParticipantCallback(UUID projectId, UUID userId);
+
+
+    /**
+     * Soft deletes a project.
+     *
+     * @param projectId The UUID of the project to be soft deleted.
+     * @return A ResponseMessage containing the result of the soft delete operation.
+     */
+    ResponseMessage<Object> softDeleteProject(UUID projectId);
 }

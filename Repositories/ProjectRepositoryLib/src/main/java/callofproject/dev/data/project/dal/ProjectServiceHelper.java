@@ -9,7 +9,6 @@ import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.data.project.entity.ProjectParticipant;
 import callofproject.dev.data.project.entity.ProjectParticipantRequest;
 import callofproject.dev.data.project.entity.User;
-import callofproject.dev.data.project.entity.enums.*;
 import callofproject.dev.library.exception.repository.RepositoryException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,7 +25,6 @@ import java.util.UUID;
 import static callofproject.dev.data.project.ProjectRepositoryBeanName.PROJECT_SERVICE_HELPER_BEAN;
 import static callofproject.dev.data.project.ProjectRepositoryBeanName.REPOSITORY_FACADE_BEAN;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForRepository;
-import static callofproject.dev.util.stream.StreamUtil.toStream;
 
 @Component(PROJECT_SERVICE_HELPER_BEAN)
 @PropertySource("classpath:application-project_repository.properties")
@@ -44,35 +41,6 @@ public class ProjectServiceHelper
         m_facade = facade;
     }
 
-
-    /**
-     * Remove project by id.
-     *
-     * @param projectId represent the project id.
-     */
-    public void removeProjectById(UUID projectId)
-    {
-        doForRepository(() -> m_facade.m_projectRepository.deleteById(projectId), "ProjectServiceHelper::removeProjectById");
-    }
-
-    /**
-     * Save project.
-     *
-     * @param project represent the project.
-     * @return Project
-     */
-    public Project saveProject(Project project)
-    {
-        return doForRepository(() -> m_facade.m_projectRepository.save(project),
-                "ProjectServiceHelper::saveProject");
-    }
-
-    /**
-     * Find all projects.
-     *
-     * @param page represent the page.
-     * @return Project
-     */
     public Page<Project> findAllProjectsPageable(int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
@@ -82,468 +50,9 @@ public class ProjectServiceHelper
     }
 
 
-    /**
-     * Find all projects by project name.
-     *
-     * @param projectName represent the project name.
-     * @param page        represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByProjectName(String projectName, int page)
+    public Iterable<Project> findAllProjects()
     {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByProjectName(projectName, pageable),
-                "ProjectServiceHelper::findAllProjectsByProjectName");
-    }
-
-    /**
-     * Find all projects by project name containing.
-     *
-     * @param word represent the word.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByProjectNameContaining(String word, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByProjectNameContaining(word, pageable),
-                "ProjectServiceHelper::findAllProjectsByProjectNameContaining");
-    }
-
-    /**
-     * Find all projects by application deadline.
-     *
-     * @param date represent the date.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByApplicationDeadline(LocalDate date, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByApplicationDeadline(date, pageable),
-                "ProjectServiceHelper::findAllProjectsByApplicationDeadline");
-    }
-
-    /**
-     * Find all projects by project summary containing ignore case.
-     *
-     * @param word represent the word.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByDescriptionContainingIgnoreCase(String word, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByDescriptionContainingIgnoreCase(word, pageable),
-                "ProjectServiceHelper::findAllProjectsByDescriptionContainingIgnoreCase");
-    }
-
-
-    /**
-     * Find all projects by application deadline after.
-     *
-     * @param date represent the date.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByApplicationDeadlineAfter(LocalDate date, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByApplicationDeadlineAfter(date, pageable),
-                "ProjectServiceHelper::findAllProjectsByApplicationDeadlineAfter");
-    }
-
-    /**
-     * Find all projects by application deadline before.
-     *
-     * @param date represent the date.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByApplicationDeadlineBefore(LocalDate date, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByApplicationDeadlineBefore(date, pageable),
-                "ProjectServiceHelper::findAllProjectsByApplicationDeadlineBefore");
-    }
-
-    /**
-     * Find all projects by application deadline between.
-     *
-     * @param start represent the start date.
-     * @param end   represent the end date.
-     * @param page  represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByApplicationDeadlineBetween(LocalDate start, LocalDate end, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByApplicationDeadlineBetween(start, end, pageable),
-                "ProjectServiceHelper::findAllProjectsByApplicationDeadlineBetween");
-    }
-
-    /**
-     * Find all projects by expected completion date.
-     *
-     * @param date represent the date.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByExpectedCompletionDate(LocalDate date, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByExpectedCompletionDate(date, pageable),
-                "ProjectServiceHelper::findAllProjectsByExpectedCompletionDate");
-    }
-
-    /**
-     * Find all projects by expected completion date after.
-     *
-     * @param date represent the date.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByExpectedCompletionDateAfter(LocalDate date, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByExpectedCompletionDateAfter(date, pageable),
-                "ProjectServiceHelper::findAllProjectsByExpectedCompletionDateAfter");
-    }
-
-    /**
-     * Find all projects by expected completion date before.
-     *
-     * @param date represent the date.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByExpectedCompletionDateBefore(LocalDate date, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByExpectedCompletionDateBefore(date, pageable),
-                "ProjectServiceHelper::findAllProjectsByExpectedCompletionDateBefore");
-    }
-
-    /**
-     * Find all projects by expected completion date between.
-     *
-     * @param start represent the start date.
-     * @param end   represent the end date.
-     * @param page  represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByExpectedCompletionDateBetween(LocalDate start, LocalDate end, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByExpectedCompletionDateBetween(start, end, pageable),
-                "ProjectServiceHelper::findAllProjectsByExpectedCompletionDateBetween");
-    }
-
-    /* *//**
- * Find all projects by expected project deadline.
- *
- * @param date represent the date.
- * @param page represent the page.
- * @return Iterable<Project>
- *//*
-    public Page<Project> findAllProjectsByExpectedProjectDeadline(LocalDate date, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByExpectedProjectDeadline(date, pageable),
-                "ProjectServiceHelper::findAllProjectsByExpectedProjectDeadline");
-    }
-
-    *//**
- * Find all projects by expected project deadline after.
- *
- * @param date represent the date.
- * @param page represent the page.
- * @return Iterable<Project>
- *//*
-    public Page<Project> findAllProjectsByExpectedProjectDeadlineAfter(LocalDate date, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByExpectedProjectDeadlineAfter(date, pageable),
-                "ProjectServiceHelper::findAllProjectsByExpectedProjectDeadlineAfter");
-    }
-
-    *//**
- * Find all projects by expected project deadline before.
- *
- * @param date represent the date.
- * @param page represent the page.
- * @return Iterable<Project>
- *//*
-    public Page<Project> findAllProjectsByExpectedProjectDeadlineBefore(LocalDate date, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByExpectedProjectDeadlineBefore(date, pageable),
-                "ProjectServiceHelper::findAllProjectsByExpectedProjectDeadlineBefore");
-    }
-
-    *//**
- * Find all projects by expected project deadline between.
- *
- * @param start represent the start date.
- * @param end   represent the end date.
- * @param page  represent the page.
- * @return Iterable<Project>
- *//*
-    public Page<Project> findAllProjectsByExpectedProjectDeadlineBetween(LocalDate start, LocalDate end, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByExpectedProjectDeadlineBetween(start, end, pageable),
-                "ProjectServiceHelper::findAllProjectsByExpectedProjectDeadlineBetween");
-    }
-*/
-
-    /**
-     * Find all projects by max participant.
-     *
-     * @param maxParticipant represent the max participant.
-     * @param page           represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByMaxParticipant(int maxParticipant, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByMaxParticipant(maxParticipant, pageable),
-                "ProjectServiceHelper::findAllProjectsByMaxParticipant");
-    }
-
-    /**
-     * Find all projects by max participant less than equal.
-     *
-     * @param maxParticipant represent the max participant.
-     * @param page           represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByMaxParticipantLessThanEqual(int maxParticipant, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByMaxParticipantLessThanEqual(maxParticipant, pageable),
-                "ProjectServiceHelper::findAllProjectsByMaxParticipantLessThanEqual");
-    }
-
-    /**
-     * Find all projects by max participant greater than equal.
-     *
-     * @param minParticipant represent the min participant.
-     * @param page           represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByMaxParticipantGreaterThanEqual(int minParticipant, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByMaxParticipantGreaterThanEqual(minParticipant, pageable),
-                "ProjectServiceHelper::findAllProjectsByMaxParticipantGreaterThanEqual");
-    }
-
-    /**
-     * Find all projects by invite link.
-     *
-     * @param link represent the link.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByInviteLink(String link, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByInviteLink(link, pageable),
-                "ProjectServiceHelper::findAllProjectsByInviteLink");
-    }
-
-    /**
-     * Find all projects by project access type.
-     *
-     * @param accessType represent the access type.
-     * @param page       represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByProjectAccessType(EProjectAccessType accessType, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByProjectAccessType(accessType, pageable),
-                "ProjectServiceHelper::findAllProjectsByProjectAccessType");
-    }
-
-    /**
-     * Find all projects by project profession level.
-     *
-     * @param professionLevel represent the profession level.
-     * @param page            represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByProjectProfessionLevel(EProjectProfessionLevel professionLevel, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByProfessionLevel(professionLevel, pageable),
-                "ProjectServiceHelper::findAllProjectsByProjectProfessionLevel");
-    }
-
-    /**
-     * Find all projects by sector.
-     *
-     * @param sector represent the sector.
-     * @param page   represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsBySector(ESector sector, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllBySector(sector, pageable),
-                "ProjectServiceHelper::findAllProjectsBySector");
-    }
-
-    /**
-     * Find all projects by degree.
-     *
-     * @param degree represent the degree.
-     * @param page   represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByDegree(EDegree degree, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByDegree(degree, pageable),
-                "ProjectServiceHelper::findAllProjectsByDegree");
-    }
-
-    /**
-     * Find all projects by project level.
-     *
-     * @param projectLevel represent the project level.
-     * @param page         represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByProjectLevel(EProjectLevel projectLevel, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByProjectLevel(projectLevel, pageable),
-                "ProjectServiceHelper::findAllProjectsByProjectLevel");
-    }
-
-    /**
-     * Find all projects by interview type.
-     *
-     * @param interviewType represent the interview type.
-     * @param page          represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByInterviewType(EInterviewType interviewType, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByInterviewType(interviewType, pageable),
-                "ProjectServiceHelper::findAllProjectsByInterviewType");
-    }
-
-    /**
-     * Find all projects by multiple criteria.
-     *
-     * @param projectName    represent the project name.
-     * @param description    represent the description.
-     * @param projectSummary represent the project summary.
-     * @param projectAim     represent the project aim.
-     * @param page           represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByMultipleCriteria(String projectName, String description, String projectSummary, String projectAim, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository
-                .findAllByProjectNameAndDescriptionAndProjectSummaryAndProjectAimContainsIgnoreCase(projectName, description,
-                        projectSummary, projectAim, pageable), "ProjectServiceHelper::findAllProjectsByMultipleCriteria");
-    }
-
-    /**
-     * Find all projects by any criteria.
-     *
-     * @param projectName    represent the project name.
-     * @param description    represent the description.
-     * @param projectSummary represent the project summary.
-     * @param projectAim     represent the project aim.
-     * @param page           represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllProjectsByAnyCriteria(String projectName, String description, String projectSummary, String projectAim, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository
-                .findAllByProjectNameOrDescriptionOrProjectSummaryOrProjectAimContainsIgnoreCase(projectName, description,
-                        projectSummary, projectAim, pageable), "ProjectServiceHelper::findAllProjectsByAnyCriteria");
-    }
-
-
-    /**
-     * Find all projects by project summary containing ignore case.
-     *
-     * @param word represent the word.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllByProjectNameContainingIgnoreCase(String word, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByProjectNameContainingIgnoreCase(word, pageable),
-                "ProjectServiceHelper::findAllByProjectNameContainingIgnoreCase");
-    }
-
-    /**
-     * Find all projects by project summary containing ignore case.
-     *
-     * @param word represent the word.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllByProjectSummaryContainingIgnoreCase(String word, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByProjectSummaryContainingIgnoreCase(word, pageable),
-                "ProjectServiceHelper::findAllByProjectSummaryContainingIgnoreCase");
-    }
-
-    /**
-     * Find all projects by project aim contains ignore case.
-     *
-     * @param word represent the word.
-     * @param page represent the page.
-     * @return Iterable<Project>
-     */
-    public Page<Project> findAllByProjectAimContainsIgnoreCase(String word, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByProjectAimContainsIgnoreCase(word, pageable),
-                "ProjectServiceHelper::findAllByProjectAimContainsIgnoreCase");
+        return doForRepository(() -> m_facade.m_projectRepository.findAll(), "ProjectServiceHelper::findAllProjects");
     }
 
 
@@ -552,33 +61,11 @@ public class ProjectServiceHelper
         return doForRepository(() -> m_facade.m_projectRepository.findById(projectId),
                 "ProjectServiceHelper::findById");
     }
-
-    public User addUser(User user)
-    {
-        return doForRepository(() -> m_facade.m_userRepository.save(user),
-                "ProjectServiceHelper::addUser");
-
-    }
-
-
-    public Optional<User> findUserById(UUID userId)
-    {
-        return doForRepository(() -> m_facade.m_userRepository.findById(userId),
-                "ProjectServiceHelper::findUserById");
-    }
-
-    public void removeUser(UUID userId)
-    {
-        doForRepository(() -> m_facade.m_userRepository.deleteById(userId),
-                "ProjectServiceHelper::removeUser");
-    }
-
     public ProjectParticipant addProjectParticipant(ProjectParticipant participant)
     {
         return doForRepository(() -> m_facade.m_projectParticipantRepository.save(participant),
                 "ProjectServiceHelper::addProjectParticipant");
     }
-
     public boolean addProjectParticipant(UUID projectId, UUID userId)
     {
         var user = findUserById(userId);
@@ -595,28 +82,62 @@ public class ProjectServiceHelper
         return updatedProject != null;
     }
 
-    public Page<Project> findAllProjectByProjectOwnerusername(String username, int page)
-    {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
 
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByProjectOwnerUsername(username, pageable),
-                "ProjectServiceHelper::findAllProjectByProjectOwnerusername");
+    public Optional<ProjectParticipant> findProjectParticipantByUserIdAndProjectId(UUID userId, UUID projectId)
+    {
+        return doForRepository(() -> m_facade.m_projectParticipantRepository.findProjectParticipantByUserIdAndProjectId(userId, projectId),
+                "ProjectServiceHelper::findProjectParticipantByUserIdAndProjectId");
     }
 
-    public Page<Project> findAllProjectByProjectOwnerUserId(UUID userId, int page)
+    public User addUser(User user)
     {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByProjectOwnerId(userId, pageable),
-                "ProjectServiceHelper::findAllProjectByProjectOwnerUserId");
+        return doForRepository(() -> m_facade.m_userRepository.save(user), "ProjectServiceHelper::addUser");
     }
 
-    public Page<Project> findAllParticipantProjectByUserId(UUID userId, int page)
+    public void removeParticipantRequestByRequestId(UUID participantRequestId)
     {
-        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
+        doForRepository(() -> m_facade.m_projectParticipantRequestRepository.deleteById(participantRequestId),
+                "ProjectServiceHelper::removeParticipantRequest");
+    }
 
-        return doForRepository(() -> m_facade.m_projectRepository.findAllParticipantProjectByUserId(userId, pageable),
-                "ProjectServiceHelper::findAllParticipantProjectByUsername");
+    public void deleteProjectParticipant(ProjectParticipant participant)
+    {
+        doForRepository(() -> m_facade.m_projectParticipantRepository.delete(participant),
+                "ProjectServiceHelper::deleteProjectParticipant");
+    }
+
+    public Optional<ProjectParticipantRequest> findProjectParticipantRequestByParticipantRequestId(UUID projectParticipantRequestId)
+    {
+        return doForRepository(() -> m_facade.m_projectParticipantRequestRepository.findById(projectParticipantRequestId),
+                "ProjectServiceHelper::findProjectParticipantRequestByParticipantRequestId");
+    }
+
+    public Optional<User> findUserById(UUID userId)
+    {
+        return doForRepository(() -> m_facade.m_userRepository.findById(userId),
+                "ProjectServiceHelper::findUserById");
+    }
+
+    public Iterable<User> saveAllUsers(Iterable<User> users)
+    {
+        return doForRepository(() -> m_facade.m_userRepository.saveAll(users), "ProjectServiceHelper::saveAllUsers");
+    }
+
+    public void removeProjectById(UUID projectId)
+    {
+        doForRepository(() -> m_facade.m_projectRepository.deleteById(projectId), "ProjectServiceHelper::removeProjectById");
+    }
+
+    public Iterable<ProjectParticipant> findAllProjectParticipantByProjectId(UUID projectId)
+    {
+        return doForRepository(() -> m_facade.m_projectParticipantRepository.findAllByProjectId(projectId),
+                "ProjectServiceHelper::findAllProjectParticipantByProjectId");
+    }
+
+    public void removeAllParticipantRequests(List<ProjectParticipantRequest> requests)
+    {
+        doForRepository(() -> m_facade.m_projectParticipantRequestRepository.deleteAll(requests),
+                "ProjectServiceHelper::removeAllParticipantRequests");
     }
 
     public ProjectParticipantRequest sendParticipantRequestToProject(ProjectParticipantRequest participantRequest)
@@ -626,7 +147,7 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::sendParticipantRequestToProject");
     }
 
-    public Optional<ProjectParticipantRequest> sendParticipantRequestToProject(UUID projectId, UUID userId)
+   /* public Optional<ProjectParticipantRequest> sendParticipantRequestToProject(UUID projectId, UUID userId)
     {
         var user = findUserById(userId);
         var project = findProjectById(projectId);
@@ -641,112 +162,7 @@ public class ProjectServiceHelper
         return updatedProject.getProjectParticipantRequests().stream().filter(r -> r.getProject().getProjectId().equals(projectId) &&
                 r.getUser().getUserId().equals(userId)).findFirst();
     }
-
-    public Iterable<Project> findAllProjectParticipantRequestByProjectId(UUID projectId)
-    {
-
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByProjectProjectId(projectId),
-                "ProjectServiceHelper::findAllProjectParticipantRequestByProjectId");
-    }
-
-    public Iterable<Project> findAllProjectParticipantRequestByUserId(UUID userId)
-    {
-        return doForRepository(() -> m_facade.m_projectRepository.findAllByUserUserId(userId),
-                "ProjectServiceHelper::findAllProjectParticipantRequestByUserId");
-    }
-
-    public Optional<ProjectParticipant> findProjectParticipantByUserIdAndProjectId(UUID userId, UUID projectId)
-    {
-        return doForRepository(() -> m_facade.m_projectParticipantRepository.findProjectParticipantByUserIdAndProjectId(userId, projectId),
-                "ProjectServiceHelper::findProjectParticipantByUserIdAndProjectId");
-    }
-
-    public void deleteProjectParticipant(ProjectParticipant participant)
-    {
-        doForRepository(() -> m_facade.m_projectParticipantRepository.delete(participant),
-                "ProjectServiceHelper::deleteProjectParticipant");
-    }
-
-    public void deleteProjectParticipantById(UUID id)
-    {
-        doForRepository(() -> m_facade.m_projectParticipantRepository.deleteById(id),
-                "ProjectServiceHelper::deleteProjectParticipant");
-    }
-
-    public void changeAllProjectOwnerToRootWhenUserRemoved(UUID removedUserId, UUID rootUserId)
-    {
-        var rootUser = m_facade.m_userRepository.findById(rootUserId);
-        var user = m_facade.m_userRepository.findById(removedUserId);
-
-        if (user.isEmpty() || rootUser.isEmpty())
-            throw new RepositoryException("User or Project is not found!");
-
-        var projects = toStream(m_facade.m_projectRepository.findAllByProjectOwnerId(removedUserId)).toList();
-
-        projects.forEach(p -> {
-            p.setAdminNote("Old Project Owner is: " + user.get().getUsername() + " - (" + user.get().getFullName() + ")");
-            p.setProjectOwner(rootUser.get());
-        });
-
-        doForRepository(() -> m_facade.m_projectRepository.saveAll(projects), "ProjectServiceHelper::changeProjectOwnerToRoot");
-    }
-
-    public void changeProjectOwner(UUID newProjectOwnerId, UUID projectId)
-    {
-        var newProjectOwner = findUserById(newProjectOwnerId);
-        var project = findProjectById(projectId);
-
-        if (newProjectOwner.isEmpty() || project.isEmpty())
-            throw new RepositoryException("User or Project is not found!");
-
-        project.get().setProjectOwner(newProjectOwner.get());
-
-        doForRepository(() -> m_facade.m_projectRepository.save(project.get()),
-                "ProjectServiceHelper::changeProjectOwner");
-    }
-
-    public Optional<User> findUserByUsername(String username)
-    {
-        return doForRepository(() -> m_facade.m_userRepository.findByUsername(username),
-                "ProjectServiceHelper::findUserByUsername");
-    }
-
-    public Iterable<ProjectParticipant> findAllProjectParticipantByProjectId(UUID projectId)
-    {
-        return doForRepository(() -> m_facade.m_projectParticipantRepository.findAllByProjectId(projectId),
-                "ProjectServiceHelper::findAllProjectParticipantByProjectId");
-    }
-
-    public Iterable<ProjectParticipant> findAllProjectParticipantByUserId(UUID userId)
-    {
-        return doForRepository(() -> m_facade.m_projectParticipantRepository.findAllByUserUserId(userId),
-                "ProjectServiceHelper::findAllProjectParticipantByUserId");
-    }
-
-    public ProjectParticipant saveProjectParticipant(ProjectParticipant projectParticipant)
-    {
-        return doForRepository(() -> m_facade.m_projectParticipantRepository.save(projectParticipant),
-                "ProjectServiceHelper::saveProjectParticipant");
-    }
-
-    public ProjectParticipantRequest saveProjectParticipantRequest(ProjectParticipantRequest projectParticipantRequest)
-    {
-        return doForRepository(() -> m_facade.m_projectParticipantRequestRepository.save(projectParticipantRequest),
-                "ProjectServiceHelper::saveProjectParticipantRequest");
-    }
-
-    public Optional<ProjectParticipantRequest> findProjectParticipantRequestByParticipantRequestId(UUID projectParticipantRequestId)
-    {
-        return doForRepository(() -> m_facade.m_projectParticipantRequestRepository.findById(projectParticipantRequestId),
-                "ProjectServiceHelper::findProjectParticipantRequestByParticipantRequestId");
-    }
-
-    public void removeParticipantRequestByRequestId(UUID participantRequestId)
-    {
-        doForRepository(() -> m_facade.m_projectParticipantRequestRepository.deleteById(participantRequestId),
-                "ProjectServiceHelper::removeParticipantRequest");
-    }
-
+*/
     public Page<Project> findAllValidProjects(int page)
     {
         var pageable = PageRequest.of(page - 1, m_defaultPageSize);
@@ -756,9 +172,31 @@ public class ProjectServiceHelper
                 "ProjectServiceHelper::findAllValidProjects");
     }
 
-    public void removeAllParticipantRequests(List<ProjectParticipantRequest> requests)
+    public Page<Project> findAllParticipantProjectByUserId(UUID userId, int page)
     {
-        doForRepository(() -> m_facade.m_projectParticipantRequestRepository.deleteAll(requests),
-                "ProjectServiceHelper::removeAllParticipantRequests");
+        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
+
+        return doForRepository(() -> m_facade.m_projectRepository.findAllParticipantProjectByUserId(userId, pageable),
+                "ProjectServiceHelper::findAllParticipantProjectByUsername");
+    }
+
+    public Page<Project> findAllProjectByProjectOwnerUserId(UUID userId, int page)
+    {
+        var pageable = PageRequest.of(page - 1, m_defaultPageSize);
+
+        return doForRepository(() -> m_facade.m_projectRepository.findAllByProjectOwnerId(userId, pageable),
+                "ProjectServiceHelper::findAllProjectByProjectOwnerUserId");
+    }
+
+    public Optional<User> findUserByUsername(String username)
+    {
+        return doForRepository(() -> m_facade.m_userRepository.findByUsername(username),
+                "ProjectServiceHelper::findUserByUsername");
+    }
+
+    public Project saveProject(Project project)
+    {
+        return doForRepository(() -> m_facade.m_projectRepository.save(project),
+                "ProjectServiceHelper::saveProject");
     }
 }
