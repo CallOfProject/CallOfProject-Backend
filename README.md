@@ -4,14 +4,15 @@
 
 - [Overview](#overview)
 - [Architecture](#architecture)
-- [Used Technologies\/Frameworks\/Environments...](#used-technologies-frameworks-environments)
+  - [Architecture Diagram](#architecture-diagram)
+- [Used Technologies/Frameworks/Environments](#used-technologies-frameworks-environments)
 - [Services](#services)
   - [Detailed Descriptions](#detailed-descriptions)
 - [Admin Panel](#admin-panel)
 - [Frontend](#frontend)
 - [Interview Part](#interview-part)
 - [Mobile Part (Android)](#mobile-part-android)
-- [Testing and Bug Fixing](#testing-and-bug-fixing)
+- [NOTES](#notes)
 
 
 
@@ -23,7 +24,13 @@ Call-Of-Project is an application where people can find project partners, collab
 
 Call-Of-Project follows a **microservices-based architecture**. Our application has adopted microservices architecture and uses **Apache Kafka** to ensure data integrity, collect and process data, and ensure the smooth operation of various processes. In this context, communication is established between microservices and data transfer is carried out using **Kafka's message queue** feature. Furthermore, with the features provided by Kafka such as clustering and high availability, the system's durability and performance are enhanced. Thus, while data flow is provided throughout the application, data integrity and proper processing of transactions are ensured. Users send all requests through a single endpoint via **API Gateway**. Each microservice has its own database. User authentication and authorization operations are performed using **JWT**. Sensitive information such as passwords is stored in hashed form. Actions in our application are sent to the necessary users via notification and/or email. We used **Apache Kafka** and **Websocket** for notifications to be delivered in real-time. Additionally, there are **scheduler services** in our application that run at specific times every day. These services are responsible for sending reminder emails to users, handling applications with past feedback time, and closing projects with expired deadlines, among other purposes.
 
-### Used Technologies/Frameworks/Environments...
+### Architecture Diagram
+
+
+
+
+
+### Used Technologies/Frameworks/Environments
 - Java 17
 - Spring Boot 3.1.5
 - Apache Kafka
@@ -80,13 +87,14 @@ Our application also features an Admin Panel where events can be managed. You ca
 
 ## Frontend
 The main frontend part of our application is not finished yet. Once completed, we will provide the link below.
-- **Frontend:** 
+- **Frontend Link:** 
 
-## Interview Part:
+## Interview Part
 You can look at the interview service frontend part
 - **Interview Part:** [Call-of-Project Interview](https://github.com/CallOfProject/Call-Of-Project-Interview)
 
-## Mobile Part (Android):
+## Mobile Part (Android)
 - **Android:** [Call-of-Project Android](https://github.com/CallOfProject/Call-Of-Project-Android)
 
-### Testing and bug fixing processes are ongoing...
+# NOTES
+- Testing and bug fixing processes are ongoing...
