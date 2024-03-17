@@ -5,7 +5,7 @@
 - [Overview](#overview)
 - [Architecture](#architecture)
   - [Architecture Diagram](#architecture-diagram)
-- [Used Technologies/Frameworks/Environments](#used-technologies-frameworks-environments)
+- [Used Technologies](#used-technologies-frameworks-environments)
 - [Services](#services)
   - [Detailed Descriptions](#detailed-descriptions)
 - [Admin Panel](#admin-panel)
@@ -27,7 +27,7 @@ Call-Of-Project follows a **microservices-based architecture**. Our application 
 ### Architecture Diagram
 ![architecture_diagram](https://github.com/CallOfProject/CallOfProject-Backend/assets/62218588/5caaa177-1e5a-4a0a-bdd6-40ffba8404b7)
 
-### Used Technologies/Frameworks/Environments
+### Used Technologies
 - Java 17
 - Spring Boot 3.1.5
 - Apache Kafka
