@@ -100,10 +100,6 @@ public class CommunityServiceHelper
         return doForRepository(() -> m_communityRepository.findById(communityId), "CommunityServiceHelper::findCommunityById");
     }
 
-    public Optional<Community> findCommunityByProjectOwnerId(UUID ownerId)
-    {
-        return doForRepository(() -> m_communityRepository.findByProjectOwnerId(ownerId), "CommunityServiceHelper::findByProjectOwnerId");
-    }
 
     public Optional<Project> findCommunityByProjectId(UUID projectId)
     {
@@ -135,4 +131,29 @@ public class CommunityServiceHelper
     }
 
 
+    public Optional<ProjectParticipant> findProjectParticipantByProjectIdAndUserId(UUID projectId, UUID userId)
+    {
+        return doForRepository(() -> m_projectParticipantRepository.findProjectParticipantByProjectIdAndUserId(projectId, userId),
+                "CommunityServiceHelper::findProjectParticipantByProjectIdAndUserId");
+    }
+
+    public void removeParticipant(ProjectParticipant projectParticipant)
+    {
+        doForRepository(() -> m_projectParticipantRepository.delete(projectParticipant), "CommunityServiceHelper::removeParticipant");
+    }
+
+    public void saveParticipant(ProjectParticipant projectParticipant)
+    {
+        doForRepository(() -> m_projectParticipantRepository.save(projectParticipant), "CommunityServiceHelper::saveParticipant");
+    }
+
+    public void deleteProjectById(UUID projectId)
+    {
+        doForRepository(() -> m_projectRepository.deleteById(projectId), "CommunityServiceHelper::deleteProjectById");
+    }
+
+    public Project saveProject(Project project)
+    {
+        return doForRepository(() -> m_projectRepository.save(project), "CommunityServiceHelper::saveProject");
+    }
 }

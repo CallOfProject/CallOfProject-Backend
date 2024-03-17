@@ -5,6 +5,7 @@ import callofproject.dev.data.community.entity.enumeration.EProjectStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,14 +23,13 @@ public class Project
     @Column(name = "title", nullable = false, length = 100)
     private String m_projectName;
 
-    @ManyToOne(cascade = ALL)
+    @ManyToOne(cascade = {DETACH, MERGE, PERSIST, REFRESH})
     @JoinColumn(name = "user_id", nullable = false)
     private User m_projectOwner;
 
     @OneToMany(mappedBy = "m_project", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<ProjectParticipant> m_projectParticipants;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "project_status")
     private EProjectStatus m_projectStatus;
@@ -39,21 +39,26 @@ public class Project
     private AdminOperationStatus m_adminOperationStatus;
 
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+   /* @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinColumn(name = "community_id", referencedColumnName = "community_id")
-    private Community m_community;
+    private Community m_community;*/
+
+    @Column(name = "created_at")
+    private LocalDateTime m_deletedAt = null;
+
+
 
     public Project()
     {
     }
 
-    public Project(UUID projectId, String projectName, User projectOwner, Community community)
+   /* public Project(UUID projectId, String projectName, User projectOwner, Community community)
     {
-        m_community = community;
+       // m_community = community;
         m_projectId = projectId;
         m_projectName = projectName;
         m_projectOwner = projectOwner;
-    }
+    }*/
 
     public Project(UUID projectId, String projectName, User projectOwner)
     {
@@ -73,7 +78,17 @@ public class Project
         m_adminOperationStatus = adminOperationStatus;
     }
 
-    public Community getCommunity()
+    public LocalDateTime getDeletedAt()
+    {
+        return m_deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt)
+    {
+        m_deletedAt = deletedAt;
+    }
+
+  /*  public Community getCommunity()
     {
         return m_community;
     }
@@ -81,7 +96,7 @@ public class Project
     public void setCommunity(Community community)
     {
         m_community = community;
-    }
+    }*/
 
     public UUID getProjectId()
     {

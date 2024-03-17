@@ -7,7 +7,8 @@ public record ProjectParticipantKafkaDTO(
         UUID projectParticipantId,
         UUID projectId,
         UUID userId,
-        LocalDateTime joinDate)
+        LocalDateTime joinDate,
+        boolean isDeleted)
 {
     @Override
     public String toString()

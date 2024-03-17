@@ -15,6 +15,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 /**
  * SecurityConfig
  */
@@ -37,7 +39,10 @@ public class SecurityConfig
      */
     private static void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests)
     {
-        requests.anyRequest().permitAll();
+        requests
+                .requestMatchers(antMatcher("/api-docs/**")).permitAll()
+                .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
+                .requestMatchers(antMatcher("/api/community/**")).hasAnyRole("ADMIN", "USER", "ROOT");
     }
 
 

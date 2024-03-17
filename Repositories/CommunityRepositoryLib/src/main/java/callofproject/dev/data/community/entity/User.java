@@ -1,11 +1,14 @@
 package callofproject.dev.data.community.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import static jakarta.persistence.CascadeType.*;
 
 @Entity
 @Table(name = "users")
@@ -37,7 +40,7 @@ public class User
     private Set<Community> communities;
 
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {PERSIST, REFRESH})
     @JoinTable(
             name = "user_connections",
             joinColumns = @JoinColumn(name = "main_user_id"),
@@ -45,7 +48,7 @@ public class User
     )
     private Set<User> connections;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {PERSIST, REFRESH})
     @JoinTable(
             name = "connection_requests",
             joinColumns = @JoinColumn(name = "main_user_id"),
@@ -53,7 +56,7 @@ public class User
     )
     private Set<User> connectionRequests;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {PERSIST, REFRESH})
     @JoinTable(
             name = "blocked_connections",
             joinColumns = @JoinColumn(name = "main_user_id"),
@@ -68,6 +71,10 @@ public class User
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")})
     private Set<Role> roles;
 
+
+    @OneToMany(mappedBy = "m_user", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
+    @JsonIgnore
+    private Set<ProjectParticipant> m_projectParticipants; // projects that user is participant
 
     public User()
     {
@@ -117,6 +124,16 @@ public class User
             blockedConnections = new HashSet<>();
 
         blockedConnections.add(user);
+    }
+
+    public Set<ProjectParticipant> getProjectParticipants()
+    {
+        return m_projectParticipants;
+    }
+
+    public void setProjectParticipants(Set<ProjectParticipant> projectParticipants)
+    {
+        m_projectParticipants = projectParticipants;
     }
 
     public Set<User> getConnections()

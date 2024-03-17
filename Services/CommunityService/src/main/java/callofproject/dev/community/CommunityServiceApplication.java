@@ -7,11 +7,13 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import static callofproject.dev.community.CommunityServiceBeanName.*;
+
 @EnableDiscoveryClient
 @SpringBootApplication
-@ComponentScan(basePackages = {"callofproject.dev.community", "callofproject.dev.data.community"})
-@EnableJpaRepositories(basePackages = {"callofproject.dev.community", "callofproject.dev.data.community"})
-@EntityScan(basePackages = "callofproject.dev.data.community.entity")
+@ComponentScan(basePackages = {BASE_PACKAGE, REPOSITORY_PACKAGE})
+@EnableJpaRepositories(basePackages = {BASE_PACKAGE, REPOSITORY_PACKAGE})
+@EntityScan(basePackages = ENTITY_PACKAGE)
 public class CommunityServiceApplication
 {
     public static void main(String[] args)

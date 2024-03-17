@@ -25,7 +25,7 @@ public class Project
     @Column(name = "title", nullable = false, length = 100)
     private String m_projectName;
 
-    @ManyToOne(cascade = ALL)
+    @ManyToOne(cascade = {DETACH, MERGE, PERSIST, REFRESH})
     @JoinColumn(name = "user_id", nullable = false)
     private User m_projectOwner;
 

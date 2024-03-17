@@ -19,9 +19,9 @@ public interface ICommunityRepository extends CrudRepository<Community, UUID>
     @Query("from Community where communityName = :communityName and communityName = :communityType")
     Iterable<Community> findAllByExactCommunityName(String communityName, String communityType);
 
-    @Query("from Community where project.m_projectId = :projectId")
+   /* @Query("from Community where project.m_projectId = :projectId")
     Optional<Community> findByProjectId(@Param("projectId") UUID projectId);
 
     @Query("from Community where project.m_projectOwner.m_userId = :ownerId")
-    Optional<Community> findByProjectOwnerId(@Param("ownerId") UUID ownerId);
+    Optional<Community> findByProjectOwnerId(@Param("ownerId") UUID ownerId);*/
 }

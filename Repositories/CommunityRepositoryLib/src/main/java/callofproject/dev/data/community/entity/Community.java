@@ -24,8 +24,8 @@ public class Community
     @Column(name = "community_status", nullable = false)
     private CommunityStatus communityStatus;
 
-    @OneToOne(mappedBy = "m_community",fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
-    private Project project;
+   /* @OneToOne(mappedBy = "m_community",fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    private Project project;*/
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "community_users",
@@ -52,7 +52,7 @@ public class Community
         this.users.add(user);
     }
 
-    public Project getProject()
+   /* public Project getProject()
     {
         return project;
     }
@@ -60,7 +60,7 @@ public class Community
     public void setProject(Project project)
     {
         this.project = project;
-    }
+    }*/
 
     public CommunityStatus getCommunityStatus()
     {
