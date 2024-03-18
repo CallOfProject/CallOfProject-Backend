@@ -41,16 +41,17 @@ public class SecurityConfig
     {
         requests.requestMatchers(antMatcher("/api-docs/**")).permitAll()
                 .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
-                .requestMatchers(antMatcher("/api/interview/**")).hasAnyRole("ADMIN", "ROOT", "USER")
-                .requestMatchers(antMatcher("/api/management/**")).hasAnyRole("ADMIN", "ROOT", "USER")
                 .requestMatchers(antMatcher("/api/interview/coding/is-solved-before")).permitAll()
                 .requestMatchers(antMatcher("/api/interview/test/is-solved-before")).permitAll()
                 .requestMatchers(antMatcher("/api/interview/coding/find/by/interview-id")).permitAll()
                 .requestMatchers(antMatcher("/api/interview/coding/submit")).permitAll()
                 .requestMatchers(antMatcher("/api/interview/test/find/question/by/interview-id")).permitAll()
                 .requestMatchers(antMatcher("/api/interview/test/submit/answer/question")).permitAll()
+                .requestMatchers(antMatcher("/api/interview/test/submit")).permitAll()
                 .requestMatchers(antMatcher("/api/interview/test/info/interview")).permitAll()
-                .requestMatchers(antMatcher("/api/interview/coding/find/info")).permitAll();
+                .requestMatchers(antMatcher("/api/interview/coding/find/info")).permitAll()
+                .requestMatchers(antMatcher("/api/interview/**")).hasAnyRole("ADMIN", "ROOT", "USER")
+                .requestMatchers(antMatcher("/api/interview/management/**")).hasAnyRole("ADMIN", "ROOT", "USER");
     }
 
 

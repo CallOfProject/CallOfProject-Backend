@@ -297,6 +297,14 @@ public class TestInterviewCallbackService
         if (userTestInterview.isEmpty())
             return new ResponseMessage<>("User not found", Status.NOT_FOUND, false);
 
+        var interview = userTestInterview.get().getTestInterview();
+
+        if (interview.getStartTime().isAfter(LocalDateTime.now()))
+            return new ResponseMessage<>("Interview is not started yet", Status.NOT_ACCEPTED, false);
+
+        if (interview.getEndTime().isBefore(LocalDateTime.now()))
+            return new ResponseMessage<>("Interview is over", Status.NOT_ACCEPTED, false);
+
         var result = userTestInterview.get().getInterviewStatus() == InterviewStatus.COMPLETED;
 
         return new ResponseMessage<>("User solved before", Status.OK, result);
