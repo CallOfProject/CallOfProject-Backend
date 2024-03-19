@@ -103,11 +103,34 @@ public class Project
     @Column(name = "deleted_at")
     private LocalDateTime m_deletedAt = null;
 
+    @Column(name = "project_rating")
+    private double m_projectRating = 0;
+
+    @ManyToMany(mappedBy = "m_showcasedProjects", fetch = FetchType.EAGER)
+    private Set<User> m_showcasedUsers;
     public Project()
     {
     }
 
+    public Set<User> getShowcasedUsers()
+    {
+        return m_showcasedUsers;
+    }
 
+    public void setShowcasedUsers(Set<User> showcasedUsers)
+    {
+        m_showcasedUsers = showcasedUsers;
+    }
+
+    public double getProjectRating()
+    {
+        return m_projectRating;
+    }
+    public double rateProject(double rating)
+    {
+        m_projectRating = ((m_projectRating + rating) / 2) % 10;
+        return m_projectRating;
+    }
     public String getAdminNote()
     {
         return m_adminNote;

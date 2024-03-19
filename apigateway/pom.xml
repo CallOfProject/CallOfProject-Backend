@@ -73,7 +73,7 @@
                 <configuration>
                     <mainClass>callofproject.dev.apigateway.ApiGatewayApplication</mainClass>
                     <layout>JAR</layout>
-                    <!-- <skip>true</skip>-->
+                   <!--  <skip>true</skip>-->
                 </configuration>
             </plugin>
         </plugins>

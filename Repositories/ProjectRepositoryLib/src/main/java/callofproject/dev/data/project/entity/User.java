@@ -42,6 +42,11 @@ public class User
     @JsonIgnore
     private Set<Project> m_projects; // projects that he owns
 
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_showcased_projects",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "project_id", referencedColumnName = "project_id", nullable = false))
+    private Set<Project> m_showcasedProjects; // projects that he showcases
     @OneToMany(mappedBy = "m_user", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<ProjectParticipant> m_projectParticipants; // projects that he owns
@@ -84,6 +89,16 @@ public class User
         m_ownerProjectCount = 0;
         m_participantProjectCount = 0;
         m_deletedAt = null;
+    }
+
+    public Set<Project> getShowcasedProjects()
+    {
+        return m_showcasedProjects;
+    }
+
+    public void setShowcasedProjects(Set<Project> showcasedProjects)
+    {
+        m_showcasedProjects = showcasedProjects;
     }
 
     public Set<Role> getRoles()

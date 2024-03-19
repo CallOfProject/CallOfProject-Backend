@@ -199,4 +199,9 @@ public class ProjectServiceHelper
         return doForRepository(() -> m_facade.m_projectRepository.save(project),
                 "ProjectServiceHelper::saveProject");
     }
+
+    public void removeUser(UUID userId)
+    {
+        doForRepository(() -> m_facade.m_userRepository.deleteById(userId), "ProjectServiceHelper::removeUser");
+    }
 }

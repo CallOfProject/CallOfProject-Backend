@@ -80,8 +80,7 @@ public class TicketCallbackService
 
     public ResponseMessage<Object> findOpenTicketCount()
     {
-        var openTicketCount = doForDataService(() -> ticketRepository.findTicketsByStatus(TicketStatus.OPEN),
-                "Error while fetching open ticket count");
+        var openTicketCount = doForDataService(() -> ticketRepository.findTicketsByStatus(TicketStatus.OPEN), "Error while fetching open ticket count");
 
         return new ResponseMessage<>(format("%d open tickets are found!", openTicketCount.size()), Status.OK, openTicketCount.size());
     }

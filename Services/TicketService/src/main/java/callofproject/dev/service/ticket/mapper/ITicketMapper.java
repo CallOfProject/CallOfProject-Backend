@@ -9,8 +9,6 @@ import org.mapstruct.Mapper;
 @Mapper(implementationName = "TicketMapperImpl", componentModel = "spring")
 public interface ITicketMapper
 {
-    Ticket toTicket(TicketDTO ticketDTOEEx);
-
     TicketDTO toTicketDTO(Ticket ticket);
 
     Ticket toTicket(TicketCreateDTO ticketDTO);

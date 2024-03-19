@@ -28,6 +28,9 @@ public class ProjectParticipant
     @Column(name = "join_date", nullable = false)
     private LocalDateTime m_joinDate;
 
+    @Column(name = "participant_rating")
+    private double m_participantRating = 0; // Means no rating yet
+
     public ProjectParticipant()
     {
         m_joinDate = LocalDateTime.now();
@@ -40,6 +43,15 @@ public class ProjectParticipant
         m_joinDate = LocalDateTime.now();
     }
 
+    public double getParticipantRating()
+    {
+        return m_participantRating;
+    }
+
+    public void rateParticipant(double rate)
+    {
+        m_participantRating = (m_participantRating + rate / 2) % 10;
+    }
 
     public LocalDateTime getJoinDate()
     {
