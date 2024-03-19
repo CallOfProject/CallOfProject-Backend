@@ -98,3 +98,5 @@ You can look at the interview service frontend part
 
 # NOTES
 - Testing and bug fixing processes are ongoing...
+
+- **Author:** Nuri Can ÖZTÜRK
