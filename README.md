@@ -4,6 +4,7 @@
 # Contents
 
 - [Overview](#overview)
+- [Architecture](#architecture)
 - [Used Technologies](#used-technologies-frameworks-environments)
 - [Services](#services)
   - [Detailed Descriptions](#detailed-descriptions)
@@ -11,8 +12,7 @@
 - [Frontend](#frontend)
 - [Interview Part](#interview-part)
 - [Mobile Part (Android)](#mobile-part-android)
-- [Architecture](#architecture)
-  - [Architecture Diagram](#architecture-diagram)
+- [Architecture Diagram](#architecture-diagram)
 - [ER Diagrams](#er-diagrams)
 - [NOTES](#notes)
 
