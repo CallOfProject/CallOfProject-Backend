@@ -11,6 +11,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Create Task DTO
+ * <p>
+ * This class contains the create task data transfer object
+ */
 public record CreateTaskDTO(
         @JsonProperty("project_id")
         @NotNull(message = "project id cannot be empty")

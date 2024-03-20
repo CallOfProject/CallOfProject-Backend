@@ -8,6 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * ProjectInfoKafkaDTO
+ */
 public record ProjectInfoKafkaDTO(
         @JsonProperty("project_id")
         UUID projectId,
@@ -23,6 +26,9 @@ public record ProjectInfoKafkaDTO(
         AdminOperationStatus adminOperationStatus,
         EOperation operation)
 {
+    /**
+     * toString
+     */
     @Override
     public String toString()
     {

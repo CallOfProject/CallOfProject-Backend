@@ -6,6 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.UUID;
 
+/**
+ * Project DTO
+ * <p>
+ * This class contains the project data transfer object
+ */
 public record ProjectDTO(
         @JsonProperty("project_id")
         UUID projectId,

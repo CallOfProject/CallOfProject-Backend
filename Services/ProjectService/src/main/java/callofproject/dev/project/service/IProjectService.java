@@ -2,6 +2,8 @@ package callofproject.dev.project.service;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.project.dto.ParticipantRateDTO;
+import callofproject.dev.project.dto.ProjectRateDTO;
 import callofproject.dev.project.dto.ProjectSaveDTO;
 import callofproject.dev.project.dto.ProjectUpdateDTO;
 import org.springframework.web.multipart.MultipartFile;
@@ -135,4 +137,21 @@ public interface IProjectService
      * @return A ResponseMessage containing the result of the join request callback.
      */
     ResponseMessage<Object> addProjectJoinRequestCallback(UUID projectId, UUID userId);
+
+    /**
+     * Callback for removing a request to join a project.
+     *
+     * @param dto Data Transfer Object containing the project and user IDs.
+     * @return A ResponseMessage containing the result of the join request callback.
+     */
+    ResponseMessage<Object> rateProject(ProjectRateDTO dto);
+
+
+    /**
+     * Callback for removing a request to join a project.
+     *
+     * @param dto Data Transfer Object containing the project and user IDs.
+     * @return A ResponseMessage containing the result of the join request callback.
+     */
+    ResponseMessage<Object> rateParticipant(ParticipantRateDTO dto);
 }

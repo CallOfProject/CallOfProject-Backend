@@ -6,6 +6,11 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
+/**
+ * Change Task Status DTO
+ * <p>
+ * This class contains the change task status data transfer object
+ */
 public record ChangeTaskStatusDTO(
         @JsonProperty("task_id")
         @NotNull(message = "task id cannot be empty")

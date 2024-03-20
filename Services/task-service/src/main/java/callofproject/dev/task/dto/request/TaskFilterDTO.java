@@ -9,6 +9,11 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * Task Filter DTO
+ * <p>
+ * This class contains the task filter data transfer object
+ */
 public record TaskFilterDTO(
         @JsonProperty(value = "priority")
         Priority priority,

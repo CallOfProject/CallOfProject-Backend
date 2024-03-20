@@ -56,6 +56,11 @@ public class KafkaConsumer
     }
 
 
+    /**
+     * Listens to the specified Kafka topic and processes ProjectInfoKafkaDTO messages.
+     *
+     * @param projectDTO The ProjectInfoKafkaDTO message received from Kafka.
+     */
     @KafkaListener(topics = "${spring.kafka.project-info-topic-name}", groupId = "${spring.kafka.consumer.project-info-group-id}", containerFactory = "configProjectInfoKafkaListener")
     public void consumeProjectInfo(ProjectInfoKafkaDTO projectDTO)
     {
@@ -68,6 +73,11 @@ public class KafkaConsumer
     }
 
 
+    /**
+     * Listens to the specified Kafka topic and processes ProjectParticipantKafkaDTO messages.
+     *
+     * @param dto The ProjectParticipantKafkaDTO message received from Kafka.
+     */
     @KafkaListener(topics = "${spring.kafka.project-participant-topic-name}", groupId = "${spring.kafka.consumer.project-participant-group-id}", containerFactory = "configProjectParticipantKafkaListener")
     @Transactional
     public void consumeProjectParticipant(ProjectParticipantKafkaDTO dto)

@@ -357,6 +357,60 @@ public class ProjectService implements IProjectService
         return new ResponseMessage<>("Participant request is sent!", OK, dto);
     }
 
+
+    /**
+     * Callback for updating a project using ProjectUpdateDTO.
+     *
+     * @param dto Data Transfer Object containing updated project information.
+     * @return A ResponseMessage containing the result of the rate project operation.
+     */
+    @Override
+    public ResponseMessage<Object> rateProject(ProjectRateDTO dto)
+    {
+        var project = findProjectIfExistsByProjectId(dto.projectId());
+
+        if (project.getProjectOwner().getUserId().equals(dto.userId()))
+            return new ResponseMessage<>("You cannot rate your project!", BAD_REQUEST, false);
+
+        project.rateProject(dto.rate());
+
+        var updatedProject = m_serviceHelper.saveProject(project);
+        var projectDTO = m_projectMapper.toProjectOverviewDTO(updatedProject, findTagList(updatedProject));
+
+        return new ResponseMessage<>("Project is rated!", OK, projectDTO);
+    }
+
+    /**
+     * Callback for removing a request to join a project.
+     *
+     * @param participantRateDTO Data Transfer Object containing the request information.
+     * @return A ResponseMessage containing the result of the join request callback.
+     */
+    @Override
+    public ResponseMessage<Object> rateParticipant(ParticipantRateDTO participantRateDTO)
+    {
+        var rateOwner = findUserIfExists(participantRateDTO.rateOwnerId());
+        var ratingUser = findUserIfExists(participantRateDTO.rateUserId());
+        var project = findProjectIfExistsByProjectId(participantRateDTO.projectId());
+
+        if (rateOwner.getUserId().equals(ratingUser.getUserId()))
+            return new ResponseMessage<>("You cannot rate yourself!", BAD_REQUEST, false);
+
+        var projectParticipant = project.getProjectParticipants().stream().filter(pp -> pp.getUser().getUserId().equals(ratingUser.getUserId())).findFirst();
+
+        if (projectParticipant.isEmpty())
+            return new ResponseMessage<>("You cannot rate user who is not participant of project!", BAD_REQUEST, false);
+
+        projectParticipant.get().rateParticipant(participantRateDTO.rate());
+
+        var updatedParticipant = m_serviceHelper.addProjectParticipant(projectParticipant.get());
+
+        var dto = m_projectParticipantMapper.toProjectParticipantDTO(updatedParticipant);
+
+        return new ResponseMessage<>("User is rated!", OK, dto);
+    }
+
+
     /**
      * Checks various project participation policies against a specific user and project.
      * Validates if the user is eligible to join or interact with the project based on predefined rules.

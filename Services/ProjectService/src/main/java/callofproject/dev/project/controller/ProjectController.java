@@ -1,6 +1,8 @@
 package callofproject.dev.project.controller;
 
 import callofproject.dev.library.exception.util.CopDataUtil;
+import callofproject.dev.project.dto.ParticipantRateDTO;
+import callofproject.dev.project.dto.ProjectRateDTO;
 import callofproject.dev.project.dto.ProjectSaveDTO;
 import callofproject.dev.project.dto.ProjectUpdateDTO;
 import callofproject.dev.project.service.IProjectService;
@@ -202,6 +204,33 @@ public class ProjectController
     public ResponseEntity<Object> findProjectDetail(@RequestParam("pid") UUID projectId)
     {
         return subscribe(() -> ok(m_projectService.findProjectDetail(projectId)),
+                msg -> internalServerError().body(msg.getMessage()));
+    }
+
+    /**
+     * Handles the HTTP POST request to rate a project.
+     *
+     * @param projectRateDTO The ProjectRateDTO containing the project's rating details.
+     * @return ResponseEntity containing the result of the rating operation if successful, or an error message in case of failure.
+     */
+    @PostMapping("/rate")
+    public ResponseEntity<Object> rateProject(@RequestBody ProjectRateDTO projectRateDTO)
+    {
+        return subscribe(() -> ok(m_projectService.rateProject(projectRateDTO)),
+                msg -> internalServerError().body(msg.getMessage()));
+    }
+
+
+    /**
+     * Handles the HTTP POST request to rate a project participant.
+     *
+     * @param dto The ParticipantRateDTO containing the participant's rating details.
+     * @return ResponseEntity containing the result of the rating operation if successful, or an error message in case of failure.
+     */
+    @PostMapping("/rate/participant")
+    public ResponseEntity<Object> rateProjectParticipant(@RequestBody ParticipantRateDTO dto)
+    {
+        return subscribe(() -> ok(m_projectService.rateParticipant(dto)),
                 msg -> internalServerError().body(msg.getMessage()));
     }
 

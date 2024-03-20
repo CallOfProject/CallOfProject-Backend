@@ -24,5 +24,11 @@ public interface IUserMapper
     User toUser(UserKafkaDTO userKafkaDTO);
 
 
+    /**
+     * Maps a User entity to a UserDTO.
+     *
+     * @param user The User to map.
+     * @return The mapped UserDTO.
+     */
     UserDTO toUserDTO(User user);
 }

@@ -11,6 +11,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Update Task DTO
+ * <p>
+ * This class contains the update task data transfer object
+ */
 public record UpdateTaskDTO(
         @JsonProperty("task_id")
         @NotNull(message = "task id cannot be empty")

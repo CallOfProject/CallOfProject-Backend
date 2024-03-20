@@ -6,6 +6,11 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
+/**
+ * Change Task Priority DTO
+ * <p>
+ * This class contains the change task priority data transfer object
+ */
 public record ChangeTaskPriorityDTO(
         @JsonProperty("task_id")
         @NotNull(message = "task id cannot be empty")

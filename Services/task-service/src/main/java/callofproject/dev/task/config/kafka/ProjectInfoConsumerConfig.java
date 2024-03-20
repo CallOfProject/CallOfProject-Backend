@@ -15,6 +15,9 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
 
+/**
+ * This class is a Spring Configuration class that provides configuration for Kafka consumer.
+ */
 @EnableKafka
 @Configuration
 public class ProjectInfoConsumerConfig
@@ -28,6 +31,11 @@ public class ProjectInfoConsumerConfig
     @Value("${spring.kafka.consumer.auto-offset-reset}")
     private String m_offsetResetConfig;
 
+    /**
+     * Creates and configures the Kafka listener container factory for ProjectInfoKafkaDTO messages.
+     *
+     * @return Configured Kafka listener container factory.
+     */
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, ProjectInfoKafkaDTO> configProjectInfoKafkaListener()
     {
@@ -36,6 +44,11 @@ public class ProjectInfoConsumerConfig
         return factory;
     }
 
+    /**
+     * Creates and configures the ConsumerFactory for ProjectInfoKafkaDTO messages.
+     *
+     * @return Configured ConsumerFactory.
+     */
     @Bean
     public ConsumerFactory<String, ProjectInfoKafkaDTO> projectConsumerConfig()
     {

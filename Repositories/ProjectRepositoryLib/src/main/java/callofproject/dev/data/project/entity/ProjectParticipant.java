@@ -36,6 +36,11 @@ public class ProjectParticipant
         m_joinDate = LocalDateTime.now();
     }
 
+    public void setParticipantRating(double participantRating)
+    {
+        m_participantRating = participantRating;
+    }
+
     public ProjectParticipant(Project project, User user)
     {
         m_project = project;

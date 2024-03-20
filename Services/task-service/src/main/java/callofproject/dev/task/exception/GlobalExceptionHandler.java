@@ -8,9 +8,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.HashMap;
 
+/**
+ * GlobalExceptionHandler class
+ * <p>
+ * This class is used to handle global exceptions.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler
 {
+    /**
+     * Handle validation exceptions
+     *
+     * @param ex method argument not valid exception
+     * @return ResponseEntity
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex)
     {

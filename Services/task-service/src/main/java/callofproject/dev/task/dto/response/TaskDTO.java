@@ -12,6 +12,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Task DTO
+ * <p>
+ * This class contains the task data transfer object
+ */
 public final class TaskDTO implements Comparable<TaskDTO>
 {
     @JsonProperty("task_id")
@@ -35,6 +40,19 @@ public final class TaskDTO implements Comparable<TaskDTO>
     @JsonProperty("assignees")
     private final List<UserDTO> assignees;
 
+    /**
+     * Construct the task DTO
+     *
+     * @param taskId      the task id
+     * @param projectDTO  the project DTO
+     * @param title       the title
+     * @param description the description
+     * @param priority    the priority
+     * @param taskStatus  the task status
+     * @param startDate   the start date
+     * @param endDate     the end date
+     * @param assignees   the assignees
+     */
     public TaskDTO(
             @JsonProperty("task_id")
             UUID taskId,
@@ -76,42 +94,77 @@ public final class TaskDTO implements Comparable<TaskDTO>
         this.assignees = assignees;
     }
 
+    /**
+     * Get the task id
+     *
+     * @return the task id
+     */
     @JsonProperty("task_id")
     public UUID taskId()
     {
         return taskId;
     }
 
+    /**
+     * Get the project DTO
+     *
+     * @return the project DTO
+     */
     @JsonProperty("project")
     public ProjectDTO projectDTO()
     {
         return projectDTO;
     }
 
+    /**
+     * Get the title
+     *
+     * @return the title
+     */
     @JsonProperty("title")
     public String title()
     {
         return title;
     }
 
+    /**
+     * Get the description
+     *
+     * @return the description
+     */
     @JsonProperty("description")
     public String description()
     {
         return description;
     }
 
+    /**
+     * Get the priority
+     *
+     * @return the priority
+     */
     @JsonProperty("priority")
     public Priority priority()
     {
         return priority;
     }
 
+    /**
+     * Get the task status
+     *
+     * @return the task status
+     */
     @JsonProperty("task_status")
     public TaskStatus taskStatus()
     {
         return taskStatus;
     }
 
+    /**
+     * Get the start date
+     *
+     * @return the start date
+     */
     @JsonProperty("start_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     public LocalDate startDate()
@@ -119,6 +172,11 @@ public final class TaskDTO implements Comparable<TaskDTO>
         return startDate;
     }
 
+    /**
+     * Get the end date
+     *
+     * @return the end date
+     */
     @JsonProperty("end_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     public LocalDate endDate()
@@ -126,12 +184,23 @@ public final class TaskDTO implements Comparable<TaskDTO>
         return endDate;
     }
 
+    /**
+     * Get the assignees
+     *
+     * @return the assignees
+     */
     @JsonProperty("assignees")
     public List<UserDTO> assignees()
     {
         return assignees;
     }
 
+    /**
+     * Compare the task with another object
+     *
+     * @param obj the object to compare
+     * @return the comparison result
+     */
     @Override
     public boolean equals(Object obj)
     {
@@ -149,12 +218,23 @@ public final class TaskDTO implements Comparable<TaskDTO>
                 Objects.equals(this.assignees, that.assignees);
     }
 
+    /**
+     * Calculate the hash code of the task
+     *
+     * @return the hash code
+     */
     @Override
     public int hashCode()
     {
         return Objects.hash(taskId, projectDTO, title, description, priority, taskStatus, startDate, endDate, assignees);
     }
 
+
+    /**
+     * Get the string representation of the task
+     *
+     * @return the string representation
+     */
     @Override
     public String toString()
     {
@@ -171,6 +251,12 @@ public final class TaskDTO implements Comparable<TaskDTO>
     }
 
 
+    /**
+     * Compare the priority of the task
+     *
+     * @param o the task to compare
+     * @return the comparison result
+     */
     @Override
     public int compareTo(TaskDTO o)
     {

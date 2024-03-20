@@ -4,6 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.UUID;
 
+/**
+ * User DTO
+ * <p>
+ * This class contains the user data transfer object
+ */
 public record UserDTO(
         @JsonProperty("user_id")
         UUID userId,

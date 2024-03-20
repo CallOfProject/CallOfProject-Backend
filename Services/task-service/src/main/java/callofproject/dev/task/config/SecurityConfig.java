@@ -57,7 +57,6 @@ public class SecurityConfig
     {
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(h -> h.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                //.cors(corsCustomizer -> corsCustomizer.configurationSource(this::setCorsConfig))
                 .csrf(AbstractHttpConfigurer::disable);
 
         http.addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)

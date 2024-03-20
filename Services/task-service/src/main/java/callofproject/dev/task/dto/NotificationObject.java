@@ -3,7 +3,9 @@ package callofproject.dev.task.dto;
 import java.util.UUID;
 
 /**
- * NotificationObject
+ * Notification object
+ * <p>
+ * This class contains the notification object
  */
 public record NotificationObject(
         UUID projectId,
