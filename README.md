@@ -4,8 +4,6 @@
 # Contents
 
 - [Overview](#overview)
-- [Architecture](#architecture)
-  - [Architecture Diagram](#architecture-diagram)
 - [Used Technologies](#used-technologies-frameworks-environments)
 - [Services](#services)
   - [Detailed Descriptions](#detailed-descriptions)
@@ -13,6 +11,9 @@
 - [Frontend](#frontend)
 - [Interview Part](#interview-part)
 - [Mobile Part (Android)](#mobile-part-android)
+- [Architecture](#architecture)
+  - [Architecture Diagram](#architecture-diagram)
+- [ER Diagrams](#er-diagrams)
 - [NOTES](#notes)
 
 
@@ -23,12 +24,6 @@ Call-Of-Project is an application where people can find project partners, collab
 ## Architecture
 
 Call-Of-Project follows a **microservices-based architecture**. Our application has adopted microservices architecture and uses **Apache Kafka** to ensure data integrity, collect and process data, and ensure the smooth operation of various processes. In this context, communication is established between microservices and data transfer is carried out using **Kafka's message queue** feature. Furthermore, with the features provided by Kafka such as clustering and high availability, the system's durability and performance are enhanced. Thus, while data flow is provided throughout the application, data integrity and proper processing of transactions are ensured. Users send all requests through a single endpoint via **API Gateway**. Each microservice has its own database. User authentication and authorization operations are performed using **JWT**. Sensitive information such as passwords is stored in hashed form. Actions in our application are sent to the necessary users via notification and/or email. We used **Apache Kafka** and **Websocket** for notifications to be delivered in real-time. Additionally, there are **scheduler services** in our application that run at specific times every day. These services are responsible for sending reminder emails to users, handling applications with past feedback time, and closing projects with expired deadlines, among other purposes.
-
-### Architecture Diagram
-- ![architecture_diagram](https://github.com/CallOfProject/CallOfProject-Backend/assets/62218588/5caaa177-1e5a-4a0a-bdd6-40ffba8404b7)
-
-  
-- ![app](https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/83e7a49b-6fe2-4c3b-89cc-0cd3e807f180)
 
 ### Used Technologies
 - Java 17
@@ -95,6 +90,19 @@ You can look at the interview service frontend part
 
 ## Mobile Part (Android)
 - **Android:** [Call-of-Project Android](https://github.com/CallOfProject/Call-Of-Project-Android)
+
+### Architecture Diagram
+- ![architecture_diagram](https://github.com/CallOfProject/CallOfProject-Backend/assets/62218588/5caaa177-1e5a-4a0a-bdd6-40ffba8404b7)
+
+  
+- ![app](https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/83e7a49b-6fe2-4c3b-89cc-0cd3e807f180)
+
+### ER Diagrams
+- ![community_db](https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/1465e756-7be7-411a-9cb2-84e42e6d3045)
+- ![cop_authentication_db](https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/a39ace64-2fdd-466b-8c8d-0624395ca85e)
+- ![cop_interview_db](https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/3c7015ae-017b-4ada-831d-3edcaae493b9)
+- ![cop_project_db](https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/e6bf09af-00d4-4aef-b05a-3d8384d909e3)
+- ![cop_task_db](https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/e36f16e3-541d-4cb1-882d-51c949b8efef)
 
 # NOTES
 - Testing and bug fixing processes are ongoing...
