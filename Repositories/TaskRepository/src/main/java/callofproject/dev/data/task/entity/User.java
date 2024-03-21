@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import static jakarta.persistence.CascadeType.*;
-import static jakarta.persistence.CascadeType.REFRESH;
 
 @Entity
 @Table(name = "users")
@@ -40,10 +39,21 @@ public class User
     @ManyToMany(mappedBy = "m_assignees", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     private Set<Task> m_assignedTasks;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_roles",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")})
+    @ManyToMany(
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.ALL}
+    )
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = {@JoinColumn(
+                    name = "user_id",
+                    referencedColumnName = "user_id"
+            )},
+            inverseJoinColumns = {@JoinColumn(
+                    name = "role_id",
+                    referencedColumnName = "role_id"
+            )}
+    )
     private Set<Role> roles;
 
     @OneToMany(mappedBy = "m_user", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)

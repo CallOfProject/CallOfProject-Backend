@@ -86,6 +86,7 @@ public class TaskServiceCallback
         var project = findProjectByIdIfExist(createTaskDTO.projectId());
         // Find users by ids
         var users = toStream(m_taskServiceHelper.findUsersByIds(createTaskDTO.userIds())).collect(toSet());
+        // Convert CreateTaskDTO to Task object
         var taskObj = m_taskMapper.toTask(createTaskDTO, project, users);
         // Save task
         var savedTask = m_taskServiceHelper.saveTask(taskObj);

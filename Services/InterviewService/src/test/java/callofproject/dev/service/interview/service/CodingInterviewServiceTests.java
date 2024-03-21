@@ -8,7 +8,6 @@ import callofproject.dev.data.interview.entity.ProjectParticipant;
 import callofproject.dev.data.interview.entity.User;
 import callofproject.dev.service.interview.DatabaseCleaner;
 import callofproject.dev.service.interview.Injection;
-import callofproject.dev.service.interview.config.kafka.dto.ProjectInfoKafkaDTO;
 import callofproject.dev.service.interview.mapper.ICodingInterviewMapper;
 import callofproject.dev.service.interview.mapper.IProjectMapper;
 import org.junit.jupiter.api.AfterEach;

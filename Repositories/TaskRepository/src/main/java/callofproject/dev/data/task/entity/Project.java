@@ -70,6 +70,14 @@ public class Project
         m_adminOperationStatus = adminOperationStatus;
     }
 
+    public void addProjectParticipant(ProjectParticipant projectParticipant)
+    {
+        if (m_projectParticipants == null)
+            m_projectParticipants = new HashSet<>();
+
+        m_projectParticipants.add(projectParticipant);
+    }
+
     public void addTask(Task task)
     {
         if (m_tasks == null)

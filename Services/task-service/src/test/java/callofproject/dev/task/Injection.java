@@ -15,6 +15,7 @@ public class Injection
 {
     @Autowired
     private TaskServiceCallback m_taskServiceCallback;
+
     @Autowired
     private ITaskRepository m_taskRepository;
 
@@ -27,10 +28,12 @@ public class Injection
     @Autowired
     private IUserMapper m_userMapper;
 
+    // ----------------------------------------------------------------------------------------------------------------
     public IUserMapper getUserMapper()
     {
         return m_userMapper;
     }
+
     public TaskServiceHelper getTaskServiceHelper()
     {
         return m_taskServiceHelper;
@@ -40,6 +43,7 @@ public class Injection
     {
         return m_userRepository;
     }
+
     public TaskServiceCallback getTaskServiceCallback()
     {
         return m_taskServiceCallback;

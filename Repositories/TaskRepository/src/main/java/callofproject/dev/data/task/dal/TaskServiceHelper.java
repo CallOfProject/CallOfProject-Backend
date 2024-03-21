@@ -28,17 +28,14 @@ public class TaskServiceHelper
     private final IProjectParticipantRepository m_participantRepository;
     private final IUserRepository m_userRepository;
     private final ITaskRepository m_taskRepository;
-    private final IRoleRepository m_roleRepository;
 
     public TaskServiceHelper(IProjectRepository projectRepository, IProjectParticipantRepository participantRepository,
-                             IUserRepository userRepository, ITaskRepository taskRepository,
-                             IRoleRepository roleRepository)
+                             IUserRepository userRepository, ITaskRepository taskRepository)
     {
         m_projectRepository = projectRepository;
         m_participantRepository = participantRepository;
         m_userRepository = userRepository;
         m_taskRepository = taskRepository;
-        m_roleRepository = roleRepository;
     }
 
     public Project saveProject(Project project)
@@ -66,11 +63,6 @@ public class TaskServiceHelper
         return doForRepository(() -> m_taskRepository.save(task), "Failed to save task");
     }
 
-    public Role saveRole(Role role)
-    {
-        return doForRepository(() -> m_roleRepository.save(role), "Failed to save role");
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
     public void deleteProject(Project project)
     {
@@ -90,11 +82,6 @@ public class TaskServiceHelper
     public void deleteTask(Task task)
     {
         doForRepository(() -> m_taskRepository.delete(task), "Failed to delete task");
-    }
-
-    public void deleteRole(Role role)
-    {
-        doForRepository(() -> m_roleRepository.delete(role), "Failed to delete role");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -124,10 +111,6 @@ public class TaskServiceHelper
         return doForRepository(() -> m_taskRepository.findById(id), "Failed to find task by id");
     }
 
-    public Optional<Role> findRoleById(long id)
-    {
-        return doForRepository(() -> m_roleRepository.findById(id), "Failed to find role by id");
-    }
     // -----------------------------------------------------------------------------------------------------------------
 
     public Page<Task> findAllTasksByProjectId(UUID projectId, int page)
