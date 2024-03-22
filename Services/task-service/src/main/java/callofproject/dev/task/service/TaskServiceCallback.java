@@ -107,7 +107,7 @@ public class TaskServiceCallback
         var task = findTaskByIdIfExist(dto.taskId());
 
         // Check if the user is the owner of the project
-        if (task.getProject().getProjectOwner().getUserId().equals(dto.userId()))
+        if (!task.getProject().getProjectOwner().getUserId().equals(dto.userId()))
             throw new DataServiceException("You are not the owner of this project");
 
         // Change task status
@@ -119,7 +119,6 @@ public class TaskServiceCallback
         return new ResponseMessage<>("Task status changed successfully", Status.OK, new Pair<>("Task status changed successfully", updatedTask));
     }
 
-
     /**
      * Deletes a task with the provided id.
      *
@@ -130,6 +129,7 @@ public class TaskServiceCallback
     {
         // Find task by id
         var task = findTaskByIdIfExist(taskId);
+
         // Get task assignees
         var taskAssignees = task.getAssignees();
 
@@ -219,7 +219,7 @@ public class TaskServiceCallback
         var task = findTaskByIdIfExist(dto.taskId());
 
         // Check if the user is the owner of the project
-        if (task.getProject().getProjectOwner().getUserId().equals(dto.userId()))
+        if (!task.getProject().getProjectOwner().getUserId().equals(dto.userId()))
             throw new DataServiceException("You are not the owner of this project");
 
         // Change task priority
@@ -291,7 +291,7 @@ public class TaskServiceCallback
                 .sorted(TaskDTO::compareTo)
                 .toList(), "TaskService::findTasksByProjectIdAndUserId");
 
-        return toMultipleResponseMessagePageable(taskPage.getTotalPages(), page, taskPage.getNumberOfElements(), tasks);
+        return toMultipleResponseMessagePageable(taskPage.getTotalPages(), page, tasks.size(), tasks);
     }
 
 

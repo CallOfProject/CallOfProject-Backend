@@ -27,10 +27,7 @@ public class Task
     @Column(name = "description")
     private String m_description;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {DETACH, MERGE, PERSIST, REFRESH})
-    @JoinTable(name = "user_tasks",
-            joinColumns = {@JoinColumn(name = "task_id", referencedColumnName = "task_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")})
+    @ManyToMany(mappedBy = "m_assignedTasks", fetch = FetchType.EAGER, cascade = {PERSIST, REFRESH, MERGE})
     @JsonIgnore
     private Set<User> m_assignees;
 

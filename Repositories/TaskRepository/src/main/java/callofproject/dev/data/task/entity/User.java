@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,8 +37,13 @@ public class User
     @Column(name = "deleted_at")
     private LocalDateTime m_deletedAt;
 
-    @ManyToMany(mappedBy = "m_assignees", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
-    private Set<Task> m_assignedTasks;
+    //@ManyToMany(mappedBy = "m_assignees", fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {PERSIST, REFRESH, MERGE})
+    @JoinTable(name = "user_tasks",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)},
+            inverseJoinColumns = {@JoinColumn(name = "task_id", referencedColumnName = "task_id", nullable = false)})
+    @JsonIgnore
+    private Set<Task> m_assignedTasks = new HashSet<>();
 
     @ManyToMany(
             fetch = FetchType.EAGER,
@@ -83,6 +89,21 @@ public class User
             m_assignedTasks = new HashSet<>();
 
         m_assignedTasks.add(task);
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(m_userId, user.m_userId) && Objects.equals(m_username, user.m_username) && Objects.equals(m_email, user.m_email);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(m_userId, m_username, m_email);
     }
 
     public Set<ProjectParticipant> getProjectParticipants()

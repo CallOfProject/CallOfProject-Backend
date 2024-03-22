@@ -47,6 +47,7 @@ public class User
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "project_id", referencedColumnName = "project_id", nullable = false))
     private Set<Project> m_showcasedProjects; // projects that he showcases
+
     @OneToMany(mappedBy = "m_user", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<ProjectParticipant> m_projectParticipants; // projects that he owns

@@ -238,4 +238,9 @@ public class TaskServiceHelper
     {
         doForRepository(() -> m_projectRepository.deleteById(id), "Failed to delete project by id in repository");
     }
+
+    public List<Project> findAllProjects()
+    {
+        return doForRepository(() -> m_projectRepository.findAll(), "Failed to find all projects in repository");
+    }
 }
