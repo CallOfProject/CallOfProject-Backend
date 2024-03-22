@@ -5,14 +5,15 @@ import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.data.project.repository.IProjectRepository;
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
-import callofproject.dev.service.filterandsearch.config.specification.ProjectFilterSpecifications;
-import callofproject.dev.service.filterandsearch.config.specification.UserFilterSpecifications;
 import callofproject.dev.service.filterandsearch.dto.*;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static callofproject.dev.service.filterandsearch.config.specification.ProjectFilterSpecifications.searchProjects;
+import static callofproject.dev.service.filterandsearch.config.specification.UserFilterSpecifications.searchUsers;
 
 
 @Service
@@ -31,8 +32,8 @@ public class SearchService
 
     public MultipleResponseMessagePageable<Object> search(String keyword, int page)
     {
-        Specification<User> userSpec = UserFilterSpecifications.searchUsers(keyword);
-        Specification<Project> projectSpec = ProjectFilterSpecifications.searchProjects(keyword);
+        Specification<User> userSpec = searchUsers(keyword);
+        Specification<Project> projectSpec = searchProjects(keyword);
         var pageR = PageRequest.of(page - 1, 20);
         var users = m_userRepository.findAll(userSpec, pageR);
         var projects = m_projectRepository.findAll(projectSpec, pageR);

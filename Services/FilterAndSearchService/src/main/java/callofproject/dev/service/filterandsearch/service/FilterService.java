@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import static callofproject.dev.service.filterandsearch.config.specification.ProjectFilterSpecifications.*;
 import static java.lang.String.format;
 
+/**
+ * FilterService
+ */
 @Service
 @Lazy
 @Transactional(transactionManager = "projectDbTransactionManager")
@@ -23,12 +26,25 @@ public class FilterService
     private final IUserRepository m_userRepository;
     private final IProjectRepository m_projectRepository;
 
+    /**
+     * Constructor
+     *
+     * @param userRepository    IUserRepository
+     * @param projectRepository IProjectRepository
+     */
     public FilterService(IUserRepository userRepository, IProjectRepository projectRepository)
     {
         m_userRepository = userRepository;
         m_projectRepository = projectRepository;
     }
 
+    /**
+     * Filter projects
+     *
+     * @param dto  ProjectFilterDTO
+     * @param page int
+     * @return Filtered projects
+     */
     public MultipleResponseMessagePageable<Object> filterProjects(ProjectFilterDTO dto, int page)
     {
         var spec = Specification.where(filterByProfessionalLevel(dto.professionLevel()))

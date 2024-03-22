@@ -18,6 +18,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 
+/**
+ * This class is used to configure the authentication database.
+ */
 @Configuration
 @EnableJpaRepositories(
         basePackages = "callofproject.dev.repository.authentication",
@@ -26,7 +29,11 @@ import javax.sql.DataSource;
 )
 public class AuthenticationDatasourceConfig
 {
-
+    /**
+     * This method is used to create the authentication data source.
+     *
+     * @return the authentication data source.
+     */
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource.auth-db")
     public DataSource authenticationDataSource()
@@ -34,12 +41,25 @@ public class AuthenticationDatasourceConfig
         return DataSourceBuilder.create().build();
     }
 
+    /**
+     * This method is used to create the JPA vendor adapter.
+     *
+     * @param jpaProperties the JPA properties.
+     * @return the JPA vendor adapter.
+     */
     @Bean
     public JpaVendorAdapter jpaVendorAdapter(JpaProperties jpaProperties)
     {
         return new HibernateJpaVendorAdapter();
     }
 
+    /**
+     * This method is used to create the authentication entity manager factory.
+     *
+     * @param dataSource       the authentication data source.
+     * @param jpaVendorAdapter the JPA vendor adapter.
+     * @return the authentication entity manager factory.
+     */
     @Bean
     public LocalContainerEntityManagerFactoryBean authenticationEntityManagerFactory(@Qualifier("authenticationDataSource") DataSource dataSource, JpaVendorAdapter jpaVendorAdapter)
     {
@@ -53,6 +73,12 @@ public class AuthenticationDatasourceConfig
                 .build();
     }
 
+    /**
+     * This method is used to create the authentication database transaction manager.
+     *
+     * @param entityManagerFactory the authentication entity manager factory.
+     * @return the authentication database transaction manager.
+     */
     @Bean
     //@ConditionalOnMissingBean(PlatformTransactionManager.class)
     public PlatformTransactionManager authenticationDbTransactionManager(@Qualifier("authenticationEntityManagerFactory") EntityManagerFactory entityManagerFactory)

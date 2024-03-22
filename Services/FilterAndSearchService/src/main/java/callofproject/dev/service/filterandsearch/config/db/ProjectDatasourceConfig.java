@@ -17,6 +17,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 
+/**
+ * This class is used to configure the project database.
+ */
 @Configuration
 @EnableJpaRepositories(
         basePackages = "callofproject.dev.data.project",
@@ -26,6 +29,11 @@ import javax.sql.DataSource;
 public class ProjectDatasourceConfig
 {
 
+    /**
+     * This method is used to create the project data source.
+     *
+     * @return the project data source.
+     */
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource.project-db")
     public DataSource projectDataSource()
@@ -33,6 +41,13 @@ public class ProjectDatasourceConfig
         return DataSourceBuilder.create().build();
     }
 
+    /**
+     * This method is used to create the project entity manager factory.
+     *
+     * @param dataSource       the project data source.
+     * @param jpaVendorAdapter the JPA vendor adapter.
+     * @return the project entity manager factory.
+     */
     @Bean
     public LocalContainerEntityManagerFactoryBean projectEntityManagerFactory(@Qualifier("projectDataSource") DataSource dataSource, JpaVendorAdapter jpaVendorAdapter)
     {
@@ -46,6 +61,12 @@ public class ProjectDatasourceConfig
                 .build();
     }
 
+    /**
+     * This method is used to create the project transaction manager.
+     *
+     * @param entityManagerFactory the project entity manager factory.
+     * @return the project transaction manager.
+     */
     @Bean
     @Primary
     public PlatformTransactionManager projectDbTransactionManager(@Qualifier("projectEntityManagerFactory") EntityManagerFactory entityManagerFactory)
