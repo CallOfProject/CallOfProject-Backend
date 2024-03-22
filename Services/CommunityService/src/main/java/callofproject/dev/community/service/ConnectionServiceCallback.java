@@ -6,6 +6,7 @@ import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.status.Status;
 import callofproject.dev.data.community.dal.CommunityServiceHelper;
 import callofproject.dev.data.community.entity.User;
+import callofproject.dev.library.exception.service.DataServiceException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -52,6 +53,7 @@ public class ConnectionServiceCallback
 
         // Update users
         m_communityServiceHelper.upsertUser(user);
+        m_communityServiceHelper.upsertUser(friend);
 
         return new ResponseMessage<>("Connection request answered is: " + answer, Status.OK, answer);
     }
@@ -62,7 +64,11 @@ public class ConnectionServiceCallback
         var friend = findUserByIdIfExist(userId);
 
         // Remove connection request
-        user.getConnectionRequests().removeIf(u -> u.getUserId().equals(friend.getUserId()));
+        user.getConnections().removeIf(u -> u.getUserId().equals(friend.getUserId()));
+        friend.getConnections().removeIf(u -> u.getUserId().equals(user.getUserId()));
+
+        m_communityServiceHelper.upsertUser(user);
+        m_communityServiceHelper.upsertUser(friend);
 
         return new ResponseMessage<>("Connection removed successfully", Status.OK, true);
     }
@@ -83,9 +89,10 @@ public class ConnectionServiceCallback
         friend.getConnections().removeIf(u -> u.getUserId().equals(user.getUserId()));
 
         user.addBlockedConnection(friend);
+        friend.addBlockedConnection(user);
 
         m_communityServiceHelper.upsertUser(user);
-        //m_communityServiceHelper.upsertUser(friend);
+        m_communityServiceHelper.upsertUser(friend);
 
         return new ResponseMessage<>("Connection blocked successfully", Status.OK, true);
     }
@@ -124,7 +131,7 @@ public class ConnectionServiceCallback
         var user = m_communityServiceHelper.findUserById(userId);
 
         if (user.isEmpty())
-            throw new IllegalArgumentException("User not found");
+            throw new DataServiceException("User not found");
 
         return user.get();
     }

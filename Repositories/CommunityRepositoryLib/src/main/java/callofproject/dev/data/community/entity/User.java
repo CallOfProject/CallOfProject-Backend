@@ -46,7 +46,7 @@ public class User
             joinColumns = @JoinColumn(name = "main_user_id"),
             inverseJoinColumns = @JoinColumn(name = "connected_user_id")
     )
-    private Set<User> connections;
+    private Set<User> connections = new HashSet<>();
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {PERSIST, REFRESH})
     @JoinTable(
@@ -54,7 +54,7 @@ public class User
             joinColumns = @JoinColumn(name = "main_user_id"),
             inverseJoinColumns = @JoinColumn(name = "requester_user_id")
     )
-    private Set<User> connectionRequests;
+    private Set<User> connectionRequests = new HashSet<>();
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {PERSIST, REFRESH})
     @JoinTable(
@@ -62,7 +62,7 @@ public class User
             joinColumns = @JoinColumn(name = "main_user_id"),
             inverseJoinColumns = @JoinColumn(name = "blocked_user_id")
     )
-    private Set<User> blockedConnections;
+    private Set<User> blockedConnections = new HashSet<>();
 
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -74,7 +74,7 @@ public class User
 
     @OneToMany(mappedBy = "m_user", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
     @JsonIgnore
-    private Set<ProjectParticipant> m_projectParticipants; // projects that user is participant
+    private Set<ProjectParticipant> m_projectParticipants = new HashSet<>(); // projects that user is participant
 
     public User()
     {
