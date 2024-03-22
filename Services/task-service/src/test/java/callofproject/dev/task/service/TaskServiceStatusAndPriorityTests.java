@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ComponentScan(basePackages = {SERVICE_BEAN_NAME, REPOSITORY_BEAN_NAME})
 @TestPropertySource(locations = TEST_PROPERTIES_FILE)
 @Transactional
+@SuppressWarnings("all")
 public class TaskServiceStatusAndPriorityTests
 {
     @Autowired

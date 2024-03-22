@@ -92,7 +92,7 @@ public class InterviewManagementCallbackService
         var userTestInterviewList = testInterview.get().getTestInterviews().stream()
                 .map(uti -> toUserTestInterviewDTO(uti, testInterview.get(), projectDTO, testInterviewDTO)).toList();
 
-        return new ResponseMessage<>("Coding Interview found!", Status.OK, userTestInterviewList);
+        return new ResponseMessage<>("Test Interview found!", Status.OK, userTestInterviewList);
     }
 
 

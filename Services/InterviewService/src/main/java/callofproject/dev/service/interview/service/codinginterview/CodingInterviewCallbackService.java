@@ -186,6 +186,7 @@ public class CodingInterviewCallbackService
         // Remove user coding interview from user and codingInterview then delete it from the database
         user.getCodingInterviews().removeIf(ci -> ci.getId().equals(userCodingInterview.getId()));
         interview.getCodingInterviews().removeIf(ci -> ci.getId().equals(userCodingInterview.getId()));
+        userCodingInterview.setCodingInterview(null);
         m_interviewServiceHelper.removeUserCodingInterview(userCodingInterview);
 
         // Convert to CodingInterviewDTO class

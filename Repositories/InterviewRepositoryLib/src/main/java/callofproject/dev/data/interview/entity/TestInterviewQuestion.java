@@ -56,6 +56,20 @@ public class TestInterviewQuestion implements Comparable<TestInterviewQuestion>
         m_status = QuestionStatus.UNANSWERED;
     }
 
+    public TestInterviewQuestion(String title, int point, String question, String option1, String option2, String option3, String option4, String answer, TestInterview testInterview, QuestionStatus status)
+    {
+        m_title = title;
+        m_point = point;
+        m_question = question;
+        m_option1 = option1;
+        m_option2 = option2;
+        m_option3 = option3;
+        m_option4 = option4;
+        m_answer = answer;
+        m_testInterview = testInterview;
+        m_status = status;
+    }
+
     @Override
     public int compareTo(TestInterviewQuestion other)
     {

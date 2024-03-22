@@ -3,12 +3,16 @@ package callofproject.dev.service.interview;
 import callofproject.dev.data.interview.entity.Project;
 import callofproject.dev.data.interview.entity.User;
 import callofproject.dev.service.interview.dto.coding.CreateCodingInterviewDTO;
+import callofproject.dev.service.interview.dto.test.CreateQuestionDTO;
+import callofproject.dev.service.interview.dto.test.CreateTestDTO;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+
+import static java.lang.String.format;
 
 public final class Util
 {
@@ -18,17 +22,10 @@ public final class Util
     {
     }
 
-
-    public static Project createProject(User owner)
+    public static User createUser(String username)
     {
-        return new Project(UUID.randomUUID(), "Test Project -" + ms_random.nextInt(1_000_000), owner);
-    }
-
-    public static User createUser()
-    {
-        var number = new Random().nextInt(1_000_000);
-        return new User(UUID.randomUUID(), "test-" + number, "test-" + number, "test-" + number,
-                "test-" + number, "test-" + number, null);
+        return new User(UUID.randomUUID(), username, format("%s@gmail.com", username), format("firstname-%s", username),
+                format("middlename-%s", username), format("lastname-%s", username), null);
     }
 
     public static CreateCodingInterviewDTO createCodingInterviewDTO(UUID projectId, List<String> userIds)
@@ -44,16 +41,18 @@ public final class Util
                 userIds);
     }
 
-    public static CreateCodingInterviewDTO createInvalidCodingInterviewDTO(UUID projectId, List<String> userIds)
+    public static CreateTestDTO createTestInterviewDTO(UUID projectId, List<String> userIds)
     {
-        return new CreateCodingInterviewDTO("Test Title",
+        var question = new CreateQuestionDTO("test question", "A", "B", "C", "D", "B", 100);
+        return new CreateTestDTO("Test Title",
+                1,
                 "Test Question",
-                null,
-                50,
+                100,
                 100,
                 projectId,
                 LocalDateTime.now(),
-                LocalDateTime.now().plusWeeks(1),
+                LocalDateTime.now().plusHours(1),
+                List.of(question),
                 userIds);
     }
 }

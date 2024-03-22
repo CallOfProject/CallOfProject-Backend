@@ -17,4 +17,19 @@ public class MultipleResponseMessage<T>
         m_message = message;
         m_object = object;
     }
+
+    public int getItemCount()
+    {
+        return m_itemCount;
+    }
+
+    public String getMessage()
+    {
+        return m_message;
+    }
+
+    public T getObject()
+    {
+        return m_object;
+    }
 }

@@ -74,6 +74,7 @@ public class TestInterviewCallbackService
         project.setTestInterview(testInterview);
         testInterview.setProject(project);
         m_interviewServiceHelper.createInterview(testInterview);
+        m_interviewServiceHelper.createProject(project);
 
         // to question entity
         var questions = dto.questionList().stream().map(m_testInterviewQuestionMapper::toTestInterviewQuestion).toList();
@@ -178,15 +179,18 @@ public class TestInterviewCallbackService
             m_interviewServiceHelper.saveUser(user); // Assuming there's a method to update user in your service
         });
 
+        // Remove user test interviews
+        m_interviewServiceHelper.removeUserTestInterviews(userTestInterviews.stream().toList());
+
         // Remove test interview questions
         m_interviewServiceHelper.removeTestInterviewQuestions(questions.stream().toList());
 
         // Remove test interviews from project
         project.setTestInterview(null);
+        interview.setProject(null);
         m_interviewServiceHelper.createProject(project);
 
-        // Remove user test interviews
-        m_interviewServiceHelper.removeUserTestInterviews(userTestInterviews.stream().toList());
+
 
         // Finally, delete the test interview itself
         m_interviewServiceHelper.deleteTestInterview(interview);

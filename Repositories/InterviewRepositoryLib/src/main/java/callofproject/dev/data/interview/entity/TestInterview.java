@@ -56,7 +56,7 @@ public class TestInterview
 
     @OneToMany(mappedBy = "m_testInterview", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore
-    private Set<TestInterviewQuestion> m_questions;
+    private Set<TestInterviewQuestion> m_questions = new HashSet<>();
 
 
     public TestInterview()

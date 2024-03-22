@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -71,6 +72,14 @@ public class Project
         m_projectParticipants = projectParticipants;
         m_projectStatus = projectStatus;
         m_adminOperationStatus = adminOperationStatus;
+    }
+
+    public void addProjectParticipant(ProjectParticipant projectParticipant)
+    {
+        if (m_projectParticipants == null)
+            m_projectParticipants = new HashSet<>();
+
+        m_projectParticipants.add(projectParticipant);
     }
 
     public LocalDateTime getDeletedAt()
