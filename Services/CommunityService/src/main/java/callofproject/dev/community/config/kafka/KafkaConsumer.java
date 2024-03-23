@@ -5,7 +5,6 @@ import callofproject.dev.community.config.kafka.dto.ProjectParticipantKafkaDTO;
 import callofproject.dev.community.config.kafka.dto.UserKafkaDTO;
 import callofproject.dev.community.mapper.IUserMapper;
 import callofproject.dev.data.community.dal.CommunityServiceHelper;
-import callofproject.dev.data.community.entity.Community;
 import callofproject.dev.data.community.entity.Project;
 import callofproject.dev.data.community.entity.ProjectParticipant;
 import callofproject.dev.data.community.entity.User;
@@ -21,6 +20,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
+ * @author Nuri Can ÖZTÜRK
  * This class represents a Kafka consumer service responsible for listening to messages from a Kafka topic.
  */
 @Service
@@ -56,11 +56,19 @@ public class KafkaConsumer
     )
     public void listenAuthenticationTopic(UserKafkaDTO dto)
     {
-
-        var user = m_userMapper.toUser(dto);
-        m_userRepository.save(user);
+        switch (dto.operation())
+        {
+            case CREATE, UPDATE -> m_userRepository.save(m_userMapper.toUser(dto));
+            case DELETE -> removeUser(dto.userId());
+            case SOFT_DELETED -> softDeleteUser(dto);
+        }
     }
 
+    /**
+     * Listens to the specified Kafka topic and processes ProjectInfoKafkaDTO messages.
+     *
+     * @param projectDTO The ProjectInfoKafkaDTO message received from Kafka.
+     */
     @KafkaListener(
             topics = "${spring.kafka.project-topic-name}",
             groupId = "${spring.kafka.consumer.project-group-id}",
@@ -78,6 +86,12 @@ public class KafkaConsumer
 
     }
 
+
+    /**
+     * Listens to the specified Kafka topic and processes ProjectParticipantKafkaDTO messages.
+     *
+     * @param dto The ProjectParticipantKafkaDTO message received from Kafka.
+     */
     @KafkaListener(topics = "${spring.kafka.project-participant-topic-name}", groupId = "${spring.kafka.consumer.project-participant-group-id}", containerFactory = "configProjectParticipantKafkaListener")
     @Transactional
     public void consumeProjectParticipant(ProjectParticipantKafkaDTO dto)
@@ -95,6 +109,11 @@ public class KafkaConsumer
     }
 
 
+    /**
+     * Removes a user with the specified ID.
+     *
+     * @param userId The ID of the user to remove.
+     */
     private void removeUser(UUID userId)
     {
         var user = m_serviceHelper.findUserById(userId);
@@ -103,6 +122,11 @@ public class KafkaConsumer
         m_serviceHelper.deleteUser(user.get());
     }
 
+    /**
+     * Soft deletes a user with the specified ID.
+     *
+     * @param dto The UserKafkaDTO message containing the user ID and deletion timestamp.
+     */
     private void softDeleteUser(UserKafkaDTO dto)
     {
         var user = m_serviceHelper.findUserById(dto.userId());
@@ -112,6 +136,12 @@ public class KafkaConsumer
         m_serviceHelper.upsertUser(user.get());
     }
 
+    /**
+     * Removes a participant from the specified project.
+     *
+     * @param project The project to remove the participant from.
+     * @param user    The user to remove from the project.
+     */
     private void removeParticipant(Project project, User user)
     {
         var participant = m_serviceHelper.findProjectParticipantByProjectIdAndUserId(project.getProjectId(), user.getUserId());
@@ -124,17 +154,36 @@ public class KafkaConsumer
         m_serviceHelper.removeParticipant(participant.get());
     }
 
+    /**
+     * Adds a participant to the specified project.
+     *
+     * @param dto     The ProjectParticipantKafkaDTO message containing the project ID, user ID, and join date.
+     * @param project The project to add the participant to.
+     * @param user    The user to add to the project.
+     */
     private void addParticipant(ProjectParticipantKafkaDTO dto, Project project, User user)
     {
         var participant = new ProjectParticipant(dto.projectParticipantId(), project, user, dto.joinDate());
         m_serviceHelper.saveParticipant(participant);
     }
 
+    /**
+     * Converts a ProjectParticipantKafkaDTO to a ProjectParticipant.
+     *
+     * @param participant The ProjectParticipantKafkaDTO to convert.
+     * @param project     The project the participant is associated with.
+     * @return The converted ProjectParticipant.
+     */
     private ProjectParticipant toProjectParticipant(ProjectParticipantKafkaDTO participant, Project project)
     {
         return new ProjectParticipant(project, m_serviceHelper.findUserById(participant.userId()).get());
     }
 
+    /**
+     * Removes a project with the specified ID.
+     *
+     * @param projectId The ID of the project to remove.
+     */
     private void removeProject(UUID projectId)
     {
         var project = m_serviceHelper.findProjectById(projectId);
@@ -146,6 +195,11 @@ public class KafkaConsumer
         m_serviceHelper.deleteProjectById(projectId);
     }
 
+    /**
+     * Creates a project from the specified ProjectInfoKafkaDTO.
+     *
+     * @param projectDTO The ProjectInfoKafkaDTO to create the project from.
+     */
     private void createProject(ProjectInfoKafkaDTO projectDTO)
     {
         var owner = m_serviceHelper.findUserById(projectDTO.projectOwner().userId());
@@ -157,6 +211,11 @@ public class KafkaConsumer
         m_projectRepository.save(project);
     }
 
+    /**
+     * Soft deletes a project with the specified ID.
+     *
+     * @param projectId The ID of the project to soft delete.
+     */
     private void softDeleteProject(UUID projectId)
     {
         var project = m_serviceHelper.findProjectById(projectId);

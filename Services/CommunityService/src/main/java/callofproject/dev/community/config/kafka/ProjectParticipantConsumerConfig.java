@@ -15,6 +15,10 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
 
+/**
+ * @author Nuri Can ÖZTÜRK
+ * This class is a Spring Configuration class that provides configuration for Kafka consumer for project participants.
+ */
 @EnableKafka
 @Configuration
 public class ProjectParticipantConsumerConfig
@@ -28,6 +32,9 @@ public class ProjectParticipantConsumerConfig
     @Value("${spring.kafka.consumer.auto-offset-reset}")
     private String m_offsetResetConfig;
 
+    /**
+     * Constructs a new ProjectParticipantConsumerConfig.
+     */
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, ProjectParticipantKafkaDTO> configProjectParticipantKafkaListener()
     {
@@ -36,6 +43,11 @@ public class ProjectParticipantConsumerConfig
         return factory;
     }
 
+    /**
+     * Creates and configures the consumer factory for project participants.
+     *
+     * @return Configured consumer factory for project participants.
+     */
     @Bean
     public ConsumerFactory<String, ProjectParticipantKafkaDTO> projectParticipantConfig()
     {

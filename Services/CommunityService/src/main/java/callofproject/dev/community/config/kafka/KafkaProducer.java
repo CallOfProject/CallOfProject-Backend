@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 
 import static org.springframework.kafka.support.KafkaHeaders.TOPIC;
 
+/**
+ * @author Nuri Can ÖZTÜRK
+ * Kafka Producer
+ */
 @Service
 public class KafkaProducer
 {
@@ -17,6 +21,12 @@ public class KafkaProducer
     private final KafkaTemplate<String, NotificationKafkaDTO> m_kafkaTemplate;
 
 
+    /**
+     * Constructor
+     *
+     * @param notificationTopic topic
+     * @param kafkaTemplate     kafka template
+     */
     public KafkaProducer(@Qualifier("notificationTopic") NewTopic notificationTopic,
                          KafkaTemplate<String, NotificationKafkaDTO> kafkaTemplate)
     {
@@ -24,6 +34,11 @@ public class KafkaProducer
         m_kafkaTemplate = kafkaTemplate;
     }
 
+    /**
+     * Send notification
+     *
+     * @param message message
+     */
     public void sendNotification(NotificationKafkaDTO message)
     {
         var msg = MessageBuilder

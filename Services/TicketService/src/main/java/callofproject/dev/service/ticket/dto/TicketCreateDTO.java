@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.UUID;
 
+/**
+ * TicketCreateDTO
+ */
 public record TicketCreateDTO(
         @JsonProperty("user_id")
         UUID userId,

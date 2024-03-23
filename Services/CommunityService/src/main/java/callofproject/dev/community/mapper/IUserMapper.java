@@ -11,6 +11,7 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 /**
+ * @author Nuri Can ÖZTÜRK
  * Mapper interface for mapping between UserDTO and User entity.
  * It provides a method to convert a UserDTO to a User entity.
  */
@@ -26,10 +27,22 @@ public interface IUserMapper
     @Mapping(target = "roles", source = "roles")
     User toUser(UserKafkaDTO userKafkaDTO);
 
+    /**
+     * Maps a User entity to a UserDTO.
+     *
+     * @param user The User entity to map.
+     * @return The mapped UserDTO.
+     */
     @Mapping(target = "userId", source = "userId")
     @Mapping(target = "username", source = "username")
     UserDTO toUserDTO(User user);
 
+    /**
+     * Maps a list of User entities to a UsersDTO.
+     *
+     * @param users The list of User entities to map.
+     * @return The mapped UsersDTO.
+     */
     default UsersDTO toUsersDTO(List<UserDTO> users)
     {
         return new UsersDTO(users);

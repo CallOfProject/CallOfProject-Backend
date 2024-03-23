@@ -4,12 +4,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class TicketServiceApplicationTests
+public class TicketServiceApplicationTests
 {
 
     @Test
     void contextLoads()
     {
+
     }
 
 }

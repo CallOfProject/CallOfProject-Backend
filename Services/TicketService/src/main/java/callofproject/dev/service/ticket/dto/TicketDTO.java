@@ -7,6 +7,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * The ticket data transfer object.
+ * CopyRight(C) 2023 by Call Of Project Teams.
+ */
 public record TicketDTO(
         String id,
         @JsonProperty("user_id")

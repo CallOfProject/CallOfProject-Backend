@@ -6,6 +6,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * The ticket user view DTO.
+ *
+ * @param userId
+ * @param username
+ * @param title
+ * @param description
+ * @param answer
+ * @param userEmail
+ * @param feedbackDeadline
+ */
 public record TicketUserViewDTO(
         @JsonProperty("user_id")
         UUID userId,

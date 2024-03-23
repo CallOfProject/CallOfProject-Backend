@@ -191,7 +191,6 @@ public class TestInterviewCallbackService
         m_interviewServiceHelper.createProject(project);
 
 
-
         // Finally, delete the test interview itself
         m_interviewServiceHelper.deleteTestInterview(interview);
 
@@ -317,43 +316,22 @@ public class TestInterviewCallbackService
 
     public TestInterview findInterviewIfExistsById(UUID testInterviewId)
     {
-        var interview = m_interviewServiceHelper.findTestInterviewById(testInterviewId);
-
-        if (interview.isEmpty())
-            throw new DataServiceException("Interview not found");
-
-        return interview.get();
+        return m_interviewServiceHelper.findTestInterviewById(testInterviewId).orElseThrow(() -> new DataServiceException("Interview not found"));
     }
-
 
     private User findUserIfExistsById(UUID userId)
     {
-        var user = m_interviewServiceHelper.findUserById(userId);
-
-        if (user.isEmpty())
-            throw new DataServiceException("User not found");
-
-        return user.get();
+       return m_interviewServiceHelper.findUserById(userId).orElseThrow(() -> new DataServiceException("User not found"));
     }
 
     private TestInterviewQuestion findQuestionIfExistsById(long questionId)
     {
-        var question = m_interviewServiceHelper.findQuestionById(questionId);
-
-        if (question.isEmpty())
-            throw new DataServiceException("Question not found");
-
-        return question.get();
+        return m_interviewServiceHelper.findQuestionById(questionId).orElseThrow(() -> new DataServiceException("Question not found"));
     }
 
     private Project findProjectIfExistsById(UUID projectId)
     {
-        var project = m_interviewServiceHelper.findProjectById(projectId);
-
-        if (project.isEmpty())
-            throw new DataServiceException("Project not found");
-
-        return project.get();
+       return m_interviewServiceHelper.findProjectById(projectId).orElseThrow(() -> new DataServiceException("Project not found"));
     }
 
     public ResponseMessage<Object> submitInterview(UUID testInterviewId, UUID userId)

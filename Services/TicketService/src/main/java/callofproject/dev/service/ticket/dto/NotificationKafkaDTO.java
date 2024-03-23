@@ -1,4 +1,4 @@
-package callofproject.dev.community.dto;
+package callofproject.dev.service.ticket.dto;
 
 
 import callofproject.dev.data.common.enums.NotificationDataType;
@@ -7,7 +7,6 @@ import callofproject.dev.data.common.enums.NotificationType;
 import java.util.UUID;
 
 /**
- * @author Nuri Can ÖZTÜRK
  * This class represents a Data Transfer Object (DTO) for project participant notifications.
  * It is used to encapsulate information related to notifications sent to project participants.
  */

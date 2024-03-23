@@ -1,9 +1,10 @@
 package callofproject.dev.service.interview;
 
 import callofproject.dev.data.interview.dal.InterviewServiceHelper;
-import callofproject.dev.data.interview.entity.ProjectParticipant;
-import callofproject.dev.data.interview.repository.*;
-import callofproject.dev.service.interview.mapper.ICodingInterviewMapper;
+import callofproject.dev.data.interview.repository.ICodingInterviewRepository;
+import callofproject.dev.data.interview.repository.IProjectRepository;
+import callofproject.dev.data.interview.repository.ITestInterviewRepository;
+import callofproject.dev.data.interview.repository.IUserRepository;
 import callofproject.dev.service.interview.service.codinginterview.CodingInterviewCallbackService;
 import callofproject.dev.service.interview.service.management.InterviewManagementCallbackService;
 import callofproject.dev.service.interview.service.testinterview.TestInterviewCallbackService;
@@ -37,19 +38,11 @@ public class Injection
     private InterviewServiceHelper m_interviewServiceHelper;
 
     @Autowired
-    private IProjectParticipantRepository m_participantRepository;
-
-    @Autowired
     private ITestInterviewRepository m_testInterviewRepository;
 
     public ITestInterviewRepository getTestInterviewRepository()
     {
         return m_testInterviewRepository;
-    }
-
-    public IProjectParticipantRepository getParticipantRepository()
-    {
-        return m_participantRepository;
     }
 
     public InterviewServiceHelper getInterviewServiceHelper()

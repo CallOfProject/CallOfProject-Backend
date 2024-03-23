@@ -1,4 +1,4 @@
-package callofproject.dev.community.config;
+package callofproject.dev.service.ticket.config;
 
 import callofproject.dev.service.jwt.filter.JWTTokenGeneratorFilter;
 import callofproject.dev.service.jwt.filter.JWTTokenValidatorFilter;
@@ -18,7 +18,6 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 /**
- * @author Nuri Can ÖZTÜRK
  * SecurityConfig
  */
 @Configuration
@@ -40,10 +39,10 @@ public class SecurityConfig
      */
     private static void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests)
     {
-        requests
-                .requestMatchers(antMatcher("/api-docs/**")).permitAll()
+        requests.requestMatchers(antMatcher("/api-docs/**")).permitAll()
                 .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
-                .requestMatchers(antMatcher("/api/community/**")).hasAnyRole("ADMIN", "USER", "ROOT");
+                .requestMatchers(antMatcher("/api/ticket/create")).hasAnyRole("ADMIN", "ROOT", "USER")
+                .requestMatchers(antMatcher("/api/ticket/**")).hasAnyRole("ADMIN", "ROOT");
     }
 
 

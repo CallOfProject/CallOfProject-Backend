@@ -6,6 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Nuri Can ÖZTÜRK
+ * This class is a Spring Component class that provides Kafka topics.
+ */
 @Component
 public class KafkaTopicProvider
 {
@@ -13,6 +17,9 @@ public class KafkaTopicProvider
     @Value("${spring.kafka.notification-topic-name}")
     private String m_notificationTopicName;
 
+    /**
+     * Constructs a new KafkaTopicProvider.
+     */
     public KafkaTopicProvider()
     {
     }

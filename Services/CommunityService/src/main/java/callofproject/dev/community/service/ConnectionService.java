@@ -17,6 +17,11 @@ import java.util.UUID;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static java.lang.String.format;
 
+/**
+ * @author Nuri Can ÖZTÜRK
+ * The type Connection service.
+ * This class is responsible for handling connection requests, answers, removals, blocks, unblocks, and getting connections, connection requests, and blocked connections.
+ */
 @Component
 @Lazy
 public class ConnectionService implements IConnectionService
@@ -30,12 +35,25 @@ public class ConnectionService implements IConnectionService
     @Value("${community.connection.reject-link}")
     private String m_rejectLink;
 
+    /**
+     * Constructor
+     *
+     * @param connectionServiceCallback the connection service callback
+     * @param kafkaProducer             the kafka producer
+     */
     public ConnectionService(ConnectionServiceCallback connectionServiceCallback, KafkaProducer kafkaProducer)
     {
         m_connectionServiceCallback = connectionServiceCallback;
         m_kafkaProducer = kafkaProducer;
     }
 
+    /**
+     * Send connection request to a user
+     *
+     * @param userId   the user id
+     * @param friendId the friend id
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> sendConnectionRequest(UUID userId, UUID friendId)
     {
@@ -55,6 +73,14 @@ public class ConnectionService implements IConnectionService
         return result;
     }
 
+    /**
+     * Answer connection request
+     *
+     * @param userId   the user id
+     * @param friendId the friend id
+     * @param answer   the answer
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> answerConnectionRequest(UUID userId, UUID friendId, boolean answer)
     {
@@ -72,36 +98,75 @@ public class ConnectionService implements IConnectionService
         return result;
     }
 
+    /**
+     * Remove connection
+     *
+     * @param userId   the user id
+     * @param friendId the friend id
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> removeConnection(UUID userId, UUID friendId)
     {
         return doForDataService(() -> m_connectionServiceCallback.removeConnection(userId, friendId), "ConnectionService::removeConnection");
     }
 
+    /**
+     * Get user by id if exist
+     *
+     * @param userId the user id
+     * @return the user
+     */
     @Override
     public MultipleResponseMessagePageable<Object> getConnectionsByUserId(UUID userId)
     {
         return doForDataService(() -> m_connectionServiceCallback.getConnectionsByUserId(userId), "ConnectionService::getConnectionsByUserId");
     }
 
+    /**
+     * Block connection
+     *
+     * @param userId   the user id
+     * @param friendId the friend id
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> blockConnection(UUID userId, UUID friendId)
     {
         return doForDataService(() -> m_connectionServiceCallback.blockConnection(userId, friendId), "ConnectionService::blockConnection");
     }
 
+    /**
+     * Unblock connection
+     *
+     * @param userId   the user id
+     * @param friendId the friend id
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> unblockConnection(UUID userId, UUID friendId)
     {
         return doForDataService(() -> m_connectionServiceCallback.unblockConnection(userId, friendId), "ConnectionService::unblockConnection");
     }
 
+    /**
+     * Get connection requests by user id
+     *
+     * @param userId the user id
+     * @return the response message
+     */
     @Override
     public MultipleResponseMessagePageable<Object> getConnectionRequestsByUserId(UUID userId)
     {
         return doForDataService(() -> m_connectionServiceCallback.getConnectionRequestsByUserId(userId), "ConnectionService::getConnectionRequestsByUserId");
     }
 
+    /**
+     * Get blocked connections by user id
+     *
+     * @param userId the user id
+     * @return the response message
+     */
     @Override
     public MultipleResponseMessagePageable<Object> getBlockedConnectionsByUserId(UUID userId)
     {

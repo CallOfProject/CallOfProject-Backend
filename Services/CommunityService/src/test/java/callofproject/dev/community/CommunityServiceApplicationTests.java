@@ -59,7 +59,7 @@ class CommunityServiceApplicationTests
     }
 
     @Test
-    void answerConnectionRequest_withGivenValidUserIdsAndPositiveAnswer_shouldReturnRequest()
+    void testAnswerConnectionRequest_withGivenValidUserIdsAndPositiveAnswer_shouldReturnRequest()
     {
         // Send connection request
         var request = m_injection.getConnectionService().sendConnectionRequest(user1.getUserId(), user2.getUserId());
@@ -88,7 +88,7 @@ class CommunityServiceApplicationTests
 
 
     @Test
-    void answerConnectionRequest_withGivenValidUserIdsAndNegativeAnswer_shouldReturnRequest()
+    void testAnswerConnectionRequest_withGivenValidUserIdsAndNegativeAnswer_shouldReturnRequest()
     {
         // Send connection request
         var request = m_injection.getConnectionService().sendConnectionRequest(user1.getUserId(), user2.getUserId());
@@ -116,7 +116,7 @@ class CommunityServiceApplicationTests
     }
 
     @Test
-    void answerConnectionRequest_withGivenInvalidUserIdsAndAnswer_shouldThrowDataServiceException()
+    void testAnswerConnectionRequest_withGivenInvalidUserIdsAndAnswer_shouldThrowDataServiceException()
     {
         assertThrows(DataServiceException.class, () -> m_injection.getConnectionService().answerConnectionRequest(UUID.randomUUID(), UUID.randomUUID(), true));
     }

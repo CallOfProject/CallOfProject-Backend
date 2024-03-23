@@ -5,6 +5,7 @@ import callofproject.dev.data.interview.BeanName;
 import callofproject.dev.data.interview.entity.*;
 import callofproject.dev.data.interview.entity.enums.AdminOperationStatus;
 import callofproject.dev.data.interview.entity.enums.EProjectStatus;
+import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.service.interview.DatabaseCleaner;
 import callofproject.dev.service.interview.Injection;
 import callofproject.dev.service.interview.dto.test.TestInfoDTO;
@@ -20,6 +21,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import static callofproject.dev.service.interview.ServiceBeanName.SERVICE_BEAN_NAME;
@@ -38,6 +40,7 @@ public class TestInterviewServiceTests
 {
     @Autowired
     private ITestInterviewMapper m_testInterviewMapper;
+
     @Autowired
     private Injection m_injection;
 
@@ -87,12 +90,23 @@ public class TestInterviewServiceTests
         assertEquals(Status.OK, result.getStatusCode());
     }
 
+    @Test
+    void testDeleteTestInterview_withGivenValidInterviewId_shouldThrowDataServiceException()
+    {
+        assertThrows(DataServiceException.class, () -> m_injection.getTestInterviewService().deleteTestInterview(randomUUID()));
+    }
 
     @Test
     void testGetQuestion_withGivenInterviewIdAndQuestionQueue_shouldReturnQuestionDTO()
     {
         var question = m_injection.getTestInterviewService().getQuestion(testInterview.getId(), 1);
         assertNotNull(question);
+    }
+
+    @Test
+    void testGetQuestion_withGivenInterviewIdAndQuestionQueue_shouldThrowDataServiceException()
+    {
+        assertThrows(DataServiceException.class, () -> m_injection.getTestInterviewService().getQuestion(randomUUID(), 1));
     }
 
     @Test
@@ -105,6 +119,13 @@ public class TestInterviewServiceTests
     }
 
     @Test
+    void testDeleteQuestion_withGivenQuestionId_shouldThrowsDataServiceException()
+    {
+        var question = testInterview.getQuestions().stream().findFirst().get();
+        assertThrows(DataServiceException.class, () -> m_injection.getTestInterviewService().deleteQuestion(new Random().nextLong(1_000_000L)));
+    }
+
+    @Test
     void testGetQuestions_withGivenInterviewId_shouldReturnQuestions()
     {
         var questions = m_injection.getTestInterviewService().getQuestions(testInterview.getId());
@@ -114,12 +135,24 @@ public class TestInterviewServiceTests
     }
 
     @Test
-    void testGetInterviewInformation_withGivenInterviewId_TestInfoDTO()
+    void testGetQuestions_withGivenInvalidInterviewId_shouldThrowsDataServiceException()
+    {
+        assertThrows(DataServiceException.class, () -> m_injection.getTestInterviewService().getQuestions(randomUUID()));
+    }
+
+    @Test
+    void testGetInterviewInformation_withGivenInterviewId_shouldReturnTestInfoDTO()
     {
         var info = m_injection.getTestInterviewService().getInterviewInformation(testInterview.getId());
         assertNotNull(info);
         var obj = (TestInfoDTO) info.getObject();
         assertEquals(obj.testInterviewId(), testInterview.getId());
+    }
+
+    @Test
+    void testGetInterviewInformation_withGivenInvalidInterviewId_shouldThrowsDataServiceException()
+    {
+        assertThrows(DataServiceException.class, () -> m_injection.getTestInterviewService().getInterviewInformation(randomUUID()));
     }
 
     @AfterEach
