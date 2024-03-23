@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static jakarta.persistence.CascadeType.*;
-import static jakarta.persistence.CascadeType.REFRESH;
 
 @Entity
 @Table(name = "project_participant")
@@ -36,16 +35,17 @@ public class ProjectParticipant
         m_joinDate = LocalDateTime.now();
     }
 
-    public void setParticipantRating(double participantRating)
-    {
-        m_participantRating = participantRating;
-    }
 
     public ProjectParticipant(Project project, User user)
     {
         m_project = project;
         m_user = user;
         m_joinDate = LocalDateTime.now();
+    }
+
+    public void setParticipantRating(double participantRating)
+    {
+        m_participantRating = participantRating;
     }
 
     public double getParticipantRating()

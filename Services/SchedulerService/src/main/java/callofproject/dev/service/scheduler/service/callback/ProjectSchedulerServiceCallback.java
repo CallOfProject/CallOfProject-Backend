@@ -4,6 +4,7 @@ import callofproject.dev.data.common.dto.EmailTopic;
 import callofproject.dev.data.common.enums.EmailType;
 import callofproject.dev.data.common.enums.NotificationDataType;
 import callofproject.dev.data.common.enums.NotificationType;
+import callofproject.dev.data.interview.dal.InterviewServiceHelper;
 import callofproject.dev.data.project.dal.ProjectServiceHelper;
 import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.data.project.entity.ProjectParticipant;
@@ -11,6 +12,7 @@ import callofproject.dev.data.project.entity.ProjectParticipantRequest;
 import callofproject.dev.data.project.entity.User;
 import callofproject.dev.data.project.entity.enums.EProjectStatus;
 import callofproject.dev.data.project.repository.IProjectRepository;
+import callofproject.dev.data.task.dal.TaskServiceHelper;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
 import callofproject.dev.service.scheduler.config.kafka.KafkaProducer;
 import callofproject.dev.service.scheduler.dto.NotificationKafkaDTO;
@@ -38,6 +40,8 @@ import static java.util.stream.Collectors.toList;
 public class ProjectSchedulerServiceCallback
 {
     private final ProjectServiceHelper m_projectServiceHelper;
+    private final TaskServiceHelper m_taskServiceHelper;
+    private final InterviewServiceHelper m_interviewServiceHelper;
     private final UserManagementServiceHelper m_userManagementServiceHelper;
     private final IProjectRepository m_projectRepository;
     private final KafkaProducer m_kafkaProducer;
@@ -64,11 +68,13 @@ public class ProjectSchedulerServiceCallback
     private String m_feedbackExtendedMessage;
 
 
-    public ProjectSchedulerServiceCallback(ProjectServiceHelper projectServiceHelper, UserManagementServiceHelper userManagementServiceHelper,
+    public ProjectSchedulerServiceCallback(ProjectServiceHelper projectServiceHelper, TaskServiceHelper taskServiceHelper, InterviewServiceHelper interviewServiceHelper, UserManagementServiceHelper userManagementServiceHelper,
                                            @Qualifier(PROJECT_SERVICE_PROJECT_REPOSITORY_NAME) IProjectRepository projectRepository,
                                            KafkaProducer kafkaProducer)
     {
         m_projectServiceHelper = projectServiceHelper;
+        m_taskServiceHelper = taskServiceHelper;
+        m_interviewServiceHelper = interviewServiceHelper;
         m_userManagementServiceHelper = userManagementServiceHelper;
         m_projectRepository = projectRepository;
         m_kafkaProducer = kafkaProducer;
@@ -81,18 +87,37 @@ public class ProjectSchedulerServiceCallback
         projects.forEach(this::prepareProjectForStart);
         projects.forEach(p -> sendEmail(p, getEmailTemplate("start_project.html")));
         projects.forEach(p -> sendNotification(p, m_projectStartedAdminNote, m_projectStartedMessage));
+
+        if (!projects.isEmpty())
+        {
+            var ids = projects.stream().map(Project::getProjectId).toList();
+            var projectsInTaskService = ids.stream().map(id -> m_taskServiceHelper.findProjectById(id).get()).toList();
+            var projectsInInterviewService = ids.stream().map(id -> m_interviewServiceHelper.findProjectById(id).get()).toList();
+            projectsInTaskService.forEach(this::prepareProjectForStartForTaskService);
+            projectsInInterviewService.forEach(this::prepareProjectForStartForInterviewService);
+        }
     }
 
 
     // Check project deadlines and Project Status changed to TIMEOUT
     public void checkProjectDeadlines()
     {
-        var projects = m_projectRepository.findAllByExpectedCompletionDate(now().minusDays(1));
+        var projects = toStream(m_projectRepository.findAllByExpectedCompletionDate(now().minusDays(1))).toList();
 
         projects.forEach(this::expireProject);
         projects.forEach(p -> sendEmailForExpiredProject(p, getEmailTemplate("expired_project.html")));
         projects.forEach(p -> sendNotification(p, m_projectExpiredTitle, m_projectExpiredMessage));
+
+        if (!projects.isEmpty())
+        {
+            var ids = projects.stream().map(Project::getProjectId).toList();
+            var projectsInTaskService = ids.stream().map(id -> m_taskServiceHelper.findProjectById(id).get()).toList();
+            var projectsInInterviewService = ids.stream().map(id -> m_interviewServiceHelper.findProjectById(id).get()).toList();
+            projectsInTaskService.forEach(this::expireProjectForTaskService);
+            projectsInInterviewService.forEach(this::expireProjectForInterviewService);
+        }
     }
+
 
     // Check feedback timeout and extend feedback date and Project Status changed to EXTEND_APPLICATION_FEEDBACK
     public void checkFeedbackTimeout()
@@ -100,7 +125,17 @@ public class ProjectSchedulerServiceCallback
         Predicate<Project> isRequestsNotEmpty = p -> !p.getProjectParticipantRequests().isEmpty();
         var projects = m_projectRepository.findAllByApplicationDeadline(now().minusDays(1)).stream().filter(isRequestsNotEmpty).toList();
         projects.forEach(this::extendFeedbackDate);
+
+        if (!projects.isEmpty())
+        {
+            var ids = projects.stream().map(Project::getProjectId).toList();
+            var projectsInTaskService = ids.stream().map(id -> m_taskServiceHelper.findProjectById(id).get()).toList();
+            var projectsInInterviewService = ids.stream().map(id -> m_interviewServiceHelper.findProjectById(id).get()).toList();
+            projectsInTaskService.forEach(this::extendFeedbackDateForTaskService);
+            projectsInInterviewService.forEach(this::extendFeedbackDateForInterviewService);
+        }
     }
+
 
     // Check feedback timeout and Project Status changed to APPLICATION_FEEDBACK_TIMEOUT
     public void checkFeedbacks()
@@ -122,6 +157,18 @@ public class ProjectSchedulerServiceCallback
     }
     // --------------------------------------------------------------------------------------------
 
+    private void extendFeedbackDateForTaskService(callofproject.dev.data.task.entity.Project project)
+    {
+        project.setProjectStatus(callofproject.dev.data.task.entity.enums.EProjectStatus.EXTEND_APPLICATION_FEEDBACK);
+        m_taskServiceHelper.saveProject(project);
+    }
+
+    private void extendFeedbackDateForInterviewService(callofproject.dev.data.interview.entity.Project project)
+    {
+        project.setProjectStatus(callofproject.dev.data.interview.entity.enums.EProjectStatus.EXTEND_APPLICATION_FEEDBACK);
+        m_interviewServiceHelper.createProject(project);
+    }
+
     private void prepareProjectForStart(Project project)
     {
         project.setAdminNote(m_projectStartedAdminNote);
@@ -129,11 +176,35 @@ public class ProjectSchedulerServiceCallback
         m_projectServiceHelper.saveProject(project);
     }
 
+    private void prepareProjectForStartForTaskService(callofproject.dev.data.task.entity.Project project)
+    {
+        project.setProjectStatus(callofproject.dev.data.task.entity.enums.EProjectStatus.IN_PROGRESS);
+        m_taskServiceHelper.saveProject(project);
+    }
+
+    private void prepareProjectForStartForInterviewService(callofproject.dev.data.interview.entity.Project project)
+    {
+        project.setProjectStatus(callofproject.dev.data.interview.entity.enums.EProjectStatus.IN_PROGRESS);
+        m_interviewServiceHelper.createProject(project);
+    }
+
     private void expireProject(Project project)
     {
         project.setProjectStatus(EProjectStatus.TIMEOUT);
         project.setAdminNote(m_projectExpiredAdminNote);
         m_projectServiceHelper.saveProject(project);
+    }
+
+    private void expireProjectForTaskService(callofproject.dev.data.task.entity.Project project)
+    {
+        project.setProjectStatus(callofproject.dev.data.task.entity.enums.EProjectStatus.TIMEOUT);
+        m_taskServiceHelper.saveProject(project);
+    }
+
+    private void expireProjectForInterviewService(callofproject.dev.data.interview.entity.Project project)
+    {
+        project.setProjectStatus(callofproject.dev.data.interview.entity.enums.EProjectStatus.TIMEOUT);
+        m_interviewServiceHelper.createProject(project);
     }
 
     private void extendFeedbackDate(Project project)

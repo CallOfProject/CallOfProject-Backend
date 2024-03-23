@@ -98,8 +98,7 @@ public class ProjectOwnerServiceTest
     public void testAddParticipant_withGivenSaveProjectParticipantDTO_shouldBeTrue()
     {
         // Add a participant to the project
-        var participantResult = m_injection.getProjectOwnerService()
-                .addParticipant(new SaveProjectParticipantDTO(testUser.getUserId(), testProjectId));
+        var participantResult = m_injection.getProjectOwnerService().addParticipant(new SaveProjectParticipantDTO(testUser.getUserId(), testProjectId));
         assertTrue(participantResult.getObject());
         var updatedProject = m_injection.getProjectServiceHelper().findProjectById(testProjectId);
         assertTrue(updatedProject.isPresent());
@@ -110,9 +109,10 @@ public class ProjectOwnerServiceTest
     @Test
     public void testAddParticipant_withGivenSaveProjectParticipantDTO_shouldThrowDataServiceException()
     {
+        var invalidId = randomUUID();
         var exception = assertThrows(DataServiceException.class, () -> m_injection.getProjectOwnerService()
-                .addParticipant(new SaveProjectParticipantDTO(randomUUID(), testProjectId)));
-        assertEquals("Message: ProjectService::addParticipant ", exception.getMessage());
+                .addParticipant(new SaveProjectParticipantDTO(invalidId, testProjectId)));
+        assertEquals(format("Message: User with id: %s is not found! ", invalidId), exception.getMessage());
     }
 
     @Test

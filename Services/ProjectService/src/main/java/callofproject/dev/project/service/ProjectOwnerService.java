@@ -23,6 +23,7 @@ import callofproject.dev.project.dto.*;
 import callofproject.dev.project.mapper.IProjectMapper;
 import callofproject.dev.project.mapper.IProjectParticipantMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -85,6 +86,7 @@ public class ProjectOwnerService implements IProjectOwnerService
      * @return A ResponseMessage containing a Boolean result of the operation.
      */
     @Override
+    @Transactional
     public ResponseMessage<Boolean> addParticipant(SaveProjectParticipantDTO dto)
     {
         var project = findProjectIfExistsByProjectId(dto.project_id());

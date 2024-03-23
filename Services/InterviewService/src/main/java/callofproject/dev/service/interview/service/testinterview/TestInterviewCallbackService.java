@@ -39,6 +39,11 @@ import static java.util.UUID.fromString;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.StreamSupport.stream;
 
+/**
+ * @author Nuri Can ÖZTÜRK
+ * The type Test interview callback service.
+ * This class is used to handle the test interview service.
+ */
 @Service
 @Lazy
 @SuppressWarnings("all")
@@ -53,6 +58,16 @@ public class TestInterviewCallbackService
     private String m_interviewEmail;
     private final KafkaProducer m_kafkaProducer;
 
+    /**
+     * Instantiates a new Test interview callback service.
+     *
+     * @param interviewServiceHelper      the interview service helper
+     * @param testInterviewMapper         the test interview mapper
+     * @param projectMapper               the project mapper
+     * @param userMapper                  the user mapper
+     * @param testInterviewQuestionMapper the test interview question mapper
+     * @param kafkaProducer               the kafka producer
+     */
     public TestInterviewCallbackService(InterviewServiceHelper interviewServiceHelper, ITestInterviewMapper testInterviewMapper, IProjectMapper projectMapper, IUserMapper userMapper, ITestInterviewQuestionMapper testInterviewQuestionMapper, KafkaProducer kafkaProducer)
     {
         m_interviewServiceHelper = interviewServiceHelper;
@@ -63,6 +78,12 @@ public class TestInterviewCallbackService
         m_kafkaProducer = kafkaProducer;
     }
 
+    /**
+     * Create a new test interview.
+     *
+     * @param dto the dto
+     * @return the response message
+     */
     public ResponseMessage<Object> createInterview(CreateTestDTO dto)
     {
         var project = findProjectIfExistsById(dto.projectId());
@@ -96,69 +117,13 @@ public class TestInterviewCallbackService
         return new ResponseMessage<>("Test interview created successfully", Status.CREATED, new Pair<>(savedTestInterviewDTO, userList));
     }
 
-    public void sendEmails(TestInterviewDTO savedTestInterviewDTO, List<UserEmailDTO> list, String template)
-    {
-        list.forEach(u -> sendEmail(fromString(savedTestInterviewDTO.id()), u.email(), savedTestInterviewDTO.projectDTO().projectName(), u.userId(), template));
-    }
 
-    private String toLocalDateTimeString(LocalDateTime localDateTime)
-    {
-        return localDateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy kk:mm:ss"));
-    }
-
-    public void sendNotification(TestInterviewDTO object, EInterviewStatus status)
-    {
-        var project = findProjectIfExistsById(object.projectDTO().projectId());
-
-
-        var participants = project.getProjectParticipants().stream().map(ProjectParticipant::getUser).toList();
-        var message = "A test interview has been %s for the Size %s Project application";
-
-        switch (status)
-        {
-            case CREATED ->
-                    participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "created", project.getProjectName())));
-            case REMOVED ->
-                    participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "removed", project.getProjectName())));
-            case ASSIGNED ->
-                    participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "assigned", project.getProjectName())));
-            case CANCELLED ->
-                    participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "cancelled", project.getProjectName())));
-            default -> throw new DataServiceException("Invalid status");
-        }
-    }
-
-    private void send(UUID owner, UUID userId, String message)
-    {
-        var notificationMessage = new NotificationKafkaDTO.Builder()
-                .setFromUserId(owner)
-                .setToUserId(userId)
-                .setMessage(message)
-                .setNotificationType(NotificationType.INFORMATION)
-                .setNotificationLink("none")
-                .setMessage(message)
-                .setNotificationImage(null)
-                .setNotificationTitle("Interview Status")
-                .build();
-
-        m_kafkaProducer.sendNotification(notificationMessage);
-    }
-
-    private void sendEmail(UUID interviewId, String email, String projectName, UUID userId, String templateName)
-    {
-        var template = Util.getEmailTemplate(templateName);
-        var user = findUserIfExistsById(userId);
-        var interview = findInterviewIfExistsById(interviewId);
-        var startDate = toLocalDateTimeString(interview.getStartTime());
-        var endDate = toLocalDateTimeString(interview.getEndTime());
-        var emailStr = String.format(m_interviewEmail, interviewId, userId);
-        var title = "Test Interview Assigned for " + projectName;
-        var msg = format(template, projectName, user.getUsername(), interview.getTitle(), startDate, endDate, emailStr);
-
-        var topic = new EmailTopic(EmailType.ASSIGN_INTERVIEW, email, title, msg, null);
-        m_kafkaProducer.sendEmail(topic);
-    }
-
+    /**
+     * Delete test interview.
+     *
+     * @param interviewId the interview id
+     * @return the response message
+     */
     public ResponseMessage<Object> deleteTestInterview(UUID interviewId)
     {
         var interview = findInterviewIfExistsById(interviewId);
@@ -200,11 +165,23 @@ public class TestInterviewCallbackService
     }
 
 
+    /**
+     * Delete test interview by project id response message.
+     *
+     * @param projectId the project id
+     * @return the response message
+     */
     public ResponseMessage<Object> deleteTestInterviewByProjectId(UUID projectId)
     {
         return deleteTestInterview(findProjectIfExistsById(projectId).getTestInterview().getId());
     }
 
+    /**
+     * Finish test interview.
+     *
+     * @param dto the TestInterviewFinishDTO
+     * @return the response message
+     */
     public ResponseMessage<Object> finishTestInterview(TestInterviewFinishDTO dto)
     {
         var interview = findInterviewIfExistsById(dto.interviewId());
@@ -214,6 +191,12 @@ public class TestInterviewCallbackService
         return new ResponseMessage<>("Test interview finished successfully", Status.OK, true);
     }
 
+    /**
+     * Start test interview response message.
+     *
+     * @param interviewId the interview id
+     * @return the response message
+     */
     public ResponseMessage<Object> startTestInterview(UUID interviewId)
     {
         var interview = findInterviewIfExistsById(interviewId);
@@ -223,6 +206,12 @@ public class TestInterviewCallbackService
         return new ResponseMessage<>("Test interview started successfully", Status.OK, true);
     }
 
+    /**
+     * Start test interview by project id response message.
+     *
+     * @param projectId the project id
+     * @return the response message
+     */
     public ResponseMessage<Object> startTestInterviewByProjectId(UUID projectId)
     {
         var project = findProjectIfExistsById(projectId);
@@ -230,6 +219,12 @@ public class TestInterviewCallbackService
         return startTestInterview(project.getTestInterview().getId());
     }
 
+    /**
+     * Assign test interview to users.
+     *
+     * @param dto the dto
+     * @return the response message
+     */
     public ResponseMessage<Object> submitAnswer(QuestionAnswerDTO dto)
     {
         var interview = findInterviewIfExistsById(dto.interviewId());
@@ -243,6 +238,13 @@ public class TestInterviewCallbackService
         return new ResponseMessage<>("Answer submitted successfully", Status.OK, true);
     }
 
+    /**
+     * Assign test interview to users.
+     *
+     * @param interviewId the interview id
+     * @param q           question order
+     * @return the response message
+     */
     public ResponseMessage<Object> getQuestion(UUID interviewId, int q)
     {
         var interview = findInterviewIfExistsById(interviewId);
@@ -256,11 +258,24 @@ public class TestInterviewCallbackService
     }
 
 
+    /**
+     * Get question response message.
+     *
+     * @param projectId the project id
+     * @param q         the q
+     * @return the response message
+     */
     public ResponseMessage<Object> getQuestionByProjectId(UUID projectId, int q)
     {
         return getQuestion(findProjectIfExistsById(projectId).getTestInterview().getId(), q);
     }
 
+    /**
+     * Remove question from interview.
+     *
+     * @param questionId the question id
+     * @return the response message
+     */
     public ResponseMessage<Object> deleteQuestion(long questionId)
     {
         var question = findQuestionIfExistsById(questionId);
@@ -271,6 +286,12 @@ public class TestInterviewCallbackService
     }
 
 
+    /**
+     * Get questions by interview id.
+     *
+     * @param interviewId the interview id
+     * @return the multiple response message
+     */
     public MultipleResponseMessage<Object> getQuestions(UUID interviewId)
     {
         var interview = findInterviewIfExistsById(interviewId);
@@ -279,11 +300,23 @@ public class TestInterviewCallbackService
         return new MultipleResponseMessage<>(questions.size(), "Questions retrieved successfully", interview.getQuestions());
     }
 
+    /**
+     * Get questions by project id.
+     *
+     * @param projectId the project id
+     * @return the multiple response message
+     */
     public MultipleResponseMessage<Object> getQuestionsByProjectId(UUID projectId)
     {
         return getQuestions(findProjectIfExistsById(projectId).getTestInterview().getId());
     }
 
+    /**
+     * Get interview information response message.
+     *
+     * @param interviewId the interview id
+     * @return the response message
+     */
     public ResponseMessage<Object> getInterviewInformation(UUID interviewId)
     {
         var interview = findInterviewIfExistsById(interviewId);
@@ -293,6 +326,13 @@ public class TestInterviewCallbackService
         return new ResponseMessage<>("Interview information retrieved successfully", Status.OK, dto);
     }
 
+    /**
+     * Check if user solved before response message.
+     *
+     * @param interviewId the interview id
+     * @param userId      the user id
+     * @return the response message
+     */
     public ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId)
     {
         var userTestInterview = m_interviewServiceHelper.findUserTestInterviewByUserAndTestInterviewId(userId, interviewId);
@@ -312,28 +352,15 @@ public class TestInterviewCallbackService
 
         return new ResponseMessage<>("User solved before", Status.OK, result);
     }
-    // private methods
 
-    public TestInterview findInterviewIfExistsById(UUID testInterviewId)
-    {
-        return m_interviewServiceHelper.findTestInterviewById(testInterviewId).orElseThrow(() -> new DataServiceException("Interview not found"));
-    }
 
-    private User findUserIfExistsById(UUID userId)
-    {
-       return m_interviewServiceHelper.findUserById(userId).orElseThrow(() -> new DataServiceException("User not found"));
-    }
-
-    private TestInterviewQuestion findQuestionIfExistsById(long questionId)
-    {
-        return m_interviewServiceHelper.findQuestionById(questionId).orElseThrow(() -> new DataServiceException("Question not found"));
-    }
-
-    private Project findProjectIfExistsById(UUID projectId)
-    {
-       return m_interviewServiceHelper.findProjectById(projectId).orElseThrow(() -> new DataServiceException("Project not found"));
-    }
-
+    /**
+     * Submit interview response message.
+     *
+     * @param testInterviewId the test interview id
+     * @param userId          the user id
+     * @return the response message
+     */
     public ResponseMessage<Object> submitInterview(UUID testInterviewId, UUID userId)
     {
         var user = findUserIfExistsById(userId);
@@ -352,21 +379,14 @@ public class TestInterviewCallbackService
         return new ResponseMessage<>("Interview submitted successfully", Status.OK, true);
     }
 
-    private int calculateScore(UserTestInterviews userTestInterview, List<TestInterviewQuestion> questions)
-    {
-        var userAnswersMap = userTestInterview.getAnswers().stream()
-                .collect(Collectors.toMap(QuestionAnswer::getQuestionId, QuestionAnswer::getAnswer));
-        int score = 0;
-        for (var question : questions)
-        {
-            var userAnswer = userAnswersMap.get(question.getId());
-            if (userAnswer != null && userAnswer.equals(question.getAnswer()))
-                score += question.getPoint();
-        }
-        return score;
-    }
 
-
+    /**
+     * Accept interview response message.
+     *
+     * @param id         the id
+     * @param isAccepted the is accepted
+     * @return the response message
+     */
     public ResponseMessage<Object> acceptInterview(UUID id, boolean isAccepted)
     {
         var userTestInterview = m_interviewServiceHelper.findUserTestInterviewByInterviewId(id);
@@ -385,5 +405,121 @@ public class TestInterviewCallbackService
         var dto = new InterviewResultDTO(project.getProjectOwner().getUserId(), user.getUserId(), project.getProjectName(), emailMsg, user.getEmail());
         var msg = format("Interview is %s!.", isAccepted ? "accepted" : "rejected");
         return new ResponseMessage<>(msg, Status.OK, dto);
+    }
+
+    /**
+     * Find all test interviews response message.
+     *
+     * @return the multiple response message
+     */
+    public TestInterview findInterviewIfExistsById(UUID testInterviewId)
+    {
+        return m_interviewServiceHelper.findTestInterviewById(testInterviewId).orElseThrow(() -> new DataServiceException("Interview not found"));
+    }
+
+    /**
+     * Send notification.
+     *
+     * @param object the object
+     * @param status the status
+     */
+    public void sendNotification(TestInterviewDTO object, EInterviewStatus status)
+    {
+        var project = findProjectIfExistsById(object.projectDTO().projectId());
+
+
+        var participants = project.getProjectParticipants().stream().map(ProjectParticipant::getUser).toList();
+        var message = "A test interview has been %s for the Size %s Project application";
+
+        switch (status)
+        {
+            case CREATED ->
+                    participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "created", project.getProjectName())));
+            case REMOVED ->
+                    participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "removed", project.getProjectName())));
+            case ASSIGNED ->
+                    participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "assigned", project.getProjectName())));
+            case CANCELLED ->
+                    participants.forEach(p -> send(project.getProjectOwner().getUserId(), p.getUserId(), format(message, "cancelled", project.getProjectName())));
+            default -> throw new DataServiceException("Invalid status");
+        }
+    }
+
+    /**
+     * Send emails.
+     *
+     * @param savedTestInterviewDTO the saved test interview dto
+     * @param list                  the list
+     * @param template              the template
+     */
+    public void sendEmails(TestInterviewDTO savedTestInterviewDTO, List<UserEmailDTO> list, String template)
+    {
+        list.forEach(u -> sendEmail(fromString(savedTestInterviewDTO.id()), u.email(), savedTestInterviewDTO.projectDTO().projectName(), u.userId(), template));
+    }
+    // ------------------------------private methods------------------------------
+
+    private User findUserIfExistsById(UUID userId)
+    {
+        return m_interviewServiceHelper.findUserById(userId).orElseThrow(() -> new DataServiceException("User not found"));
+    }
+
+    private TestInterviewQuestion findQuestionIfExistsById(long questionId)
+    {
+        return m_interviewServiceHelper.findQuestionById(questionId).orElseThrow(() -> new DataServiceException("Question not found"));
+    }
+
+    private Project findProjectIfExistsById(UUID projectId)
+    {
+        return m_interviewServiceHelper.findProjectById(projectId).orElseThrow(() -> new DataServiceException("Project not found"));
+    }
+
+    private String toLocalDateTimeString(LocalDateTime localDateTime)
+    {
+        return localDateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy kk:mm:ss"));
+    }
+
+    private int calculateScore(UserTestInterviews userTestInterview, List<TestInterviewQuestion> questions)
+    {
+        var userAnswersMap = userTestInterview.getAnswers().stream()
+                .collect(Collectors.toMap(QuestionAnswer::getQuestionId, QuestionAnswer::getAnswer));
+        int score = 0;
+        for (var question : questions)
+        {
+            var userAnswer = userAnswersMap.get(question.getId());
+            if (userAnswer != null && userAnswer.equals(question.getAnswer()))
+                score += question.getPoint();
+        }
+        return score;
+    }
+
+    private void send(UUID owner, UUID userId, String message)
+    {
+        var notificationMessage = new NotificationKafkaDTO.Builder()
+                .setFromUserId(owner)
+                .setToUserId(userId)
+                .setMessage(message)
+                .setNotificationType(NotificationType.INFORMATION)
+                .setNotificationLink("none")
+                .setMessage(message)
+                .setNotificationImage(null)
+                .setNotificationTitle("Interview Status")
+                .build();
+
+        m_kafkaProducer.sendNotification(notificationMessage);
+    }
+
+    private void sendEmail(UUID interviewId, String email, String projectName, UUID userId, String templateName)
+    {
+        var template = Util.getEmailTemplate(templateName);
+        var user = findUserIfExistsById(userId);
+        var interview = findInterviewIfExistsById(interviewId);
+        var startDate = toLocalDateTimeString(interview.getStartTime());
+        var endDate = toLocalDateTimeString(interview.getEndTime());
+        var emailStr = String.format(m_interviewEmail, interviewId, userId);
+        var title = "Test Interview Assigned for " + projectName;
+        var msg = format(template, projectName, user.getUsername(), interview.getTitle(), startDate, endDate, emailStr);
+
+        var topic = new EmailTopic(EmailType.ASSIGN_INTERVIEW, email, title, msg, null);
+        m_kafkaProducer.sendEmail(topic);
     }
 }

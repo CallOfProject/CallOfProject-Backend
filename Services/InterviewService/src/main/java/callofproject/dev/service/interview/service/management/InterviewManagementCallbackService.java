@@ -22,6 +22,11 @@ import java.util.UUID;
 
 import static java.util.stream.StreamSupport.stream;
 
+/**
+ * @author Nuri Can ÖZTÜRK
+ * Represents the class interview management service logic.
+ * CopyRight(C) 2023 by Call Of Project Teams.
+ */
 @Service
 @Lazy
 public class InterviewManagementCallbackService
@@ -34,6 +39,17 @@ public class InterviewManagementCallbackService
     private final IUserMapper m_userMapper;
     private final IProjectMapper m_projectMapper;
 
+    /**
+     * Instantiates a new Interview management callback service.
+     *
+     * @param interviewServiceHelper    the interview service helper
+     * @param testInterviewMapper       the test interview mapper
+     * @param codingInterviewMapper     the coding interview mapper
+     * @param userCodingInterviewMapper the user coding interview mapper
+     * @param userTestInterviewMapper   the user test interview mapper
+     * @param userMapper                the user mapper
+     * @param projectMapper             the project mapper
+     */
     public InterviewManagementCallbackService(InterviewServiceHelper interviewServiceHelper, ITestInterviewMapper testInterviewMapper, ICodingInterviewMapper codingInterviewMapper, IUserCodingInterviewMapper userCodingInterviewMapper, IUserTestInterviewMapper userTestInterviewMapper, IUserMapper userMapper, IProjectMapper projectMapper)
     {
         m_interviewServiceHelper = interviewServiceHelper;
@@ -45,7 +61,12 @@ public class InterviewManagementCallbackService
         m_projectMapper = projectMapper;
     }
 
-
+    /**
+     * Find all interviews by user id.
+     *
+     * @param userId the user id
+     * @return the multiple response message
+     */
     public MultipleResponseMessage<Object> findAllInterviewsByUserId(UUID userId)
     {
         var codingInterviews = stream(m_interviewServiceHelper.findCodingInterviewsByOwnerId(userId).spliterator(), false)
@@ -61,6 +82,12 @@ public class InterviewManagementCallbackService
         return new MultipleResponseMessage<>(itemCount, "Coding And Test Interviews found!", codingWithTestInterviewsDTO);
     }
 
+    /**
+     * Find coding interview owner response message.
+     *
+     * @param interviewId the interview id
+     * @return the response message
+     */
     public ResponseMessage<Object> findCodingInterviewOwner(UUID interviewId)
     {
         var codingInterview = m_interviewServiceHelper.findCodingInterviewById(interviewId);
@@ -78,6 +105,12 @@ public class InterviewManagementCallbackService
     }
 
 
+    /**
+     * Find test interview owner response message.
+     *
+     * @param interviewId the interview id
+     * @return the response message
+     */
     public ResponseMessage<Object> findTestInterviewOwner(UUID interviewId)
     {
         var testInterview = m_interviewServiceHelper.findTestInterviewById(interviewId);
@@ -108,6 +141,15 @@ public class InterviewManagementCallbackService
                 q.getOption2(), q.getOption3(), q.getOption4(), q.getAnswer());
     }
 
+    /**
+     * To user test interview dto user test interview dto.
+     *
+     * @param uti              the uti
+     * @param testInterview    the test interview
+     * @param projectDTO       the project dto
+     * @param testInterviewDTO the test interview dto
+     * @return the user test interview dto
+     */
     public UserTestInterviewDTO toUserTestInterviewDTO(UserTestInterviews uti, TestInterview testInterview, ProjectDTO projectDTO, TestInterviewDTO testInterviewDTO)
     {
         var userId = uti.getUser().getUserId();

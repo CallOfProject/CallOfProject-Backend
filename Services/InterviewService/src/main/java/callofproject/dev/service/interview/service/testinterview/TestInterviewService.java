@@ -27,6 +27,11 @@ import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 
+/**
+ * @author Nuri Can ÖZTÜRK
+ * The type Test interview service.
+ * This class is used to handle the test interview service.
+ */
 @Service
 @Lazy
 @SuppressWarnings("unchecked")
@@ -35,12 +40,24 @@ public class TestInterviewService implements ITestInterviewService
     private final TestInterviewCallbackService m_callbackService;
     private final KafkaProducer m_kafkaProducer;
 
+    /**
+     * Instantiates a new Test interview service.
+     *
+     * @param callbackService the callback service
+     * @param kafkaProducer   the kafka producer
+     */
     public TestInterviewService(TestInterviewCallbackService callbackService, KafkaProducer kafkaProducer)
     {
         m_callbackService = callbackService;
         m_kafkaProducer = kafkaProducer;
     }
 
+    /**
+     * Create interview response message.
+     *
+     * @param dto the dto
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> createInterview(CreateTestDTO dto)
     {
@@ -56,6 +73,12 @@ public class TestInterviewService implements ITestInterviewService
         return testInterview;
     }
 
+    /**
+     * Delete interview response message.
+     *
+     * @param interviewId the interview id
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> deleteTestInterview(UUID interviewId)
     {
@@ -68,6 +91,12 @@ public class TestInterviewService implements ITestInterviewService
         return testInterview;
     }
 
+    /**
+     * Delete interview response message.
+     *
+     * @param projectId the project id
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> deleteTestInterviewByProjectId(UUID projectId)
     {
@@ -80,30 +109,38 @@ public class TestInterviewService implements ITestInterviewService
         return testInterview;
     }
 
+    /**
+     * Finish test interview response message.
+     *
+     * @param dto the dto
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> finishTestInterview(TestInterviewFinishDTO dto)
     {
         return doForDataService(() -> m_callbackService.finishTestInterview(dto), "TestInterviewService::finishTestInterview");
     }
 
-    @Override
-    public ResponseMessage<Object> startTestInterview(UUID interviewId)
-    {
-        return doForDataService(() -> m_callbackService.startTestInterview(interviewId), "TestInterviewService::startTestInterview");
-    }
 
-    @Override
-    public ResponseMessage<Object> startTestInterviewByProjectId(UUID projectId)
-    {
-        return doForDataService(() -> m_callbackService.startTestInterviewByProjectId(projectId), "TestInterviewService::startTestInterviewByProjectId");
-    }
-
+    /**
+     * Submit question with QuestionAnswerDTO
+     *
+     * @param dto the QuestionAnswerDTO
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> submitAnswer(QuestionAnswerDTO dto)
     {
         return doForDataService(() -> m_callbackService.submitAnswer(dto), "TestInterviewService::submitAnswer");
     }
 
+    /**
+     * Submit interview response message.
+     *
+     * @param userId          the user id
+     * @param testInterviewId the test interview id
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> submitInterview(UUID userId, UUID testInterviewId)
     {
@@ -111,30 +148,61 @@ public class TestInterviewService implements ITestInterviewService
     }
 
 
+    /**
+     * Get interview response message.
+     *
+     * @param interviewId the interview id
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> getQuestion(UUID interviewId, int q)
     {
         return doForDataService(() -> m_callbackService.getQuestion(interviewId, q), "TestInterviewService::getQuestion");
     }
 
+    /**
+     * Get interview response message.
+     *
+     * @param projectId the project id
+     * @param q         the q
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> getQuestionByProjectId(UUID projectId, int q)
     {
         return doForDataService(() -> m_callbackService.getQuestionByProjectId(projectId, q), "TestInterviewService::getQuestionByProjectId");
     }
 
+    /**
+     * Delete question
+     *
+     * @param questionId the question id
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> deleteQuestion(long questionId)
     {
         return doForDataService(() -> m_callbackService.deleteQuestion(questionId), "TestInterviewService::deleteQuestion");
     }
 
+    /**
+     * Find all questions
+     *
+     * @param interviewId the interview id
+     * @return the response message
+     */
     @Override
     public MultipleResponseMessage<Object> getQuestions(UUID interviewId)
     {
         return doForDataService(() -> m_callbackService.getQuestions(interviewId), "TestInterviewService::getQuestions");
     }
 
+    /**
+     * Find all questions
+     *
+     * @param projectId the project id
+     * @return the response message
+     */
     @Override
     public MultipleResponseMessage<Object> getQuestionsByProjectId(UUID projectId)
     {
@@ -142,18 +210,38 @@ public class TestInterviewService implements ITestInterviewService
     }
 
 
+    /**
+     * Check if user solved before
+     *
+     * @param interviewId the interview id
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> isUserSolvedBefore(UUID userId, UUID interviewId)
     {
         return doForDataService(() -> m_callbackService.isUserSolvedBefore(userId, interviewId), "TestInterviewService::isUserSolvedBefore");
     }
 
+    /**
+     * Get interview information for start interview
+     *
+     * @param interviewId the interview id
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> getInterviewInformation(UUID interviewId)
     {
         return doForDataService(() -> m_callbackService.getInterviewInformation(interviewId), "TestInterviewService::getInterviewInformation");
     }
 
+
+    /**
+     * Accept interview.
+     *
+     * @param id         interview id
+     * @param isAccepted the is accepted
+     * @return the response message
+     */
     @Override
     public ResponseMessage<Object> acceptInterview(UUID id, boolean isAccepted)
     {
