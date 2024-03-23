@@ -107,6 +107,7 @@ You can look at the interview service frontend part
 
 ### Test Results
 https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/135e0303-538a-4fe2-b190-3a8956683cbc 
+- **Test Result:** Passed all tests
 
 # NOTES
 - Testing and bug fixing processes are ongoing...
