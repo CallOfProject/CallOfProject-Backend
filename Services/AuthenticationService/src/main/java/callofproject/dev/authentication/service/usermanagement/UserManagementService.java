@@ -24,6 +24,11 @@ public class UserManagementService implements IUserManagementService
 {
     private final UserManagementServiceCallback m_serviceCallback;
 
+    /**
+     * Instantiates a new User management service.
+     *
+     * @param serviceCallback the service callback
+     */
     public UserManagementService(UserManagementServiceCallback serviceCallback)
     {
         m_serviceCallback = serviceCallback;

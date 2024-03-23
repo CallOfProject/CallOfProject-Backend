@@ -60,6 +60,17 @@ public class AuthenticationServiceCallback
     private int m_verifyUserTokenExpirationTime;
     private final ExecutorService m_executorService;
 
+    /**
+     * Constructor for AuthenticationServiceCallback.
+     *
+     * @param userManagementService  The UserManagementService to interact with user-related operations.
+     * @param passwordEncoder        The PasswordEncoder for encoding passwords.
+     * @param authenticationProvider The AuthenticationProvider for authenticating users.
+     * @param kafkaProducer          The KafkaProducer for sending email notifications.
+     * @param serviceHelper          The UserServiceHelper to interact with user-related operations.
+     * @param userRepository         The IUserRepository to interact with user-related operations.
+     * @param executorService        The ExecutorService for executing tasks.
+     */
     public AuthenticationServiceCallback(UserManagementService userManagementService, PasswordEncoder passwordEncoder, AuthenticationProvider authenticationProvider, KafkaProducer kafkaProducer, UserServiceHelper serviceHelper, IUserRepository userRepository, ExecutorService executorService)
     {
         m_userManagementService = userManagementService;

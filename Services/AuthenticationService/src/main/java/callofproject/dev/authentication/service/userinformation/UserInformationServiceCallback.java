@@ -42,6 +42,16 @@ public class UserInformationServiceCallback
     @Value("${application.cv-bucket.name}")
     private String m_cvBucketName;
 
+    /**
+     * Constructs a new UserInformationServiceCallback with the given UserManagementServiceHelper, MatchServiceHelper,
+     * IEnvironmentClientService, MapperConfiguration, and S3Service.
+     *
+     * @param serviceHelper      The UserManagementServiceHelper to be used by this service.
+     * @param matchServiceHelper The MatchServiceHelper to be used by this service.
+     * @param environmentClient  The IEnvironmentClientService to be used by this service.
+     * @param mapperConfig       The MapperConfiguration to be used by this service.
+     * @param s3Service          The S3Service to be used by this service.
+     */
     public UserInformationServiceCallback(UserManagementServiceHelper serviceHelper, MatchServiceHelper matchServiceHelper, IEnvironmentClientService environmentClient, MapperConfiguration mapperConfig, S3Service s3Service)
     {
         m_serviceHelper = serviceHelper;

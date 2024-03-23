@@ -33,6 +33,10 @@ import static callofproject.dev.util.stream.StreamUtil.toList;
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
 
+/**
+ * Service class for admin-related operations.
+ * It implements the IAdminService interface.
+ */
 @Service
 @Lazy
 public class AdminServiceCallback
@@ -42,6 +46,14 @@ public class AdminServiceCallback
     private final AuthenticationProvider m_authenticationProvider;
     private final IUserMapper m_userMapper;
 
+    /**
+     * Constructor for AdminServiceCallback class.
+     *
+     * @param managementServiceHelper The UserManagementServiceHelper object to be injected.
+     * @param kafkaProducer           The KafkaProducer object to be injected.
+     * @param authenticationProvider  The AuthenticationProvider object to be injected.
+     * @param userMapper              The IUserMapper object to be injected.
+     */
     public AdminServiceCallback(UserManagementServiceHelper managementServiceHelper, KafkaProducer kafkaProducer, AuthenticationProvider authenticationProvider, IUserMapper userMapper)
     {
         m_managementServiceHelper = managementServiceHelper;

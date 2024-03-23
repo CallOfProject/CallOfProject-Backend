@@ -24,7 +24,7 @@ public class InterviewSchedulerService
         m_serviceCallback.checkStartedTestInterviews();
     }
 
-    @Scheduled(cron = "*/5 * * * * *", zone = "Europe/Istanbul")
+    @Scheduled(cron = "00 00 02 * * *", zone = "Europe/Istanbul")
     public void checkStartedCodingInterviews()
     {
         m_serviceCallback.checkStartedCodingInterviews();

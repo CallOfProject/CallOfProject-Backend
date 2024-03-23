@@ -22,6 +22,11 @@ public class UserInformationService implements IUserInformationService
 {
     private final UserInformationServiceCallback m_serviceCallback;
 
+    /**
+     * Constructor for UserInformationService.
+     *
+     * @param serviceCallback The UserInformationServiceCallback to interact with user information operations.
+     */
     public UserInformationService(UserInformationServiceCallback serviceCallback)
     {
         m_serviceCallback = serviceCallback;

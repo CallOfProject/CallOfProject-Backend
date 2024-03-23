@@ -7,12 +7,24 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Utility class for general operations.
+ */
 public final class Util
 {
+    /**
+     * Private constructor for Util class.
+     */
     private Util()
     {
     }
 
+    /**
+     * Get email template content.
+     *
+     * @param templateName The name of the template file.
+     * @return The content of the email template.
+     */
     public static String getEmailTemplate(String templateName)
     {
         var templateContent = "";

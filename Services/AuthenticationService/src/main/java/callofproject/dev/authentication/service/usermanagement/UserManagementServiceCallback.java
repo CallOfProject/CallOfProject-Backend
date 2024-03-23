@@ -38,6 +38,15 @@ public class UserManagementServiceCallback
     private final S3Service m_storageService;
     private final ImageService m_imageService;
 
+    /**
+     * Instantiates a new User management service callback.
+     *
+     * @param userProducer   the user producer
+     * @param serviceHelper  the service helper
+     * @param mapperConfig   the mapper config
+     * @param storageService the storage service
+     * @param imageService   the image service
+     */
     public UserManagementServiceCallback(KafkaProducer userProducer, UserManagementServiceHelper serviceHelper, MapperConfiguration mapperConfig, S3Service storageService, ImageService imageService)
     {
         m_userProducer = userProducer;
@@ -47,6 +56,12 @@ public class UserManagementServiceCallback
         m_imageService = imageService;
     }
 
+    /**
+     * Save user with given dto class.
+     *
+     * @param userDTO represent the user dto class.
+     * @return UserSaveDTO class.
+     */
     public ResponseMessage<UserSaveDTO> saveUserCallback(UserSignUpRequestDTO userDTO)
     {
         var user = m_mapperConfig.userMapper.toUser(userDTO);
@@ -161,7 +176,6 @@ public class UserManagementServiceCallback
     }
 
 
-
     private String uploadProfilePhoto(byte[] profilePhoto, UserProfile userProfile, User user)
     {
         var fileName = "pp_" + user.getUserId() + "_" + userProfile.getUserProfileId() + "_" + System.currentTimeMillis() + ".jpg";
@@ -209,7 +223,6 @@ public class UserManagementServiceCallback
 
         m_userProducer.sendMessage(kafkaMessage);
     }
-
 
 
     /**
