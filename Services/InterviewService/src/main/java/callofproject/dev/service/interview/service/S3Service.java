@@ -9,6 +9,7 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,7 @@ import static callofproject.dev.library.exception.util.CopDataUtil.doForDataServ
  * This class provides functionalities to upload, download, and delete files from Amazon S3 buckets.
  */
 @Service
+@PropertySource("classpath:application-dev.properties")
 public class S3Service
 {
     @Value("${application.bucket.name}")
