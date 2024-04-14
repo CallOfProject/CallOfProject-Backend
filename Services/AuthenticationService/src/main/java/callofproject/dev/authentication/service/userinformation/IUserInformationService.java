@@ -1,9 +1,6 @@
 package callofproject.dev.authentication.service.userinformation;
 
-import callofproject.dev.authentication.dto.environments.CourseUpsertDTO;
-import callofproject.dev.authentication.dto.environments.EducationUpsertDTO;
-import callofproject.dev.authentication.dto.environments.ExperienceUpsertDTO;
-import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
+import callofproject.dev.authentication.dto.environments.*;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +17,9 @@ public interface IUserInformationService
      * @param dto represents the education upsert dto
      * @return the response message
      */
-    ResponseMessage<Object> upsertEducation(EducationUpsertDTO dto);
+    ResponseMessage<Object> saveEducation(EducationCreateDTO dto);
+
+    ResponseMessage<Object> updateEducation(EducationUpdateDTO dto);
 
     /**
      * Upsert experience.
@@ -28,7 +27,15 @@ public interface IUserInformationService
      * @param dto represents the experience upsert dto
      * @return the response message
      */
-    ResponseMessage<Object> upsertExperience(ExperienceUpsertDTO dto);
+    ResponseMessage<Object> saveExperience(ExperienceCreateDTO dto);
+
+    /**
+     * Update experience.
+     *
+     * @param dto represents the experience update dto
+     * @return the response message
+     */
+    ResponseMessage<Object> updateExperience(ExperienceUpdateDTO dto);
 
     /**
      * Upsert course.
@@ -36,7 +43,16 @@ public interface IUserInformationService
      * @param dto represents the course upsert dto
      * @return the response message
      */
-    ResponseMessage<Object> upsertCourse(CourseUpsertDTO dto);
+    ResponseMessage<Object> saveCourse(CourseCreateDTO dto);
+
+
+    /**
+     * Update course.
+     *
+     * @param dto represents the course update dto
+     * @return the response message
+     */
+    ResponseMessage<Object> updateCourse(CourseUpdateDTO dto);
 
     /**
      * Upsert link.
@@ -44,7 +60,15 @@ public interface IUserInformationService
      * @param dto represents the link upsert dto
      * @return the response message
      */
-    ResponseMessage<Object> upsertLink(LinkUpsertDTO dto);
+    ResponseMessage<Object> saveLink(LinkCreateDTO dto);
+
+    /**
+     * Update link.
+     *
+     * @param dto represents the link update dto
+     * @return the response message
+     */
+    ResponseMessage<Object> updateLink(LinkUpdateDTO dto);
 
     /**
      * Remove education.

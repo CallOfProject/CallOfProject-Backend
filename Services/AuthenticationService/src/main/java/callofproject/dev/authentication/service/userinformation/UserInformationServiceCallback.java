@@ -4,10 +4,7 @@ import callofproject.dev.authentication.dto.client.CompanySaveDTO;
 import callofproject.dev.authentication.dto.client.CourseOrganizationSaveDTO;
 import callofproject.dev.authentication.dto.client.CourseSaveDTO;
 import callofproject.dev.authentication.dto.client.UniversitySaveDTO;
-import callofproject.dev.authentication.dto.environments.CourseUpsertDTO;
-import callofproject.dev.authentication.dto.environments.EducationUpsertDTO;
-import callofproject.dev.authentication.dto.environments.ExperienceUpsertDTO;
-import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
+import callofproject.dev.authentication.dto.environments.*;
 import callofproject.dev.authentication.mapper.MapperConfiguration;
 import callofproject.dev.authentication.service.IEnvironmentClientService;
 import callofproject.dev.authentication.service.S3Service;
@@ -69,7 +66,7 @@ public class UserInformationServiceCallback
      * @return A ResponseMessage indicating the success of the education upsert operation.
      * @throws DataServiceException if the user or education information does not exist.
      */
-    public ResponseMessage<Object> upsertEducationCallback(EducationUpsertDTO dto)
+    public ResponseMessage<Object> saveEducationCallback(EducationCreateDTO dto)
     {
         // save to environment client if not exists
         var educationOnClient = m_environmentClient.saveUniversity(new UniversitySaveDTO(dto.getSchoolName()));
@@ -103,13 +100,39 @@ public class UserInformationServiceCallback
     }
 
     /**
+     * Updates educational information for a user based on the provided EducationUpdateDTO.
+     *
+     * @param dto The DTO containing education information to be updated.
+     * @return A ResponseMessage indicating the success of the education update operation.
+     */
+    public ResponseMessage<Object> updateEducationCallback(EducationUpdateDTO dto)
+    {
+        var education = m_serviceHelper.getEducationServiceHelper().findByIdEducation(dto.getEducationId());
+
+        if (education.isEmpty())
+            throw new DataServiceException("Education does not exists!");
+
+        education.get().setSchoolName(dto.getSchoolName());
+        education.get().setDepartment(dto.getDepartment());
+        education.get().setDescription(dto.getDescription());
+        education.get().setStartDate(dto.getStartDate());
+        education.get().setFinishDate(dto.getFinishDate());
+        education.get().setContinue(dto.isContinue());
+        education.get().setGpa(dto.getGpa());
+
+        var updatedEducation = m_serviceHelper.getEducationServiceHelper().saveEducation(education.get());
+        var educationDTO = m_mapperConfig.educationMapper.toEducationDTO(updatedEducation);
+        return new ResponseMessage<>("Education updated successfully!", 200, educationDTO);
+    }
+
+    /**
      * Adds or updates professional experience for a user based on the provided ExperienceUpsertDTO.
      *
      * @param dto The DTO containing experience information to be upserted.
      * @return A ResponseMessage indicating the success of the experience upsert operation.
      * @throws DataServiceException if the user or experience information does not exist.
      */
-    public ResponseMessage<Object> upsertExperienceCallback(ExperienceUpsertDTO dto)
+    public ResponseMessage<Object> saveExperienceCallback(ExperienceCreateDTO dto)
     {
         // save to environment client if not exists
         var experienceOnClient = m_environmentClient.saveCompany(new CompanySaveDTO(dto.getCompanyName()));
@@ -142,13 +165,40 @@ public class UserInformationServiceCallback
     }
 
     /**
+     * Updates educational information for a user based on the provided EducationUpdateDTO.
+     *
+     * @param dto The DTO containing education information to be updated.
+     * @return A ResponseMessage indicating the success of the education update operation.
+     */
+    public ResponseMessage<Object> updateExperienceCallback(ExperienceUpdateDTO dto)
+    {
+        var experience = m_serviceHelper.getExperienceServiceHelper().findById(dto.getExperienceId());
+
+        if (experience.isEmpty()) // unexpected case
+            throw new DataServiceException("Experience does not exists!");
+
+        experience.get().setCompanyName(dto.getCompanyName());
+        experience.get().setDescription(dto.getDescription());
+        experience.get().setCompanyWebsiteLink(dto.getCompanyWebsite());
+        experience.get().setStartDate(dto.getStartDate());
+        experience.get().setFinishDate(dto.getFinishDate());
+        experience.get().setContinue(dto.isContinue());
+        experience.get().setJobDefinition(dto.getJobDefinition());
+
+        var updatedExperience = m_serviceHelper.getExperienceServiceHelper().saveExperience(experience.get());
+        var experienceDTO = m_mapperConfig.experienceMapper.toExperienceDTO(updatedExperience);
+        return new ResponseMessage<>("Experience updated successfully!", 200, experienceDTO);
+    }
+
+
+    /**
      * Adds or updates course information for a user based on the provided CourseUpsertDTO.
      *
      * @param dto The DTO containing course information to be upserted.
      * @return A ResponseMessage indicating the success of the course upsert operation.
      * @throws DataServiceException if the user or course information does not exist.
      */
-    public ResponseMessage<Object> upsertCourseCallback(CourseUpsertDTO dto)
+    public ResponseMessage<Object> saveCourseCallback(CourseCreateDTO dto)
     {
         // save to environment client if not exists
         var courseOnClient = m_environmentClient.saveCourse(new CourseSaveDTO(dto.getCourseName()));
@@ -193,12 +243,48 @@ public class UserInformationServiceCallback
     }
 
     /**
+     * Updates course information for a user based on the provided CourseUpdateDTO.
+     *
+     * @param dto The DTO containing course information to be updated.
+     * @return A ResponseMessage indicating the success of the course update operation.
+     */
+    public ResponseMessage<Object> updateCourseCallback(CourseUpdateDTO dto)
+    {
+        var course = m_serviceHelper.getCourseServiceHelper().findById(dto.getCourseId());
+
+        if (course.isEmpty()) // unexpected case
+            throw new DataServiceException("Course does not exists!");
+
+
+        if (!course.get().getCourseOrganization().getCourseOrganizationName().equals(convert(dto.getOrganizator())))
+        {
+            var organizator = m_serviceHelper.getCourseOrganizationServiceHelper()
+                    .findByCourseOrganizationNameContainsIgnoreCase(dto.getOrganizator());
+
+            var organization = organizator.orElseGet(() -> m_serviceHelper.getCourseOrganizationServiceHelper()
+                    .saveCourseOrganization(new CourseOrganization(dto.getOrganizator())));
+
+            course.get().setCourseOrganization(organization);
+        }
+
+        course.get().setCourseName(dto.getCourseName());
+        course.get().setStartDate(dto.getStartDate());
+        course.get().setFinishDate(dto.getFinishDate());
+        course.get().setContinue(dto.isContinue());
+        course.get().setDescription(dto.getDescription());
+
+        var updatedCourse = m_serviceHelper.getCourseServiceHelper().saveCourse(course.get());
+        var courseDTO = m_mapperConfig.courseMapper.toCourseDTO(updatedCourse);
+        return new ResponseMessage<>("Experience updated successfully!", 200, courseDTO);
+    }
+
+    /**
      * Adds or updates a link for a user based on the provided LinkUpsertDTO.
      *
      * @param dto The DTO containing link information to be upserted.
      * @return A ResponseMessage indicating the success of the link upsert operation.
      */
-    public ResponseMessage<Object> upsertLinkCallback(LinkUpsertDTO dto)
+    public ResponseMessage<Object> saveLinkCallback(LinkCreateDTO dto)
     {
         var user = getUserProfile(dto.userId());
 
@@ -208,6 +294,28 @@ public class UserInformationServiceCallback
         m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(user);
 
         return new ResponseMessage<>("Link upserted successfully!", 200, upsertedLink);
+    }
+
+
+    /**
+     * Updates a link for a user based on the provided LinkUpdateDTO.
+     *
+     * @param dto The DTO containing link information to be updated.
+     * @return A ResponseMessage indicating the success of the link update operation.
+     */
+    public ResponseMessage<Object> updateLinkCallback(LinkUpdateDTO dto)
+    {
+        var link = m_serviceHelper.getLinkServiceHelper().findById(dto.linkId());
+
+        if (link.isEmpty())
+            throw new DataServiceException("Link does not exists!");
+
+        link.get().setLink(dto.link());
+        link.get().setLinkTitle(dto.linkTitle());
+
+        var updatedLink = m_serviceHelper.getLinkServiceHelper().saveLink(link.get());
+        var linkDTO = m_mapperConfig.linkMapper.toLinkDTO(updatedLink);
+        return new ResponseMessage<>("Link updated successfully!", 200, linkDTO);
     }
 
     /**
@@ -409,5 +517,4 @@ public class UserInformationServiceCallback
 
         return userProfile.get();
     }
-
 }

@@ -1,7 +1,6 @@
 package callofproject.dev.authentication.dto.environments;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -14,15 +13,14 @@ import java.util.UUID;
 /**
  * Data Transfer Object for a course.
  */
-public class CourseUpsertDTO
+public class CourseUpdateDTO
 {
     @JsonProperty("user_id")
     @NotNull
     private UUID userId;
 
     @JsonProperty("course_id")
-    @JsonIgnore
-    private String courseId;
+    private UUID courseId;
 
     @JsonProperty("organizator")
     private String organizator;
@@ -61,7 +59,7 @@ public class CourseUpsertDTO
      * @param isContinue  is continue
      * @param description description
      */
-    public CourseUpsertDTO(UUID userId, String organizator, String courseName, LocalDate startDate, LocalDate finishDate, boolean isContinue, String description)
+    public CourseUpdateDTO(UUID userId, String organizator, String courseName, LocalDate startDate, LocalDate finishDate, boolean isContinue, String description)
     {
         this.userId = userId;
         this.organizator = organizator;
@@ -100,7 +98,7 @@ public class CourseUpsertDTO
      *
      * @return course ID
      */
-    public String getCourseId()
+    public UUID getCourseId()
     {
         return courseId;
     }
@@ -111,7 +109,7 @@ public class CourseUpsertDTO
      *
      * @param courseId course ID
      */
-    public void setCourseId(String courseId)
+    public void setCourseId(UUID courseId)
     {
         this.courseId = courseId;
     }

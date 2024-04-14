@@ -14,30 +14,40 @@ import java.util.UUID;
 /**
  * Data Transfer Object for an experience.
  */
-public class ExperienceUpsertDTO
+public class ExperienceUpdateDTO
 {
     @JsonProperty("user_id")
     private UUID userId;
+
+    @JsonProperty("experience_id")
+    private UUID experienceId;
+
+
     @JsonProperty("company_name")
     @NotBlank(message = "Company name cannot be blank")
     private String companyName;
+
     private String description;
+
     @JsonProperty("company_website")
     @Pattern(regexp = "^(http|https)://.*$", message = "Invalid URL format. It should start with http:// or https://")
     private String companyWebsite;
 
     @JsonProperty("job_definition")
     private String jobDefinition;
+
     @JsonProperty("start_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Schema(description = "date format: dd/MM/yyyy", type = "string")
     @NotNull(message = "Start date cannot be null")
     private LocalDate startDate;
+
     @JsonProperty("finish_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Schema(description = "date format: dd/MM/yyyy", type = "string")
     @FutureOrPresent(message = "Finish date must be in the future or present")
     private LocalDate finishDate;
+
     @JsonProperty("is_continue")
     private boolean isContinue;
 
@@ -54,7 +64,7 @@ public class ExperienceUpsertDTO
      * @param isContinue     is continue
      * @param jobDefinition  job definition
      */
-    public ExperienceUpsertDTO(UUID userId, String companyName, String description, String companyWebsite,
+    public ExperienceUpdateDTO(UUID userId, String companyName, String description, String companyWebsite,
                                LocalDate startDate, LocalDate finishDate, boolean isContinue, String jobDefinition)
     {
         this.jobDefinition = jobDefinition;
@@ -239,4 +249,28 @@ public class ExperienceUpsertDTO
     {
         isContinue = aContinue;
     }
+
+
+    /**
+     * Getter for experience ID.
+     *
+     * @return experience ID
+     */
+    public UUID getExperienceId()
+    {
+        return experienceId;
+    }
+
+    /**
+     * Setter for experience ID.
+     *
+     * @param experienceId experience ID
+     */
+    public void setExperienceId(UUID experienceId)
+    {
+        this.experienceId = experienceId;
+    }
+
+
+
 }

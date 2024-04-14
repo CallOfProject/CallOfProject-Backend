@@ -1,9 +1,6 @@
 package callofproject.dev.authentication.service.userinformation;
 
-import callofproject.dev.authentication.dto.environments.CourseUpsertDTO;
-import callofproject.dev.authentication.dto.environments.EducationUpsertDTO;
-import callofproject.dev.authentication.dto.environments.ExperienceUpsertDTO;
-import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
+import callofproject.dev.authentication.dto.environments.*;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -39,9 +36,21 @@ public class UserInformationService implements IUserInformationService
      * @return MessageResponseDTO.
      */
     @Override
-    public ResponseMessage<Object> upsertEducation(EducationUpsertDTO dto)
+    public ResponseMessage<Object> saveEducation(EducationCreateDTO dto)
     {
-        return doForDataService(() -> m_serviceCallback.upsertEducationCallback(dto), "Education cannot be upserted!");
+        return doForDataService(() -> m_serviceCallback.saveEducationCallback(dto), "Education cannot be upserted!");
+    }
+
+    /**
+     * Update education with given dto class.
+     *
+     * @param dto represent the dto class
+     * @return MessageResponseDTO.
+     */
+    @Override
+    public ResponseMessage<Object> updateEducation(EducationUpdateDTO dto)
+    {
+        return doForDataService(() -> m_serviceCallback.updateEducationCallback(dto), "Education cannot be updated!");
     }
 
     /**
@@ -51,9 +60,21 @@ public class UserInformationService implements IUserInformationService
      * @return MessageResponseDTO.
      */
     @Override
-    public ResponseMessage<Object> upsertExperience(ExperienceUpsertDTO dto)
+    public ResponseMessage<Object> saveExperience(ExperienceCreateDTO dto)
     {
-        return doForDataService(() -> m_serviceCallback.upsertExperienceCallback(dto), "Experience cannot be upserted!");
+        return doForDataService(() -> m_serviceCallback.saveExperienceCallback(dto), "Experience cannot be upserted!");
+    }
+
+    /**
+     * Update experience with given dto class.
+     *
+     * @param dto represent the dto class
+     * @return MessageResponseDTO.
+     */
+    @Override
+    public ResponseMessage<Object> updateExperience(ExperienceUpdateDTO dto)
+    {
+        return doForDataService(() -> m_serviceCallback.updateExperienceCallback(dto), "Experience cannot be updated!");
     }
 
     /**
@@ -63,9 +84,22 @@ public class UserInformationService implements IUserInformationService
      * @return MessageResponseDTO.
      */
     @Override
-    public ResponseMessage<Object> upsertCourse(CourseUpsertDTO dto)
+    public ResponseMessage<Object> saveCourse(CourseCreateDTO dto)
     {
-        return doForDataService(() -> m_serviceCallback.upsertCourseCallback(dto), "Course cannot be upserted!");
+        return doForDataService(() -> m_serviceCallback.saveCourseCallback(dto), "Course cannot be upserted!");
+    }
+
+
+    /**
+     * Update course with given dto class.
+     *
+     * @param dto represent the dto class
+     * @return MessageResponseDTO.
+     */
+    @Override
+    public ResponseMessage<Object> updateCourse(CourseUpdateDTO dto)
+    {
+        return doForDataService(() -> m_serviceCallback.updateCourseCallback(dto), "Course cannot be updated!");
     }
 
     /**
@@ -75,9 +109,22 @@ public class UserInformationService implements IUserInformationService
      * @return MessageResponseDTO.
      */
     @Override
-    public ResponseMessage<Object> upsertLink(LinkUpsertDTO dto)
+    public ResponseMessage<Object> saveLink(LinkCreateDTO dto)
     {
-        return doForDataService(() -> m_serviceCallback.upsertLinkCallback(dto), "Link cannot be upserted!");
+        return doForDataService(() -> m_serviceCallback.saveLinkCallback(dto), "Link cannot be upserted!");
+    }
+
+
+    /**
+     * Update link with given dto class.
+     *
+     * @param dto represent the dto class
+     * @return MessageResponseDTO.
+     */
+    @Override
+    public ResponseMessage<Object> updateLink(LinkUpdateDTO dto)
+    {
+        return doForDataService(() -> m_serviceCallback.updateLinkCallback(dto), "Link cannot be updated!");
     }
 
     /**

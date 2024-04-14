@@ -1,7 +1,6 @@
 package callofproject.dev.authentication.dto.environments;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,26 +12,25 @@ import java.util.UUID;
 /**
  * Data Transfer Object for an education.
  */
-public class EducationUpsertDTO
+public class EducationCreateDTO
 {
     @NotNull
     @Parameter(description = "User ID")
     @JsonProperty("user_id")
     private UUID userId;
-    @JsonProperty("university_id")
-    @JsonIgnore
-    private String universityId;
 
     @Parameter(description = "School Name (between 2 and 100 characters)")
     @JsonProperty("school_name")
     @NotBlank
     @Size(min = 2, max = 100)
     private String schoolName;
+
     @JsonProperty("department")
     @NotBlank
     @Size(min = 2, max = 100)
     @Parameter(description = "Department (between 2 and 100 characters)")
     private String department;
+
     @JsonProperty("description")
     @Size(max = 255)
     @Parameter(description = "Description (up to 255 characters)")
@@ -53,6 +51,7 @@ public class EducationUpsertDTO
     @FutureOrPresent
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate finishDate;
+
     @Parameter(description = "Is Continue (true or false)", example = "true")
     @JsonProperty("is_continue")
     @Schema(description = "true/false", type = "boolean")
@@ -78,7 +77,7 @@ public class EducationUpsertDTO
      * @param isContinue  is continue
      * @param gpa         gpa
      */
-    public EducationUpsertDTO(UUID userId, String schoolName, String department, String description, LocalDate startDate, LocalDate finishDate, boolean isContinue, double gpa)
+    public EducationCreateDTO(UUID userId, String schoolName, String department, String description, LocalDate startDate, LocalDate finishDate, boolean isContinue, double gpa)
     {
         this.userId = userId;
         this.schoolName = schoolName;
@@ -93,7 +92,7 @@ public class EducationUpsertDTO
     /**
      * Constructor.
      */
-    public EducationUpsertDTO()
+    public EducationCreateDTO()
     {
     }
 
@@ -117,28 +116,6 @@ public class EducationUpsertDTO
     public void setUserId(UUID userId)
     {
         this.userId = userId;
-    }
-
-
-    /**
-     * Getter for university ID.
-     *
-     * @return university ID
-     */
-    public String getUniversityId()
-    {
-        return universityId;
-    }
-
-
-    /**
-     * Setter for university ID.
-     *
-     * @param universityId university ID
-     */
-    public void setUniversityId(String universityId)
-    {
-        this.universityId = universityId;
     }
 
 

@@ -1,9 +1,6 @@
 package callofproject.dev.authentication.controller;
 
-import callofproject.dev.authentication.dto.environments.CourseUpsertDTO;
-import callofproject.dev.authentication.dto.environments.EducationUpsertDTO;
-import callofproject.dev.authentication.dto.environments.ExperienceUpsertDTO;
-import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
+import callofproject.dev.authentication.dto.environments.*;
 import callofproject.dev.authentication.service.userinformation.UserInformationService;
 import callofproject.dev.data.common.clas.ErrorMessage;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -47,10 +44,23 @@ public class UserInformationController
      * @param dto represent the education information
      * @return boolean value success or not
      */
-    @PostMapping("upsert/education")
-    public ResponseEntity<Object> saveEducation(@RequestBody EducationUpsertDTO dto)
+    @PostMapping("save/education")
+    public ResponseEntity<Object> saveEducation(@RequestBody EducationCreateDTO dto)
     {
-        return subscribe(() -> ok(m_service.upsertEducation(dto)),
+        return subscribe(() -> ok(m_service.saveEducation(dto)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    /**
+     * Update education to user.
+     *
+     * @param dto represent the education information
+     * @return boolean value success or not
+     */
+    @PutMapping("update/education")
+    public ResponseEntity<Object> updateEducation(@RequestBody EducationUpdateDTO dto)
+    {
+        return subscribe(() -> ok(m_service.updateEducation(dto)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
@@ -60,10 +70,24 @@ public class UserInformationController
      * @param dto represent the experience information
      * @return boolean value success or not
      */
-    @PostMapping("upsert/experience")
-    public ResponseEntity<Object> saveExperience(@RequestBody ExperienceUpsertDTO dto)
+    @PostMapping("save/experience")
+    public ResponseEntity<Object> saveExperience(@RequestBody ExperienceCreateDTO dto)
     {
-        return subscribe(() -> ok(m_service.upsertExperience(dto)),
+        return subscribe(() -> ok(m_service.saveExperience(dto)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+
+    /**
+     * Update experience to user.
+     *
+     * @param dto represent the experience information
+     * @return boolean value success or not
+     */
+    @PutMapping("update/experience")
+    public ResponseEntity<Object> updateExperience(@RequestBody ExperienceUpdateDTO dto)
+    {
+        return subscribe(() -> ok(m_service.updateExperience(dto)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
@@ -73,10 +97,23 @@ public class UserInformationController
      * @param dto represent the link information
      * @return boolean value success or not
      */
-    @PostMapping("upsert/link")
-    public ResponseEntity<Object> saveLink(@RequestBody LinkUpsertDTO dto)
+    @PostMapping("save/link")
+    public ResponseEntity<Object> saveLink(@RequestBody LinkCreateDTO dto)
     {
-        return subscribe(() -> ok(m_service.upsertLink(dto)),
+        return subscribe(() -> ok(m_service.saveLink(dto)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    /**
+     * Update link to user.
+     *
+     * @param dto represent the link information
+     * @return boolean value success or not
+     */
+    @PutMapping("update/link")
+    public ResponseEntity<Object> updateLink(@RequestBody LinkUpdateDTO dto)
+    {
+        return subscribe(() -> ok(m_service.updateLink(dto)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
@@ -86,10 +123,23 @@ public class UserInformationController
      * @param dto represent the course information
      * @return boolean value success or not
      */
-    @PostMapping("upsert/course")
-    public ResponseEntity<Object> saveCourse(@RequestBody CourseUpsertDTO dto)
+    @PostMapping("save/course")
+    public ResponseEntity<Object> saveCourse(@RequestBody CourseCreateDTO dto)
     {
-        return subscribe(() -> ok(m_service.upsertCourse(dto)),
+        return subscribe(() -> ok(m_service.saveCourse(dto)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    /**
+     * Update course to user.
+     *
+     * @param dto represent the course information
+     * @return boolean value success or not
+     */
+    @PutMapping("update/course")
+    public ResponseEntity<Object> updateCourse(@RequestBody CourseUpdateDTO dto)
+    {
+        return subscribe(() -> ok(m_service.updateCourse(dto)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 

@@ -164,7 +164,7 @@
                     <image>
                         <builder>paketobuildpacks/builder-jammy-base:latest</builder>
                     </image>
-                    <skip>true</skip>
+                   
                 </configuration>
             </plugin>
 

@@ -80,4 +80,13 @@ public interface IUserManagementService
      * @return UserDTO class.
      */
     ResponseMessage<Object> findUserWithProfile(UUID userId);
+
+    /**
+     * Update about me with given user id and about me.
+     *
+     * @param userId  represent the user id.
+     * @param aboutMe represent the about me.
+     * @return MessageResponseDTO.
+     */
+    ResponseMessage<Object> updateAboutMe(UUID userId, String aboutMe);
 }

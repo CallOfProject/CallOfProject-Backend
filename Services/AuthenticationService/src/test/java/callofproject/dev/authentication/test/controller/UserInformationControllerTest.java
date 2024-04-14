@@ -1,10 +1,10 @@
 package callofproject.dev.authentication.test.controller;
 
 import callofproject.dev.authentication.controller.UserInformationController;
-import callofproject.dev.authentication.dto.environments.CourseUpsertDTO;
-import callofproject.dev.authentication.dto.environments.EducationUpsertDTO;
-import callofproject.dev.authentication.dto.environments.ExperienceUpsertDTO;
-import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
+import callofproject.dev.authentication.dto.environments.CourseCreateDTO;
+import callofproject.dev.authentication.dto.environments.EducationCreateDTO;
+import callofproject.dev.authentication.dto.environments.ExperienceCreateDTO;
+import callofproject.dev.authentication.dto.environments.LinkCreateDTO;
 import callofproject.dev.authentication.service.userinformation.UserInformationService;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.library.exception.service.DataServiceException;
@@ -35,9 +35,9 @@ public class UserInformationControllerTest
     @InjectMocks
     private UserInformationController userInformationController;
 
-    private LinkUpsertDTO linkDto = new LinkUpsertDTO(UUID.randomUUID(), "LinkedIn", "https://www.linkedin.com/in/username");
+    private LinkCreateDTO linkDto = new LinkCreateDTO(UUID.randomUUID(), "LinkedIn", "https://www.linkedin.com/in/username");
 
-    private ExperienceUpsertDTO getExperienceUpsertDTO()
+    private ExperienceCreateDTO getExperienceUpsertDTO()
     {
         var userId1 = UUID.randomUUID();
         var companyName1 = "Company A";
@@ -48,11 +48,11 @@ public class UserInformationControllerTest
         var isContinue1 = false;
         var jobDefinition1 = "Job Definition for Company A";
 
-        return new ExperienceUpsertDTO(userId1, companyName1, description1,
+        return new ExperienceCreateDTO(userId1, companyName1, description1,
                 companyWebsite1, startDate1, finishDate1, isContinue1, jobDefinition1);
     }
 
-    private EducationUpsertDTO getEducationUpsertDTO()
+    private EducationCreateDTO getEducationUpsertDTO()
     {
         var userId1 = UUID.randomUUID();
         var schoolName1 = "Sample School 1";
@@ -63,11 +63,11 @@ public class UserInformationControllerTest
         var isContinue1 = false;
         var gpa1 = 3.5;
 
-        return new EducationUpsertDTO(userId1, schoolName1, department1,
+        return new EducationCreateDTO(userId1, schoolName1, department1,
                 description1, startDate1, finishDate1, isContinue1, gpa1);
     }
 
-    private CourseUpsertDTO getCourseUpsertDTO()
+    private CourseCreateDTO getCourseUpsertDTO()
     {
         var userId = UUID.randomUUID();
         var organizator = "Sample Organizator";
@@ -77,7 +77,7 @@ public class UserInformationControllerTest
         var isContinue = false;
         var description = "Sample Description";
 
-        return new CourseUpsertDTO(userId, organizator, courseName, startDate, finishDate, isContinue, description);
+        return new CourseCreateDTO(userId, organizator, courseName, startDate, finishDate, isContinue, description);
     }
 
 
@@ -86,7 +86,7 @@ public class UserInformationControllerTest
     {
         // given
         var expectedResult = new ResponseMessage<Object>("Education saved successfully!", 200, true);
-        when(userInformationService.upsertEducation(any(EducationUpsertDTO.class))).thenReturn(expectedResult);
+        when(userInformationService.saveEducation(any(EducationCreateDTO.class))).thenReturn(expectedResult);
         // Act
         ResponseEntity<Object> response = userInformationController.saveEducation(getEducationUpsertDTO());
 
@@ -98,7 +98,7 @@ public class UserInformationControllerTest
     public void testSaveEducation_withServiceException_shouldReturnInternalServerError()
     {
         // given
-        when(userInformationService.upsertEducation(any(EducationUpsertDTO.class))).thenThrow(new DataServiceException("Education cannot be upserted!"));
+        when(userInformationService.saveEducation(any(EducationCreateDTO.class))).thenThrow(new DataServiceException("Education cannot be upserted!"));
         // Act
         ResponseEntity<Object> response = userInformationController.saveEducation(getEducationUpsertDTO());
         // Assert
@@ -111,7 +111,7 @@ public class UserInformationControllerTest
     {
         // given
         var expectedResult = new ResponseMessage<Object>("Experience saved successfully!", 200, true);
-        when(userInformationService.upsertExperience(any(ExperienceUpsertDTO.class))).thenReturn(expectedResult);
+        when(userInformationService.saveExperience(any(ExperienceCreateDTO.class))).thenReturn(expectedResult);
         // Act
         ResponseEntity<Object> response = userInformationController.saveExperience(getExperienceUpsertDTO());
         // Assert
@@ -123,7 +123,7 @@ public class UserInformationControllerTest
     public void testExperience_withServiceException_shouldReturnInternalServerError()
     {
         // given
-        when(userInformationService.upsertExperience(any(ExperienceUpsertDTO.class))).thenThrow(new DataServiceException("Experience cannot be upserted!"));
+        when(userInformationService.saveExperience(any(ExperienceCreateDTO.class))).thenThrow(new DataServiceException("Experience cannot be upserted!"));
         // Act
         ResponseEntity<Object> response = userInformationController.saveExperience(getExperienceUpsertDTO());
         // Assert
@@ -135,7 +135,7 @@ public class UserInformationControllerTest
     {
         // given
         var expectedResult = new ResponseMessage<Object>("Link saved successfully!", 200, true);
-        when(userInformationService.upsertLink(any(LinkUpsertDTO.class))).thenReturn(expectedResult);
+        when(userInformationService.saveLink(any(LinkCreateDTO.class))).thenReturn(expectedResult);
         // Act
         ResponseEntity<Object> response = userInformationController.saveLink(linkDto);
         // Assert
@@ -146,7 +146,7 @@ public class UserInformationControllerTest
     public void testLink_withServiceException_shouldReturnInternalServerError()
     {
         // given
-        when(userInformationService.upsertLink(any(LinkUpsertDTO.class))).thenThrow(new DataServiceException("Link cannot be upserted!"));
+        when(userInformationService.saveLink(any(LinkCreateDTO.class))).thenThrow(new DataServiceException("Link cannot be upserted!"));
         // Act
         ResponseEntity<Object> response = userInformationController.saveLink(linkDto);
         // Assert
@@ -158,7 +158,7 @@ public class UserInformationControllerTest
     {
         // given
         var expectedResult = new ResponseMessage<Object>("course saved successfully!", 200, true);
-        when(userInformationService.upsertCourse(any(CourseUpsertDTO.class))).thenReturn(expectedResult);
+        when(userInformationService.saveCourse(any(CourseCreateDTO.class))).thenReturn(expectedResult);
         // Act
         ResponseEntity<Object> response = userInformationController.saveCourse(getCourseUpsertDTO());
         // Assert
@@ -169,7 +169,7 @@ public class UserInformationControllerTest
     public void testCourse_withServiceException_shouldReturnInternalServerError()
     {
         // given
-        when(userInformationService.upsertCourse(any(CourseUpsertDTO.class))).thenThrow(new DataServiceException("Course cannot be upserted!"));
+        when(userInformationService.saveCourse(any(CourseCreateDTO.class))).thenThrow(new DataServiceException("Course cannot be upserted!"));
         // Act
         ResponseEntity<Object> response = userInformationController.saveCourse(getCourseUpsertDTO());
         // Assert

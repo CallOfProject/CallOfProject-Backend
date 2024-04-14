@@ -140,4 +140,10 @@ public class UserManagementService implements IUserManagementService
     {
         return doForDataService(() -> m_serviceCallback.findUserWithProfileCallback(userId), "UserManagementService::findUserWithProfile");
     }
+
+    @Override
+    public ResponseMessage<Object> updateAboutMe(UUID userId, String aboutMe)
+    {
+        return doForDataService(() -> m_serviceCallback.updateAboutMeCallback(userId, aboutMe), "UserManagementService::updateAboutMe");
+    }
 }

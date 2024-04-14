@@ -1,6 +1,6 @@
 package callofproject.dev.authentication.mapper;
 
-import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
+import callofproject.dev.authentication.dto.environments.LinkCreateDTO;
 import callofproject.dev.authentication.dto.user_profile.LinkDTO;
 import callofproject.dev.authentication.dto.user_profile.LinksDTO;
 import callofproject.dev.repository.authentication.entity.Link;
@@ -18,10 +18,10 @@ public interface ILinkMapper
     /**
      * Maps a LinkUpsertDTO to a Link entity.
      *
-     * @param linkUpsertDTO The LinkUpsertDTO to be mapped.
+     * @param linkCreateDTO The LinkUpsertDTO to be mapped.
      * @return A Link entity representing the mapped LinkUpsertDTO.
      */
-    Link toLink(LinkUpsertDTO linkUpsertDTO);
+    Link toLink(LinkCreateDTO linkCreateDTO);
 
     /**
      * Maps a Link entity to a LinkDTO.

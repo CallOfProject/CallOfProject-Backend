@@ -7,9 +7,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public record UserProfileUpdateDTO(
         @JsonProperty("user_rate")
-        double userRate,
+        Double userRate,
         @JsonProperty("user_feedback_rate")
-        double userFeedbackRate,
+        Double userFeedbackRate,
         @JsonProperty("user_id")
         String userId,
         @JsonProperty("about_me")

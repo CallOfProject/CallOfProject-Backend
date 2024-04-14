@@ -12,19 +12,26 @@ import java.util.UUID;
 public record ExperienceDTO(
         @JsonProperty("experience_id")
         UUID experienceId,
+
         @JsonProperty("company_name")
         String companyName,
+
         String description,
+
         @JsonProperty("company_website_link")
         String companyWebsiteLink,
+
         @JsonProperty("start_date")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
         LocalDate startDate,
+
         @JsonProperty("finish_date")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
         LocalDate finishDate,
+
         @JsonProperty("is_continue")
         boolean isContinue,
+
         String position
 )
 {

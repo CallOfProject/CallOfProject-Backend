@@ -11,15 +11,17 @@ import java.util.UUID;
 /**
  * Data Transfer Object for a link.
  */
-public record LinkUpsertDTO(
+public record LinkCreateDTO(
         @JsonProperty("user_id")
         @Tag(name = "user_id", description = "type: UUID")
         @NotNull(message = "User ID cannot be null")
         UUID userId,
+
         @JsonProperty("link_title")
         @NotBlank(message = "Link title cannot be blank")
         @Size(max = 255, message = "Link title cannot exceed 255 characters")
         String linkTitle,
+
         @NotBlank(message = "Link cannot be blank")
         String link)
 {

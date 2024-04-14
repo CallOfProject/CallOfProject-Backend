@@ -4,7 +4,6 @@ import callofproject.dev.authentication.dto.UserProfileUpdateDTO;
 import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
 import callofproject.dev.authentication.service.usermanagement.UserManagementService;
 import callofproject.dev.data.common.clas.ErrorMessage;
-import callofproject.dev.library.exception.util.CopDataUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
+import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static callofproject.dev.library.exception.util.ExceptionUtil.subscribe;
 import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
@@ -94,9 +94,22 @@ public class UserManagementController
                                                     @RequestParam(value = "photo", required = false) MultipartFile photo,
                                                     @RequestParam(value = "cv", required = false) MultipartFile cv)
     {
-        var obj = CopDataUtil.doForDataService(() -> m_objectMapper.readValue(dto, UserProfileUpdateDTO.class), "ProjectSaveDTO");
+        var obj = doForDataService(() -> m_objectMapper.readValue(dto, UserProfileUpdateDTO.class), "ProjectSaveDTO");
 
         return subscribe(() -> ok(m_service.upsertUserProfile(obj, photo, cv)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    /**
+     * Find user with given id
+     *
+     * @return UserDTO wrapped in MessageResponseDTO
+     */
+    @PutMapping(value = "update/user/profile/about-me")
+    public ResponseEntity<Object> updateUserProfileMobile(@RequestParam("user_id") UUID userId,
+                                                          @RequestParam(value = "about_me") String aboutMe)
+    {
+        return subscribe(() -> ok(m_service.updateAboutMe(userId, aboutMe)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 

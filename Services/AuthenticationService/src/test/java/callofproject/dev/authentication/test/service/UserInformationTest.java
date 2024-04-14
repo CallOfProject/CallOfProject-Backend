@@ -3,10 +3,10 @@ package callofproject.dev.authentication.test.service;
 import callofproject.dev.authentication.DatabaseCleaner;
 import callofproject.dev.authentication.Injection;
 import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
-import callofproject.dev.authentication.dto.environments.CourseUpsertDTO;
-import callofproject.dev.authentication.dto.environments.EducationUpsertDTO;
-import callofproject.dev.authentication.dto.environments.ExperienceUpsertDTO;
-import callofproject.dev.authentication.dto.environments.LinkUpsertDTO;
+import callofproject.dev.authentication.dto.environments.CourseCreateDTO;
+import callofproject.dev.authentication.dto.environments.EducationCreateDTO;
+import callofproject.dev.authentication.dto.environments.ExperienceCreateDTO;
+import callofproject.dev.authentication.dto.environments.LinkCreateDTO;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.entity.Course;
 import callofproject.dev.repository.authentication.entity.Education;
@@ -84,21 +84,21 @@ public class UserInformationTest
         var savedUser2 = m_injection.getUserManagementService().saveUserCallback(user2);
 
 
-        link1 = (Link) m_injection.getUserInformationService().upsertLinkCallback(new LinkUpsertDTO(savedUser1.getObject().userId(), "Link Title", "http://link.com")).getObject();
-        link2 = (Link) m_injection.getUserInformationService().upsertLinkCallback(new LinkUpsertDTO(savedUser2.getObject().userId(), "Link Title", "http://link.com")).getObject();
+        link1 = (Link) m_injection.getUserInformationService().saveLinkCallback(new LinkCreateDTO(savedUser1.getObject().userId(), "Link Title", "http://link.com")).getObject();
+        link2 = (Link) m_injection.getUserInformationService().saveLinkCallback(new LinkCreateDTO(savedUser2.getObject().userId(), "Link Title", "http://link.com")).getObject();
 
 
-        education1 = (Education) m_injection.getUserInformationService().upsertEducationCallback(new EducationUpsertDTO(savedUser1.getObject().userId(), "YASAR UNIVERSITY",
+        education1 = (Education) m_injection.getUserInformationService().saveEducationCallback(new EducationCreateDTO(savedUser1.getObject().userId(), "YASAR UNIVERSITY",
                 "ENGINEERING", "SOFTWARE ENGINEERING", LocalDate.now(), LocalDate.now().plusYears(4), true, 3.5)).getObject();
-        education2 = (Education) m_injection.getUserInformationService().upsertEducationCallback(new EducationUpsertDTO(savedUser2.getObject().userId(),
+        education2 = (Education) m_injection.getUserInformationService().saveEducationCallback(new EducationCreateDTO(savedUser2.getObject().userId(),
                 "EGE UNIVERSITY", "ENGINEERING", "SOFTWARE ENGINEERING", LocalDate.now(), LocalDate.now().plusYears(4), true, 2.5)).getObject();
 
-        experience1 = (Experience) m_injection.getUserInformationService().upsertExperienceCallback(new ExperienceUpsertDTO(savedUser1.getObject().userId(), "Company Name", "Description", "http://website.com", LocalDate.now(), LocalDate.now().plusYears(2), true, "Job Definition")).getObject();
-        experience2 = (Experience) m_injection.getUserInformationService().upsertExperienceCallback(new ExperienceUpsertDTO(savedUser2.getObject().userId(), "Company Name", "Description", "http://website.com", LocalDate.now(), LocalDate.now().plusYears(2), true, "Job Definition")).getObject();
+        experience1 = (Experience) m_injection.getUserInformationService().saveExperienceCallback(new ExperienceCreateDTO(savedUser1.getObject().userId(), "Company Name", "Description", "http://website.com", LocalDate.now(), LocalDate.now().plusYears(2), true, "Job Definition")).getObject();
+        experience2 = (Experience) m_injection.getUserInformationService().saveExperienceCallback(new ExperienceCreateDTO(savedUser2.getObject().userId(), "Company Name", "Description", "http://website.com", LocalDate.now(), LocalDate.now().plusYears(2), true, "Job Definition")).getObject();
 
 
-        course1 = (Course) m_injection.getUserInformationService().upsertCourseCallback(new CourseUpsertDTO(savedUser1.getObject().userId(), "Organizator", "Course Name", LocalDate.now(), LocalDate.now().plusMonths(6), false, "Description")).getObject();
-        course2 = (Course) m_injection.getUserInformationService().upsertCourseCallback(new CourseUpsertDTO(savedUser2.getObject().userId(), "Organizator", "Course Name", LocalDate.now(), LocalDate.now().plusMonths(6), false, "Description")).getObject();
+        course1 = (Course) m_injection.getUserInformationService().saveCourseCallback(new CourseCreateDTO(savedUser1.getObject().userId(), "Organizator", "Course Name", LocalDate.now(), LocalDate.now().plusMonths(6), false, "Description")).getObject();
+        course2 = (Course) m_injection.getUserInformationService().saveCourseCallback(new CourseCreateDTO(savedUser2.getObject().userId(), "Organizator", "Course Name", LocalDate.now(), LocalDate.now().plusMonths(6), false, "Description")).getObject();
 
         assertNotNull(savedUser1);
         assertNotNull(savedUser2);
@@ -118,64 +118,64 @@ public class UserInformationTest
     @Test
     public void testUpsertEducation_withValidData_shouldReturnSuccessResponse()
     {
-        EducationUpsertDTO dto = new EducationUpsertDTO(user2Id, "DOKUZ EYLUL UNIVERSITY", "Department", "Description", LocalDate.now(), LocalDate.now().plusYears(4), true, 3.5);
-        var response = m_injection.getUserInformationService().upsertEducationCallback(dto);
+        EducationCreateDTO dto = new EducationCreateDTO(user2Id, "DOKUZ EYLUL UNIVERSITY", "Department", "Description", LocalDate.now(), LocalDate.now().plusYears(4), true, 3.5);
+        var response = m_injection.getUserInformationService().saveEducationCallback(dto);
         assertNotNull(response);
     }
 
     @Test
     public void testUpsertEducation_withInvalidData_shouldThrowException()
     {
-        EducationUpsertDTO dto = new EducationUpsertDTO(UUID.randomUUID(), "YASAR UNIVERSITY",
+        EducationCreateDTO dto = new EducationCreateDTO(UUID.randomUUID(), "YASAR UNIVERSITY",
                 "ENGINEERING", "SOFTWARE ENGINEERING", null, null, true, -1);
-        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().upsertEducationCallback(dto));
+        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().saveEducationCallback(dto));
     }
 
     @Test
     public void testUpsertExperience_withValidData_shouldReturnSuccessResponse()
     {
-        ExperienceUpsertDTO dto = new ExperienceUpsertDTO(user1Id, "Company Name", "Description", "http://website.com", LocalDate.now(), LocalDate.now().plusYears(2), true, "Job Definition");
-        var response = m_injection.getUserInformationService().upsertExperienceCallback(dto);
+        ExperienceCreateDTO dto = new ExperienceCreateDTO(user1Id, "Company Name", "Description", "http://website.com", LocalDate.now(), LocalDate.now().plusYears(2), true, "Job Definition");
+        var response = m_injection.getUserInformationService().saveExperienceCallback(dto);
         assertNotNull(response);
     }
 
     @Test
     public void testUpsertExperience_withInvalidData_shouldThrowException()
     {
-        ExperienceUpsertDTO dto = new ExperienceUpsertDTO(user2Id, "", "", "", null, null, false, ""); // Invalid data
-        assertThrows(DataIntegrityViolationException.class, () -> m_injection.getUserInformationService().upsertExperienceCallback(dto));
+        ExperienceCreateDTO dto = new ExperienceCreateDTO(user2Id, "", "", "", null, null, false, ""); // Invalid data
+        assertThrows(DataIntegrityViolationException.class, () -> m_injection.getUserInformationService().saveExperienceCallback(dto));
     }
 
     @Test
     public void testUpsertCourse_withValidData_shouldReturnSuccessResponse()
     {
         System.out.println("user1Id: " + user1Id);
-        CourseUpsertDTO dto = new CourseUpsertDTO(user1Id, "Organizator", "Course Name", LocalDate.now(),
+        CourseCreateDTO dto = new CourseCreateDTO(user1Id, "Organizator", "Course Name", LocalDate.now(),
                 LocalDate.now(), false, "Description");
-        var response = m_injection.getUserInformationService().upsertCourseCallback(dto);
+        var response = m_injection.getUserInformationService().saveCourseCallback(dto);
         assertNotNull(response);
     }
 
     @Test
     public void testUpsertCourse_withInvalidData_shouldThrowException()
     {
-        CourseUpsertDTO dto = new CourseUpsertDTO(user2Id, "", "", null, null, false, ""); // Invalid data
-        assertThrows(DataIntegrityViolationException.class, () -> m_injection.getUserInformationService().upsertCourseCallback(dto));
+        CourseCreateDTO dto = new CourseCreateDTO(user2Id, "", "", null, null, false, ""); // Invalid data
+        assertThrows(DataIntegrityViolationException.class, () -> m_injection.getUserInformationService().saveCourseCallback(dto));
     }
 
     @Test
     public void testUpsertLink_withValidData_shouldReturnSuccessResponse()
     {
-        LinkUpsertDTO dto = new LinkUpsertDTO(user1Id, "Link Title", "http://link.com");
-        var response = m_injection.getUserInformationService().upsertLinkCallback(dto);
+        LinkCreateDTO dto = new LinkCreateDTO(user1Id, "Link Title", "http://link.com");
+        var response = m_injection.getUserInformationService().saveLinkCallback(dto);
         assertNotNull(response);
     }
 
     @Test
     public void testUpsertLink_withInvalidData_shouldThrowException()
     {
-        LinkUpsertDTO dto = new LinkUpsertDTO(user1Id, null, null); // Invalid data
-        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().upsertLinkCallback(dto));
+        LinkCreateDTO dto = new LinkCreateDTO(user1Id, null, null); // Invalid data
+        assertThrows(DataServiceException.class, () -> m_injection.getUserInformationService().saveLinkCallback(dto));
     }
 
     @Test

@@ -292,4 +292,20 @@ public class UserManagementServiceCallback
 
         return m_mapperConfig.userProfileMapper.toUserProfileDTO(userProfile, educations, experiences, courses, links);
     }
+
+    public ResponseMessage<Object> updateAboutMeCallback(UUID userId, String aboutMe)
+    {
+        var user = getUserIfExists(userId);
+
+        var userProfile = m_serviceHelper.getUserProfileServiceHelper().findUserProfileByUserId(user.getUserId());
+
+        if (userProfile.isEmpty())
+            throw new DataServiceException("User profile does not exists!");
+
+        userProfile.get().setAboutMe(aboutMe);
+
+        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(userProfile.get());
+
+        return new ResponseMessage<>("About me updated successfully!", 200, getUserProfile(user));
+    }
 }
