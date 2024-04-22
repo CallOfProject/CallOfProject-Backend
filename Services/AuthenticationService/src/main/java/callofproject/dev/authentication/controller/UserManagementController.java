@@ -113,6 +113,37 @@ public class UserManagementController
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
+
+    /**
+     * Upload user profile photo.
+     *
+     * @param userId represent the user id
+     * @param file   represent the file
+     * @return boolean value success or not
+     */
+    @PostMapping("upload/profile-photo")
+    public ResponseEntity<Object> uploadProfilePhoto(@RequestParam("uid") UUID userId, @RequestParam MultipartFile file)
+    {
+        return subscribe(() -> ok(m_service.uploadUserProfilePhoto(userId, file)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+
+    /**
+     * Upload user profile photo.
+     *
+     * @param userId represent the user id
+     * @param file   represent the file
+     * @return boolean value success or not
+     */
+    @PostMapping("upload/cv")
+    public ResponseEntity<Object> uploadUserCv(@RequestParam("uid") UUID userId, @RequestParam MultipartFile file)
+    {
+        return subscribe(() -> ok(m_service.uploadUserCv(userId, file)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+
     /**
      * Find user Profile with username
      *

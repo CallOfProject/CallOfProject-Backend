@@ -85,6 +85,6 @@ public class KafkaConsumer
                 .setNotificationId(savedNotification.getId())
                 .build();
 
-        messagingTemplate.convertAndSend("/topic/user-" + dto.getToUserId(), dto);
+        messagingTemplate.convertAndSend("/topic/user-%s".formatted(dto.getToUserId()), dto);
     }
 }

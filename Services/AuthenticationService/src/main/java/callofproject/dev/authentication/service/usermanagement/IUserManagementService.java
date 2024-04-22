@@ -89,4 +89,22 @@ public interface IUserManagementService
      * @return MessageResponseDTO.
      */
     ResponseMessage<Object> updateAboutMe(UUID userId, String aboutMe);
+
+    /**
+     * Upload user profile photo.
+     *
+     * @param userId represent the user id.
+     * @param file   represent the file.
+     * @return ResponseMessage.
+     */
+    ResponseMessage<Object> uploadUserProfilePhoto(UUID userId, MultipartFile file);
+
+    /**
+     * Upload user cv.
+     *
+     * @param userId represent the user id.
+     * @param file   represent the file.
+     * @return ResponseMessage.
+     */
+    ResponseMessage<Object> uploadUserCv(UUID userId, MultipartFile file);
 }

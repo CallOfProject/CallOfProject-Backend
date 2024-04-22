@@ -146,4 +146,16 @@ public class UserManagementService implements IUserManagementService
     {
         return doForDataService(() -> m_serviceCallback.updateAboutMeCallback(userId, aboutMe), "UserManagementService::updateAboutMe");
     }
+
+    @Override
+    public ResponseMessage<Object> uploadUserProfilePhoto(UUID userId, MultipartFile file)
+    {
+        return doForDataService(() -> m_serviceCallback.uploadUserProfilePhotoCallback(userId, file), "UserManagementService::uploadUserProfilePhoto");
+    }
+
+    @Override
+    public ResponseMessage<Object> uploadUserCv(UUID userId, MultipartFile file)
+    {
+        return doForDataService(() -> m_serviceCallback.uploadUserCvCallback(userId, file), "UserManagementService::uploadUserCv");
+    }
 }

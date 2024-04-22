@@ -20,7 +20,6 @@ import static callofproject.dev.service.notification.util.BeanName.NOTIFICATION_
 @EnableMongoRepositories(basePackages = {NO_SQL_REPOSITORY_BEAN_NAME})
 @EnableDiscoveryClient
 @EnableWebSocket
-@EnableWebSocketMessageBroker
 @SecurityScheme(
         name = "Authorization",
         type = SecuritySchemeType.HTTP,

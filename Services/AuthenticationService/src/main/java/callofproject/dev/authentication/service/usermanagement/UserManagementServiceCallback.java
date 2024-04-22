@@ -308,4 +308,32 @@ public class UserManagementServiceCallback
 
         return new ResponseMessage<>("About me updated successfully!", 200, getUserProfile(user));
     }
+
+    public ResponseMessage<Object> uploadUserProfilePhotoCallback(UUID userId, MultipartFile file)
+    {
+        var user = getUserIfExists(userId);
+
+        var compressedPhoto = file != null && file.getSize() > 0 ? m_imageService.compressImageToJPEG(file) : null;
+
+        var profilePhotoUrl = compressedPhoto != null ? uploadProfilePhoto(compressedPhoto, user.getUserProfile(), user) : null;
+
+        user.getUserProfile().setProfilePhoto(profilePhotoUrl);
+
+        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(user.getUserProfile());
+
+        return new ResponseMessage<>("Profile photo uploaded successfully!", 200, profilePhotoUrl);
+    }
+
+    public ResponseMessage<Object> uploadUserCvCallback(UUID userId, MultipartFile cvFile)
+    {
+        var user = getUserIfExists(userId);
+
+        var cvUrl = cvFile != null && cvFile.getSize() > 0 ? uploadCV(cvFile, user.getUserProfile(), user) : null;
+
+        user.getUserProfile().setCv(cvUrl);
+
+        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(user.getUserProfile());
+
+        return new ResponseMessage<>("CV uploaded successfully!", 200, cvUrl);
+    }
 }
