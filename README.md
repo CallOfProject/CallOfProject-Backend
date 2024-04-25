@@ -1,6 +1,9 @@
 # Call-Of-Project Backend
 ![cop_logo](https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/651d115b-fdbb-41c2-84b5-a6ad113d1088)
 
+### Author
+- **Author:** [Nuri Can ÖZTÜRK](https://github.com/nuricanozturk01)
+
 # Contents
 
 - [Javadoc Documentation](#documentation)
