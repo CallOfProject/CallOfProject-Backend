@@ -1,16 +1,19 @@
 package callofproject.dev.service.notification.service;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
+import callofproject.dev.data.common.clas.ResponseMessage;
+import callofproject.dev.data.common.status.Status;
 import callofproject.dev.library.exception.ISupplier;
 import callofproject.dev.nosql.dal.NotificationServiceHelper;
 import callofproject.dev.nosql.entity.Notification;
 import callofproject.dev.service.notification.dto.NotificationDTO;
+import callofproject.dev.util.stream.StreamUtil;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
@@ -89,7 +92,7 @@ public class NotificationService
         var notificationPageable = doForDataService(supplier, "NotificationService::findAllNotificationsByNotificationOwnerIdAndSortCreatedAt");
         var notifications = notificationPageable.getContent();
 
-        var list = toStream(notifications)
+        var list = new ArrayList<>(toStream(notifications)
                 .map(notification -> new NotificationDTO.Builder()
                         .setNotificationData(notification.getNotificationData())
                         .setNotificationLink(notification.getNotificationLink())
@@ -106,10 +109,42 @@ public class NotificationService
                         .setNotificationRejectLink(notification.getNotificationRejectLink())
                         .setNotificationId(notification.getId())
                         .build())
-                .toList();
+                .toList());
 
-
+        list.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
         return new MultipleResponseMessagePageable<>(notificationPageable.getTotalPages(), page, notificationPageable.getNumberOfElements(),
                 "Notifications found!", list);
+    }
+
+    public ResponseMessage<Object> markAllNotificationRead(UUID userId)
+    {
+        try
+        {
+            var allNotifications = m_notificationServiceHelper.findAllNotificationsByNotificationOwnerId(userId);
+            allNotifications.forEach(notification -> notification.setIsRead(true));
+            doForDataService(() -> m_notificationServiceHelper.saveAllNotifications(allNotifications), "NotificationService::markAllRead");
+            return new ResponseMessage<>("All notifications are marked as read!", Status.OK, true);
+        } catch (Throwable e)
+        {
+            return new ResponseMessage<>("An error occurred while marking all notifications as read!", Status.INTERNAL_SERVER_ERROR, false);
+        }
+    }
+
+
+    public ResponseMessage<Object> countUnreadNotifications(UUID userId)
+    {
+        var notifications = doForDataService(() -> m_notificationServiceHelper.findAllUnreadNotificationsByNotificationOwnerId(userId),
+                "NotificationService::countUnreadNotifications");
+
+
+        return new ResponseMessage<>("Found notifications", Status.OK, StreamUtil.toStream(notifications).count());
+    }
+
+    public ResponseMessage<Object> clearAllNotificationsByNotificationOwnerId(UUID userId)
+    {
+        var response = doForDataService(() -> m_notificationServiceHelper.removeAllNotificationsByNotificationOwnerId(userId),
+                "NotificationService::clearAllNotificationsByNotificationOwnerId");
+
+        return new ResponseMessage<>(response ? "All notifications are cleared!" : "An error occurred while clearing all notifications!", Status.OK, response);
     }
 }

@@ -47,7 +47,8 @@ public class FilterService
      */
     public MultipleResponseMessagePageable<Object> filterProjects(ProjectFilterDTO dto, int page)
     {
-        var spec = Specification.where(filterByProfessionalLevel(dto.professionLevel()))
+        var spec = Specification
+                .where(filterByProfessionalLevel(dto.professionLevel()))
                 .and(filterByProjectLevel(dto.projectLevel()))
                 .and(filterByDegree(dto.degree()))
                 .and(filterByFeedbackTimeRange(dto.feedbackTimeRange()))

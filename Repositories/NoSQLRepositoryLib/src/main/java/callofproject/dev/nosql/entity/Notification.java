@@ -30,11 +30,13 @@ public class Notification
     private String notificationTitle;
     private LocalDateTime createdAt;
     private NotificationDataType notificationDataType;
-
     private UUID requestId;
+    private boolean isRead;
+
 
     public Notification()
     {
+        isRead = false;
     }
 
     public static class Builder
@@ -158,11 +160,21 @@ public class Notification
         return notificationDataType;
     }
 
+    public boolean isRead()
+    {
+        return isRead;
+    }
+
+    public void setIsRead(boolean isRead)
+    {
+        this.isRead = isRead;
+    }
 
     public UUID getRequestId()
     {
         return requestId;
     }
+
     public String getId()
     {
         return id;

@@ -101,7 +101,7 @@ public class NotificationServiceHelper
      */
     public Page<Notification> findAllNotificationsByNotificationOwnerIdAndSortCreatedAt(UUID ownerId, Pageable pageable)
     {
-        return doForRepository(() -> m_notificationRepository.findByNotificationOwnerIdOrderByCreatedAt(ownerId, pageable), "NotificationServiceHelper::findAllNotificationsByNotificationOwnerId");
+        return doForRepository(() -> m_notificationRepository.findByNotificationOwnerIdOrderByCreatedAtDesc(ownerId, pageable), "NotificationServiceHelper::findAllNotificationsByNotificationOwnerId");
     }
 
     /**
@@ -114,5 +114,42 @@ public class NotificationServiceHelper
     {
         doForRepository(() -> m_notificationRepository.deleteNotificationById(id), "NotificationServiceHelper::deleteNotificationById");
         return true;
+    }
+
+
+    /**
+     * Save all notifications
+     *
+     * @param notifications notifications
+     * @return Iterable<Notification>
+     */
+    public Iterable<Notification> saveAllNotifications(Iterable<Notification> notifications)
+    {
+        return doForRepository(() -> m_notificationRepository.saveAll(notifications),
+                "NotificationServiceHelper::saveAllNotifications");
+    }
+
+    /**
+     * Find all unread notifications by notification owner id
+     *
+     * @param ownerId notification owner id
+     * @return Iterable<Notification>
+     */
+    public Iterable<Notification> findAllUnreadNotificationsByNotificationOwnerId(UUID ownerId)
+    {
+        return doForRepository(() -> m_notificationRepository.findAllByNotificationOwnerIdAndRead(ownerId, false),
+                "NotificationServiceHelper::findAllUnreadNotificationsByNotificationOwnerId");
+    }
+
+    /**
+     * Find all notifications by notification owner id
+     *
+     * @param ownerId notification owner id
+     * @return Iterable<Notification>
+     */
+    public Iterable<Notification> findAllReadNotificationsByNotificationOwnerId(UUID ownerId)
+    {
+        return doForRepository(() -> m_notificationRepository.findAllReadNotificationsByNotificationOwnerId(ownerId),
+                "NotificationServiceHelper::findAllNotificationsByNotificationOwnerId");
     }
 }

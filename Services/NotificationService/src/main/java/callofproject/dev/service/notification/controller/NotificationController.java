@@ -3,10 +3,7 @@ package callofproject.dev.service.notification.controller;
 import callofproject.dev.service.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -39,10 +36,50 @@ public class NotificationController
      * @param page   represent the page.
      * @return ResponseEntity.
      */
-    @GetMapping("find/all/sort/created-at")
+    @GetMapping("/find/all/sort/created-at")
     public ResponseEntity<Object> findAllNotificationsByNotificationOwnerIdAndSortCreatedAt(@RequestParam("uid") UUID userId, @RequestParam("p") int page)
     {
         return subscribe(() -> ok(m_notificationService.findAllNotificationsByNotificationOwnerIdAndSortCreatedAt(userId, page)),
+                msg -> internalServerError().body(msg.getMessage()));
+    }
+
+
+    /**
+     * Find unread notifications by notification owner id.
+     *
+     * @param userId represent the user id.
+     * @return ResponseEntity.
+     */
+    @PostMapping("/mark/all/read")
+    public ResponseEntity<Object> markAllNotificationRead(@RequestParam("uid") UUID userId)
+    {
+        return subscribe(() -> ok(m_notificationService.markAllNotificationRead(userId)),
+                msg -> internalServerError().body(msg.getMessage()));
+    }
+
+    /**
+     * Find all notifications by notification owner id and sort created at.
+     *
+     * @param userId represent the user id.
+     * @return ResponseEntity.
+     */
+    @GetMapping("/find/all/count/unread")
+    public ResponseEntity<Object> countUnreadNotificationsByNotificationOwnerId(@RequestParam("uid") UUID userId)
+    {
+        return subscribe(() -> ok(m_notificationService.countUnreadNotifications(userId)),
+                msg -> internalServerError().body(msg.getMessage()));
+    }
+
+    /**
+     * Clear all notifications by notification owner id.
+     *
+     * @param userId represent the user id.
+     * @return ResponseEntity.
+     */
+    @DeleteMapping("/clear/all")
+    public ResponseEntity<Object> clearAllNotificationsByNotificationOwnerId(@RequestParam("uid") UUID userId)
+    {
+        return subscribe(() -> ok(m_notificationService.clearAllNotificationsByNotificationOwnerId(userId)),
                 msg -> internalServerError().body(msg.getMessage()));
     }
 }

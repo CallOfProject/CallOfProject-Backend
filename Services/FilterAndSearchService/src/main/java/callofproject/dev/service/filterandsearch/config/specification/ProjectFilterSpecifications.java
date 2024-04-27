@@ -103,6 +103,13 @@ public final class ProjectFilterSpecifications
                 interviewType == null ? criteriaBuilder.conjunction() : criteriaBuilder.equal(root.get("m_interviewType"), interviewType);
     }
 
+
+    /**
+     * This method creates a specification for filtering projects by a project owner's profession level.
+     *
+     * @param projectStatus The project status to filter by.
+     * @return The specification for filtering projects by a project status.
+     */
     public static Specification<Project> filterByProjectStatus(EProjectStatus projectStatus)
     {
         return (root, query, criteriaBuilder) ->

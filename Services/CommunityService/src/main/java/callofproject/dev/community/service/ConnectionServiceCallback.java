@@ -69,6 +69,8 @@ public class ConnectionServiceCallback
 
         // Remove connection request
         user.getConnectionRequests().removeIf(u -> u.getUserId().equals(friend.getUserId()));
+        friend.getConnectionRequests().removeIf(u -> u.getUserId().equals(user.getUserId()));
+
 
         // Add connection if answer is true
         if (answer)
