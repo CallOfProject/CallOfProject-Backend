@@ -1,13 +1,7 @@
 package callofproject.dev.data.community.dal;
 
-import callofproject.dev.data.community.entity.Community;
-import callofproject.dev.data.community.entity.Project;
-import callofproject.dev.data.community.entity.ProjectParticipant;
-import callofproject.dev.data.community.entity.User;
-import callofproject.dev.data.community.repository.ICommunityRepository;
-import callofproject.dev.data.community.repository.IProjectParticipantRepository;
-import callofproject.dev.data.community.repository.IProjectRepository;
-import callofproject.dev.data.community.repository.IUserRepository;
+import callofproject.dev.data.community.entity.*;
+import callofproject.dev.data.community.repository.*;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -21,27 +15,30 @@ import static callofproject.dev.library.exception.util.CopDataUtil.doForReposito
 public class CommunityServiceHelper
 {
     private final IUserRepository m_userRepository;
-    private final ICommunityRepository m_communityRepository;
     private final IProjectRepository m_projectRepository;
     private final IProjectParticipantRepository m_projectParticipantRepository;
+    private final IUserConnectionRepository m_userConnectionRepository;
+    private final IConnectionRequestRepository m_connectionRequestRepository;
+    private final IBlockConnectionRepository m_blockConnectionRepository;
 
-    public CommunityServiceHelper(IUserRepository userRepository, ICommunityRepository communityRepository, IProjectRepository projectRepository, IProjectParticipantRepository projectParticipantRepository)
+    public CommunityServiceHelper(IUserRepository userRepository, IProjectRepository projectRepository,
+                                  IProjectParticipantRepository projectParticipantRepository,
+                                  IUserConnectionRepository userConnectionRepository,
+                                  IConnectionRequestRepository connectionRequestRepository,
+                                  IBlockConnectionRepository blockConnectionRepository)
     {
         m_userRepository = userRepository;
-        m_communityRepository = communityRepository;
         m_projectRepository = projectRepository;
         m_projectParticipantRepository = projectParticipantRepository;
+        m_userConnectionRepository = userConnectionRepository;
+        m_connectionRequestRepository = connectionRequestRepository;
+        m_blockConnectionRepository = blockConnectionRepository;
     }
 
     // ------------------- Upsert -------------------
     public User upsertUser(User user)
     {
         return doForRepository(() -> m_userRepository.save(user), "CommunityServiceHelper::upsertUser");
-    }
-
-    public Community upsertCommunity(Community community)
-    {
-        return doForRepository(() -> m_communityRepository.save(community), "CommunityServiceHelper::upsertCommunity");
     }
 
     public Project upsertProject(Project project)
@@ -54,17 +51,37 @@ public class CommunityServiceHelper
         return doForRepository(() -> m_projectParticipantRepository.save(projectParticipant), "CommunityServiceHelper::upsertProjectParticipant");
     }
 
+    public UserConnection upsertUserConnection(UserConnection userConnection)
+    {
+        return doForRepository(() -> m_userConnectionRepository.save(userConnection), "CommunityServiceHelper::upsertUserConnection");
+    }
+
+    public void upsertConnectionRequest(ConnectionRequest request)
+    {
+        doForRepository(() -> m_connectionRequestRepository.save(request), "CommunityServiceHelper::upsertConnectionRequest");
+    }
+
+    public void upsertBlockConnection(BlockConnection blockConnection)
+    {
+        doForRepository(() -> m_blockConnectionRepository.save(blockConnection), "CommunityServiceHelper::upsertBlockConnection");
+    }
+
+    public void upsertUserConnections(Iterable<UserConnection> userConnections)
+    {
+        doForRepository(() -> m_userConnectionRepository.saveAll(userConnections), "CommunityServiceHelper::upsertUserConnections");
+    }
+
+
+    public void deleteUserConnection(User user, UserConnection userConnection) {
+        user.removeUserConnection(userConnection);
+        doForRepository(() -> m_userConnectionRepository.delete(userConnection), "CommunityServiceHelper::deleteUserConnection");
+    }
     // ------------------- Upsert -------------------
     //--------------------------------------------------------------------------------
     // ------------------- Remove -------------------
     public void deleteUser(User user)
     {
         doForRepository(() -> m_userRepository.delete(user), "CommunityServiceHelper::deleteUser");
-    }
-
-    public void deleteCommunity(Community community)
-    {
-        doForRepository(() -> m_communityRepository.delete(community), "CommunityServiceHelper::deleteCommunity");
     }
 
     public void deleteProject(Project project)
@@ -75,6 +92,21 @@ public class CommunityServiceHelper
     public void deleteProjectParticipant(ProjectParticipant projectParticipant)
     {
         doForRepository(() -> m_projectParticipantRepository.delete(projectParticipant), "CommunityServiceHelper::deleteProjectParticipant");
+    }
+
+    public void deleteUserConnection(UserConnection userConnection)
+    {
+        doForRepository(() -> m_userConnectionRepository.delete(userConnection), "CommunityServiceHelper::deleteUserConnection");
+    }
+
+    public void deleteConnectionRequest(ConnectionRequest request)
+    {
+        doForRepository(() -> m_connectionRequestRepository.delete(request), "CommunityServiceHelper::deleteConnectionRequest");
+    }
+
+    public void deleteBlockConnection(BlockConnection blockConnection)
+    {
+        doForRepository(() -> m_blockConnectionRepository.delete(blockConnection), "CommunityServiceHelper::deleteBlockConnection");
     }
 
     // ------------------- Remove -------------------
@@ -95,41 +127,33 @@ public class CommunityServiceHelper
         return doForRepository(() -> m_projectRepository.findById(projectId), "CommunityServiceHelper::findProjectById");
     }
 
-    public Optional<Community> findCommunityById(UUID communityId)
-    {
-        return doForRepository(() -> m_communityRepository.findById(communityId), "CommunityServiceHelper::findCommunityById");
-    }
-
 
     public Optional<Project> findCommunityByProjectId(UUID projectId)
     {
         return doForRepository(() -> m_projectRepository.findById(projectId), "CommunityServiceHelper::findProjectById");
     }
 
-    // ------------------- Find -------------------
-
-    public Iterable<Community> findAllCommunities()
+    public Iterable<UserConnection> findUserConnectionsByUserId(UUID userId)
     {
-        return doForRepository(m_communityRepository::findAll, "CommunityServiceHelper::findAllCommunities");
+        return doForRepository(() -> m_userConnectionRepository.findUserConnectionsByUserId(userId), "CommunityServiceHelper::findUserConnectionsByUserId");
     }
+
+    public Iterable<ConnectionRequest> findConnectionRequestsByUserId(UUID userId)
+    {
+        return doForRepository(() -> m_connectionRequestRepository.findConnectionRequestsByRequesterId(userId), "CommunityServiceHelper::findConnectionRequestsByUserId");
+    }
+
+    public Iterable<BlockConnection> findBlockedConnectionsByUserId(UUID userId)
+    {
+        return doForRepository(() -> m_blockConnectionRepository.findBlockedConnectionsByUserId(userId), "CommunityServiceHelper::findBlockedConnectionsByUserId");
+    }
+
+    // ------------------- Find -------------------
 
     public Iterable<User> findAllUsers()
     {
         return doForRepository(m_userRepository::findAll, "CommunityServiceHelper::findAllUsers");
     }
-
-    public Iterable<Community> findAllCommunitiesByCommunityNameContainsIgnoreCase(String communityName)
-    {
-        return doForRepository(() -> m_communityRepository.findAllByCommunityNameContainsIgnoreCase(communityName),
-                "CommunityServiceHelper::findAllCommunitiesByCommunityNameContainsIgnoreCase");
-    }
-
-    public Iterable<Community> findAllCommunitiesByExactCommunityName(String communityName, String communityType)
-    {
-        return doForRepository(() -> m_communityRepository.findAllByExactCommunityName(communityName, communityType),
-                "CommunityServiceHelper::findAllCommunitiesByExactCommunityName");
-    }
-
 
     public Optional<ProjectParticipant> findProjectParticipantByProjectIdAndUserId(UUID projectId, UUID userId)
     {
@@ -156,4 +180,5 @@ public class CommunityServiceHelper
     {
         return doForRepository(() -> m_projectRepository.save(project), "CommunityServiceHelper::saveProject");
     }
+
 }

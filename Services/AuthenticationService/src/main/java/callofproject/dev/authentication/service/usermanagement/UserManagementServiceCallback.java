@@ -15,6 +15,7 @@ import callofproject.dev.repository.authentication.dal.UserManagementServiceHelp
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.entity.UserProfile;
 import callofproject.dev.service.jwt.JwtUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,6 +38,9 @@ public class UserManagementServiceCallback
     private final MapperConfiguration m_mapperConfig;
     private final S3Service m_storageService;
     private final ImageService m_imageService;
+
+    @Value("${user.profile.default_pp}")
+    private String defaultProfilePhoto;
 
     /**
      * Instantiates a new User management service callback.
@@ -68,7 +72,39 @@ public class UserManagementServiceCallback
         user.setAccountBlocked(true);
 
         var userProfile = new UserProfile();
+        userProfile.setProfilePhoto(defaultProfilePhoto);
+        userProfile.setUser(user);
+        user.setUserProfile(userProfile);
 
+        var savedUser = m_serviceHelper.getUserServiceHelper().saveUser(user);
+
+        if (savedUser == null)
+            throw new DataServiceException("User cannot be saved!");
+
+        var claims = new HashMap<String, Object>();
+        var authorities = JwtUtil.populateAuthorities(user.getRoles());
+        claims.put("authorities", authorities);
+
+        var token = JwtUtil.generateToken(claims, user.getUsername());
+        var refreshToken = JwtUtil.generateToken(claims, user.getUsername());
+
+        return new ResponseMessage<>("User saved successfully!", 200, new UserSaveDTO(token, refreshToken, true, savedUser.getUserId()));
+    }
+
+
+    /**
+     * Save user with given dto class.
+     *
+     * @param userDTO represent the user dto class.
+     * @return UserSaveDTO class.
+     */
+    public ResponseMessage<UserSaveDTO> saveUserForMobileCallback(UserSignUpRequestDTO userDTO)
+    {
+        var user = m_mapperConfig.userMapper.toUser(userDTO);
+        user.setAccountBlocked(false);
+
+        var userProfile = new UserProfile();
+        userProfile.setProfilePhoto(defaultProfilePhoto);
         userProfile.setUser(user);
         user.setUserProfile(userProfile);
 
@@ -219,7 +255,7 @@ public class UserManagementServiceCallback
 
         var kafkaMessage = new UserKafkaDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(),
                 user.getMiddleName(), user.getLastName(), EOperation.CREATE, user.getPassword(), user.getRoles(),
-                user.getDeleteAt(), 0, 0, 0);
+                user.getDeleteAt(), 0, 0, 0, user.getUserProfile().getProfilePhoto());
 
         m_userProducer.sendMessage(kafkaMessage);
     }
@@ -336,4 +372,6 @@ public class UserManagementServiceCallback
 
         return new ResponseMessage<>("CV uploaded successfully!", 200, cvUrl);
     }
+
+
 }

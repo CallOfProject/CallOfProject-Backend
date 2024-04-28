@@ -69,6 +69,20 @@ public class AuthenticationController
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
+
+    /**
+     * Register to application.
+     *
+     * @param request represent the Register information.
+     * @return if success AuthenticationResponse else return ErrorMessage.
+     */
+    @PostMapping("/register/mobile") //TODO: Future, this will be removed and replaced with OTP
+    public ResponseEntity<Object> registerForMobile(@Valid @RequestBody RegisterRequest request)
+    {
+        return subscribe(() -> ok(m_authenticationService.registerForMobile(request)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
     /**
      * Verify the user and register to application.
      *

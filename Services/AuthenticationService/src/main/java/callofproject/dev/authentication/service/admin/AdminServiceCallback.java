@@ -258,7 +258,7 @@ public class AdminServiceCallback
             var toProjectServiceDTO = new UserKafkaDTO(savedUser.get().getUserId(), savedUser.get().getUsername(), savedUser.get().getEmail(),
                     savedUser.get().getFirstName(), savedUser.get().getMiddleName(), savedUser.get().getLastName(), operation,
                     savedUser.get().getPassword(), savedUser.get().getRoles(),
-                    savedUser.get().getDeleteAt(), 0, 0, 0);
+                    savedUser.get().getDeleteAt(), 0, 0, 0, savedUser.get().getUserProfile().getProfilePhoto());
 
             m_kafkaProducer.sendMessage(toProjectServiceDTO);
         }
@@ -279,7 +279,7 @@ public class AdminServiceCallback
             var toProjectServiceDTO = new UserKafkaDTO(savedUser.get().getUserId(), savedUser.get().getUsername(), savedUser.get().getEmail(),
                     savedUser.get().getFirstName(), savedUser.get().getMiddleName(), savedUser.get().getLastName(), operation,
                     savedUser.get().getPassword(), savedUser.get().getRoles(),
-                    savedUser.get().getDeleteAt(), 0, 0, 0);
+                    savedUser.get().getDeleteAt(), 0, 0, 0, savedUser.get().getUserProfile().getProfilePhoto());
 
             m_kafkaProducer.sendMessage(toProjectServiceDTO);
         }

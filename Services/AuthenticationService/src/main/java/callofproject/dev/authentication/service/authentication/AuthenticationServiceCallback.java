@@ -96,10 +96,11 @@ public class AuthenticationServiceCallback
                 m_passwordEncoder.encode(request.getPassword()), request.getBirth_date(),
                 RoleEnum.ROLE_USER);
 
-        var user = m_userManagementService.saveUser(dto);
+        var user = m_userManagementService.saveUserForMobile(dto);
 
         return new AuthenticationResponse(user.getObject().accessToken(), user.getObject().refreshToken(), true, RoleEnum.ROLE_USER.getRole(), user.getObject().userId());
     }
+
 
     /**
      * Send authentication email.
@@ -151,7 +152,7 @@ public class AuthenticationServiceCallback
                 {
                     m_userRepository.deleteById(user.get().getUserId());
                     m_kafkaProducer.sendMessage(new UserKafkaDTO(user.get().getUserId(), null, null, null, null, null,
-                            REGISTER_NOT_VERIFY, null, null, null, -1, -1, -1));
+                            REGISTER_NOT_VERIFY, null, null, null, -1, -1, -1, null));
                 }
             }
         }.start();
@@ -326,4 +327,6 @@ public class AuthenticationServiceCallback
     {
         return m_serviceHelper.findByUsername(username);
     }
+
+
 }

@@ -33,14 +33,13 @@ public class User
     @Column(name = "last_name", nullable = false)
     private String m_lastName;
 
+    @Column(name = "profile_photo")
+    private String m_profilePhoto;
+
     @Column(name = "deleted_at")
     private LocalDateTime m_deletedAt;
 
-    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
-    private Set<Community> communities;
-
-
-    @OneToMany(fetch = FetchType.EAGER, cascade = {PERSIST, REFRESH})
+/*    @OneToMany(fetch = FetchType.EAGER, cascade = {PERSIST, REFRESH})
     @JoinTable(
             name = "user_connections",
             joinColumns = @JoinColumn(name = "main_user_id"),
@@ -62,7 +61,7 @@ public class User
             joinColumns = @JoinColumn(name = "main_user_id"),
             inverseJoinColumns = @JoinColumn(name = "blocked_user_id")
     )
-    private Set<User> blockedConnections = new HashSet<>();
+    private Set<User> blockedConnections = new HashSet<>();*/
 
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -76,12 +75,22 @@ public class User
     @JsonIgnore
     private Set<ProjectParticipant> m_projectParticipants = new HashSet<>(); // projects that user is participant
 
+    @OneToMany(mappedBy = "m_requester", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
+    private Set<ConnectionRequest> connectionRequests = new HashSet<>();
+
+    @OneToMany(mappedBy = "m_mainUser", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
+    private Set<UserConnection> connections = new HashSet<>();
+
+    @OneToMany(mappedBy = "m_mainUser", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
+    private Set<BlockConnection> blockedConnections = new HashSet<>();
+
     public User()
     {
         m_deletedAt = null;
     }
 
-    public User(UUID userId, String username, String email, String firstName, String middleName, String lastName, Set<Role> roles)
+    public User(UUID userId, String username, String email, String firstName, String middleName, String lastName, Set<Role> roles,
+                String profilePhoto)
     {
         this.roles = roles;
         m_userId = userId;
@@ -90,40 +99,38 @@ public class User
         m_firstName = firstName;
         m_middleName = middleName;
         m_lastName = lastName;
+        m_profilePhoto = profilePhoto;
         m_deletedAt = null;
     }
 
-    // TODO:  add community might be a good idea
-    public void addConnection(User user)
-    {
-        if (connections == null)
-            connections = new HashSet<>();
 
-        connections.add(user);
+    public void addUserConnection(UserConnection userConnection)
+    {
+        connections.add(userConnection);
     }
 
-    public void removeConnection(User user)
+    public void addConnectionRequest(ConnectionRequest connectionRequest)
     {
-        if (connections == null)
-            return;
-
-        connections.remove(user);
+        connectionRequests.add(connectionRequest);
     }
 
-    public void addConnectionRequest(User user)
+    public void addBlockedConnection(BlockConnection blockConnection)
     {
-        if (connectionRequests == null)
-            connectionRequests = new HashSet<>();
-
-        connectionRequests.add(user);
+        blockedConnections.add(blockConnection);
     }
 
-    public void addBlockedConnection(User user)
+    public void removeUserConnection(UserConnection userConnection)
     {
-        if (blockedConnections == null)
-            blockedConnections = new HashSet<>();
+        connections.remove(userConnection);
+    }
+    public String getProfilePhoto()
+    {
+        return m_profilePhoto;
+    }
 
-        blockedConnections.add(user);
+    public void setProfilePhoto(String profilePhoto)
+    {
+        m_profilePhoto = profilePhoto;
     }
 
     public Set<ProjectParticipant> getProjectParticipants()
@@ -136,44 +143,34 @@ public class User
         m_projectParticipants = projectParticipants;
     }
 
-    public Set<User> getConnections()
-    {
-        return connections;
-    }
-
-    public void setConnections(Set<User> connections)
-    {
-        this.connections = connections;
-    }
-
-    public Set<User> getConnectionRequests()
+    public Set<ConnectionRequest> getConnectionRequests()
     {
         return connectionRequests;
     }
 
-    public void setConnectionRequests(Set<User> connectionRequests)
+    public void setConnectionRequests(Set<ConnectionRequest> connectionRequests)
     {
         this.connectionRequests = connectionRequests;
     }
 
-    public Set<User> getBlockedConnections()
+    public Set<UserConnection> getConnections()
+    {
+        return connections;
+    }
+
+    public void setConnections(Set<UserConnection> connections)
+    {
+        this.connections = connections;
+    }
+
+    public Set<BlockConnection> getBlockedConnections()
     {
         return blockedConnections;
     }
 
-    public void setBlockedConnections(Set<User> blockedConnections)
+    public void setBlockedConnections(Set<BlockConnection> blockedConnections)
     {
         this.blockedConnections = blockedConnections;
-    }
-
-    public Set<Community> getCommunities()
-    {
-        return communities;
-    }
-
-    public void setCommunities(Set<Community> communities)
-    {
-        this.communities = communities;
     }
 
     public UUID getUserId()

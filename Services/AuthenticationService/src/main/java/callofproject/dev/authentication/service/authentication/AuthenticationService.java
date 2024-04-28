@@ -63,6 +63,19 @@ public class AuthenticationService implements IAuthenticationService
         return result;
     }
 
+
+    /**
+     * Register user with given RegisterRequest parameter.
+     *
+     * @param request represent the request.
+     * @return AuthenticationResponse.
+     */
+    @Override
+    public AuthenticationResponse registerForMobile(RegisterRequest request)
+    {
+        return doForDataService(() -> m_serviceCallback.registerUserCallback(request), "AuthenticationService::register");
+    }
+
     /**
      * Login operation for users.
      *

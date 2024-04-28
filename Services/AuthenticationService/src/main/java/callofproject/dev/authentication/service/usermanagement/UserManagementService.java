@@ -53,6 +53,20 @@ public class UserManagementService implements IUserManagementService
     }
 
 
+
+
+    @Override
+    public ResponseMessage<UserSaveDTO> saveUserForMobile(UserSignUpRequestDTO userDTO)
+    {
+        var result = doForDataService(() -> m_serviceCallback.saveUserForMobileCallback(userDTO), "User cannot be saved!");
+
+        if (result.getStatusCode() == 200)
+            m_serviceCallback.PublishUser(result.getObject().userId());
+
+        return result;
+    }
+
+
     /**
      * Find user with given username
      *

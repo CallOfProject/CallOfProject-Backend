@@ -29,7 +29,8 @@ public record UserKafkaDTO(
         LocalDateTime deletedAt,
         int ownerProjectCount,
         int participantProjectCount,
-        int totalProjectCount
+        int totalProjectCount,
+        String profilePhoto
 )
 {
     @Override

@@ -3,7 +3,6 @@ package callofproject.dev.community;
 import callofproject.dev.data.common.status.Status;
 import callofproject.dev.data.community.entity.User;
 import callofproject.dev.library.exception.service.DataServiceException;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.test.context.TestPropertySource;
 import java.util.UUID;
 
 import static callofproject.dev.community.CommunityServiceBeanName.*;
+import static callofproject.dev.util.stream.StreamUtil.toStream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -26,17 +26,14 @@ class CommunityServiceApplicationTests
     @Autowired
     private Injection m_injection;
 
-    @Autowired
-    private DatabaseCleaner m_databaseCleaner;
-
     private User user1;
     private User user2;
 
     @BeforeEach
     void contextLoads()
     {
-        var user_1 = new User(UUID.randomUUID(), "nuri", "nuri@gmail.com", "Nuri", "Can", "Ozturk", null);
-        var user_2 = new User(UUID.randomUUID(), "halil", "halil@gmail.com", "Halil", "Can", "Ozturk", null);
+        var user_1 = new User(UUID.randomUUID(), "nuri", "nuri@gmail.com", "Nuri", "Can", "Ozturk", null, null);
+        var user_2 = new User(UUID.randomUUID(), "halil", "halil@gmail.com", "Halil", "Can", "Ozturk", null, null);
 
         user1 = m_injection.getCommunityServiceHelper().upsertUser(user_1);
         user2 = m_injection.getCommunityServiceHelper().upsertUser(user_2);
@@ -152,16 +149,19 @@ class CommunityServiceApplicationTests
         assertTrue((Boolean) remove.getObject());
 
         // Check connections
-        connectedUser1 = m_injection.getConnectionService().findUserByIdIfExist(user1.getUserId());
-        connectedUser2 = m_injection.getConnectionService().findUserByIdIfExist(user2.getUserId());
+        var k = m_injection.getConnectionService().findUserByIdIfExist(user1.getUserId());
+        var k2 = m_injection.getConnectionService().findUserByIdIfExist(user2.getUserId());
 
         assertNotNull(connectedUser1);
         assertNotNull(connectedUser2);
 
-        assertEquals(0, connectedUser1.getConnections().size());
-        assertEquals(0, connectedUser2.getConnections().size());
-        assertEquals(0, connectedUser1.getConnectionRequests().size());
-        assertEquals(0, connectedUser2.getConnectionRequests().size());
+
+        var size1 = toStream(m_injection.getCommunityServiceHelper().findUserConnectionsByUserId(user1.getUserId())).toList();
+        var size2 = toStream(m_injection.getCommunityServiceHelper().findUserConnectionsByUserId(user2.getUserId())).toList();
+        assertEquals(0, size1.size());
+        assertEquals(0, size2.size());
+        assertEquals(0, k.getConnectionRequests().size());
+        assertEquals(0, k2.getConnectionRequests().size());
     }
 
 
@@ -206,11 +206,5 @@ class CommunityServiceApplicationTests
         assertEquals(1, blockedUser2.getBlockedConnections().size());
         assertEquals(0, blockedUser1.getConnections().size());
         assertEquals(0, blockedUser2.getConnections().size());
-    }
-
-    @AfterEach
-    void tearDown()
-    {
-        m_databaseCleaner.clearH2Database();
     }
 }

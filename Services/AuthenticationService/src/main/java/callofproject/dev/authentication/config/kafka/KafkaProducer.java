@@ -26,9 +26,9 @@ public class KafkaProducer
      * Constructor for the KafkaProducer class.
      * It is used to inject dependencies into the service.
      *
-     * @param topic             The NewTopic object to be injected.
-     * @param emailTopic        The NewTopic object to be injected.
-     * @param kafkaTemplate     The KafkaTemplate object to be injected.
+     * @param topic              The NewTopic object to be injected.
+     * @param emailTopic         The NewTopic object to be injected.
+     * @param kafkaTemplate      The KafkaTemplate object to be injected.
      * @param emailKafkaTemplate The KafkaTemplate object to be injected.
      */
     public KafkaProducer(NewTopic topic, @Qualifier("emailTopic") NewTopic emailTopic, KafkaTemplate<String, UserKafkaDTO> kafkaTemplate, KafkaTemplate<String, EmailTopic> emailKafkaTemplate)

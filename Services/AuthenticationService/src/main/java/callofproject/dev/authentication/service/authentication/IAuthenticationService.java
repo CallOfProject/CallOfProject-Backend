@@ -24,6 +24,14 @@ public interface IAuthenticationService
     AuthenticationResponse register(RegisterRequest request);
 
     /**
+     * Register a new user for mobile devices. This method is used for testing.
+     *
+     * @param request The RegisterRequest object representing the user's registration request.
+     * @return The AuthenticationResponse object representing the user's authentication response.
+     */
+    AuthenticationResponse registerForMobile(RegisterRequest request);
+
+    /**
      * Authenticate a user.
      *
      * @param request The AuthenticationRequest object representing the user's authentication request.

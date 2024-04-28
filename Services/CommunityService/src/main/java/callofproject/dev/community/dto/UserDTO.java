@@ -11,6 +11,8 @@ public record UserDTO(
         @JsonProperty("user_id")
         UUID userId,
         @JsonProperty("username")
-        String username)
+        String username,
+        @JsonProperty("profile_photo")
+        String profilePhoto)
 {
 }

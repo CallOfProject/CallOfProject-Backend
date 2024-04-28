@@ -23,6 +23,14 @@ public interface IUserManagementService
     ResponseMessage<UserSaveDTO> saveUser(UserSignUpRequestDTO userDTO);
 
     /**
+     * Save User with given dto class. Use for testing.
+     *
+     * @param userDTO represent the dto class
+     * @return UserSaveDTO.
+     */
+    ResponseMessage<UserSaveDTO> saveUserForMobile(UserSignUpRequestDTO userDTO);
+
+    /**
      * Find user with given username
      *
      * @param username represent the username.

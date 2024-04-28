@@ -10,6 +10,7 @@ import callofproject.dev.repository.authentication.enumeration.RoleEnum;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -47,6 +48,8 @@ public class AuthenticationServiceApplication implements ApplicationRunner
     private final IUserRepository m_userRepository;
     private final PasswordEncoder m_passwordEncoder;
     private final KafkaProducer m_kafkaProducer;
+    @Value("${user.profile.default_pp}")
+    private String m_defaultPp;
 
     public AuthenticationServiceApplication(IUserRepository userRepository, PasswordEncoder passwordEncoder, KafkaProducer kafkaProducer)
     {
@@ -72,6 +75,7 @@ public class AuthenticationServiceApplication implements ApplicationRunner
             rootUser.addRoleToUser(new Role(RoleEnum.ROLE_USER.getRole()));
             rootUser.addRoleToUser(new Role(RoleEnum.ROLE_ADMIN.getRole()));
             var profile1 = new UserProfile();
+            profile1.setProfilePhoto(m_defaultPp);
             profile1.setUser(rootUser);
             rootUser.setUserProfile(profile1);
 
@@ -84,14 +88,17 @@ public class AuthenticationServiceApplication implements ApplicationRunner
 
             var profile2 = new UserProfile();
             profile2.setUser(adminUser);
+            profile2.setProfilePhoto(m_defaultPp);
             adminUser.setUserProfile(profile2);
             m_userRepository.save(adminUser);
 
             m_kafkaProducer.sendMessage(new UserKafkaDTO(rootUser.getUserId(), rootUser.getUsername(), rootUser.getEmail(),
-                    rootUser.getFirstName(), rootUser.getMiddleName(), rootUser.getLastName(), EOperation.CREATE, rootUser.getPassword(), rootUser.getRoles(), null, 0, 0, 0));
+                    rootUser.getFirstName(), rootUser.getMiddleName(), rootUser.getLastName(), EOperation.CREATE, rootUser.getPassword(),
+                    rootUser.getRoles(), null, 0, 0, 0, rootUser.getUserProfile().getProfilePhoto()));
 
             m_kafkaProducer.sendMessage(new UserKafkaDTO(adminUser.getUserId(), adminUser.getUsername(), adminUser.getEmail(),
-                    adminUser.getFirstName(), adminUser.getMiddleName(), adminUser.getLastName(), EOperation.CREATE, adminUser.getPassword(), adminUser.getRoles(), null, 0, 0, 0));
+                    adminUser.getFirstName(), adminUser.getMiddleName(), adminUser.getLastName(), EOperation.CREATE, adminUser.getPassword(),
+                    adminUser.getRoles(), null, 0, 0, 0, adminUser.getUserProfile().getProfilePhoto()));
         }
     }
 }
