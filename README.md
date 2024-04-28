@@ -48,6 +48,7 @@ Call-Of-Project follows a **microservices-based architecture**. Our application 
 - Mock
 - Mapstruct
 - Amazon S3 (for file and photos)
+- Pagination
 - ...
 
 ## Services
