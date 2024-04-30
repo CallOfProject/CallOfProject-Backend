@@ -24,6 +24,15 @@
 ## Javadoc Documentation
 - [Javadoc for some services](https://callofproject.github.io/Call-of-Project-API-Documentation/)
 
+## Other parts of Call-of-Project
+
+For more information about the project, visit our repositories:
+
+- **Android:** [Call-of-Project-Android](https://github.com/CallOfProject/Call-Of-Project-Android)
+- **Interview:** [Call-of-Project-Interview](https://github.com/CallOfProject/Call-Of-Project-Interview)
+- **Admin Panel:** [Call-of-Project-Admin-Panel](https://github.com/CallOfProject/CallOfProject-AdminPanel)
+- **Frontend:** Not completed yet
+
 ## Overview
 
 Call-Of-Project is an application where people can find project partners, collaborate on projects together, and manage project management to some extent. With this application, individuals can find friends to progress together when they have a project in mind, and people who want to join a project can also become part of a project. The project owner can create a project, approve joining requests for the project, and assign tasks to team members within the same project. Additionally, the project owner can prepare coding or testing interviews to select the right people to join the project. This way, they can work on a project together.
