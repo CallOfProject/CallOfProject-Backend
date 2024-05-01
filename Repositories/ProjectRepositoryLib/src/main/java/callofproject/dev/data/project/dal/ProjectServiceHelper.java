@@ -204,4 +204,10 @@ public class ProjectServiceHelper
     {
         doForRepository(() -> m_facade.m_userRepository.deleteById(userId), "ProjectServiceHelper::removeUser");
     }
+
+    public Iterable<Project> findAllProjectByIds(List<UUID> projectIds)
+    {
+        return doForRepository(() -> m_facade.m_projectRepository.findAllById(projectIds),
+                "ProjectServiceHelper::findAllProjectByIds");
+    }
 }

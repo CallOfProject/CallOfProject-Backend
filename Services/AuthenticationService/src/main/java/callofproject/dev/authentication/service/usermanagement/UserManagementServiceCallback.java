@@ -10,10 +10,12 @@ import callofproject.dev.authentication.service.S3Service;
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.data.common.enums.EOperation;
+import callofproject.dev.data.common.util.UtilityMethod;
 import callofproject.dev.library.exception.service.DataServiceException;
 import callofproject.dev.repository.authentication.dal.UserManagementServiceHelper;
 import callofproject.dev.repository.authentication.entity.User;
 import callofproject.dev.repository.authentication.entity.UserProfile;
+import callofproject.dev.repository.authentication.entity.UserTag;
 import callofproject.dev.service.jwt.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -25,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import static callofproject.dev.data.common.util.UtilityMethod.convert;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static callofproject.dev.util.stream.StreamUtil.toListConcurrent;
 import static java.lang.String.format;
@@ -326,7 +329,9 @@ public class UserManagementServiceCallback
 
         var links = m_mapperConfig.linkMapper.toLinksDTO(toListConcurrent(userProfile.getLinkList(), m_mapperConfig.linkMapper::toLinkDTO));
 
-        return m_mapperConfig.userProfileMapper.toUserProfileDTO(userProfile, educations, experiences, courses, links);
+        var tags = m_mapperConfig.userTagMapper.toUserTagsDTO(toListConcurrent(userProfile.getTagList(), m_mapperConfig.userTagMapper::toUserTagDTO));
+
+        return m_mapperConfig.userProfileMapper.toUserProfileDTO(userProfile, educations, experiences, courses, links, tags);
     }
 
     public ResponseMessage<Object> updateAboutMeCallback(UUID userId, String aboutMe)
@@ -374,4 +379,72 @@ public class UserManagementServiceCallback
     }
 
 
+    public ResponseMessage<Object> createUserTagCallback(UserTagCreateDTO dto)
+    {
+        var user = getUserIfExists(dto.userId());
+
+        // to english alphabet and create UserTag object
+        var tagNameObjList = dto.tagNames().stream()
+                .map(UtilityMethod::convert)
+                .map(UserTag::new)
+                .toList();
+
+        var addingTags = tagNameObjList.stream()
+                .filter(tag -> !user.getUserProfile().getTagList().stream().map(UserTag::getTagName).toList()
+                        .contains(tag.getTagName()))
+                .toList();
+
+        if (addingTags.isEmpty())
+            return new ResponseMessage<>("User tag already exists!", 400, user.getUserProfile().getTagList()
+                    .stream().map(m_mapperConfig.userTagMapper::toUserTagDTO).toList());
+        // save all tags
+        var savedUserTag = m_serviceHelper.getUserTagServiceHelper().saveAll(addingTags);
+
+        // add tags to user profile
+        savedUserTag.forEach(user.getUserProfile()::addTag);
+
+        // save user and user profile
+        m_serviceHelper.getUserServiceHelper().saveUser(user);
+        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(user.getUserProfile());
+
+        var tagsDTO = m_mapperConfig.userTagMapper.toUserTagsDTO(toListConcurrent(savedUserTag, m_mapperConfig.userTagMapper::toUserTagDTO));
+        return new ResponseMessage<>("User tag saved successfully!", 200, tagsDTO);
+    }
+
+    public ResponseMessage<Object> updateUserTagCallback(UserTagUpdateDTO dto)
+    {
+        var user = getUserIfExists(dto.userId());
+
+        var tag = m_serviceHelper.getUserTagServiceHelper().findByTagId(dto.tagId());
+
+        if (tag.isEmpty())
+            return new ResponseMessage<>("User tag does not exists!", 400, null);
+
+        tag.get().setTagName(convert(dto.tagName()));
+
+        var updatedTag = m_serviceHelper.getUserTagServiceHelper().saveUserTag(tag.get());
+        user.getUserProfile().getTagList().stream()
+                .filter(t -> t.getTagId().equals(updatedTag.getTagId()))
+                .findFirst()
+                .ifPresent(t -> t.setTagName(updatedTag.getTagName()));
+
+        m_serviceHelper.getUserServiceHelper().saveUser(user);
+        return new ResponseMessage<>("User tag updated successfully!", 200, m_mapperConfig.userTagMapper.toUserTagDTO(tag.get()));
+    }
+
+    public ResponseMessage<Object> deleteUserTagCallback(UUID userId, UUID tagId)
+    {
+        var user = getUserIfExists(userId);
+
+        var tag = m_serviceHelper.getUserTagServiceHelper().findByTagId(tagId);
+
+        if (tag.isEmpty())
+            return new ResponseMessage<>("User tag does not exists!", 400, null);
+
+        user.getUserProfile().getTagList().removeIf(t -> t.getTagId().equals(tagId));
+
+        m_serviceHelper.getUserServiceHelper().saveUser(user);
+
+        return new ResponseMessage<>("User tag deleted successfully!", 200, m_mapperConfig.userTagMapper.toUserTagDTO(tag.get()));
+    }
 }

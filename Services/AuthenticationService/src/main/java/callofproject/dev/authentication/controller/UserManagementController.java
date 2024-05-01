@@ -2,6 +2,8 @@ package callofproject.dev.authentication.controller;
 
 import callofproject.dev.authentication.dto.UserProfileUpdateDTO;
 import callofproject.dev.authentication.dto.UserSignUpRequestDTO;
+import callofproject.dev.authentication.dto.UserTagCreateDTO;
+import callofproject.dev.authentication.dto.UserTagUpdateDTO;
 import callofproject.dev.authentication.service.usermanagement.UserManagementService;
 import callofproject.dev.data.common.clas.ErrorMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -180,6 +182,28 @@ public class UserManagementController
     public ResponseEntity<Object> findUserWithProfileByUserId(@RequestParam("uid") UUID userId)
     {
         return subscribe(() -> ok(m_service.findUserWithProfile(userId)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    @PostMapping("create/user-tag")
+    public ResponseEntity<Object> addTagToUser(@RequestBody UserTagCreateDTO dto)
+    {
+        return subscribe(() -> ok(m_service.createUserTag(dto)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+    @PostMapping("update/user-tag")
+    public ResponseEntity<Object> updateUserTags(@RequestBody UserTagUpdateDTO dto)
+    {
+        return subscribe(() -> ok(m_service.updateUserTag(dto)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
+
+    @DeleteMapping("delete/user-tag")
+    public ResponseEntity<Object> deleteUserTag(@RequestParam("uid") UUID userId, @RequestParam("tid") UUID tagId)
+    {
+        return subscribe(() -> ok(m_service.deleteUserTag(userId, tagId)),
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 }

@@ -17,6 +17,7 @@ public class UserManagementServiceHelper
     private final LinkServiceHelper m_linkServiceHelper;
     private final ExperienceServiceHelper m_experienceServiceHelper;
     private final CourseOrganizationServiceHelper m_courseOrganizationServiceHelper;
+    private final UserTagServiceHelper m_userTagServiceHelper;
 
     public UserManagementServiceHelper(@Qualifier(USER_DAL_BEAN) UserServiceHelper userServiceHelper,
                                        @Qualifier(USER_PROFILE_DAL_BEAN) UserProfileServiceHelper userProfileServiceHelper,
@@ -24,6 +25,7 @@ public class UserManagementServiceHelper
                                        @Qualifier(COURSE_DAL_BEAN) CourseServiceHelper courseServiceHelper,
                                        @Qualifier(LINK_DAL_BEAN) LinkServiceHelper linkServiceHelper,
                                        @Qualifier(EXPERIENCE_DAL_BEAN) ExperienceServiceHelper experienceServiceHelper,
+                                       @Qualifier(USER_TAG_DAL_BEAN) UserTagServiceHelper userTagServiceHelper,
                                        @Qualifier(COURSE_ORGANIZATION_DAL_BEAN) CourseOrganizationServiceHelper courseOrganizationServiceHelper)
     {
         m_userServiceHelper = userServiceHelper;
@@ -33,6 +35,7 @@ public class UserManagementServiceHelper
         m_linkServiceHelper = linkServiceHelper;
         m_experienceServiceHelper = experienceServiceHelper;
         m_courseOrganizationServiceHelper = courseOrganizationServiceHelper;
+        m_userTagServiceHelper = userTagServiceHelper;
     }
 
     public CourseOrganizationServiceHelper getCourseOrganizationServiceHelper()
@@ -68,5 +71,10 @@ public class UserManagementServiceHelper
     public ExperienceServiceHelper getExperienceServiceHelper()
     {
         return m_experienceServiceHelper;
+    }
+
+    public UserTagServiceHelper getUserTagServiceHelper()
+    {
+        return m_userTagServiceHelper;
     }
 }

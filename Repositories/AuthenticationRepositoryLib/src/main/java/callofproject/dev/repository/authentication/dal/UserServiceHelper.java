@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -70,7 +71,7 @@ public class UserServiceHelper
         return doForRepository(() -> m_userRepository.findAll(), "UserRepository::findAll");
     }
 
-    public Page <User> findAllPageable(int page)
+    public Page<User> findAllPageable(int page)
     {
         var pageable = of(page - 1, m_defaultPageSize);
         return doForRepository(() -> m_userRepository.findAll(pageable), "UserRepository::findAllPageable");
@@ -140,5 +141,11 @@ public class UserServiceHelper
     public long countUsersByCreationDateAfter(LocalDate date)
     {
         return doForRepository(() -> m_userRepository.countUsersByCreationDateAfter(date), "UserRepository::countUsersByCreationDateAfter");
+    }
+
+
+    public Iterable<User> findAllByUserIds(List<UUID> userIds)
+    {
+        return doForRepository(() -> m_userRepository.findAllById(userIds), "UserRepository::findAllByUserIds");
     }
 }

@@ -1,5 +1,6 @@
 package callofproject.dev.authentication.dto.user_profile;
 
+import callofproject.dev.authentication.dto.UserTagDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class UserProfileDTO
     public List<EducationDTO> educations;
     public List<ExperienceDTO> experiences;
     public List<LinkDTO> links;
+    public List<UserTagDTO> tags;
 
     /**
      * Constructor.

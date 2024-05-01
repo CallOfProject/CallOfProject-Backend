@@ -56,6 +56,13 @@ public class UserProfile
             inverseJoinColumns = @JoinColumn(name = "link_id", referencedColumnName = "link_id", nullable = false))
     private Set<Link> linkList;
 
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_profiles_to_tags",
+            joinColumns = @JoinColumn(name = "user_profile_id", referencedColumnName = "user_profile_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "tag_id", nullable = false))
+    private Set<UserTag> tagList = new HashSet<>();
+
     public UserProfile()
     {
         this.userRate = 10.0;
@@ -70,6 +77,12 @@ public class UserProfile
         this.userRate = 10.0;
         this.userFeedbackRate = 10.0;
     }
+
+    public void addTag(UserTag tag)
+    {
+        tagList.add(tag);
+    }
+
 
     public void addCourse(Course course)
     {
@@ -137,6 +150,16 @@ public class UserProfile
         experiences.forEach(experienceList::add);
         courses.forEach(courseList::add);
         links.forEach(linkList::add);
+    }
+
+    public Set<UserTag> getTagList()
+    {
+        return tagList;
+    }
+
+    public void setTagList(Set<UserTag> tagList)
+    {
+        this.tagList = tagList;
     }
 
     public UUID getUserProfileId()

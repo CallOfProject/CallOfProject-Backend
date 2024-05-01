@@ -172,4 +172,22 @@ public class UserManagementService implements IUserManagementService
     {
         return doForDataService(() -> m_serviceCallback.uploadUserCvCallback(userId, file), "UserManagementService::uploadUserCv");
     }
+
+    @Override
+    public ResponseMessage<Object> createUserTag(UserTagCreateDTO dto)
+    {
+        return doForDataService(() -> m_serviceCallback.createUserTagCallback(dto), "UserManagementService::createUserTag");
+    }
+
+    @Override
+    public ResponseMessage<Object> updateUserTag(UserTagUpdateDTO dto)
+    {
+        return doForDataService(() -> m_serviceCallback.updateUserTagCallback(dto), "UserManagementService::updateUserTag");
+    }
+
+    @Override
+    public ResponseMessage<Object> deleteUserTag(UUID userId, UUID tagId)
+    {
+        return doForDataService(() -> m_serviceCallback.deleteUserTagCallback(userId, tagId), "UserManagementService::deleteUserTag");
+    }
 }

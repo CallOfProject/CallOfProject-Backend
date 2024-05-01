@@ -43,4 +43,22 @@ public final class Util
 
         return templateContent;
     }
+
+    public static String toEnglishAlphabet(String input)
+    {
+        return input == null ? null : input
+                .replace("ç", "C")
+                .replace("Ç", "C")
+                .replace("ğ", "G")
+                .replace("Ğ", "G")
+                .replace("ı", "I")
+                .replace("İ", "I")
+                .replace("ö", "O")
+                .replace("Ö", "O")
+                .replace("ş", "S")
+                .replace("Ş", "S")
+                .replace("ü", "U")
+                .replace("Ü", "U")
+                .toUpperCase();
+    }
 }

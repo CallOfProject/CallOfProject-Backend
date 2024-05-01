@@ -12,6 +12,7 @@ public class BeanName
     public static final String ROLE_REPOSITORY_BEAN = "callofproject.dev.repository.authentication.userrole";
     public static final String ROLE_DAL_BEAN = "callofproject.dev.repository.authentication.dal.userrole";
     public static final String USER_MANAGEMENT_DAL_BEAN = "callofproject.dev.repository.authentication.dal.usermanagement";
+    public static final String USER_TAG_DAL_BEAN = "callofproject.dev.repository.authentication.dal.usertag";
     public static final String USER_DAL_BEAN = "callofproject.dev.repository.authentication.dal.user";
     public static final String USER_PROFILE_DAL_BEAN = "callofproject.dev.repository.authentication.dal.userprofile";
     public static final String EDUCATION_DAL_BEAN = "callofproject.dev.repository.authentication.dal.education";

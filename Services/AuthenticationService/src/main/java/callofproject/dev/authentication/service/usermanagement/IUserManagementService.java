@@ -115,4 +115,29 @@ public interface IUserManagementService
      * @return ResponseMessage.
      */
     ResponseMessage<Object> uploadUserCv(UUID userId, MultipartFile file);
+
+
+    /**
+     * Create User Tag.
+     *
+     * @param dto represent the dto class
+     * @return user tags.
+     */
+    ResponseMessage<Object> createUserTag(UserTagCreateDTO dto);
+
+    /**
+     * Update User Tag.
+     *
+     * @param dto represent the dto class
+     * @return user tags.
+     */
+    ResponseMessage<Object> updateUserTag(UserTagUpdateDTO dto);
+
+    /**
+     * Find User Tags by User Id.
+     *
+     * @param userId represent the user id.
+     * @return user tags.
+     */
+    ResponseMessage<Object> deleteUserTag(UUID userId, UUID tagId);
 }

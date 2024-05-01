@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
@@ -23,6 +24,8 @@ import static callofproject.dev.service.scheduler.SchedulerBeanName.*;
         BeanName.ENTITY_PACKAGE, TaskServiceBeanName.ENTITY_BEAN_NAME})
 
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+
+@EnableFeignClients
 public class SchedulerServiceApplication
 {
     public static void main(String[] args)
