@@ -23,60 +23,79 @@ public class Project
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "project_id")
     private UUID m_projectId;
+
     @Column(name = "project_image", nullable = true)
     private String m_projectImagePath;
+
     @Column(name = "title", nullable = false, length = 100)
     private String m_projectName;
+
     @Column(name = "summary", nullable = false, length = 200)
     private String m_projectSummary;
+
     @Column(name = "description", nullable = false, length = 500)
     private String m_description;
+
     @Column(name = "aim", nullable = false, length = 250)
     private String m_projectAim;
+
     @Column(name = "application_deadline", nullable = false)
     private LocalDate m_applicationDeadline; // Last date for application
+
     @Column(name = "expected_completion_date", nullable = false)
     private LocalDate m_expectedCompletionDate; // Expected completion date
+
     @Column(name = "start_date", nullable = false)
     private LocalDate m_startDate; // Project start date
+
     @Column(name = "completion_date", nullable = true)
     private LocalDate m_completionDate; // Project completion date
+
+    @Column(name = "creation_date", nullable = true)
+    private LocalDate m_creationDate = now();
+
     @Column(name = "max_participant")
     private int m_maxParticipant;
+
     @Column(name = "invite_link")
     private String m_inviteLink;
+
     @Column(name = "technical_requirements", length = 200)
     private String m_technicalRequirements;
+
     @Column(name = "special_requirements", length = 200)
     private String m_specialRequirements;
+
     @Enumerated(EnumType.STRING)
-    //@JoinColumn(name = "project_access_type", nullable = false)
     @Column(name = "project_access_type")
     private EProjectAccessType m_projectAccessType;
+
     @Enumerated(EnumType.STRING)
-    //@JoinColumn(name = "project_profession_level", nullable = false)
     @Column(name = "project_profession_level")
     private EProjectProfessionLevel m_professionLevel;
+
     @Enumerated(EnumType.STRING)
-    //@JoinColumn(name = "sector", nullable = false)
     @Column(name = "sector")
     private ESector m_sector;
+
     @Enumerated(EnumType.STRING)
-    //@JoinColumn(name = "degree", nullable = false)
     @Column(name = "degree")
     private EDegree m_degree;
+
     @Enumerated(EnumType.STRING)
-    //@JoinColumn(name = "project_level", nullable = false)
     @Column(name = "project_level")
     private EProjectLevel m_projectLevel;
+
     @Enumerated(EnumType.STRING)
     //@JoinColumn(name = "interview_type", nullable = false)
     @Column(name = "interview_type")
     private EInterviewType m_interviewType;
 
+
     @ManyToOne(cascade = {DETACH, MERGE, PERSIST, REFRESH})
     @JoinColumn(name = "user_id", nullable = false)
     private User m_projectOwner;
+
 
     @OneToMany(mappedBy = "m_project", cascade = {DETACH, MERGE, PERSIST, REFRESH}, fetch = FetchType.EAGER)
     @JsonIgnore
@@ -92,6 +111,7 @@ public class Project
     @Enumerated(EnumType.STRING)
     @Column(name = "project_status")
     private EProjectStatus m_projectStatus;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "admin_operation_status")
     private AdminOperationStatus m_adminOperationStatus;
@@ -390,6 +410,11 @@ public class Project
     public void setAdminOperationStatus(AdminOperationStatus adminOperationStatus)
     {
         m_adminOperationStatus = adminOperationStatus;
+    }
+
+    public LocalDate getCreationDate()
+    {
+        return m_creationDate;
     }
 
     public UUID getProjectId()

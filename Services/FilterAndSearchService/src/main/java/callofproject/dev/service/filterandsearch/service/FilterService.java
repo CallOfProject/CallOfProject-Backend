@@ -1,6 +1,7 @@
 package callofproject.dev.service.filterandsearch.service;
 
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
+import callofproject.dev.data.project.entity.Project;
 import callofproject.dev.data.project.repository.IProjectRepository;
 import callofproject.dev.repository.authentication.repository.rdbms.IUserRepository;
 import callofproject.dev.service.filterandsearch.dto.ProjectDTO;
@@ -61,8 +62,15 @@ public class FilterService
 
         var pageRequest = PageRequest.of(page - 1, 20);
         var projectPage = m_projectRepository.findAll(spec, pageRequest);
-        var projectsDTO = new ProjectsDTO(projectPage.get().map(p -> new ProjectDTO(p.getProjectId(), p.getProjectName(), p.getProjectImagePath(), p.getProjectSummary(), p.getProjectOwner().getUsername(), p.getProjectStatus())).toList());
+        var projectsDTO = new ProjectsDTO(projectPage.get().map(this::toProjectDTO).toList());
         var elementCount = projectsDTO.projects().size();
         return new MultipleResponseMessagePageable<>(projectPage.getTotalPages(), page, elementCount, format("%d projects are found!", elementCount), projectsDTO);
+    }
+
+    private ProjectDTO toProjectDTO(Project p)
+    {
+        return new ProjectDTO(p.getProjectId(), p.getProjectName(), p.getProjectImagePath(), p.getProjectSummary(),
+                p.getProjectOwner().getUsername(), p.getProjectStatus(), p.getApplicationDeadline(),
+                p.getCreationDate(), p.getStartDate(), p.getExpectedCompletionDate());
     }
 }

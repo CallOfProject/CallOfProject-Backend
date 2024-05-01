@@ -22,7 +22,16 @@ public record ProjectDiscoveryDTO(
         String projectOwnerName,
         @JsonProperty("application_deadline")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-        LocalDate applicationDeadline
+        LocalDate applicationDeadline,
+        @JsonProperty("creation_date")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+        LocalDate creationDate,
+        @JsonProperty("start_date")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+        LocalDate startDate,
+        @JsonProperty("expected_completion_date")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+        LocalDate expectedCompletionDate
 )
 {
 }

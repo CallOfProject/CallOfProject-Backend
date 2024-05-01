@@ -31,6 +31,7 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>, JpaSpe
             and m_adminOperationStatus = 'ACTIVE'
             and m_projectAccessType = 'PUBLIC'
             and m_deletedAt is null
+            order by m_creationDate desc
             """)
     Page<Project> findAllByProjectStatusAndAdminOperationStatusAndProjectAccessType(Pageable pageable);
 

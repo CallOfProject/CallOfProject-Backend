@@ -18,8 +18,7 @@ public class ProjectRecommendationService
         m_serviceCallback = serviceCallback;
     }
 
-    //@Scheduled(cron = "0 0 5 ? * SAT", zone = "Europe/Istanbul")
-    @Scheduled(cron = "*/10 * * * * *", zone = "Europe/Istanbul")
+    @Scheduled(cron = "0 0 5 ? * SAT", zone = "Europe/Istanbul")
     public void recommendProjectsByUserTagsAndProjectTags()
     {
         m_serviceCallback.recommendProjectByProjectTagAndUserId();
