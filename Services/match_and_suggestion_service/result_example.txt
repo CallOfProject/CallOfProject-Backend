@@ -1,0 +1,36 @@
+USER:
+User(user_id=a4aa3127eb0c409294910ae37fa9a5de, username=emirkafadar, universities=['EGE_UNIVERSITY', 'YASAR_UNİVERSİTY'], user_tags=['SWİFT', 'TYPESCRİPT'], experiences=['Software Engineering'])
+
+PROJECTS:
+Project(project_id=2c84bc2b16074530a9f2da43349b646b, project_name=Facebook, project_tags=['NODEJS', 'ANGULAR', 'REACT', 'JAVASCRİPT', 'TYPESCRİPT', 'SWİFT'])
+Project(project_id=3128a8540dd946b59f89283d484bb013, project_name=Call-of-Project, project_tags=['JAVA', 'SPRİNG_BOOT', 'REACT', 'ANGULAR', 'ANDROİD', 'KOTLİN'])
+Project(project_id=7f9b829e644b42f191fdb789f5143352, project_name=instagram, project_tags=['REACT_NATİVE', 'C#', 'SPRİNG_BOOY', 'ENTİTY_FRAMEWORK', 'REACT'])
+Project(project_id=88b9230f11df452cb9c5fc7ef8219938, project_name=StarFace, project_tags=['ANGULAR', 'ANDROID', 'KOTLIN', 'PYTHON', 'NODEJS'])
+Project(project_id=b11834e2e45f4421ab1a709c6930f1a4, project_name=ByteShare, project_tags=['JAVA', 'SPRİNG_BOOT', 'VAADİN', 'KOTLİN', 'SWİFT', 'ANDROİD', 'İOS'])
+Project(project_id=f346d74eedfe4ca99c947877dbd20838, project_name=Github, project_tags=['REACT', 'JAVASCRİPT', 'SWİFT', 'KOTLİN', 'JAVA'])
+
+SUGGESTED PROJECTS:
+Facebook {'TYPESCRİPT', 'SWİFT'}
+ByteShare {'SWİFT'}
+Github {'SWİFT'}
+
+
+
+
+USER:
+User(user_id=59d0b65bfb0a4049a94a7b7cdf73e0bd, username=ahmetkoc, universities=[], user_tags=['ASP_.NET_CORE', 'C#', 'ENTİTY_FRAMEWORK', 'SİGNALR'], experiences=[])
+
+PROJECTS:
+Project(project_id=2c84bc2b16074530a9f2da43349b646b, project_name=Facebook, project_tags=['NODEJS', 'ANGULAR', 'REACT', 'JAVASCRİPT', 'TYPESCRİPT', 'SWİFT'])
+Project(project_id=3128a8540dd946b59f89283d484bb013, project_name=Call-of-Project, project_tags=['JAVA', 'SPRİNG_BOOT', 'REACT', 'ANGULAR', 'ANDROİD', 'KOTLİN'])
+Project(project_id=7f9b829e644b42f191fdb789f5143352, project_name=instagram, project_tags=['REACT_NATİVE', 'C#', 'SPRİNG_BOOY', 'ENTİTY_FRAMEWORK', 'REACT'])
+Project(project_id=88b9230f11df452cb9c5fc7ef8219938, project_name=StarFace, project_tags=['ANGULAR', 'ANDROID', 'KOTLIN', 'PYTHON', 'NODEJS'])
+Project(project_id=b11834e2e45f4421ab1a709c6930f1a4, project_name=ByteShare, project_tags=['JAVA', 'SPRİNG_BOOT', 'VAADİN', 'KOTLİN', 'SWİFT', 'ANDROİD', 'İOS'])
+Project(project_id=f346d74eedfe4ca99c947877dbd20838, project_name=Github, project_tags=['REACT', 'JAVASCRİPT', 'SWİFT', 'KOTLİN', 'JAVA'])
+
+SUGGESTED PROJECTS:
+instagram {'C#', 'ENTİTY_FRAMEWORK'}
+
+
+
+
