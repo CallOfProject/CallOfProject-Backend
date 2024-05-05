@@ -101,16 +101,9 @@ public class ConnectionService implements IConnectionService
                 m_notificationServiceHelper.deleteNotificationById(notificationId);
             else
             {
-                System.out.println(user.getUserId().toString());
-                System.out.println(friend.getUserId().toString());
-                System.out.println(callofproject.dev.nosql.enums.NotificationDataType.CONNECTION_REQUEST);
-
                 var notification = m_notificationServiceHelper.findByUserIdAndNotificationDataType(friend.getUserId(), user.getUserId(),
                         callofproject.dev.nosql.enums.NotificationDataType.CONNECTION_REQUEST);
                 notification.ifPresent(value -> m_notificationServiceHelper.deleteNotificationById(value.getId()));
-
-                if (notification.isEmpty())
-                    System.out.println("Notification is empty");
             }
             sendNotificationToUser(user, friend, msg, "", "", "Update Connection Request", true);
         }
