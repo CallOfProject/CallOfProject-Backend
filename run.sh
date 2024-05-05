@@ -7,7 +7,6 @@ rm -f "$pid_file"
 
 touch "$pid_file"
 
-# Function to start a new terminal and run a command, macOS specific
 start_new_terminal_mac() {
     osascript -e 'tell application "Terminal"' \
               -e 'activate' \
@@ -17,7 +16,6 @@ start_new_terminal_mac() {
               -e 'end tell'
 }
 
-# Function to start a new terminal and run a command, Linux specific
 start_new_terminal_linux() {
     gnome-terminal -- bash -c "cd $1; $2"
 }
@@ -35,10 +33,8 @@ service_pids+=("$eureka_pid")
 for service in "${services[@]}"
 do
     if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS systems
         start_new_terminal_mac "$TARGET_DIR" "java -jar $service"
-    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        # Linux systems
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then        
         start_new_terminal_linux "$TARGET_DIR" "java -jar $service"
     fi
     pid=$(ps -ef | grep "java -jar $service" | grep -v grep | awk '{print $2}')
