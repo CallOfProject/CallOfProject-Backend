@@ -7,7 +7,7 @@ import java.util.UUID;
 /**
  * ParticipantRequestDTO
  */
-public record   ParticipantRequestDTO(
+public record ParticipantRequestDTO(
         @JsonProperty("request_id")
         UUID requestId,
         @JsonProperty("notification_id")

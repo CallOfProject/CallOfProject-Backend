@@ -192,6 +192,13 @@ public class UserManagementController
                 msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
     }
 
+    @PostMapping("create/user-tag/single")
+    public ResponseEntity<Object> addTagToUser(@RequestParam("tag_name") String tagName, @RequestParam("uid") UUID userId)
+    {
+        return subscribe(() -> ok(m_service.createUserTag(tagName, userId)),
+                msg -> internalServerError().body(new ErrorMessage(msg.getMessage(), false, 500)));
+    }
+
     @PostMapping("update/user-tag")
     public ResponseEntity<Object> updateUserTags(@RequestBody UserTagUpdateDTO dto)
     {

@@ -28,9 +28,13 @@ public class ConnectionController
     }
 
     @PostMapping("/answer/connection-request")
-    public ResponseEntity<?> acceptConnectionRequest(@RequestParam("user_id") UUID userId, @RequestParam("friend_id") UUID friendId, @RequestParam("answer") boolean answer)
+    public ResponseEntity<?> acceptConnectionRequest(@RequestParam("user_id") UUID userId,
+                                                     @RequestParam("friend_id") UUID friendId,
+                                                     @RequestParam("answer") boolean answer,
+                                                     @RequestParam("notification_id") String notificationId
+    )
     {
-        return subscribe(() -> ok(m_connectionService.answerConnectionRequest(userId, friendId, answer)), ex -> internalServerError().body(ex.getMessage()));
+        return subscribe(() -> ok(m_connectionService.answerConnectionRequest(userId, friendId, answer, notificationId)), ex -> internalServerError().body(ex.getMessage()));
     }
 
     @PostMapping("/remove/connection")

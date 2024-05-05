@@ -12,6 +12,6 @@ import java.util.UUID;
 @Lazy
 public interface IConnectionRequestRepository extends CrudRepository<ConnectionRequest, UUID>
 {
-    @Query("from ConnectionRequest where m_requester.m_userId = :requesterId")
+    @Query("from ConnectionRequest where m_requestee.m_userId = :requesterId")
     Iterable<ConnectionRequest> findConnectionRequestsByRequesterId(UUID requesterId);
 }

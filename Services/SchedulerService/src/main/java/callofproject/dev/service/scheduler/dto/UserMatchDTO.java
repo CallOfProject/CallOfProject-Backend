@@ -10,7 +10,6 @@ public record UserMatchDTO(
         String lastName,
         String link,
         String email,
-        String image
-        )
+        String image)
 {
 }

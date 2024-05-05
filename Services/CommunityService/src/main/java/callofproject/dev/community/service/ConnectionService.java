@@ -8,12 +8,14 @@ import callofproject.dev.data.common.enums.NotificationDataType;
 import callofproject.dev.data.common.enums.NotificationType;
 import callofproject.dev.data.common.status.Status;
 import callofproject.dev.data.community.entity.User;
+import callofproject.dev.nosql.dal.NotificationServiceHelper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+import static callofproject.dev.data.common.enums.NotificationDataType.CONNECTION_REQUEST;
 import static callofproject.dev.library.exception.util.CopDataUtil.doForDataService;
 import static java.lang.String.format;
 
@@ -27,6 +29,7 @@ import static java.lang.String.format;
 public class ConnectionService implements IConnectionService
 {
     private final ConnectionServiceCallback m_connectionServiceCallback;
+    private final NotificationServiceHelper m_notificationServiceHelper;
     private final KafkaProducer m_kafkaProducer;
 
     @Value("${community.connection.approve-link}")
@@ -41,9 +44,10 @@ public class ConnectionService implements IConnectionService
      * @param connectionServiceCallback the connection service callback
      * @param kafkaProducer             the kafka producer
      */
-    public ConnectionService(ConnectionServiceCallback connectionServiceCallback, KafkaProducer kafkaProducer)
+    public ConnectionService(ConnectionServiceCallback connectionServiceCallback, NotificationServiceHelper notificationServiceHelper, KafkaProducer kafkaProducer)
     {
         m_connectionServiceCallback = connectionServiceCallback;
+        m_notificationServiceHelper = notificationServiceHelper;
         m_kafkaProducer = kafkaProducer;
     }
 
@@ -67,7 +71,7 @@ public class ConnectionService implements IConnectionService
             var msg = format("%s sent you a connection request", user.getUsername());
             var approvalLink = format(m_approvalLink, owner.getUserId(), user.getUserId());
             var rejectLink = format(m_rejectLink, owner.getUserId(), user.getUserId());
-            sendNotificationToUser(user, owner, msg, approvalLink, rejectLink, "Connection Request");
+            sendNotificationToUser(user, owner, msg, approvalLink, rejectLink, "Connection Request", false);
         }
 
         return result;
@@ -82,9 +86,10 @@ public class ConnectionService implements IConnectionService
      * @return the response message
      */
     @Override
-    public ResponseMessage<Object> answerConnectionRequest(UUID userId, UUID friendId, boolean answer)
+    public ResponseMessage<Object> answerConnectionRequest(UUID userId, UUID friendId, boolean answer, String notificationId)
     {
-        var result = doForDataService(() -> m_connectionServiceCallback.answerConnectionRequest(userId, friendId, answer), "ConnectionService::answerConnectionRequest");
+        var result = doForDataService(() -> m_connectionServiceCallback.answerConnectionRequest(userId, friendId, answer, notificationId),
+                "ConnectionService::answerConnectionRequest");
 
         if (result.getStatusCode() == Status.OK)
         {
@@ -92,7 +97,22 @@ public class ConnectionService implements IConnectionService
             var friend = m_connectionServiceCallback.findUserByIdIfExist(friendId);
 
             var msg = format("%s %s your connection request!", user.getUsername(), answer ? "accepted" : "rejected");
-            sendNotificationToUser(user, friend, msg, "", "", "Update Connection Request");
+            if (!notificationId.isEmpty())
+                m_notificationServiceHelper.deleteNotificationById(notificationId);
+            else
+            {
+                System.out.println(user.getUserId().toString());
+                System.out.println(friend.getUserId().toString());
+                System.out.println(callofproject.dev.nosql.enums.NotificationDataType.CONNECTION_REQUEST);
+
+                var notification = m_notificationServiceHelper.findByUserIdAndNotificationDataType(friend.getUserId(), user.getUserId(),
+                        callofproject.dev.nosql.enums.NotificationDataType.CONNECTION_REQUEST);
+                notification.ifPresent(value -> m_notificationServiceHelper.deleteNotificationById(value.getId()));
+
+                if (notification.isEmpty())
+                    System.out.println("Notification is empty");
+            }
+            sendNotificationToUser(user, friend, msg, "", "", "Update Connection Request", true);
         }
 
         return result;
@@ -173,7 +193,7 @@ public class ConnectionService implements IConnectionService
         return doForDataService(() -> m_connectionServiceCallback.getBlockedConnectionsByUserId(userId), "ConnectionService::getBlockedConnectionsByUserId");
     }
 
-    private void sendNotificationToUser(User user, User owner, String message, String approvalLink, String rejectLink, String title)
+    private void sendNotificationToUser(User user, User owner, String message, String approvalLink, String rejectLink, String title, boolean isAnswer)
     {
         var notificationMessage = new NotificationKafkaDTO.Builder()
                 .setFromUserId(user.getUserId())
@@ -183,7 +203,7 @@ public class ConnectionService implements IConnectionService
                 .setNotificationLink("none")
                 .setNotificationImage(null)
                 .setNotificationTitle(title)
-                .setNotificationDataType(NotificationDataType.REQUEST)
+                .setNotificationDataType(isAnswer ? NotificationDataType.COMMUNITY : CONNECTION_REQUEST)
                 .setApproveLink(approvalLink)
                 .setRejectLink(rejectLink)
                 .build();

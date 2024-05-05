@@ -140,4 +140,13 @@ public interface IUserManagementService
      * @return user tags.
      */
     ResponseMessage<Object> deleteUserTag(UUID userId, UUID tagId);
+
+    /**
+     * Create User Tag with given tag name and user id.
+     *
+     * @param tagName represent the tag name.
+     * @param userId  represent the user id.
+     * @return user tags.
+     */
+    ResponseMessage<Object> createUserTag(String tagName, UUID userId);
 }

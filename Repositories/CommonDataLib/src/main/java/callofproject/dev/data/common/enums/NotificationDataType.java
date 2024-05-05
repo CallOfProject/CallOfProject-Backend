@@ -6,6 +6,7 @@ public enum NotificationDataType {
     TASK,
     INTERVIEW,
     REQUEST,
+    CONNECTION_REQUEST,
     USER,
     MATCH,
     PROJECT_TAG,

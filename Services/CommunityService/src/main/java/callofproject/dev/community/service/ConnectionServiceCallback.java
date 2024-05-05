@@ -68,7 +68,7 @@ public class ConnectionServiceCallback
      * @param answer   the answer
      * @return the response message
      */
-    public ResponseMessage<Object> answerConnectionRequest(UUID userId, UUID friendId, boolean answer)
+    public ResponseMessage<Object> answerConnectionRequest(UUID userId, UUID friendId, boolean answer, String notificationId)
     {
         var user = findUserByIdIfExist(friendId);
         var friend = findUserByIdIfExist(userId);
@@ -94,7 +94,6 @@ public class ConnectionServiceCallback
         // Update users
         m_communityServiceHelper.upsertUser(user);
         m_communityServiceHelper.upsertUser(friend);
-
         return new ResponseMessage<>("Connection request answered is: " + answer, Status.OK, answer);
     }
 
@@ -128,7 +127,6 @@ public class ConnectionServiceCallback
 
         m_communityServiceHelper.upsertUserConnection(con1.get());
         m_communityServiceHelper.upsertUserConnection(con2.get());*/
-
 
 
         return new ResponseMessage<>("Connection removed successfully", Status.OK, true);
@@ -216,9 +214,13 @@ public class ConnectionServiceCallback
     public MultipleResponseMessagePageable<Object> getConnectionRequestsByUserId(UUID userId)
     {
         var user = findUserByIdIfExist(userId);
-        var connectionRequests = m_userMapper.toUsersDTO(user.getConnectionRequests()
-                .stream().map(ConnectionRequest::getRequestee)
-                .map(m_userMapper::toUserDTO).toList());
+
+        var requests = toStream(m_communityServiceHelper.findConnectionRequestsByUserId(userId))
+                .map(ConnectionRequest::getRequester)
+                .map(m_userMapper::toUserDTO)
+                .toList();
+
+        var connectionRequests = m_userMapper.toUsersDTO(requests);
 
         return new MultipleResponseMessagePageable<>(1, 1, connectionRequests.users().size(), "Connection Requests retrieved successfully", connectionRequests);
     }

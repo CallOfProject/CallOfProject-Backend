@@ -1,12 +1,14 @@
 package callofproject.dev.nosql.dal;
 
 import callofproject.dev.nosql.entity.Notification;
+import callofproject.dev.nosql.enums.NotificationDataType;
 import callofproject.dev.nosql.repository.INotificationRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static callofproject.dev.library.exception.util.CopDataUtil.doForRepository;
@@ -151,5 +153,20 @@ public class NotificationServiceHelper
     {
         return doForRepository(() -> m_notificationRepository.findAllReadNotificationsByNotificationOwnerId(ownerId),
                 "NotificationServiceHelper::findAllNotificationsByNotificationOwnerId");
+    }
+
+
+    /**
+     * Find all notifications by user id and notification data type
+     *
+     * @param from                 from user id
+     * @param to                   to user id
+     * @param notificationDataType notification data type
+     * @return boolean value
+     */
+    public Optional<Notification> findByUserIdAndNotificationDataType(UUID from, UUID to, NotificationDataType notificationDataType)
+    {
+        return doForRepository(() -> m_notificationRepository.findByFromUserIdAndNotificationOwnerIdAndNotificationDataType(from, to, notificationDataType),
+                "NotificationServiceHelper::findAllByUserIdAndNotificationDataType");
     }
 }

@@ -29,7 +29,7 @@ public interface IConnectionService
      * @param answer    the answer
      * @return the response message
      */
-    ResponseMessage<Object> answerConnectionRequest(UUID requestId, UUID friendId, boolean answer);
+    ResponseMessage<Object> answerConnectionRequest(UUID requestId, UUID friendId, boolean answer, String notificationId);
 
     /**
      * Remove connection response message.

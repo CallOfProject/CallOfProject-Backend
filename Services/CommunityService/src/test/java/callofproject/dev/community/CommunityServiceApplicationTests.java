@@ -65,7 +65,7 @@ class CommunityServiceApplicationTests
         assertTrue((Boolean) request.getObject());
 
         // Accept connection request
-        var answer = m_injection.getConnectionService().answerConnectionRequest(user1.getUserId(), user2.getUserId(), true);
+        var answer = m_injection.getConnectionService().answerConnectionRequest(user1.getUserId(), user2.getUserId(), true, null);
         assertNotNull(answer);
         assertEquals(Status.OK, answer.getStatusCode());
         assertTrue((Boolean) answer.getObject());
@@ -94,7 +94,7 @@ class CommunityServiceApplicationTests
         assertTrue((Boolean) request.getObject());
 
         // Accept connection request
-        var answer = m_injection.getConnectionService().answerConnectionRequest(user1.getUserId(), user2.getUserId(), false);
+        var answer = m_injection.getConnectionService().answerConnectionRequest(user1.getUserId(), user2.getUserId(), false, null);
         assertNotNull(answer);
         assertEquals(Status.OK, answer.getStatusCode());
         assertFalse((Boolean) answer.getObject());
@@ -115,7 +115,7 @@ class CommunityServiceApplicationTests
     @Test
     void testAnswerConnectionRequest_withGivenInvalidUserIdsAndAnswer_shouldThrowDataServiceException()
     {
-        assertThrows(DataServiceException.class, () -> m_injection.getConnectionService().answerConnectionRequest(UUID.randomUUID(), UUID.randomUUID(), true));
+        assertThrows(DataServiceException.class, () -> m_injection.getConnectionService().answerConnectionRequest(UUID.randomUUID(), UUID.randomUUID(), true, null));
     }
 
     @Test
@@ -128,7 +128,7 @@ class CommunityServiceApplicationTests
         assertTrue((Boolean) request.getObject());
 
         // Accept connection request
-        var answer = m_injection.getConnectionService().answerConnectionRequest(user1.getUserId(), user2.getUserId(), true);
+        var answer = m_injection.getConnectionService().answerConnectionRequest(user1.getUserId(), user2.getUserId(), true, null);
         assertNotNull(answer);
         assertEquals(Status.OK, answer.getStatusCode());
         assertTrue((Boolean) answer.getObject());
@@ -175,7 +175,7 @@ class CommunityServiceApplicationTests
         assertTrue((Boolean) request.getObject());
 
         // Accept connection request
-        var answer = m_injection.getConnectionService().answerConnectionRequest(user1.getUserId(), user2.getUserId(), true);
+        var answer = m_injection.getConnectionService().answerConnectionRequest(user1.getUserId(), user2.getUserId(), true, null);
         assertNotNull(answer);
         assertEquals(Status.OK, answer.getStatusCode());
         assertTrue((Boolean) answer.getObject());

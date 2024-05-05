@@ -1,6 +1,7 @@
 package callofproject.dev.nosql.repository;
 
 import callofproject.dev.nosql.entity.Notification;
+import callofproject.dev.nosql.enums.NotificationDataType;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +9,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -32,4 +34,8 @@ public interface INotificationRepository extends MongoRepository<Notification, U
     @Query("{ 'notificationOwnerId' : ?0, 'read' : true }")
     Iterable<Notification> findAllReadNotificationsByNotificationOwnerId(UUID ownerId);
 
+    //@Query("{'fromUserId' : ?0, 'notificationOwnerId': ?1, 'notificationDataType': ?2}")
+    //Optional<Notification> findByUserIdAndNotificationDataType(UUID from, UUID to, NotificationDataType notificationDataType);
+
+    Optional<Notification> findByFromUserIdAndNotificationOwnerIdAndNotificationDataType(UUID from, UUID to, NotificationDataType notificationDataType);
 }

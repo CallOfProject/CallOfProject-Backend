@@ -53,8 +53,6 @@ public class UserManagementService implements IUserManagementService
     }
 
 
-
-
     @Override
     public ResponseMessage<UserSaveDTO> saveUserForMobile(UserSignUpRequestDTO userDTO)
     {
@@ -189,5 +187,11 @@ public class UserManagementService implements IUserManagementService
     public ResponseMessage<Object> deleteUserTag(UUID userId, UUID tagId)
     {
         return doForDataService(() -> m_serviceCallback.deleteUserTagCallback(userId, tagId), "UserManagementService::deleteUserTag");
+    }
+
+    @Override
+    public ResponseMessage<Object> createUserTag(String tagName, UUID userId)
+    {
+        return doForDataService(() -> m_serviceCallback.createUserTagCallback(tagName, userId), "UserManagementService::createUserTag");
     }
 }

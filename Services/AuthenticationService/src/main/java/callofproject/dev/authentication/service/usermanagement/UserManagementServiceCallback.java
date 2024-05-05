@@ -447,4 +447,24 @@ public class UserManagementServiceCallback
 
         return new ResponseMessage<>("User tag deleted successfully!", 200, m_mapperConfig.userTagMapper.toUserTagDTO(tag.get()));
     }
+
+    public ResponseMessage<Object> createUserTagCallback(String tagName, UUID userId)
+    {
+        var user = getUserIfExists(userId);
+        var userTags = user.getUserProfile().getTagList();
+
+        if (userTags.stream().anyMatch(tag -> tag.getTagName().equals(convert(tagName))))
+            return new ResponseMessage<>("User tag already exists!", 400, userTags.stream().map(m_mapperConfig.userTagMapper::toUserTagDTO).toList());
+
+        var tag = new UserTag(convert(tagName));
+        var savedTag = m_serviceHelper.getUserTagServiceHelper().saveUserTag(tag);
+
+        user.getUserProfile().addTag(savedTag);
+
+        var updatedUser = m_serviceHelper.getUserServiceHelper().saveUser(user);
+
+        //var tagsDTO = m_mapperConfig.userTagMapper.toUserTagsDTO(toListConcurrent(updatedUser.getUserProfile().getTagList(), m_mapperConfig.userTagMapper::toUserTagDTO));
+
+        return new ResponseMessage<>("User tag saved successfully!", 200, m_mapperConfig.userTagMapper.toUserTagDTO(savedTag));
+    }
 }
