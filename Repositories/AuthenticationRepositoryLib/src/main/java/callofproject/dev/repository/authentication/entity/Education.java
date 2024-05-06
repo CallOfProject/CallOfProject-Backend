@@ -15,17 +15,22 @@ public class Education
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "education_id")
     private UUID education_id;
+
     @Column(name = "university_id", nullable = false)
     private String universityId;
+
     @Column(name = "school_name", nullable = false, length = 80)
     private String schoolName;
+
     @Column(name = "department", nullable = false, length = 80)
     private String department;
+
     @Column(name = "description", nullable = false, length = 500)
     private String description;
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
+
     @Column(name = "finish_date", nullable = false)
     private LocalDate finishDate;
 
@@ -136,12 +141,12 @@ public class Education
         this.finishDate = finishDate;
     }
 
-    public boolean isContinue()
+    public boolean getIsContinue()
     {
         return isContinue;
     }
 
-    public void setContinue(boolean aContinue)
+    public void setIsContinue(boolean aContinue)
     {
         isContinue = aContinue;
     }

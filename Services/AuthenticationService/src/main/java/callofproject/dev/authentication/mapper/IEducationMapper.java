@@ -21,6 +21,7 @@ public interface IEducationMapper
      * @return An EducationDTO representing the mapped Education entity.
      */
     @Mapping(target = "educationId", source = "education.education_id")
+    @Mapping(target = "isContinue", source = "education.isContinue")
     EducationDTO toEducationDTO(Education education);
 
     /**

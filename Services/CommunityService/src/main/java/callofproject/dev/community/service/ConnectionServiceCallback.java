@@ -53,6 +53,12 @@ public class ConnectionServiceCallback
         var user = findUserByIdIfExist(userId);
         var friend = findUserByIdIfExist(friendId);
 
+        if (user.getConnections().stream().anyMatch(u -> u.getConnectedUser().getUserId().equals(friend.getUserId())))
+            return new ResponseMessage<>("Connection already exists", Status.NOT_ACCEPTED, false);
+
+        if (user.getConnectionRequests().stream().anyMatch(u -> u.getRequestee().getUserId().equals(friend.getUserId())))
+            return new ResponseMessage<>("Connection request already sent", Status.NOT_ACCEPTED, false);
+
         var connectionRequest = new ConnectionRequest(user, friend);
         user.addConnectionRequest(connectionRequest);
         m_communityServiceHelper.upsertUser(friend);

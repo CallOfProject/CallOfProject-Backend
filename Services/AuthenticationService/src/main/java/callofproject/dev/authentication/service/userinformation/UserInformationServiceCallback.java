@@ -117,7 +117,7 @@ public class UserInformationServiceCallback
         education.get().setDescription(dto.getDescription());
         education.get().setStartDate(dto.getStartDate());
         education.get().setFinishDate(dto.getFinishDate());
-        education.get().setContinue(dto.isContinue());
+        education.get().setIsContinue(dto.isContinue());
         education.get().setGpa(dto.getGpa());
 
         var updatedEducation = m_serviceHelper.getEducationServiceHelper().saveEducation(education.get());
