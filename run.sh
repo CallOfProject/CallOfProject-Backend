@@ -2,11 +2,6 @@
 BASE_DIR=$(pwd)
 TARGET_DIR=$1
 
-if [[ "$OSTYPE" == "msys"* ]]; then
-    "$BASE_DIR\win_run.ps1 $TARGET_DIR"
-    exit 0
-fi
-
 
 pid_file="$BASE_DIR/service_pids.txt"
 rm -f "$pid_file"

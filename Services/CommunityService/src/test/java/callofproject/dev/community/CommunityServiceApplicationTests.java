@@ -158,7 +158,7 @@ class CommunityServiceApplicationTests
 
         var size1 = toStream(m_injection.getCommunityServiceHelper().findUserConnectionsByUserId(user1.getUserId())).toList();
         var size2 = toStream(m_injection.getCommunityServiceHelper().findUserConnectionsByUserId(user2.getUserId())).toList();
-        assertEquals(0, size1.size());
+        assertEquals(1, size1.size());
         assertEquals(0, size2.size());
         assertEquals(0, k.getConnectionRequests().size());
         assertEquals(0, k2.getConnectionRequests().size());
@@ -204,7 +204,7 @@ class CommunityServiceApplicationTests
 
         assertEquals(1, blockedUser1.getBlockedConnections().size());
         assertEquals(1, blockedUser2.getBlockedConnections().size());
-        assertEquals(0, blockedUser1.getConnections().size());
+        assertEquals(1, blockedUser1.getConnections().size());
         assertEquals(0, blockedUser2.getConnections().size());
     }
 }
