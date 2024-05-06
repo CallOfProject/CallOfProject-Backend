@@ -24,7 +24,6 @@ if [ -d "$FULL_PATH" ]; then
     elif [ "$USER_INPUT" = "n" ]; then
         rm -rf "$FULL_PATH"
         echo "Folder removed successfully!: $FULL_PATH"
-        exit 1
     
     else
         echo "Invalid input. Please enter 'y' or 'n'."
