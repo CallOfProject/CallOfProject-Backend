@@ -42,7 +42,8 @@ public final class DataProvider
                 List.of(
                         new ProjectTag("Tag1", UUID.randomUUID()),
                         new ProjectTag("Tag2", UUID.randomUUID())
-                )
+                ),
+                null
         );
     }
 

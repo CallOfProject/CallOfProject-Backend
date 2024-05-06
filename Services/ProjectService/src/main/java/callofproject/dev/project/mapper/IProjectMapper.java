@@ -42,6 +42,20 @@ public interface IProjectMapper
     ProjectOverviewDTO toProjectOverviewDTO(Project project, List<ProjectTag> projectTags);
 
     /**
+     * Maps a Project entity and a list of ProjectTag entities to a ProjectOverviewDTO.
+     *
+     * @param project     The Project entity to map.
+     * @param projectTags The list of ProjectTag entities.
+     * @return The mapped ProjectOverviewDTO.
+     */
+    @Mappings({
+            @Mapping(source = "project.projectOwner.username", target = "projectOwnerName"),
+            @Mapping(source = "project.projectName", target = "projectTitle"),
+            @Mapping(source = "projectsParticipantDTO.projectParticipants", target = "projectParticipants")
+    })
+    ProjectOverviewDTO toProjectOverviewDTO(Project project, List<ProjectTag> projectTags, ProjectsParticipantDTO projectsParticipantDTO);
+
+    /**
      * Wraps a list of ProjectOverviewDTOs into a ProjectOverviewsDTO.
      *
      * @param projectOverviewDTOs The list of ProjectOverviewDTOs.

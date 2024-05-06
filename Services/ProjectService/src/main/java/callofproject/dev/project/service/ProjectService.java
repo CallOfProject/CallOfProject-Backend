@@ -498,7 +498,8 @@ public class ProjectService implements IProjectService
 
         /*var img = m_s3Service.getImage(project.getProjectImagePath());
         project.setProjectImagePath(img);*/
-        var projectOverviewDTO = m_projectMapper.toProjectOverviewDTO(project, tags);
+
+        var projectOverviewDTO = m_projectMapper.toProjectOverviewDTO(project, tags, findProjectParticipantsDTOByProjectId(project));
 
         return new ResponseMessage<>("Project is found!", OK, projectOverviewDTO);
     }
