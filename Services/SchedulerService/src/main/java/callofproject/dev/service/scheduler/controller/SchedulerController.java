@@ -16,7 +16,8 @@ public class SchedulerController
     {
         m_schedulerServiceFacade = schedulerServiceFacade;
     }
-//api/scheduler/interview/test/check/started
+
+    //api/scheduler/interview/test/check/started
     @GetMapping("/interview/test/check/started")
     public ResponseEntity<String> checkStartedTestInterviews()
     {
@@ -87,5 +88,29 @@ public class SchedulerController
     public ResponseEntity<String> checkProjectStartDates()
     {
         return ResponseEntity.ok(m_schedulerServiceFacade.checkProjectStartDates());
+    }
+
+    @GetMapping("recommendation/projects/by-tags")
+    public ResponseEntity<String> recommendProjects()
+    {
+        return ResponseEntity.ok(m_schedulerServiceFacade.recommendProjects());
+    }
+
+    @GetMapping("match/users/by-tags")
+    public ResponseEntity<String> matchUsersByTags()
+    {
+        return ResponseEntity.ok(m_schedulerServiceFacade.matchUsersByTags());
+    }
+
+    @GetMapping("match/users/by-education")
+    public ResponseEntity<String> matchUsersByEducation()
+    {
+        return ResponseEntity.ok(m_schedulerServiceFacade.matchUsersByEducation());
+    }
+
+    @GetMapping("match/users/by-experience")
+    public ResponseEntity<String> matchUsersByExperience()
+    {
+        return ResponseEntity.ok(m_schedulerServiceFacade.matchUsersByExperience());
     }
 }

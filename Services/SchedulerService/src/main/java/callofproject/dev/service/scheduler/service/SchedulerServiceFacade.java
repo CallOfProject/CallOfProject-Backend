@@ -3,6 +3,8 @@ package callofproject.dev.service.scheduler.service;
 import callofproject.dev.service.scheduler.service.callback.InterviewSchedulerServiceCallback;
 import callofproject.dev.service.scheduler.service.callback.ProjectSchedulerServiceCallback;
 import callofproject.dev.service.scheduler.service.callback.TaskSchedulerServiceCallback;
+import callofproject.dev.service.scheduler.service.match.ProjectRecommendationService;
+import callofproject.dev.service.scheduler.service.match.UserMatchingService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -13,12 +15,18 @@ public class SchedulerServiceFacade
     private final InterviewSchedulerServiceCallback m_interviewSchedulerService;
     private final TaskSchedulerServiceCallback m_taskSchedulerService;
     private final ProjectSchedulerServiceCallback m_projectSchedulerService;
+    private final ProjectRecommendationService m_projectRecommendationService;
+    private final UserMatchingService m_userMatchingService;
 
-    public SchedulerServiceFacade(InterviewSchedulerServiceCallback interviewSchedulerService, TaskSchedulerServiceCallback taskSchedulerService, ProjectSchedulerServiceCallback projectSchedulerService)
+    public SchedulerServiceFacade(InterviewSchedulerServiceCallback interviewSchedulerService,
+                                  TaskSchedulerServiceCallback taskSchedulerService, ProjectSchedulerServiceCallback projectSchedulerService,
+                                  ProjectRecommendationService projectRecommendationService, UserMatchingService userMatchingService)
     {
         m_interviewSchedulerService = interviewSchedulerService;
         m_taskSchedulerService = taskSchedulerService;
         m_projectSchedulerService = projectSchedulerService;
+        m_projectRecommendationService = projectRecommendationService;
+        m_userMatchingService = userMatchingService;
     }
 
     public String checkStartedTestInterviews()
@@ -169,12 +177,63 @@ public class SchedulerServiceFacade
 
     public String checkProjectStartDates()
     {
-
         try
         {
             System.out.println("Checking project start dates");
             m_projectSchedulerService.checkProjectStartDates();
             return "'Check project start dates' scheduler is started.";
+        } catch (Throwable ex)
+        {
+            return ex.getMessage();
+        }
+    }
+
+    public String recommendProjects()
+    {
+        try
+        {
+            System.out.println("Checking recommend projects");
+            m_projectRecommendationService.recommendProjectsByUserTagsAndProjectTags();
+            return "'Recommend projects' scheduler is started.";
+        } catch (Throwable ex)
+        {
+            return ex.getMessage();
+        }
+    }
+
+    public String matchUsersByTags()
+    {
+        try
+        {
+            System.out.println("Checking match users by tags");
+            m_userMatchingService.matchUsersByTag();
+            return "'Match users by tags' scheduler is started.";
+        } catch (Throwable ex)
+        {
+            return ex.getMessage();
+        }
+    }
+
+    public String matchUsersByEducation()
+    {
+        try
+        {
+            System.out.println("Checking match users by education");
+            m_userMatchingService.matchUsersByEducation();
+            return "'Match users by education' scheduler is started.";
+        } catch (Throwable ex)
+        {
+            return ex.getMessage();
+        }
+    }
+
+    public String matchUsersByExperience()
+    {
+        try
+        {
+            System.out.println("Checking match users by experience");
+            m_userMatchingService.matchUsersByExperience();
+            return "'Match users by experience' scheduler is started.";
         } catch (Throwable ex)
         {
             return ex.getMessage();
