@@ -27,7 +27,7 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>, JpaSpe
     Page<Project> findAllParticipantProjectByUserId(@Param("userId") UUID userId, Pageable pageable);
 
     @Query("""
-            from Project where (m_projectStatus = 'NOT_STARTED' or m_projectStatus = 'IN_PROGRESS')
+            from Project where (m_projectStatus = 'NOT_STARTED' or m_projectStatus = 'IN_PROGRESS' or m_projectStatus = 'EXTEND_APPLICATION_FEEDBACK')
             and m_adminOperationStatus = 'ACTIVE'
             and m_projectAccessType = 'PUBLIC'
             and m_deletedAt is null
@@ -40,13 +40,13 @@ public interface IProjectRepository extends JpaRepository<Project, UUID>, JpaSpe
 
     Page<Project> findAllByApplicationDeadline(LocalDate date, Pageable pageable);
 
-    @Query("from Project where m_applicationDeadline = :date and (m_projectStatus = 'IN_PROGRESS' or m_projectStatus = 'NOT_STARTED') and m_deletedAt is null")
+    @Query("from Project where m_applicationDeadline = :date and (m_projectStatus = 'IN_PROGRESS' or m_projectStatus = 'NOT_STARTED' or m_projectStatus = 'EXTEND_APPLICATION_FEEDBACK') and m_deletedAt is null")
     List<Project> findAllByApplicationDeadline(LocalDate date);
 
-    @Query("from Project where m_expectedCompletionDate = :date and (m_projectStatus = 'IN_PROGRESS' or m_projectStatus = 'NOT_STARTED') and m_deletedAt is null")
+    @Query("from Project where m_expectedCompletionDate = :date and (m_projectStatus = 'IN_PROGRESS' or m_projectStatus = 'NOT_STARTED' or m_projectStatus = 'EXTEND_APPLICATION_FEEDBACK') and m_deletedAt is null")
     Page<Project> findAllByExpectedCompletionDate(LocalDate date, Pageable pageable);
 
-    @Query("from Project where m_expectedCompletionDate = :date and (m_projectStatus = 'IN_PROGRESS' or m_projectStatus = 'NOT_STARTED') and m_deletedAt is null")
+    @Query("from Project where m_expectedCompletionDate = :date and (m_projectStatus = 'IN_PROGRESS' or m_projectStatus = 'NOT_STARTED' or m_projectStatus = 'EXTEND_APPLICATION_FEEDBACK') and m_deletedAt is null")
     Iterable<Project> findAllByExpectedCompletionDate(LocalDate date);
 
     @Query("from Project where m_startDate = :date and m_projectStatus = 'NOT_STARTED'")
