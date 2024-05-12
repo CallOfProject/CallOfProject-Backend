@@ -11,7 +11,7 @@
 - [Used Technologies](#used-technologies-frameworks-environments)
 - [Services](#services)
   - [Detailed Descriptions](#detailed-descriptions)
-- [Other parts of Call-of-Project](#other-parts)
+- [Other parts](#others)
 - [Architecture Diagram](#architecture-diagram)
 - [ER Diagrams](#er-diagrams)
 - [Test Results](#test-results)
@@ -79,10 +79,8 @@ These services are independent and can operate as standalone applications, adher
 - **Environment Service**: A service where information such as school, course, and experience of users is processed. It is dependent on a NoSQL database.
 - **Filter and Search Service**: A service that performs search and filtering operations for users.
 
-## Other parts of Call-of-Project
-
+### Other parts
 For more information about the project, visit our repositories:
-
 - **Android:** [Call-of-Project-Android](https://github.com/CallOfProject/Call-Of-Project-Android)
 - **Interview:** [Call-of-Project-Interview](https://github.com/CallOfProject/Call-Of-Project-Interview)
 - **Admin Panel:** [Call-of-Project-Admin-Panel](https://github.com/CallOfProject/CallOfProject-AdminPanel)
