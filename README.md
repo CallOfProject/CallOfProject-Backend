@@ -11,7 +11,7 @@
 - [Used Technologies](#used-technologies-frameworks-environments)
 - [Services](#services)
   - [Detailed Descriptions](#detailed-descriptions)
-- [Other parts](#others)
+- [Other parts](#other-parts)
 - [Architecture Diagram](#architecture-diagram)
 - [ER Diagrams](#er-diagrams)
 - [Test Results](#test-results)
