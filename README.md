@@ -151,16 +151,16 @@ https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/135e0303
       - ```bash
         bash run.sh ~/Desktop/call-of-project
         ```
-  ### Killing Processes
-    - To terminate all associated processes on *Linux* or *macOS*, execute:
-      - ```bash
-          bash kill_all.sh
-        ```
+ ### Kill Processes:
+  - In macOs or Linux:
+  ```bash
+    bash kill_all.sh
+  ```
   ### Test:
   - In project directory:
-     - ```bash
-          bash run_tests.sh
-        ```
+  ```bash
+    bash run_tests.sh
+  ```
 
 # NOTES
 - Testing and bug fixing processes are ongoing...
