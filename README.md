@@ -1,5 +1,9 @@
 # Call-Of-Project Backend
-![cop_logo](https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/651d115b-fdbb-41c2-84b5-a6ad113d1088)
+
+<p float="left">
+<img width="250" src="https://github.com/CallOfProject/CallOfProject-Backend/assets/62218588/87934f02-647e-4741-b0bc-6b7edfb75e5d">
+<img width="250" src="https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/651d115b-fdbb-41c2-84b5-a6ad113d1088">
+</p>
 
 ### Author
 - **Author:** [Nuri Can ÖZTÜRK](https://github.com/nuricanozturk01)
