@@ -20,7 +20,7 @@
 - [ER Diagrams](#er-diagrams)
 - [Test Results](#test-results)
 - [Installation](#setup)
-- [NOTES](#notes)
+- [Project Load Test Results](#project-load-test-results)
 
 ## Javadoc Documentation
 - [Javadoc for some services](https://callofproject.github.io/Call-of-Project-API-Documentation/)
@@ -163,8 +163,24 @@ https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/135e0303
   ```bash
     bash run_tests.sh
   ```
+## Project Load Test Results
+This document summarizes the results of the load test conducted to assess the performance of our project.
 
-# NOTES
-- Testing and bug fixing processes are ongoing...
+### Test Details
+- **Test Date**: May 13, 2024
+- **Total Sessions**: 3994
+- **Test Duration**: 7 minutes 13 seconds
+- **Maximum Users**: 100
 
-- **Author:** Nuri Can ÖZTÜRK
+### Performance Metrics
+- **Average Response Time**: 0.4466 seconds
+- **90% Response Time**: 0.4889 seconds
+- **Maximum Response Time**: 0.794 seconds
+
+### Results
+The test results demonstrate that our system is high-performing and stable. With 100 users, we are able to maintain low response times, proving our commitment to optimizing user experience.
+
+These results provide a solid foundation for future scalability efforts. We aim to scale our system to support an increasing number of users in the future.
+
+- **References**
+  - [user-dotcom-monitor](https://user.dotcom-monitor.com/) Load Testing application. (FREE VERSION) (max: 100 USER)
