@@ -97,6 +97,8 @@ For more information about the project, visit our repositories:
 - ![app](https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/83e7a49b-6fe2-4c3b-89cc-0cd3e807f180)
  **Recommendation and Matching Service Diagram**
 - ![dark](https://github.com/CallOfProject/CallOfProject-Backend/assets/62218588/2c1f12f3-7bb9-4a97-9462-07da94745e5f)
+***Deployment Diagram**
+- ![deployment_diagram](https://github.com/CallOfProject/CallOfProject-Backend/assets/62218588/d25ef9ed-4e6a-464e-9c67-da5674ac81a5)
 
 ### ER Diagrams
 - ![community_db](https://github.com/CallOfProject/CallOfProject-Backend/assets/147416047/1465e756-7be7-411a-9cb2-84e42e6d3045)
