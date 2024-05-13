@@ -13,7 +13,12 @@
     <groupId>nuricanozturk.dev</groupId>
     <artifactId>task-service</artifactId>
     <version>1.0.0</version>
-
+    <repositories>
+        <repository>
+            <id>CallOfProject</id>
+            <url>https://raw.github.com/CallOfProject/CallOfProject-Maven-Repo/main</url>
+        </repository>
+    </repositories>
 
     <properties>
         <java.version>17</java.version>
