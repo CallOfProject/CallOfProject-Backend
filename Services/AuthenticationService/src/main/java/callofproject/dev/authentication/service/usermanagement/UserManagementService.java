@@ -1,10 +1,12 @@
 package callofproject.dev.authentication.service.usermanagement;
 
 
+import callofproject.dev.authentication.config.kafka.KafkaProducer;
 import callofproject.dev.authentication.dto.*;
 import callofproject.dev.data.common.clas.MultipleResponseMessagePageable;
 import callofproject.dev.data.common.clas.ResponseMessage;
 import callofproject.dev.repository.authentication.entity.User;
+import callofproject.dev.repository.authentication.entity.UserProfile;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,15 +25,18 @@ import static callofproject.dev.library.exception.util.CopDataUtil.doForDataServ
 public class UserManagementService implements IUserManagementService
 {
     private final UserManagementServiceCallback m_serviceCallback;
+    private final KafkaProducer m_kafkaProducer;
 
     /**
      * Instantiates a new User management service.
      *
      * @param serviceCallback the service callback
+     * @param kafkaProducer   the kafka producer
      */
-    public UserManagementService(UserManagementServiceCallback serviceCallback)
+    public UserManagementService(UserManagementServiceCallback serviceCallback, KafkaProducer kafkaProducer)
     {
         m_serviceCallback = serviceCallback;
+        m_kafkaProducer = kafkaProducer;
     }
 
 
@@ -47,7 +52,7 @@ public class UserManagementService implements IUserManagementService
         var result = doForDataService(() -> m_serviceCallback.saveUserCallback(userDTO), "User cannot be saved!");
 
         if (result.getStatusCode() == 200)
-            m_serviceCallback.PublishUser(result.getObject().userId());
+            m_serviceCallback.publishUserForCreate(result.getObject().userId());
 
         return result;
     }
@@ -59,7 +64,7 @@ public class UserManagementService implements IUserManagementService
         var result = doForDataService(() -> m_serviceCallback.saveUserForMobileCallback(userDTO), "User cannot be saved!");
 
         if (result.getStatusCode() == 200)
-            m_serviceCallback.PublishUser(result.getObject().userId());
+            m_serviceCallback.publishUserForUpdate(result.getObject().userId());
 
         return result;
     }
@@ -162,7 +167,12 @@ public class UserManagementService implements IUserManagementService
     @Override
     public ResponseMessage<Object> uploadUserProfilePhoto(UUID userId, MultipartFile file)
     {
-        return doForDataService(() -> m_serviceCallback.uploadUserProfilePhotoCallback(userId, file), "UserManagementService::uploadUserProfilePhoto");
+        var profile = doForDataService(() -> m_serviceCallback.uploadUserProfilePhotoCallback(userId, file),
+                "UserManagementService::uploadUserProfilePhoto");
+
+        if (profile.getStatusCode() == 200)
+            m_serviceCallback.publishUserForCreate(userId);
+        return new ResponseMessage<>(profile.getMessage(), profile.getStatusCode(), ((UserProfile) profile.getObject()).getProfilePhoto());
     }
 
     @Override

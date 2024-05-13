@@ -252,12 +252,28 @@ public class UserManagementServiceCallback
      *
      * @param uuid represent the uuid
      */
-    public void PublishUser(UUID uuid)
+    public void publishUserForCreate(UUID uuid)
     {
         var user = getUserIfExists(uuid);
 
         var kafkaMessage = new UserKafkaDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(),
                 user.getMiddleName(), user.getLastName(), EOperation.CREATE, user.getPassword(), user.getRoles(),
+                user.getDeleteAt(), 0, 0, 0, user.getUserProfile().getProfilePhoto());
+
+        m_userProducer.sendMessage(kafkaMessage);
+    }
+
+    /**
+     * publish user to kafka for update
+     *
+     * @param uuid represent the uuid
+     */
+    public void publishUserForUpdate(UUID uuid)
+    {
+        var user = getUserIfExists(uuid);
+
+        var kafkaMessage = new UserKafkaDTO(user.getUserId(), user.getUsername(), user.getEmail(), user.getFirstName(),
+                user.getMiddleName(), user.getLastName(), EOperation.UPDATE, user.getPassword(), user.getRoles(),
                 user.getDeleteAt(), 0, 0, 0, user.getUserProfile().getProfilePhoto());
 
         m_userProducer.sendMessage(kafkaMessage);
@@ -360,9 +376,9 @@ public class UserManagementServiceCallback
 
         user.getUserProfile().setProfilePhoto(profilePhotoUrl);
 
-        m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(user.getUserProfile());
+        var updatedProfile = m_serviceHelper.getUserProfileServiceHelper().saveUserProfile(user.getUserProfile());
 
-        return new ResponseMessage<>("Profile photo uploaded successfully!", 200, profilePhotoUrl);
+        return new ResponseMessage<>("Profile photo uploaded successfully!", 200, updatedProfile);
     }
 
     public ResponseMessage<Object> uploadUserCvCallback(UUID userId, MultipartFile cvFile)

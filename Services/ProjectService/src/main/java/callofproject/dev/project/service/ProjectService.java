@@ -425,13 +425,13 @@ public class ProjectService implements IProjectService
         if (user.getProjects().stream().map(Project::getProjectId).anyMatch(project.getProjectId()::equals))
             return new ResponseMessage<>("You are owner of project!", NOT_ACCEPTED, null);
 
-        // If user is already joined to project then return error message.
-        if (user.getProjectParticipants().stream().map(ProjectParticipant::getProjectId).anyMatch(project.getProjectId()::equals))
-            return new ResponseMessage<>("you are participant of project already!", NOT_ACCEPTED, null);
-
         // If user sent request already then return error message.
-        if (user.getProjectParticipantRequests().stream().map(p -> p.getProject().getProjectId()).anyMatch(project.getProjectId()::equals))
+        if (user.getProjectParticipantRequests().stream().anyMatch(pr -> pr.getProject().getProjectId().equals(project.getProjectId())))
             return new ResponseMessage<>("you sent request already!", NOT_ACCEPTED, null);
+
+        // If user is already joined to project then return error message.
+        if (project.getProjectParticipants().stream().anyMatch(pp -> pp.getUser().getUserId().equals(user.getUserId())))
+            return new ResponseMessage<>("you are participant of project already!", NOT_ACCEPTED, null);
 
         // If user participant project count is greater than or equals to max participant project count then return error message.
         if (user.getParticipantProjectCount() >= Policy.MAX_PARTICIPANT_PROJECT_COUNT)
@@ -954,7 +954,8 @@ public class ProjectService implements IProjectService
             if (m_tagServiceHelper.existsByTagNameContainsIgnoreCase(tagName)) // If tag already exists then save project tag
             {
                 m_projectTagServiceHelper.saveProjectTag(new ProjectTag(tagName, savedProject.getProjectId()));
-            } else // If tag not exists then save tag and project tag
+            }
+            else // If tag not exists then save tag and project tag
             {
                 m_tagServiceHelper.saveTag(new Tag(tagName));
                 m_projectTagServiceHelper.saveProjectTag(new ProjectTag(tagName, savedProject.getProjectId()));

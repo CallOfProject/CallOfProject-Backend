@@ -16,7 +16,7 @@ public record CreateCodingInterviewDTO(
         int point,
         @JsonProperty("project_id")
         UUID projectId,
-        @JsonProperty("start_time")
+        @JsonProperty("start_time") // 10/05/2022 12:00:00
         @JsonFormat(pattern = "dd/MM/yyyy kk:mm:ss")
         LocalDateTime startTime,
         @JsonProperty("end_time")
