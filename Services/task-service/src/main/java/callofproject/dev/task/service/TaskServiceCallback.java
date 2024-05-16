@@ -86,10 +86,18 @@ public class TaskServiceCallback
         var project = findProjectByIdIfExist(createTaskDTO.projectId());
         // Find users by ids
         var users = toStream(m_taskServiceHelper.findUsersByIds(createTaskDTO.userIds())).collect(toSet());
+
         // Convert CreateTaskDTO to Task object
         var taskObj = m_taskMapper.toTask(createTaskDTO, project, users);
+
         // Save task
         var savedTask = m_taskServiceHelper.saveTask(taskObj);
+
+        // save tasks to users
+
+        users.forEach(user -> user.getAssignedTasks().add(savedTask));
+
+        users.forEach(m_taskServiceHelper::saveUser);
 
         return new ResponseMessage<>("Task created successfully", Status.CREATED, savedTask);
     }
@@ -164,7 +172,8 @@ public class TaskServiceCallback
             throw new DataServiceException("User not found");
 
         // Remove user from task
-        task.getAssignees().remove(user.get());
+        task.getAssignees().removeIf(u -> u.getUserId().equals(userId));
+        user.get().getAssignedTasks().removeIf(t -> t.getTaskId().equals(taskId));
 
         // Save task
         var savedTask = m_taskServiceHelper.saveTask(task);
